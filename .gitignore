@@ -41,6 +41,15 @@ local.sbt
 *.springBeans
 
 #C++
-*.vcxproj
 *.user
 *.filters
+moc_*
+ui_*
+*.log
+*.pdb
+build*
+*.db
+*.opendb
+/x64
+/UAVManage/x64
+/.vs
