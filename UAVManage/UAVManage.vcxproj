@@ -61,11 +61,22 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <LanguageStandard>Default</LanguageStandard>
+      <LanguageStandard_C>stdc11</LanguageStandard_C>
+      <AdditionalIncludeDirectories>.\mavlink1-c\common;.\mavlink1-c;.\libhv\include;.\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>HV_STATICLIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <Link>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <PreprocessorDefinitions>HV_STATICLIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>.\mavlink1-c\common;.\mavlink1-c\;.\libhv\include;.\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="Configuration">
@@ -105,6 +116,7 @@
     <ClCompile Include="adddevicedialog.cpp" />
     <ClCompile Include="devicecontrol.cpp" />
     <ClCompile Include="devicemanage.cpp" />
+    <ClCompile Include="resendmessage.cpp" />
     <ClCompile Include="setdevicedialog.cpp" />
     <ClCompile Include="uavmanage.cpp" />
     <ClCompile Include="main.cpp" />
@@ -120,6 +132,11 @@
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="setdevicedialog.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="libhvsetting.h" />
+    <ClInclude Include="mavlinksetting.h" />
+    <QtMoc Include="resendmessage.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

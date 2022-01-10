@@ -1,5 +1,6 @@
 #include "uavmanage.h"
 #include <QtWidgets/QApplication>
+#include <QDebug>
 
 int main(int argc, char *argv[])
 {

@@ -43,6 +43,8 @@ private:
 	DeviceControl* getCurrentDevice();
 private:
 	Ui::DeviceManage ui;
-	QStringList m_listDeviceNames;
+	//已记录的设备，名称及IP不可以重复
+	//QMap<QString, _tagDeviceProperty> m_mapDevices;
+	//设备菜单
 	QMenu* m_pMenu;
 };
