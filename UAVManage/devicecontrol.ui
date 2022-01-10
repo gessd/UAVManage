@@ -57,14 +57,14 @@
      <item>
       <widget class="QLabel" name="labelConnect">
        <property name="text">
-        <string>连接</string>
+        <string>未连接</string>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QLabel" name="labelStatus">
        <property name="text">
-        <string>状态</string>
+        <string>心跳</string>
        </property>
       </widget>
      </item>

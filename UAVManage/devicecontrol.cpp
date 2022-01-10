@@ -36,6 +36,7 @@ QString DeviceControl::getIP()
 
 void DeviceControl::setIp(QString ip)
 {
+	//此处会连接设备,如果无法连接则耗时比较长
 	if (m_qstrIP == ip) return;
 	m_qstrIP = ip;
 	disconnectDevice();
@@ -60,6 +61,8 @@ QList<float> DeviceControl::getStartLocation()
 //连接设备
 bool DeviceControl::connectDevice()
 {
+	//无论是否连接，需要先把上一次的tcp对象删除后重建，否则造成崩溃
+	disconnectDevice();
 	if (nullptr == m_pHvTcpClient) m_pHvTcpClient = new hv::TcpClient;
 	if (nullptr == m_pHvTcpClient) return false;
 	int connfd = m_pHvTcpClient->createsocket(_DevicePort_, m_qstrIP.toLatin1());

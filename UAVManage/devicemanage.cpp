@@ -2,6 +2,7 @@
 #include "qmath.h"
 #include <QMessageBox>
 #include <QInputDialog>
+#include <QDebug>
 
 #define _DeviceNamePrefix_ "无人机"
 #define _ItemHeight_ 60
@@ -10,7 +11,33 @@ DeviceManage::DeviceManage(QWidget *parent)
 {
 	ui.setupUi(this);
 	
-	//右键菜单
+	//设置设备列表
+	ui.listWidget->installEventFilter(this);
+	connect(ui.listWidget, &QListWidget::itemPressed, [this](QListWidgetItem* item) {qDebug() << "--list itemPressed"; });
+	connect(ui.listWidget, &QListWidget::itemClicked, [this](QListWidgetItem* item) {qDebug() << "--list itemClicked"; });
+	connect(ui.listWidget, &QListWidget::itemDoubleClicked, [this](QListWidgetItem* item) {qDebug() << "--list itemDoubleClicked"; });
+	connect(ui.listWidget, &QListWidget::itemActivated, [this](QListWidgetItem* item) {qDebug() << "--list itemActivated"; });
+	connect(ui.listWidget, &QListWidget::itemEntered, [this](QListWidgetItem* item) {qDebug() << "--list itemEntered"; });
+	connect(ui.listWidget, &QListWidget::itemChanged, [this](QListWidgetItem* item) {qDebug() << "--list itemChanged"; });
+	connect(ui.listWidget, &QListWidget::currentItemChanged, [this](QListWidgetItem* current, QListWidgetItem* previous) {
+		qDebug() << "--list currentItemChanged" << current; 
+		QString name;
+		QString previousname;
+		if (current) {
+			DeviceControl* pControl = dynamic_cast<DeviceControl*>(current);
+			if (pControl) name = pControl->getName();
+		}
+		if (current) {
+			DeviceControl* pControl = dynamic_cast<DeviceControl*>(previous);
+			if (pControl) previousname = pControl->getName();
+		}
+		emit currentDeviceNameChanged(name, previousname);
+		});
+	connect(ui.listWidget, &QListWidget::currentTextChanged, [this](const QString& currentText) {qDebug() << "--list currentTextChanged" << currentText; });
+	connect(ui.listWidget, &QListWidget::currentRowChanged, [this](int currentRow) {qDebug() << "--list currentRowChanged" << currentRow; });
+	connect(ui.listWidget, &QListWidget::itemSelectionChanged, [this]() {qDebug() << "--list itemSelectionChanged"; });
+
+	//添加右键菜单
 	m_pMenu = new QMenu(this);
 	QAction* pActionResetName = new QAction(tr("重命名"), this);
 	QAction* pActionResetIP = new QAction(tr("修改IP"), this);
@@ -20,7 +47,6 @@ DeviceManage::DeviceManage(QWidget *parent)
 	m_pMenu->addAction(pActionResetIP);
 	m_pMenu->addAction(pActionDicconnect);
 	m_pMenu->addAction(pFlyTo);
-	ui.listWidget->installEventFilter(this);
 	//菜单响应处理
 	connect(pActionResetName, &QAction::triggered, [this](bool checked) {
 		DeviceControl* pControl = getCurrentDevice();
@@ -63,6 +89,8 @@ DeviceManage::DeviceManage(QWidget *parent)
 		addDevice(dialog.getName(), dialog.getIP());
 		});
 	connect(ui.btnRemoveDevice, &QAbstractButton::clicked, [this]() { removeDevice(); });
+
+
 }
 
 DeviceManage::~DeviceManage()
@@ -81,7 +109,9 @@ bool DeviceManage::addDevice(QString qstrName, QString ip)
 	QListWidgetItem* item = new QListWidgetItem();
 	item->setSizeHint(QSize(0, _ItemHeight_));
 	ui.listWidget->addItem(item);
-	ui.listWidget->setItemWidget(item, new DeviceControl(qstrName, ip));
+	//此处会耗时
+	DeviceControl* pControl = new DeviceControl(qstrName, ip);
+	ui.listWidget->setItemWidget(item, pControl);
 	ui.listWidget->setCurrentItem(item);
 	return true;
 }
@@ -96,6 +126,18 @@ void DeviceManage::removeDevice()
 	DeviceControl* m_pControl = dynamic_cast<DeviceControl*>(ui.listWidget->itemWidget(item));
 	if (!m_pControl) return;
 	ui.listWidget->takeItem(ui.listWidget->currentRow());
+}
+
+void DeviceManage::clearDevice()
+{
+	ui.listWidget->clear();
+}
+
+QString DeviceManage::getCurrentDeviceName()
+{
+	DeviceControl* pControl = getCurrentDevice();
+	if (!pControl) return "";
+	return pControl->getName();
 }
 
 //获取可用的新设备名称

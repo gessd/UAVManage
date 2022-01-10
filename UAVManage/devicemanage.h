@@ -27,6 +27,14 @@ public:
 	*/
 	void removeDevice();
 	/**
+	 * @brief 清空所有设备
+	 */
+	void clearDevice();
+	/**
+	 * @brief 获取当前设备名
+	 */
+	QString getCurrentDeviceName();
+	/**
 	* @brief 获取新的可用的设备名称,因设备名称不可重复
 	* @return 按顺序返回设备名称
 	*/
@@ -37,6 +45,8 @@ public:
 	* @return 如果和已存在的设备名称重复返回TRUE
 	*/
 	bool isRepetitionName(QString qstrName);
+signals:
+	void currentDeviceNameChanged(QString currentName, QString previousName);
 protected:
 	virtual bool eventFilter(QObject* watched, QEvent* event);
 private:

@@ -1,0 +1,11 @@
+
+QAbstractButton{
+    color:rgb(255,255,255);
+    background:rgb(199,202,214);
+}
+QAbstractButton:hover{
+    background:rgb(165,167,181);
+}
+QAbstractButton:pressed{
+    background:rgb(136,138,149);
+}
