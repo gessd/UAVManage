@@ -6,6 +6,7 @@
 #define _ProjectSuffix  ".qz"
 //默认项目名称
 #define _ProjectName    "temp"
+#define _ProjectDirName_ "/code/"
 
 //设备名称前缀
 #define _DeviceNamePrefix_ "无人机"

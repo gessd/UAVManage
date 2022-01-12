@@ -52,6 +52,9 @@ public:
 	*/
 	bool isRepetitionName(QString qstrName);
 signals:
+	void deviceAddFinished(QString qstrName, QString ip, float x, float y);
+	void deviceRemoveFinished(QString qstrName);
+	void deviceRenameFinished(QString newName, QString oldName);
 	void currentDeviceNameChanged(QString currentName, QString previousName);
 protected:
 	virtual bool eventFilter(QObject* watched, QEvent* event);

@@ -24,11 +24,11 @@ DeviceManage::DeviceManage(QWidget *parent)
 		QString name;
 		QString previousname;
 		if (current) {
-			DeviceControl* pControl = dynamic_cast<DeviceControl*>(current);
+			DeviceControl* pControl = dynamic_cast<DeviceControl*>(ui.listWidget->itemWidget(current));
 			if (pControl) name = pControl->getName();
 		}
-		if (current) {
-			DeviceControl* pControl = dynamic_cast<DeviceControl*>(previous);
+		if (previous) {
+			DeviceControl* pControl = dynamic_cast<DeviceControl*>(ui.listWidget->itemWidget(previous));
 			if (pControl) previousname = pControl->getName();
 		}
 		emit currentDeviceNameChanged(name, previousname);
@@ -59,6 +59,7 @@ DeviceManage::DeviceManage(QWidget *parent)
 			return;
 		}
 		pControl->setName(qstrNewName);
+		emit deviceRenameFinished(qstrNewName, qstrOldName);
 		});
 	connect(pActionResetIP, &QAction::triggered, [this](bool checked) {
 		DeviceControl* pControl = getCurrentDevice();
@@ -120,6 +121,7 @@ QString DeviceManage::addDevice(QString qstrName, QString ip, float x, float y)
 	DeviceControl* pControl = new DeviceControl(qstrName, x, y, ip);
 	ui.listWidget->setItemWidget(item, pControl);
 	ui.listWidget->setCurrentItem(item);
+	emit deviceAddFinished(qstrName, ip, x, y);
 	return "";
 }
 
@@ -132,7 +134,9 @@ void DeviceManage::removeDevice()
 	if (!item) item = ui.listWidget->item(count - 1);
 	DeviceControl* m_pControl = dynamic_cast<DeviceControl*>(ui.listWidget->itemWidget(item));
 	if (!m_pControl) return;
+	QString name = m_pControl->getName();
 	ui.listWidget->takeItem(ui.listWidget->currentRow());
+	emit deviceRemoveFinished(name);
 }
 
 void DeviceManage::clearDevice()

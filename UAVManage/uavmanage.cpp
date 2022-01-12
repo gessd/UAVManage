@@ -36,6 +36,9 @@ UAVManage::UAVManage(QWidget *parent)
 	m_pDeviceManage->setMaximumWidth(200);
     ui.gridLayoutMain->addWidget(m_pDeviceManage, 0,1);
 	connect(m_pDeviceManage, SIGNAL(currentDeviceNameChanged(QString, QString)), this, SLOT(onCurrentDeviceNameChanged(QString, QString)));
+	connect(m_pDeviceManage, SIGNAL(deviceAddFinished(QString, QString, float, float)), this, SLOT(onDeviceAdd(QString, QString, float, float)));
+	connect(m_pDeviceManage, SIGNAL(deviceRemoveFinished(QString)), this, SLOT(onDeviceRemove(QString)));
+	connect(m_pDeviceManage, SIGNAL(deviceRenameFinished(QString, QString)), this, SLOT(onDeviceRename(QString, QString)));
 
 	//添加菜单
 	QStyle* style = QApplication::style();
@@ -82,17 +85,38 @@ void UAVManage::updateStyle()
 	}
 }
 
-void UAVManage::updateWeb()
+void UAVManage::loadWeb()
 {
 	QString qstrUrl = "file:///" + QApplication::applicationDirPath() + "/blockly_dev/blockly_dev/code/index.html";
 	ui.webEngineView->load(QUrl(qstrUrl));
 }
 
+QString UAVManage::getCurrentBlocklyFile()
+{
+	if(m_qstrCurrentProjectFile.isEmpty() || !m_pDeviceManage) return QString();
+	QString name = m_pDeviceManage->getCurrentDeviceName();
+	if (name.isEmpty()) return QString();
+	QFileInfo info(m_qstrCurrentProjectFile);
+	QString path = info.path();
+	return QString("%1%2%3.blockly").arg(path).arg(_ProjectDirName_).arg(name);
+}
+
+QString UAVManage::getCurrentPythonFile()
+{
+	if (m_qstrCurrentProjectFile.isEmpty() || !m_pDeviceManage) return QString();
+	QString name = m_pDeviceManage->getCurrentDeviceName();
+	if (name.isEmpty()) return QString();
+	QFileInfo info(m_qstrCurrentProjectFile);
+	QString path = info.path();
+	return QString("%1%2%3.py").arg(path).arg(_ProjectDirName_).arg(name);
+}
+
 void UAVManage::onNewProject()
 {
 	//先清空数据
-	updateWeb();
-	m_pDeviceManage->clearDevice();
+	m_qstrCurrentProjectFile.clear();
+	onWebClear();
+	if(m_pDeviceManage) m_pDeviceManage->clearDevice();
 	//选择新建路径
 	QString qstrName = QFileDialog::getSaveFileName(this, tr("项目名"), "", "File(*.qz)");
 	if (qstrName.isEmpty()) return;
@@ -107,17 +131,19 @@ void UAVManage::onNewProject()
 	}
 	//新建项目文件并写入初始化内容
 	if (!newProjectFile(qstrFile)) {
-		//dir.rmdir(qstrDir);
+		dir.rmdir(qstrDir);
 		QMessageBox::warning(this, tr("错误"), tr("新建项目文件失败"));
 		return;
 	}
+	dir.mkdir(qstrDir + _ProjectDirName_);
 	onOpenProject(qstrFile);
 }
 
 void UAVManage::onOpenProject(QString qstrFile)
 {
-	updateWeb();
-	m_pDeviceManage->clearDevice();
+	m_qstrCurrentProjectFile.clear();
+	onWebClear();
+	if (m_pDeviceManage) m_pDeviceManage->clearDevice();
 	QTextCodec* code = QTextCodec::codecForName(_XMLNameCoding_);
 	std::string filename = code->fromUnicode(qstrFile).data();
 	tinyxml2::XMLDocument doc;
@@ -132,6 +158,7 @@ void UAVManage::onOpenProject(QString qstrFile)
 	float y = place->FloatAttribute(_AttributeY_);
 	tinyxml2::XMLElement* device = root->FirstChildElement(_ElementDevice_);
 	if (!device) return;
+	m_qstrCurrentProjectFile = qstrFile;
 	while (device){
 		//遍历无人机属性
 		QString devicename = device->Attribute(_AttributeName_);
@@ -140,7 +167,7 @@ void UAVManage::onOpenProject(QString qstrFile)
 		float dy = device->FloatAttribute(_AttributeY_);
 		qDebug() << x << y << devicename << ip << dx << dy;
 		device = device->NextSiblingElement(_ElementDevice_);
-		m_pDeviceManage->addDevice(devicename, ip, dx, dy);
+		if (m_pDeviceManage) m_pDeviceManage->addDevice(devicename, ip, dx, dy);
 	}
 }
 
@@ -154,9 +181,15 @@ void UAVManage::onSaveasProject()
 	//复制工程到新文件夹并重命名
 }
 
+void UAVManage::onWebClear()
+{
+	if (!m_pWebSocket) return;
+	m_pWebSocket->sendTextMessage("");
+}
+
 void UAVManage::showEvent(QShowEvent* event)
 {
-	updateWeb();
+	loadWeb();
 }
 
 void UAVManage::onWebLoadProgress(int progress)
@@ -175,13 +208,36 @@ void UAVManage::onSocketNewConnection()
 	//只记录一个web连接，防止通过浏览器访问blockly
 	if (m_pWebSocket) return;
 	m_pWebSocket = m_pSocketServer->nextPendingConnection();
-	connect(m_pWebSocket, SIGNAL(textMessageReceived(const QString)), this, SLOT(onSocketTextMessageReceived(const QString)));
+	connect(m_pWebSocket, SIGNAL(textMessageReceived(QString)), this, SLOT(onSocketTextMessageReceived(QString)));
 	connect(m_pWebSocket, SIGNAL(disconnected()), this, SLOT(onSocketDisconnected()));
 }
 
-void UAVManage::onSocketTextMessageReceived(const QString message)
+void UAVManage::onSocketTextMessageReceived(QString message)
 {
 	qDebug() << "----websocket message:" << message;
+	//更新blockly及python文件
+	message = message.right(message.size() - 7);						//减去 JsonData 字符串
+	QStringList strList = message.split("pythonData");
+	if (strList.size() < 2) return;
+	QString xmlData = strList[0];										//XML文本数据
+	xmlData = xmlData.right(xmlData.length() - 1);
+	QString pythonData = strList[1];									//python文本数据
+	pythonData = pythonData.right(pythonData.length() - 1);
+	qDebug() << xmlData;
+	qDebug() << pythonData;
+	QString blocklyFileName = getCurrentBlocklyFile();
+	QString pythonFileName = getCurrentPythonFile();
+	if (blocklyFileName.isEmpty() || pythonFileName.isEmpty()) return;
+	QFile blocklyFile(blocklyFileName);
+	if (blocklyFile.open(QIODevice::WriteOnly | QIODevice::Text)){
+		blocklyFile.write(xmlData.toUtf8());
+		blocklyFile.close();
+	}
+	QFile pythonFile(pythonFileName);
+	if (pythonFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
+		pythonFile.write(pythonData.toUtf8());
+		pythonFile.close();
+	}
 }
 
 void UAVManage::onSocketDisconnected()
@@ -192,69 +248,104 @@ void UAVManage::onSocketDisconnected()
 
 void UAVManage::onCurrentDeviceNameChanged(QString currentName, QString previousName)
 {
-	//updateWeb();
+	QString blocklyFilePath = getCurrentBlocklyFile();
+	if (blocklyFilePath.isEmpty()) return;
+	QFile file(blocklyFilePath);
+	if (!file.open(QIODevice::ReadOnly)) return;
+	QByteArray arrBlockly = file.readAll();
+	if(m_pWebSocket) m_pWebSocket->sendTextMessage(arrBlockly);
+	file.close();
 }
 
-void UAVManage::onBtnTestClicked()
+void UAVManage::onDeviceAdd(QString name, QString ip, float x, float y)
 {
-    
+	if (m_qstrCurrentProjectFile.isEmpty()) return;
+	QTextCodec* code = QTextCodec::codecForName(_XMLNameCoding_);
+	std::string filename = code->fromUnicode(m_qstrCurrentProjectFile).data();
+	tinyxml2::XMLDocument doc;
+	tinyxml2::XMLError error = doc.LoadFile(filename.c_str());
+	if (error != tinyxml2::XMLError::XML_SUCCESS) return;
+	tinyxml2::XMLElement* root = doc.RootElement();
+	if (!root) return;
+	tinyxml2::XMLElement* device = doc.NewElement(_ElementDevice_);
+	device->SetAttribute(_AttributeName_, name.toUtf8().data());
+	device->SetAttribute(_AttributeIP_, ip.toUtf8().data());
+	device->SetAttribute(_AttributeX_, x);
+	device->SetAttribute(_AttributeY_, y);
+	root->InsertEndChild(device);
+	error = doc.SaveFile(filename.c_str());
+	if (error != tinyxml2::XMLError::XML_SUCCESS) return;
+	onWebClear();
+}
+
+void UAVManage::onDeviceRemove(QString name)
+{
+	if (m_qstrCurrentProjectFile.isEmpty()) return;
+	QTextCodec* code = QTextCodec::codecForName(_XMLNameCoding_);
+	std::string filename = code->fromUnicode(m_qstrCurrentProjectFile).data();
+	tinyxml2::XMLDocument doc;
+	tinyxml2::XMLError error = doc.LoadFile(filename.c_str());
+	if (error != tinyxml2::XMLError::XML_SUCCESS) return;
+	tinyxml2::XMLElement* root = doc.RootElement();
+	if (!root) return;
+	tinyxml2::XMLElement* device = root->FirstChildElement(_ElementDevice_);
+	if (!device) return;
+	while (device) {
+		//遍历无人机属性
+		QString devicename = device->Attribute(_AttributeName_);
+		if (devicename != name) {
+			device = device->NextSiblingElement(_ElementDevice_);
+			continue;
+		}
+		root->DeleteChild(device);
+		break;
+	}
+	doc.SaveFile(filename.c_str());
+	if (error != tinyxml2::XMLError::XML_SUCCESS) return;
+	QFileInfo info(m_qstrCurrentProjectFile);
+	QString qstrPath = info.path();
+	QString qstrBlocklyFile = QString("%1%2%3.blockly").arg(qstrPath).arg(_ProjectDirName_).arg(name);
+	QString qstrPythonFile = QString("%1%2%3.py").arg(qstrPath).arg(_ProjectDirName_).arg(name);
+	QFile::remove(qstrBlocklyFile);
+	QFile::remove(qstrPythonFile);
+}
+
+void UAVManage::onDeviceRename(QString newName, QString oldName)
+{
+	if (m_qstrCurrentProjectFile.isEmpty()) return;
+	QTextCodec* code = QTextCodec::codecForName(_XMLNameCoding_);
+	std::string filename = code->fromUnicode(m_qstrCurrentProjectFile).data();
+	tinyxml2::XMLDocument doc;
+	tinyxml2::XMLError error = doc.LoadFile(filename.c_str());
+	if (error != tinyxml2::XMLError::XML_SUCCESS) return;
+	tinyxml2::XMLElement* root = doc.RootElement();
+	if (!root) return;
+	tinyxml2::XMLElement* device = root->FirstChildElement(_ElementDevice_);
+	if (!device) return;
+	while (device) {
+		//遍历无人机属性
+		QString devicename = device->Attribute(_AttributeName_);
+		if (devicename != oldName) {
+			device = device->NextSiblingElement(_ElementDevice_);
+			continue;
+		}
+		device->SetAttribute(_AttributeName_, newName.toUtf8().data());
+		break;
+	}
+	doc.SaveFile(filename.c_str());
+	if (error != tinyxml2::XMLError::XML_SUCCESS) return;
+	QFileInfo info(m_qstrCurrentProjectFile);
+	QString qstrPath = info.path();
+	QString qstrNewBlocklyFile = QString("%1%2%3.blockly").arg(qstrPath).arg(_ProjectDirName_).arg(newName);
+	QString qstrNewPythonFile = QString("%1%2%3.py").arg(qstrPath).arg(_ProjectDirName_).arg(newName);
+	QString qstrOldBlocklyFile = QString("%1%2%3.blockly").arg(qstrPath).arg(_ProjectDirName_).arg(oldName);
+	QString qstrOldPythonFile = QString("%1%2%3.py").arg(qstrPath).arg(_ProjectDirName_).arg(oldName);
+	QFile::rename(qstrOldBlocklyFile, qstrNewBlocklyFile);
+	QFile::rename(qstrOldPythonFile, qstrNewPythonFile);
 }
 
 bool UAVManage::newProjectFile(QString qstrFile, float X, float Y)
-{
-	/*
-	QTextCodec* code = QTextCodec::codecForName(_XMLNameCoding_);
-	std::string name = code->fromUnicode(qstrFile).data();
-
-	tinyxml2::XMLDocument* doc = new tinyxml2::XMLDocument;
-	tinyxml2::XMLDeclaration* declaration = doc->NewDeclaration("xml version=\"1.0\" encoding=\"UTF-8\"");
-	doc->LinkEndChild(declaration);
-
-	tinyxml2::XMLElement* School = doc->NewElement("School");
-	doc->LinkEndChild(School);
-	School->SetAttribute("name", "机械工程学院");
-
-	tinyxml2::XMLElement* Class = doc->NewElement("Class");
-	School->LinkEndChild(Class);
-	Class->SetAttribute("name", "c++");
-
-	tinyxml2::XMLElement* Student = doc->NewElement("Student");
-	Class->LinkEndChild(Student);
-	Student->SetAttribute("name", "天霸");
-	Student->SetAttribute("number", "01");
-
-	tinyxml2::XMLElement* Email = doc->NewElement("Email");
-	Student->LinkEndChild(Email);
-	tinyxml2::XMLText* email = doc->NewText("TB@126.com");
-	Email->LinkEndChild(email);
-
-	tinyxml2::XMLElement* Address = doc->NewElement("Address");
-	Student->LinkEndChild(Address);
-	tinyxml2::XMLText* address = doc->NewText("中国辽宁");
-	Address->LinkEndChild(address);
-
-	tinyxml2::XMLElement* Student_1 = doc->NewElement("Student");
-	Class->LinkEndChild(Student_1);
-	Student_1->SetAttribute("name", "动霸");
-	Student_1->SetAttribute("number", "02");
-
-	tinyxml2::XMLElement* Email_1 = doc->NewElement("Email");
-	Student_1->LinkEndChild(Email_1);
-	tinyxml2::XMLText* email_1 = doc->NewText("DB@126.com");
-	Email_1->LinkEndChild(email_1);
-
-	tinyxml2::XMLElement* Address_1 = doc->NewElement("Address");
-	Student_1->LinkEndChild(Address_1);
-	tinyxml2::XMLText* address_1 = doc->NewText("中国香港");
-	Address_1->LinkEndChild(address_1);
-	if (tinyxml2::XMLError::XML_SUCCESS != doc->SaveFile(name.c_str())) {
-		delete doc;
-		return false;
-	}
-	delete doc;
-	return true;
-	*/
-	
+{	
 	const char* declaration = _XMLVersion_;
 	tinyxml2::XMLDocument doc;
 	tinyxml2::XMLError error = doc.Parse(declaration);
