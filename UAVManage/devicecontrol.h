@@ -19,17 +19,35 @@ public:
 		DeviceMessageToimeout = -404
 	};
 public:
-	DeviceControl(QString name, QString ip = "", QWidget *parent = Q_NULLPTR);
+	DeviceControl(QString name, float x, float y, QString ip = "", QWidget *parent = Q_NULLPTR);
 	~DeviceControl();
 	QString getName();
 	void setName(QString name);
 	QString getIP();
 	void setIp(QString ip);
+	float getX();
+	void setX(float x);
+	float getY();
+	void setY(float y);
 	void setStartLocation(float x, float y);
 	QList<float> getStartLocation();
+	/**
+	 * @brief 连接设备
+	 */
 	bool connectDevice();
+	/**
+	 * @brief 断开设备连接
+	 */
 	void disconnectDevice();
+	/**
+	 * @brief 设备是否连接
+	 */
 	bool isConnectDevice();
+	/**
+	 * @brief 发送数据
+	 * @param data [in] 二进制数据
+	 * @return 发送成功
+	 */
 	bool sendMessage(QByteArray data);
 	/**
 	 * @brief 启用心跳

@@ -17,11 +17,13 @@ public:
 	~DeviceManage();
 	/**
 	* @brief 添加设备
-	* @param [in] qstrName设备名称
-	* @param [in] ip设备IP
-	* @return 添加成功或失败
+	* @param [in] qstrName 设备名称
+	* @param [in] ip 设备IP
+	* @param [in] x 初始位置
+	* @param [in] y 初始位置
+	* @return 错误信息,成功为空
 	*/
-	bool addDevice(QString qstrName, QString ip);
+	QString addDevice(QString qstrName, QString ip, float x, float y);
 	/**
 	* @brief 删除设备
 	*/
@@ -34,6 +36,10 @@ public:
 	 * @brief 获取当前设备名
 	 */
 	QString getCurrentDeviceName();
+	/**
+	 * @brief 获取设备名称列表,按照列表顺序
+	 */
+	QStringList getDeviceNameList();
 	/**
 	* @brief 获取新的可用的设备名称,因设备名称不可重复
 	* @return 按顺序返回设备名称

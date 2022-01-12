@@ -3,8 +3,8 @@
 #include <QMessageBox>
 #include <QInputDialog>
 #include <QDebug>
+#include "definesetting.h"
 
-#define _DeviceNamePrefix_ "无人机"
 #define _ItemHeight_ 60
 DeviceManage::DeviceManage(QWidget *parent)
 	: QWidget(parent)
@@ -86,7 +86,10 @@ DeviceManage::DeviceManage(QWidget *parent)
 	connect(ui.btnAddDevice, &QAbstractButton::clicked, [this]() {
 		AddDeviceDialog dialog(getNewDefaultName(), this);
 		if (QDialog::Accepted != dialog.exec())return;
-		addDevice(dialog.getName(), dialog.getIP());
+		QString qstrError = addDevice(dialog.getName(), dialog.getIP(), dialog.getX(), dialog.getY());
+		if (!qstrError.isEmpty()) {
+			QMessageBox::warning(this, tr("错误"), qstrError);
+		}
 		});
 	connect(ui.btnRemoveDevice, &QAbstractButton::clicked, [this]() { removeDevice(); });
 
@@ -97,23 +100,27 @@ DeviceManage::~DeviceManage()
 {
 }
 
-bool DeviceManage::addDevice(QString qstrName, QString ip)
+QString DeviceManage::addDevice(QString qstrName, QString ip, float x, float y)
 {
-	if (qstrName.isEmpty()) qstrName = getNewDefaultName();
+	if (qstrName.isEmpty()) {
+		return tr("设备名称为空");
+	}
 	//判断设备名称是否重复
 	if (isRepetitionName(qstrName)) {
-		QMessageBox::warning(this, tr("提示"), tr("无法添加设备,名称重复"));
-		return false;
+		return tr("设备名称重复");
 	}
+	//TODO
 	//判断设备IP是否重复
+	//判断初始位置是否重复
+
 	QListWidgetItem* item = new QListWidgetItem();
 	item->setSizeHint(QSize(0, _ItemHeight_));
 	ui.listWidget->addItem(item);
 	//此处会耗时
-	DeviceControl* pControl = new DeviceControl(qstrName, ip);
+	DeviceControl* pControl = new DeviceControl(qstrName, x, y, ip);
 	ui.listWidget->setItemWidget(item, pControl);
 	ui.listWidget->setCurrentItem(item);
-	return true;
+	return "";
 }
 
 void DeviceManage::removeDevice()
@@ -138,6 +145,22 @@ QString DeviceManage::getCurrentDeviceName()
 	DeviceControl* pControl = getCurrentDevice();
 	if (!pControl) return "";
 	return pControl->getName();
+}
+
+QStringList DeviceManage::getDeviceNameList()
+{
+	QStringList list;
+	if (0 >= ui.listWidget->count()) return list;
+	for (int i = 0; i < ui.listWidget->count(); i++) {
+		QListWidgetItem* pItem = ui.listWidget->item(i);
+		if (!pItem) continue;
+		QWidget* pWidget = ui.listWidget->itemWidget(pItem);
+		if (!pWidget) continue;
+		DeviceControl* pDevice = dynamic_cast<DeviceControl*>(pWidget);
+		if (!pDevice) continue;
+		list.append(pDevice->getName());
+	}
+	return list;
 }
 
 //获取可用的新设备名称

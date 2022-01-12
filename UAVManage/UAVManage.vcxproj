@@ -118,6 +118,7 @@
     <ClCompile Include="devicemanage.cpp" />
     <ClCompile Include="resendmessage.cpp" />
     <ClCompile Include="setdevicedialog.cpp" />
+    <ClCompile Include="tinyxml2\tinyxml2.cpp" />
     <ClCompile Include="uavmanage.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
@@ -137,6 +138,7 @@
     <ClInclude Include="definesetting.h" />
     <ClInclude Include="libhvsetting.h" />
     <ClInclude Include="mavlinksetting.h" />
+    <ClInclude Include="tinyxml2\tinyxml2.h" />
     <QtMoc Include="resendmessage.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -4,7 +4,7 @@
 #include <QDateTime>
 
 #define _CurrentTime_  QTime::currentTime().toString("hh:mm:ss.zzz")
-DeviceControl::DeviceControl(QString name, QString ip, QWidget *parent)
+DeviceControl::DeviceControl(QString name, float x, float y, QString ip, QWidget *parent)
 	: QWidget(parent)
 {
 	ui.setupUi(this);
@@ -45,16 +45,36 @@ void DeviceControl::setIp(QString ip)
 	connectDevice();
 }
 
-void DeviceControl::setStartLocation(float x, float y)
+float DeviceControl::getX()
+{
+	return m_fStartX;
+}
+
+void DeviceControl::setX(float x)
 {
 	m_fStartX = x;
+}
+
+float DeviceControl::getY()
+{
+	return m_fStartY;
+}
+
+void DeviceControl::setY(float y)
+{
 	m_fStartY = y;
+}
+
+void DeviceControl::setStartLocation(float x, float y)
+{
+	setX(x);
+	setY(y);
 }
 
 QList<float> DeviceControl::getStartLocation()
 {
 	QList<float> list;
-	list << m_fStartX << m_fStartY;
+	list << getX() << getY();
 	return list;
 }
 
@@ -210,9 +230,8 @@ void DeviceControl::hvcbReceiveMessage(const hv::SocketChannelPtr& channel, hv::
 	if (buf->size() <= 0) return;
 	QByteArray arrData((char*)buf->data(), buf->size());
 	if (arrData.isEmpty()) return;
-	qDebug() << "----收到消息" << _CurrentTime_<< arrData.toHex().toUpper();
+	qDebug() << "----收到消息" << _CurrentTime_ << channel->peeraddr().c_str() << arrData.toHex().toUpper();
 	//解包
-
 	mavlink_message_t msg;
 	mavlink_status_t status;
 	for (int i = 0; i < arrData.length(); i++) {
@@ -243,7 +262,7 @@ void DeviceControl::hvcbWriteComplete(const hv::SocketChannelPtr& channel, hv::B
 	if (buf->size() <= 0) return;
 	QByteArray arrBuf((char*)buf->data(), buf->size());
 	if (arrBuf.isEmpty()) return;
-	qDebug() << "----已发送消息" << _CurrentTime_ << arrBuf.toHex().toUpper();
+	qDebug() << "----已发送消息" << _CurrentTime_<< channel->peeraddr().c_str() << arrBuf.toHex().toUpper();
 }
 
 QByteArray DeviceControl::mavMessageToBuffer(mavlink_message_t mesage)
