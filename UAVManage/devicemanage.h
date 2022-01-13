@@ -6,6 +6,13 @@
 #include "devicecontrol.h"
 #include <QMenu>
 #include <QAction>
+#include <QDir>
+#include <QFileDialog>
+#include <QFileInfo>
+#include <QTextCodec>
+#include <QMessageBox>
+#include "definesetting.h"
+#include "tinyxml2/tinyxml2.h"
 
 class DeviceManage : public QWidget
 {
@@ -36,6 +43,10 @@ public:
 	 * @brief 获取当前设备名
 	 */
 	QString getCurrentDeviceName();
+	/**
+	 * @brief 设置当前选中设备
+	 */
+	bool setCurrentDevice(QString qstrName);
 	/**
 	 * @brief 获取设备名称列表,按照列表顺序
 	 */

@@ -12,6 +12,8 @@ DeviceControl::DeviceControl(QString name, float x, float y, QString ip, QWidget
 	m_pHvTcpClient = nullptr;
 	setName(name);
 	setIp(ip);
+	setX(x);
+	setY(y);
 }
 
 DeviceControl::~DeviceControl()

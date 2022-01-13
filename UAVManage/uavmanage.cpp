@@ -45,11 +45,9 @@ UAVManage::UAVManage(QWidget *parent)
 	QMenu* pProjectMenu = new QMenu(tr("项目"));
 	QAction* pActionNew = new QAction(style->standardIcon(QStyle::SP_FileDialogNewFolder), tr("新建"));
 	QAction* pActionOpen = new QAction(style->standardIcon(QStyle::SP_DialogOpenButton), tr("打开"));
-	QAction* pActionSave = new QAction(style->standardIcon(QStyle::SP_DialogSaveButton), tr("保存"));
 	QAction* pActionSaveas = new QAction(style->standardIcon(QStyle::SP_DirIcon), tr("另存为"));
 	pProjectMenu->addAction(pActionNew);
 	pProjectMenu->addAction(pActionOpen);
-	pProjectMenu->addAction(pActionSave);
 	pProjectMenu->addAction(pActionSaveas);
 	ui.menuBar->addMenu(pProjectMenu);
 	connect(pActionNew, &QAction::triggered, [this]() { onNewProject(); });
@@ -57,7 +55,6 @@ UAVManage::UAVManage(QWidget *parent)
 		QString qstrFile = QFileDialog::getOpenFileName(this, tr("项目名"), "", "File(*.qz)");
 		onOpenProject(qstrFile);
 		});
-	connect(pActionSave, &QAction::triggered, [this]() {onSaveProject(); });
 	connect(pActionSaveas, &QAction::triggered, [this]() {onSaveasProject(); });
 }
 
@@ -69,6 +66,7 @@ UAVManage::~UAVManage()
 		m_pSocketServer = nullptr;
 	}
 	if (m_pDeviceManage) {
+		m_pDeviceManage->clearDevice();
 		delete m_pDeviceManage;
 		m_pDeviceManage = nullptr;
 	}
@@ -141,6 +139,7 @@ void UAVManage::onNewProject()
 
 void UAVManage::onOpenProject(QString qstrFile)
 {
+	qDebug() << "----打开工程" << qstrFile;
 	m_qstrCurrentProjectFile.clear();
 	onWebClear();
 	if (m_pDeviceManage) m_pDeviceManage->clearDevice();
@@ -156,6 +155,7 @@ void UAVManage::onOpenProject(QString qstrFile)
 	//读取场地大小
 	float x = place->FloatAttribute(_AttributeX_);
 	float y = place->FloatAttribute(_AttributeY_);
+	QString qstrCurrnetName = place->Attribute(_AttributeName_);
 	tinyxml2::XMLElement* device = root->FirstChildElement(_ElementDevice_);
 	if (!device) return;
 	m_qstrCurrentProjectFile = qstrFile;
@@ -165,25 +165,78 @@ void UAVManage::onOpenProject(QString qstrFile)
 		QString ip = device->Attribute(_AttributeIP_);
 		float dx = device->FloatAttribute(_AttributeX_);
 		float dy = device->FloatAttribute(_AttributeY_);
-		qDebug() << x << y << devicename << ip << dx << dy;
 		device = device->NextSiblingElement(_ElementDevice_);
 		if (m_pDeviceManage) m_pDeviceManage->addDevice(devicename, ip, dx, dy);
 	}
+	qDebug() << "----工程打开完成";
+	m_pDeviceManage->setCurrentDevice(qstrCurrnetName);
 }
 
-void UAVManage::onSaveProject()
+//拷贝文件夹
+bool copyDirectoryFiles(const QString& fromDir, const QString& toDir, bool coverFileIfExist)
 {
-	//暂时使用自动保存
+	QDir sourceDir(fromDir);
+	QDir targetDir(toDir);
+	if (!targetDir.exists()) {    /**< 如果目标目录不存在，则进行创建 */
+		if (!targetDir.mkdir(targetDir.absolutePath()))
+			return false;
+	}
+
+	QFileInfoList fileInfoList = sourceDir.entryInfoList();
+	foreach(QFileInfo fileInfo, fileInfoList) {
+		if (fileInfo.fileName() == "." || fileInfo.fileName() == "..")
+			continue;
+
+		if (fileInfo.isDir()) {    /**< 当为目录时，递归的进行copy */
+			if (!copyDirectoryFiles(fileInfo.filePath(),
+				targetDir.filePath(fileInfo.fileName()),
+				coverFileIfExist))
+				return false;
+		}
+		else {            /**< 当允许覆盖操作时，将旧文件进行删除操作 */
+			if (coverFileIfExist && targetDir.exists(fileInfo.fileName())) {
+				targetDir.remove(fileInfo.fileName());
+			}
+
+			/// 进行文件copy
+			if (!QFile::copy(fileInfo.filePath(),
+				targetDir.filePath(fileInfo.fileName()))) {
+				return false;
+			}
+		}
+	}
+	return true;
 }
 
 void UAVManage::onSaveasProject()
 {
 	//复制工程到新文件夹并重命名
+	QString qstrName = QFileDialog::getSaveFileName(this, tr("项目名"), "", "File(*.qz)");
+	if (qstrName.isEmpty()) return;
+	QFileInfo info(qstrName);
+	QString qstrPath = info.path();
+	info.setFile(m_qstrCurrentProjectFile);
+	QString qstrFromPath = info.path()+ _ProjectDirName_;
+	if (QFile::exists(qstrName)) {
+		QFile::remove(qstrName);
+	}else {
+		QFileInfo info(qstrName);
+		qstrPath = info.path() + "/" + info.baseName();
+		qstrName = qstrPath + "/" + info.fileName();
+		//新建项目文件夹
+		QDir dir;
+		if (!dir.mkdir(qstrPath)) return;
+	}
+	//复制积木块文件到新文件夹
+	copyDirectoryFiles(qstrFromPath, qstrPath + _ProjectDirName_, true);
+	bool bcp = QFile::copy(m_qstrCurrentProjectFile, qstrName);
+	m_qstrCurrentProjectFile = qstrName;
 }
 
 void UAVManage::onWebClear()
 {
 	if (!m_pWebSocket) return;
+	qDebug() << "----清空WEB界面";
 	m_pWebSocket->sendTextMessage("");
 }
 
@@ -227,6 +280,7 @@ void UAVManage::onSocketTextMessageReceived(QString message)
 	qDebug() << pythonData;
 	QString blocklyFileName = getCurrentBlocklyFile();
 	QString pythonFileName = getCurrentPythonFile();
+	qDebug() << "---update file" << blocklyFileName << pythonFileName;
 	if (blocklyFileName.isEmpty() || pythonFileName.isEmpty()) return;
 	QFile blocklyFile(blocklyFileName);
 	if (blocklyFile.open(QIODevice::WriteOnly | QIODevice::Text)){
@@ -248,18 +302,19 @@ void UAVManage::onSocketDisconnected()
 
 void UAVManage::onCurrentDeviceNameChanged(QString currentName, QString previousName)
 {
+	qDebug() << "----设备切换" << currentName << previousName;
 	QString blocklyFilePath = getCurrentBlocklyFile();
 	if (blocklyFilePath.isEmpty()) return;
 	QFile file(blocklyFilePath);
-	if (!file.open(QIODevice::ReadOnly)) return;
-	QByteArray arrBlockly = file.readAll();
+	QByteArray arrBlockly;
+	if (file.open(QIODevice::ReadOnly)) {
+		arrBlockly = file.readAll();
+		file.close();
+	}
+	qDebug() << "----更新WEB界面" << blocklyFilePath << arrBlockly;
 	if(m_pWebSocket) m_pWebSocket->sendTextMessage(arrBlockly);
-	file.close();
-}
-
-void UAVManage::onDeviceAdd(QString name, QString ip, float x, float y)
-{
-	if (m_qstrCurrentProjectFile.isEmpty()) return;
+	
+	//更新项目工程中选中设备
 	QTextCodec* code = QTextCodec::codecForName(_XMLNameCoding_);
 	std::string filename = code->fromUnicode(m_qstrCurrentProjectFile).data();
 	tinyxml2::XMLDocument doc;
@@ -267,15 +322,56 @@ void UAVManage::onDeviceAdd(QString name, QString ip, float x, float y)
 	if (error != tinyxml2::XMLError::XML_SUCCESS) return;
 	tinyxml2::XMLElement* root = doc.RootElement();
 	if (!root) return;
-	tinyxml2::XMLElement* device = doc.NewElement(_ElementDevice_);
+	tinyxml2::XMLElement* place = root->FirstChildElement(_ElementPlace_);
+	if (!place) return;
+	place->SetAttribute(_AttributeName_, currentName.toUtf8().data());
+	error = doc.SaveFile(filename.c_str());
+}
+
+void UAVManage::onDeviceAdd(QString name, QString ip, float x, float y)
+{
+	if (m_qstrCurrentProjectFile.isEmpty()) return;
+	qDebug() << "----设备新增" << name << ip << x << y;
+	QTextCodec* code = QTextCodec::codecForName(_XMLNameCoding_);
+	std::string filename = code->fromUnicode(m_qstrCurrentProjectFile).data();
+	tinyxml2::XMLDocument doc;
+	tinyxml2::XMLError error = doc.LoadFile(filename.c_str());
+	if (error != tinyxml2::XMLError::XML_SUCCESS) return;
+	tinyxml2::XMLElement* root = doc.RootElement();
+	if (!root) return;
+	//查找是否存在，已经存在则更新属性，否则新建
+	tinyxml2::XMLElement* temp = root->FirstChildElement(_ElementDevice_);
+	bool bExist = false;
+	while (temp) {
+		//遍历无人机属性
+		QString devicename = temp->Attribute(_AttributeName_);
+		if (devicename == name) {
+			bExist = true;
+			qDebug() << "----新增设备已存在直接更新属性" << name;
+			break;
+		}
+		temp = temp->NextSiblingElement(_ElementDevice_);
+	}
+	tinyxml2::XMLElement* device = temp;
+	if (!bExist) {
+		device = doc.NewElement(_ElementDevice_);
+		root->InsertEndChild(device);
+		//新建设备文件
+		QFileInfo info(m_qstrCurrentProjectFile);
+		QString qstrPath = info.path();
+		QString qstrBlocklyFile = QString("%1%2%3.blockly").arg(qstrPath).arg(_ProjectDirName_).arg(name);
+		QString qstrPythonFile = QString("%1%2%3.py").arg(qstrPath).arg(_ProjectDirName_).arg(name);
+		QFile file(qstrBlocklyFile);
+		if (file.open(QIODevice::ReadWrite)) file.close();
+		file.setFileName(qstrPythonFile);
+		if (file.open(QIODevice::ReadWrite)) file.close();
+	}
 	device->SetAttribute(_AttributeName_, name.toUtf8().data());
 	device->SetAttribute(_AttributeIP_, ip.toUtf8().data());
 	device->SetAttribute(_AttributeX_, x);
 	device->SetAttribute(_AttributeY_, y);
-	root->InsertEndChild(device);
 	error = doc.SaveFile(filename.c_str());
 	if (error != tinyxml2::XMLError::XML_SUCCESS) return;
-	onWebClear();
 }
 
 void UAVManage::onDeviceRemove(QString name)
@@ -357,10 +453,12 @@ bool UAVManage::newProjectFile(QString qstrFile, float X, float Y)
 	user->SetAttribute(_AttributeY_, Y);
 	root->InsertEndChild(user);
 	tinyxml2::XMLElement* device = doc.NewElement(_ElementDevice_);
-	device->SetAttribute(_AttributeName_, (QString(_DeviceNamePrefix_)+QString::number(1)).toUtf8().data());
+	QString qstrDeviceName = QString(_DeviceNamePrefix_) + QString::number(1);
+	device->SetAttribute(_AttributeName_, qstrDeviceName.toUtf8().data());
 	device->SetAttribute(_AttributeIP_, "");
 	device->SetAttribute(_AttributeX_, 0);
 	device->SetAttribute(_AttributeY_, 0);
+	user->SetAttribute(_AttributeName_, qstrDeviceName.toUtf8().data());
 	root->InsertEndChild(device);
 	QTextCodec* code = QTextCodec::codecForName(_XMLNameCoding_);
 	std::string name = code->fromUnicode(qstrFile).data();

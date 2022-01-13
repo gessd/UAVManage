@@ -13,12 +13,6 @@ DeviceManage::DeviceManage(QWidget *parent)
 	
 	//设置设备列表
 	ui.listWidget->installEventFilter(this);
-	connect(ui.listWidget, &QListWidget::itemPressed, [this](QListWidgetItem* item) {qDebug() << "--list itemPressed"; });
-	connect(ui.listWidget, &QListWidget::itemClicked, [this](QListWidgetItem* item) {qDebug() << "--list itemClicked"; });
-	connect(ui.listWidget, &QListWidget::itemDoubleClicked, [this](QListWidgetItem* item) {qDebug() << "--list itemDoubleClicked"; });
-	connect(ui.listWidget, &QListWidget::itemActivated, [this](QListWidgetItem* item) {qDebug() << "--list itemActivated"; });
-	connect(ui.listWidget, &QListWidget::itemEntered, [this](QListWidgetItem* item) {qDebug() << "--list itemEntered"; });
-	connect(ui.listWidget, &QListWidget::itemChanged, [this](QListWidgetItem* item) {qDebug() << "--list itemChanged"; });
 	connect(ui.listWidget, &QListWidget::currentItemChanged, [this](QListWidgetItem* current, QListWidgetItem* previous) {
 		qDebug() << "--list currentItemChanged" << current; 
 		QString name;
@@ -33,9 +27,6 @@ DeviceManage::DeviceManage(QWidget *parent)
 		}
 		emit currentDeviceNameChanged(name, previousname);
 		});
-	connect(ui.listWidget, &QListWidget::currentTextChanged, [this](const QString& currentText) {qDebug() << "--list currentTextChanged" << currentText; });
-	connect(ui.listWidget, &QListWidget::currentRowChanged, [this](int currentRow) {qDebug() << "--list currentRowChanged" << currentRow; });
-	connect(ui.listWidget, &QListWidget::itemSelectionChanged, [this]() {qDebug() << "--list itemSelectionChanged"; });
 
 	//添加右键菜单
 	m_pMenu = new QMenu(this);
@@ -67,6 +58,7 @@ DeviceManage::DeviceManage(QWidget *parent)
 		QString qstrNewIP = QInputDialog::getText(this, tr("IP"), tr("请输入设备IP"), QLineEdit::Normal, pControl->getIP());
 		if (qstrNewIP.isEmpty()) return;
 		pControl->setIp(qstrNewIP);
+		emit deviceAddFinished(pControl->getName(), qstrNewIP, pControl->getX(), pControl->getY());
 		});
 	connect(pActionDicconnect, &QAction::triggered, [this](bool checked) {
 		DeviceControl* pControl = getCurrentDevice();
@@ -149,6 +141,23 @@ QString DeviceManage::getCurrentDeviceName()
 	DeviceControl* pControl = getCurrentDevice();
 	if (!pControl) return "";
 	return pControl->getName();
+}
+
+bool DeviceManage::setCurrentDevice(QString qstrName)
+{
+	for (int i = 0; i < ui.listWidget->count(); i++) {
+		QListWidgetItem* pItem = ui.listWidget->item(i);
+		if (!pItem) continue;
+		QWidget* pWidget = ui.listWidget->itemWidget(pItem);
+		if (!pWidget) continue;
+		DeviceControl* pDevice = dynamic_cast<DeviceControl*>(pWidget);
+		if (!pDevice) continue;
+		if(pDevice->getName() != qstrName) continue;
+		ui.listWidget->setCurrentItem(pItem);
+		qDebug() << "----选中设备" << qstrName;
+		return true;
+	}
+	return false;
 }
 
 QStringList DeviceManage::getDeviceNameList()

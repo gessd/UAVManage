@@ -22,10 +22,9 @@ public slots:
     void onNewProject();
     void onOpenProject(QString qstrFile);
     //每一步都自动保存,无需手动保存,不自动保存会造成切换无人机后blockly新编辑内容丢失
-    void onSaveProject();
     void onSaveasProject();
     /**
-     * @brief 情况WEB积木块
+     * @brief 清空WEB积木块
      */
     void onWebClear();
 protected:
@@ -58,7 +57,7 @@ private slots:
      */
     void onCurrentDeviceNameChanged(QString currentName, QString previousName);
     /**
-     * @brief 设备列表中设备新增
+     * @brief 设备列表中设备新增或更新
      */
     void onDeviceAdd(QString name, QString ip, float x, float y);
     /**
