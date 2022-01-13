@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
 
     QFile file(":/res/qss/style.qss");
     if (file.open(QIODevice::ReadOnly)) {
-        qApp->setStyleSheet(file.readAll());
+        //qApp->setStyleSheet(file.readAll());
         file.close();
     }
 

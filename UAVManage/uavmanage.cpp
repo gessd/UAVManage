@@ -42,6 +42,12 @@ UAVManage::UAVManage(QWidget *parent)
 
 	//添加菜单
 	QStyle* style = QApplication::style();
+	QMenu* pTestMenu = new QMenu(tr("测试"));
+	QAction* pQssAction = new QAction(style->standardIcon(QStyle::SP_ComputerIcon), tr("更新样式"));
+	pTestMenu->addAction(pQssAction);
+	connect(pQssAction, &QAction::triggered, [this]() { updateStyle(); });
+	ui.menuBar->addMenu(pTestMenu);
+
 	QMenu* pProjectMenu = new QMenu(tr("项目"));
 	QAction* pActionNew = new QAction(style->standardIcon(QStyle::SP_FileDialogNewFolder), tr("新建"));
 	QAction* pActionOpen = new QAction(style->standardIcon(QStyle::SP_DialogOpenButton), tr("打开"));
@@ -53,6 +59,7 @@ UAVManage::UAVManage(QWidget *parent)
 	connect(pActionNew, &QAction::triggered, [this]() { onNewProject(); });
 	connect(pActionOpen, &QAction::triggered, [this]() {
 		QString qstrFile = QFileDialog::getOpenFileName(this, tr("项目名"), "", "File(*.qz)");
+		if (qstrFile.isEmpty()) return;
 		onOpenProject(qstrFile);
 		});
 	connect(pActionSaveas, &QAction::triggered, [this]() {onSaveasProject(); });

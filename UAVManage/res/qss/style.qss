@@ -1,11 +1,55 @@
+QWidget{
+    border:none;
+	color:rgb(255,255,255);
+	background:rgb(58,58,58);
+}
+QToolButton, QPushButton, QDialog QPushButton{
+    background:rgb(80, 80, 80);
+	/*border:1px solid red;*/
+	border-radius:10px;
+}
+QToolButton:hover, QPushButton:hover, QDialog QPushButton:hover{
+    background:rgb(100,100,100);
+}
+QToolButton:pressed, QPushButton:pressed, QDialog QPushButton:pressed{
+    background:rgb(120,120,120);
+}
 
-QAbstractButton{
-    color:rgb(255,255,255);
-    background:rgb(199,202,214);
+QLineEdit, QListWidget{
+	border:1px dashed rgb(255,255,255);
 }
-QAbstractButton:hover{
-    background:rgb(165,167,181);
+QListWidget QLabel{
+    background:transparent;
 }
-QAbstractButton:pressed{
-    background:rgb(136,138,149);
+QListWidget::item:hover{
+	background-color:rgb(100,100,100);
 }
+QListWidget::item:selected{
+	background-color:rgb(120,120,120);
+	border-width:0;
+}
+
+QMenu::item {
+	background:transparent;
+}
+
+/* 选中条目时 */
+QMenu::item:selected {
+	background:rgb(80,80,80);
+}
+QMenu::item:hover {
+	background:rgb(100,100,100);
+}
+
+/* 条目被选中时*/
+QMenu::icon::checked {
+	background:red;
+	border:3px inset red;
+	position:absolute;
+}
+/* 条目之间的距离 */
+/*
+QMenuBar::item {
+	spacing:20px;
+}
+*/

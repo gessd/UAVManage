@@ -85,8 +85,6 @@ DeviceManage::DeviceManage(QWidget *parent)
 		}
 		});
 	connect(ui.btnRemoveDevice, &QAbstractButton::clicked, [this]() { removeDevice(); });
-
-
 }
 
 DeviceManage::~DeviceManage()
