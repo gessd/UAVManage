@@ -12,7 +12,6 @@
 #include <QTextCodec>
 #include <QMessageBox>
 #include "definesetting.h"
-#include "tinyxml2/tinyxml2.h"
 
 class DeviceManage : public QWidget
 {
@@ -70,6 +69,9 @@ signals:
 protected:
 	virtual bool eventFilter(QObject* watched, QEvent* event);
 private:
+	/**
+	 * @brief 当前选中的设备
+	 */
 	DeviceControl* getCurrentDevice();
 private:
 	Ui::DeviceManage ui;
