@@ -13,11 +13,7 @@ class DeviceControl : public QWidget
 {
 	Q_OBJECT
 public:
-	enum _DeviceStatus 
-	{
-		DeviceUnConnect = -1,
-		DeviceMessageToimeout = -404
-	};
+	
 public:
 	DeviceControl(QString name, float x, float y, QString ip = "", QWidget *parent = Q_NULLPTR);
 	~DeviceControl();
@@ -159,15 +155,40 @@ private:
 	*/
 	QByteArray mavMessageToBuffer(mavlink_message_t mesage);
 	QByteArray mavCommandLongToBuffer(float param1, float param2, float param3, float param4, float param5, float param6, float param7, int command, int confirmation = 1);
-	int sendNavCommandLong(float param1, float param2, float param3, float param4, float param5, float param6, float param7, int command, bool wait);
+	int sendNavCommandLong(float param1, float param2, float param3, float param4, float param5, float param6, float param7
+		, int command, bool wait);
+	/**
+	 * @brief 发送Mav指令消息
+	 * @param commandID     指令ID
+	 * @param arrData       发送的数据内容
+	 * @param arrAgainData  重发的数据内容
+	 * @param bWait         等待发送结果
+	 * @param bAgainsend    是否重发数据
+	 * @param againNum      重发次数
+	 * @param againInterval 重发时间间隔[毫秒]
+	 * @param nTimeout      超时时间[毫秒]
+	 * @return 返回执行结果
+	 */
+public:
+	int MavSendCommandLongMessage(int commandID, QByteArray arrData, QByteArray arrAgainData, bool bWait
+		, bool bAgainsend, unsigned int againNum, unsigned int againInterval, unsigned int nTimeout);
 signals:
-	void sigConnectStatus(QString, bool);
+	/**
+	 * @brief COMMAND消息返回值
+	 * @param 设备IP地址
+	 * @param 连接成功与断开
+	 */
+	void sigConnectStatus(QString ip, bool connect);
 	/**
 	 * @brief COMMAND消息返回值
 	 * @param result    返回值
 	 * @param commandid 指令ID
 	 */
 	void sigCommandResult(int result, int commandid);
+	/**
+	 * @brief 指令执行结果
+	 */
+	void sigActionResult();
 private:
 	Ui::DeviceControl ui;
 	QString m_qstrIP;

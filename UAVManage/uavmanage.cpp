@@ -33,6 +33,7 @@ UAVManage::UAVManage(QWidget *parent)
 
 	//增加设备列表
     m_pDeviceManage = new DeviceManage(this);
+	m_pDeviceManage->setEnabled(false);
 	m_pDeviceManage->setMaximumWidth(200);
     ui.gridLayoutMain->addWidget(m_pDeviceManage, 0,1);
 	connect(m_pDeviceManage, SIGNAL(currentDeviceNameChanged(QString, QString)), this, SLOT(onCurrentDeviceNameChanged(QString, QString)));
@@ -118,6 +119,7 @@ QString UAVManage::getCurrentPythonFile()
 
 void UAVManage::onNewProject()
 {
+	m_pDeviceManage->setEnabled(true);
 	//先清空数据
 	m_qstrCurrentProjectFile.clear();
 	onWebClear();
@@ -146,6 +148,7 @@ void UAVManage::onNewProject()
 
 void UAVManage::onOpenProject(QString qstrFile)
 {
+	m_pDeviceManage->setEnabled(true);
 	qDebug() << "----打开工程" << qstrFile;
 	m_qstrCurrentProjectFile.clear();
 	onWebClear();
@@ -177,6 +180,8 @@ void UAVManage::onOpenProject(QString qstrFile)
 	}
 	qDebug() << "----工程打开完成";
 	m_pDeviceManage->setCurrentDevice(qstrCurrnetName);
+	QFileInfo info(qstrFile);
+	setWindowTitle(info.baseName());
 }
 
 //拷贝文件夹
@@ -249,7 +254,7 @@ void UAVManage::onWebClear()
 
 void UAVManage::showEvent(QShowEvent* event)
 {
-	loadWeb();
+	if(!m_pWebSocket) loadWeb();
 }
 
 void UAVManage::onWebLoadProgress(int progress)
@@ -274,6 +279,9 @@ void UAVManage::onSocketNewConnection()
 
 void UAVManage::onSocketTextMessageReceived(QString message)
 {
+	//防止数据大量重复处理
+	if (m_qstrLastWebMessage == message) return;
+	m_qstrLastWebMessage = message;
 	qDebug() << "----websocket message:" << message;
 	//更新blockly及python文件
 	message = message.right(message.size() - 7);						//减去 JsonData 字符串

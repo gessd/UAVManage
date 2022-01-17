@@ -5,6 +5,8 @@
 #include <QDebug>
 #include <QWebSocket>
 #include <QWebSocketServer>
+//python宏定义与mavlink中宏定义有冲突，python引用必须放到mavlink引用之前
+#include "threadpython.h"
 #include "devicemanage.h"
 
 class UAVManage : public QMainWindow
@@ -85,6 +87,8 @@ private:
     QWebSocketServer* m_pSocketServer;
     //web连接
     QWebSocket* m_pWebSocket;
+    QString m_qstrLastWebMessage;
     //当前工程文件
     QString m_qstrCurrentProjectFile;
+    ThreadPython ptyhon;
 };

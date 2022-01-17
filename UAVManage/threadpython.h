@@ -52,15 +52,14 @@ class ThreadPython : public QThread
 public:
 	ThreadPython(QObject *parent = NULL);
 	~ThreadPython();
-	bool compilePythonCode(QByteArray arrCode, bool bUpload = false);
+	bool compilePythonCode(QByteArray arrCode);
 	PythonRunState getLastState();
 private:
-	bool compilePythonFile(QString qstrFile, bool bUpload);
+	bool compilePythonFile(QString qstrFile);
 	QString checkWaypoint();
 private:
 	void run();
 private:
 	QString m_qstrFilePath;
 	PythonRunState m_pythonState;
-	bool m_bUpload;
 };

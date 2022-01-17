@@ -226,7 +226,6 @@ ThreadPython::ThreadPython(QObject *parent)
 	: QThread(parent)
 {
 	m_pythonState = PythonRunNone;
-	m_bUpload = false;
 }
 
 ThreadPython::~ThreadPython()
@@ -237,8 +236,9 @@ ThreadPython::~ThreadPython()
 	}
 }
 
-bool ThreadPython::compilePythonCode(QByteArray arrCode, bool bUpload)
+bool ThreadPython::compilePythonCode(QByteArray arrCode)
 {
+	if(arrCode.isEmpty()) return false;
 	m_pythonState = PythonRunNone;
 	//保存至文件后执行
 	QString qstrHeadFile = QApplication::applicationDirPath() + _PyHeadFile_;
@@ -263,7 +263,7 @@ bool ThreadPython::compilePythonCode(QByteArray arrCode, bool bUpload)
 		return false;
 	}
 	filePython.close();
-	return compilePythonFile(qstrRunFile, bUpload);
+	return compilePythonFile(qstrRunFile);
 }
 
 PythonRunState ThreadPython::getLastState()
@@ -271,9 +271,8 @@ PythonRunState ThreadPython::getLastState()
 	return m_pythonState;
 }
 
-bool ThreadPython::compilePythonFile(QString qstrFile, bool bUpload)
+bool ThreadPython::compilePythonFile(QString qstrFile)
 {
-	m_bUpload = bUpload;
 	if (!QFile::exists(qstrFile)) return false;
 	m_qstrFilePath = qstrFile;
 	//添加接口类

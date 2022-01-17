@@ -5,22 +5,27 @@
 #include <QMutex>
 #include "libhvsetting.h"
 
+enum _DeviceStatus
+{
+	DeviceMessageToimeout = -404,
+	DeviceDataError = -3,
+	DeviceUnConnect = -2,
+	DeviceWaiting = -1,
+	DeviceDataSucceed = 0
+};
 
 class ResendMessage : public QThread
 {
 	Q_OBJECT
 
 public:
-	enum {
-		MessageUnknown = 0,
-		MessageTimeout = -404
-	};
-
 	ResendMessage(hv::TcpClient* tcpClient, unsigned int againNum, unsigned int timeout, 
-		QByteArray arrData, QByteArray arrAgainData, int messageid, QObject *parent=nullptr);
+		QByteArray arrData, QByteArray arrAgainData, int messageid, _DeviceStatus initStatus = DeviceWaiting
+		, bool bauto = false, QObject *parent=nullptr);
 	~ResendMessage();
 	void stopThread();
 	int getResult();
+	void setAutoDelete(bool bauto);
 private slots:
 	void onResult(int res, int id);
 protected:
@@ -36,4 +41,6 @@ private:
 	QMutex m_mutexResult;
 	int m_nResult;
 	int m_nMessageID;
+	bool m_bAutoDelete;
+	_DeviceStatus m_initStatus;
 };

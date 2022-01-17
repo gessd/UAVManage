@@ -73,7 +73,9 @@ DeviceManage::DeviceManage(QWidget *parent)
 	connect(pFlyTo, &QAction::triggered, [this](bool checked) {
 		DeviceControl* pControl = getCurrentDevice();
 		if (!pControl) return;
-		int nTest = pControl->Fun_MAV_CMD_NAV_TAKEOFF_LOCAL(1, 2, 3, 4, 5, 6, 7);
+		int res = pControl->MavSendCommandLongMessage(MAV_CMD_NAV_TAKEOFF_LOCAL, "abc","abcd", false, true, 2, 3000, 10*1000);
+		qDebug() << "----device message:" << res;
+		//int nTest = pControl->Fun_MAV_CMD_NAV_TAKEOFF_LOCAL(1, 2, 3, 4, 5, 6, 7);
 		});
 
 	connect(ui.btnAddDevice, &QAbstractButton::clicked, [this]() {
@@ -220,6 +222,21 @@ bool DeviceManage::eventFilter(QObject* watched, QEvent* event)
 		m_pMenu->exec(QCursor::pos());
 	}
 	return false;
+}
+
+void DeviceManage::onBtnClickedFlyTakeoffLocal()
+{
+	//遍历设备,逐个发送命令
+	for (int i = 0; i < ui.listWidget->count(); i++) {
+		QListWidgetItem* pItem = ui.listWidget->item(i);
+		if (!pItem) continue;
+		QWidget* pWidget = ui.listWidget->itemWidget(pItem);
+		if (!pWidget) continue;
+		DeviceControl* pDevice = dynamic_cast<DeviceControl*>(pWidget);
+		if (!pDevice) continue;
+		//需要记录执行结果,循环体外提示,或者单独使用输出信息
+		pDevice->Fun_MAV_CMD_NAV_TAKEOFF_LOCAL(0, 0, 0, 0, 0, 0, 100, false);
+	}
 }
 
 DeviceControl* DeviceManage::getCurrentDevice()

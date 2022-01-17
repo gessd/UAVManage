@@ -2,7 +2,7 @@
 #include <QTime>
 
 ResendMessage::ResendMessage(hv::TcpClient* tcpClient, unsigned int againNum, unsigned int timeout, 
-	QByteArray arrData, QByteArray arrAgainData, int messageid, QObject *parent)
+	QByteArray arrData, QByteArray arrAgainData, int messageid, _DeviceStatus initStatus, bool bauto, QObject *parent)
 	: QThread(parent)
 {
 	m_pTcpClient = tcpClient;
@@ -10,9 +10,16 @@ ResendMessage::ResendMessage(hv::TcpClient* tcpClient, unsigned int againNum, un
 	m_unTimeout = timeout;
 	m_arrData = arrData;
 	m_arrAgainData = arrAgainData;
-	m_nResult = -1;
+	m_nResult = initStatus;
+	m_initStatus = initStatus;
 	m_bStop = false;
 	m_nMessageID = messageid;
+	setAutoDelete(bauto);
+
+	connect(this, &QThread::finished, [this]() {
+		if (false == m_bAutoDelete) return;
+		deleteLater();
+		});
 }
 
 ResendMessage::~ResendMessage()
@@ -35,6 +42,11 @@ int ResendMessage::getResult()
 	return m_nResult;
 }
 
+void ResendMessage::setAutoDelete(bool bauto)
+{
+	m_bAutoDelete = bauto;
+}
+
 void ResendMessage::onResult(int res, int id)
 {
 	if (m_nMessageID != id) return;
@@ -51,7 +63,6 @@ void ResendMessage::run()
 	QTime time;
 	time.start();
 	unsigned int index = 0;
-	index++;
 	m_pTcpClient->send(m_arrData.data(), m_arrData.length());
 	while (!m_bStop) {
 		//超时重发
@@ -62,7 +73,7 @@ void ResendMessage::run()
 			//超出重发次数
 			m_bStop = true;
 			m_mutexResult.lock();
-			m_nResult = -404;
+			if (m_initStatus == m_nResult) m_nResult = DeviceMessageToimeout;
 			m_mutexResult.unlock();
 			return;
 		}

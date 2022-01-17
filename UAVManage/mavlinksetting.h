@@ -18,7 +18,7 @@
 #define _DeviceHeartbeatInterval_ 500
 
 //指令消息重发发送次数
-#define _NavLinkResendNum_ 3
+#define _NavLinkResendNum_ 2
 //指令消息重发间隔 毫秒
 #define _NkCommandResendInterval_ 3000
 

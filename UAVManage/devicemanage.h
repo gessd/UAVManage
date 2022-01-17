@@ -68,6 +68,8 @@ signals:
 	void currentDeviceNameChanged(QString currentName, QString previousName);
 protected:
 	virtual bool eventFilter(QObject* watched, QEvent* event);
+private slots:
+	void onBtnClickedFlyTakeoffLocal();
 private:
 	/**
 	 * @brief 当前选中的设备

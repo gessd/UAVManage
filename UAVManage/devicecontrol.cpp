@@ -202,6 +202,7 @@ void DeviceControl::hvcbConnectionStatus(const hv::SocketChannelPtr& channel)
 		//连接成功
 		channel->setHeartbeat(_DeviceHeartbeatInterval_, [&, this]() {
 			//设置心跳
+			return;
 			if (!m_bHeartbeatEnable) return;
 			QTime time = QTime::currentTime();
 			mavlink_message_t message;
@@ -296,7 +297,8 @@ QByteArray DeviceControl::mavCommandLongToBuffer(float param1, float param2, flo
 	return mavMessageToBuffer(message);
 }
 
-int DeviceControl::sendNavCommandLong(float param1, float param2, float param3, float param4, float param5, float param6, float param7, int command, bool wait)
+int DeviceControl::sendNavCommandLong(float param1, float param2, float param3, float param4, float param5, float param6, float param7
+	, int command, bool wait)
 {
 	if (!m_pHvTcpClient) return DeviceUnConnect;
 	QByteArray arrData = mavCommandLongToBuffer(param1, param2, param3, param4, param5, param6, param7, command);
@@ -312,9 +314,64 @@ int DeviceControl::sendNavCommandLong(float param1, float param2, float param3, 
 	ResendMessage message(m_pHvTcpClient, _NavLinkResendNum_, _NkCommandResendInterval_, arrData, arrResendData, command);
 	connect(this, SIGNAL(sigCommandResult(int, int)), &message, SLOT(onResult(int, int)));
 	message.start();
+	//阻塞等待结果
 	while (!message.isFinished()) {
 		if (!m_pHvTcpClient) return DeviceUnConnect;
 		QApplication::processEvents();
 	}
 	return message.getResult();
+}
+
+int DeviceControl::MavSendCommandLongMessage(int commandID, QByteArray arrData, QByteArray arrAgainData, bool bWait
+	, bool bAgainsend, unsigned int againNum, unsigned int againInterval, unsigned int nTimeout)
+{
+	static bool bConnect = false;
+	if (arrData.isEmpty()) return DeviceDataError;
+	if (!m_pHvTcpClient) return DeviceUnConnect;
+	if (false == bAgainsend) {
+		if (arrData.length() != m_pHvTcpClient->send(arrData.data(), arrData.length())) return DeviceDataError;
+		if (bWait) {
+			static bool bWaiting = true;
+			bWaiting = true;
+			int res = DeviceMessageToimeout;
+			//等待指令返回结果
+			if (false == bConnect) {
+				//防止信号槽反复绑定
+				connect(this, &DeviceControl::sigCommandResult, [&, this](int result, int commandid) {
+					if (false == bWaiting) return;
+					if (commandID != commandid) return;
+					res = result;
+					});
+				bConnect = true;
+			}
+			QTime timeStart;
+			timeStart.start();
+			while (DeviceMessageToimeout == res) {
+				QApplication::processEvents();
+				if(timeStart.elapsed()>nTimeout) break;
+			}
+			bWaiting = false;
+			return res;
+		}
+		return DeviceDataSucceed;
+	}
+	else {
+		//TODO
+		//需要考虑当阻塞发送消息时，连接断开TCPclient指针会释放造成崩溃
+		ResendMessage* pMessageThread = new ResendMessage(m_pHvTcpClient, againNum, againInterval, arrData, arrAgainData, commandID);
+		connect(this, SIGNAL(sigCommandResult(int, int)), pMessageThread, SLOT(onResult(int, int)));
+		pMessageThread->start();
+		if (bWait) {
+			//阻塞等待结果
+			while (!pMessageThread->isFinished()) {
+				//if (!m_pHvTcpClient) pMessageThread->stopThread();
+				QApplication::processEvents();
+			}
+			int res = pMessageThread->getResult();
+			pMessageThread->deleteLater();
+			return res;
+		}
+		pMessageThread->setAutoDelete(true);
+		return DeviceDataSucceed;
+	}
 }
