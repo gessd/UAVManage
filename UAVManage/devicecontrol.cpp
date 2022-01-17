@@ -8,8 +8,9 @@ DeviceControl::DeviceControl(QString name, float x, float y, QString ip, QWidget
 	: QWidget(parent)
 {
 	ui.setupUi(this);
-	m_bHeartbeatEnable = true;
 	m_pHvTcpClient = nullptr;
+	m_pHvTcpClient = new hv::TcpClient;
+	m_bHeartbeatEnable = true;
 	setName(name);
 	setIp(ip);
 	setX(x);
@@ -108,10 +109,10 @@ bool DeviceControl::connectDevice()
 //断开连接
 void DeviceControl::disconnectDevice()
 {
-	if (!m_pHvTcpClient) return;
-	m_pHvTcpClient->stop();
-	delete m_pHvTcpClient;
-	m_pHvTcpClient = NULL;
+	emit sigRenewTcpClient();
+	if (isConnectDevice()) 
+		m_pHvTcpClient->stop();
+	SAFE_DELETE(m_pHvTcpClient);
 }
 
 //是否已连接
@@ -356,15 +357,14 @@ int DeviceControl::MavSendCommandLongMessage(int commandID, QByteArray arrData, 
 		return DeviceDataSucceed;
 	}
 	else {
-		//TODO
-		//需要考虑当阻塞发送消息时，连接断开TCPclient指针会释放造成崩溃
 		ResendMessage* pMessageThread = new ResendMessage(m_pHvTcpClient, againNum, againInterval, arrData, arrAgainData, commandID);
 		connect(this, SIGNAL(sigCommandResult(int, int)), pMessageThread, SLOT(onResult(int, int)));
+		//连接主动断开时TCPclient指针会释放,需求停止线程,否则造成崩溃
+		connect(this, SIGNAL(sigRenewTcpClient()), pMessageThread, SLOT(stopThread()));
 		pMessageThread->start();
 		if (bWait) {
 			//阻塞等待结果
 			while (!pMessageThread->isFinished()) {
-				//if (!m_pHvTcpClient) pMessageThread->stopThread();
 				QApplication::processEvents();
 			}
 			int res = pMessageThread->getResult();

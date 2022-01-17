@@ -1,5 +1,6 @@
 #include "resendmessage.h"
 #include <QTime>
+#include <QDebug>
 
 ResendMessage::ResendMessage(hv::TcpClient* tcpClient, unsigned int againNum, unsigned int timeout, 
 	QByteArray arrData, QByteArray arrAgainData, int messageid, _DeviceStatus initStatus, bool bauto, QObject *parent)
@@ -34,6 +35,8 @@ void ResendMessage::stopThread()
 	m_mutexStop.lock();
 	m_bStop = true;
 	m_mutexStop.unlock();
+	//µÈ´ıÏß³ÌÍ£Ö¹
+	while (isRunning());
 }
 
 int ResendMessage::getResult()

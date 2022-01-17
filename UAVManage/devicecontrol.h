@@ -5,6 +5,7 @@
 #include <QMenu>
 #include <QAction>
 #include <QMutex>
+#include <QTimer>
 #include "libhvsetting.h"
 #include "mavlinksetting.h"
 #include "resendmessage.h"
@@ -173,6 +174,10 @@ public:
 	int MavSendCommandLongMessage(int commandID, QByteArray arrData, QByteArray arrAgainData, bool bWait
 		, bool bAgainsend, unsigned int againNum, unsigned int againInterval, unsigned int nTimeout);
 signals:
+	/**
+	 * @brief 当主动断开tcp连接时,会释放Tcp指针
+	 */
+	void sigRenewTcpClient();
 	/**
 	 * @brief COMMAND消息返回值
 	 * @param 设备IP地址

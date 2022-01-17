@@ -23,9 +23,10 @@ public:
 		QByteArray arrData, QByteArray arrAgainData, int messageid, _DeviceStatus initStatus = DeviceWaiting
 		, bool bauto = false, QObject *parent=nullptr);
 	~ResendMessage();
-	void stopThread();
 	int getResult();
 	void setAutoDelete(bool bauto);
+public slots:
+	void stopThread(); 
 private slots:
 	void onResult(int res, int id);
 protected:
