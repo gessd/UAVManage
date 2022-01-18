@@ -257,6 +257,11 @@ void UAVManage::showEvent(QShowEvent* event)
 	if(!m_pWebSocket) loadWeb();
 }
 
+void UAVManage::closeEvent(QCloseEvent* event)
+{
+
+}
+
 void UAVManage::onWebLoadProgress(int progress)
 {
 	qDebug() << "----webload:" << progress;

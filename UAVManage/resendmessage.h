@@ -28,7 +28,7 @@ public:
 public slots:
 	void stopThread(); 
 private slots:
-	void onResult(int res, int id);
+	void onResult(QString name, int res, int id);
 protected:
 	void run();
 private:

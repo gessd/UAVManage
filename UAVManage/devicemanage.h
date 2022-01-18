@@ -19,6 +19,11 @@ class DeviceManage : public QWidget
 
 	//Q_PROPERTY(QString deviceName READ getCurrentName WRITE setCurrentName)
 public:
+	enum _AllDeviceCommand {
+		_DeviceTakeoffLocal, //起飞
+		_DeviceLandLocal,    //降落
+		_DeviceQuickStop     //急停
+	};
 	DeviceManage(QWidget *parent = Q_NULLPTR);
 	~DeviceManage();
 	/**
@@ -61,6 +66,10 @@ public:
 	* @return 如果和已存在的设备名称重复返回TRUE
 	*/
 	bool isRepetitionName(QString qstrName);
+	/**
+	 * @brief 控制所有设备执行
+	 */
+	void allDeviceControl(_AllDeviceCommand comand);
 signals:
 	void deviceAddFinished(QString qstrName, QString ip, float x, float y);
 	void deviceRemoveFinished(QString qstrName);
@@ -69,7 +78,7 @@ signals:
 protected:
 	virtual bool eventFilter(QObject* watched, QEvent* event);
 private slots:
-	void onBtnClickedFlyTakeoffLocal();
+	
 private:
 	/**
 	 * @brief 当前选中的设备

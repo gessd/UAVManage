@@ -31,6 +31,7 @@ public slots:
     void onWebClear();
 protected:
     virtual void showEvent(QShowEvent* event);
+    virtual void closeEvent(QCloseEvent* event);
 private slots:
     /**
      * @brief WEB页面加载进度，百分制

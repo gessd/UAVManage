@@ -138,61 +138,72 @@ void DeviceControl::setHeartbeatEnable(bool enable)
 }
 
 //无人机设置模式
-int DeviceControl::Fun_MAV_CMD_DO_SET_MODE(float Mode, bool wait)
+int DeviceControl::Fun_MAV_CMD_DO_SET_MODE(float Mode, bool wait, bool again)
 {
 	//参数2,3,4,5,6,7无效
 	//1姿态模式|2定高模式|3航点模式
-	return sendNavCommandLong(Mode, 0, 0, 0, 0, 0, 0, MAV_CMD_DO_SET_MODE, wait);
+	QByteArray arrData = mavCommandLongToBuffer(Mode, 0, 0, 0, 0, 0, 0, MAV_CMD_DO_SET_MODE);
+	return MavSendCommandLongMessage(MAV_CMD_DO_SET_MODE, arrData, arrData, wait, again, _MavLinkResendNum_, _NkCommandResendInterval_, _NkCommandResendInterval_);
 }
 
 //无人机起飞
-int DeviceControl::Fun_MAV_CMD_NAV_TAKEOFF_LOCAL(float Pitch, float Empty, float AscendRate, float Yaw, float X, float Y, float Z, bool wait)
+int DeviceControl::Fun_MAV_CMD_NAV_TAKEOFF_LOCAL(float Pitch, float Empty, float AscendRate, float Yaw, float X, float Y, float Z, bool wait, bool again)
 {
 	//参数1无效
-	return sendNavCommandLong(0, 0, AscendRate, Yaw, X, Y, Z, MAV_CMD_NAV_TAKEOFF_LOCAL, wait);
+	//参数2用了标记是否为重发的消息
+	QByteArray arrData = mavCommandLongToBuffer(0, 0, AscendRate, Yaw, X, Y, Z, MAV_CMD_NAV_TAKEOFF_LOCAL);
+	QByteArray againData = mavCommandLongToBuffer(0, _MavResendFlag_, AscendRate, Yaw, X, Y, Z, MAV_CMD_NAV_TAKEOFF_LOCAL);
+	return MavSendCommandLongMessage(MAV_CMD_NAV_TAKEOFF_LOCAL, arrData, againData, wait, again, _MavLinkResendNum_, _NkCommandResendInterval_, _NkCommandResendInterval_);
 }
 
 //无人机降落
-int DeviceControl::Fun_MAV_CMD_NAV_LAND_LOCAL(float Target, float Offset, float DescendRate, float Yaw, float X, float Y, float Z, bool wait /*= false*/)
+int DeviceControl::Fun_MAV_CMD_NAV_LAND_LOCAL(float Target, float Offset, float DescendRate, float Yaw, float X, float Y, float Z, bool wait, bool again)
 {
 	//参数1参数2无效
-	return sendNavCommandLong(0, 0, DescendRate, Yaw, X, Y, Z, MAV_CMD_NAV_LAND_LOCAL, wait);
+	QByteArray arrData = mavCommandLongToBuffer(0, 0, DescendRate, Yaw, X, Y, Z, MAV_CMD_NAV_LAND_LOCAL);
+	return MavSendCommandLongMessage(MAV_CMD_NAV_LAND_LOCAL, arrData, arrData, wait, again, _MavLinkResendNum_, _NkCommandResendInterval_, _NkCommandResendInterval_);
 }
 
 //无人机急停
-int DeviceControl::Fun_MAV_QUICK_STOP()
+int DeviceControl::Fun_MAV_QUICK_STOP(bool wait, bool again)
 {
-	return sendNavCommandLong(0, 0, 0, 0, 0, 0, 0, _NavStopFlyMessageID_, true);
+	QByteArray arrData = mavCommandLongToBuffer(0, 0, 0, 0, 0, 0, 0, _MavStopFlyMessageID_);
+	return MavSendCommandLongMessage(_MavStopFlyMessageID_, arrData, arrData, wait, again, _MavLinkResendNum_, _MavQuickStopFlyTimeout_, _NkCommandResendInterval_);
 }
 
 //无人机航点指令
-int DeviceControl::Fun_MAV_CMD_NAV_WAYPOINT(float Hold, float AcceptRadius, float PassRadius, float Yaw, float Latitude, float Longitude, float Altitude, bool wait /*= false*/)
+int DeviceControl::Fun_MAV_CMD_NAV_WAYPOINT(float Hold, float AcceptRadius, float PassRadius, float Yaw, float Latitude, float Longitude, float Altitude, bool wait, bool again)
 {
-	return sendNavCommandLong(Hold, AcceptRadius, PassRadius, Yaw, Latitude, Longitude, Altitude, MAV_CMD_NAV_WAYPOINT, wait);
+	QByteArray arrData = mavCommandLongToBuffer(Hold, AcceptRadius, PassRadius, Yaw, Latitude, Longitude, Altitude, MAV_CMD_NAV_WAYPOINT);
+	return MavSendCommandLongMessage(MAV_CMD_NAV_WAYPOINT, arrData, arrData, wait, again, _MavLinkResendNum_, _NkCommandResendInterval_, _NkCommandResendInterval_);
 }
 
 //无人机校准
-int DeviceControl::Fun_MAV_CALIBRATION(float p1, float p2, float p3, float p4, float p5, float p6, float p7, bool wait)
+int DeviceControl::Fun_MAV_CALIBRATION(float p1, float p2, float p3, float p4, float p5, float p6, float p7, bool wait, bool again)
 {
-	return sendNavCommandLong(p1, p2, p3, p4, p5, p6, p7, MAV_CMD_PREFLIGHT_CALIBRATION, wait);
+	QByteArray arrData = mavCommandLongToBuffer(p1, p2, p3, p4, p5, p6, p7, MAV_CMD_PREFLIGHT_CALIBRATION);
+	return MavSendCommandLongMessage(MAV_CMD_PREFLIGHT_CALIBRATION, arrData, arrData, wait, again, _MavLinkResendNum_, _NkCommandResendInterval_, _NkCommandResendInterval_);
 }
 
 //无人机列队
 int DeviceControl::Fun_MAV_Defined_Queue()
 {
-	return sendNavCommandLong(0, 0, 0, 0, 0, 0, 0, MAV_CMD_USER_1, true);
+	QByteArray arrData = mavCommandLongToBuffer(0, 0, 0, 0, 0, 0, 0, MAV_CMD_USER_1);
+	return MavSendCommandLongMessage(MAV_CMD_USER_1, arrData, arrData, true, true, _MavLinkResendNum_, _NkCommandResendInterval_, _NkCommandResendInterval_);
 }
 
 //无人机回收
 int DeviceControl::Fun_MAV_Defined_Regain()
 {
-	return sendNavCommandLong(0, 0, 0, 0, 0, 0, 0, MAV_CMD_USER_2, true);
+	QByteArray arrData = mavCommandLongToBuffer(0, 0, 0, 0, 0, 0, 0, MAV_CMD_USER_2);
+	return MavSendCommandLongMessage(MAV_CMD_USER_2, arrData, arrData, true, true, _MavLinkResendNum_, _NkCommandResendInterval_, _NkCommandResendInterval_);
 }
 
 //无人机灯光
 int DeviceControl::Fun_MAV_LED_MODE()
 {
-	return sendNavCommandLong(0, 0, 0, 0, 0, 0, 0, MAV_CMD_WAYPOINT_USER_4, true);
+	QByteArray arrData = mavCommandLongToBuffer(0, 0, 0, 0, 0, 0, 0, MAV_CMD_WAYPOINT_USER_4);
+	return MavSendCommandLongMessage(MAV_CMD_WAYPOINT_USER_4, arrData, arrData, true, true, _MavLinkResendNum_, _NkCommandResendInterval_, _NkCommandResendInterval_);
 }
 
 //网络连接状态
@@ -219,13 +230,12 @@ void DeviceControl::hvcbConnectionStatus(const hv::SocketChannelPtr& channel)
 			}
 			});
 		ui.labelConnect->setText(tr("已连接"));
-		emit sigConnectStatus(peeraddr.c_str(), true);
 	}
 	else {
 		//连接断开
 		ui.labelConnect->setText(tr("已断开"));
-		emit sigConnectStatus(peeraddr.c_str(), false);
 	}
+	emit sigConnectStatus(ui.labelDeviceName->text(), peeraddr.c_str(), channel->isConnected());
 }
 
 //收到的数据
@@ -251,7 +261,7 @@ void DeviceControl::hvcbReceiveMessage(const hv::SocketChannelPtr& channel, hv::
 		{
 			mavlink_command_ack_t ack;
 			mavlink_msg_command_ack_decode(&msg, &ack);
-			emit sigCommandResult(ack.result, ack.command);
+			emit sigCommandResult(ui.labelDeviceName->text(), ack.result, ack.command);
 			break;		
 		}
 		default:
@@ -298,46 +308,20 @@ QByteArray DeviceControl::mavCommandLongToBuffer(float param1, float param2, flo
 	return mavMessageToBuffer(message);
 }
 
-int DeviceControl::sendNavCommandLong(float param1, float param2, float param3, float param4, float param5, float param6, float param7
-	, int command, bool wait)
-{
-	if (!m_pHvTcpClient) return DeviceUnConnect;
-	QByteArray arrData = mavCommandLongToBuffer(param1, param2, param3, param4, param5, param6, param7, command);
-	if (!wait) {
-		m_pHvTcpClient->send(arrData.data(), arrData.length());
-		return 0;
-	}
-	QByteArray arrResendData = arrData;
-	if (MAV_CMD_NAV_TAKEOFF_LOCAL == command) {
-		//起飞指令重发内容参数2需要置为1用于标记
-		arrResendData = mavCommandLongToBuffer(param1, _NavResendFlag_, param3, param4, param5, param6, param7, command);
-	}
-	ResendMessage message(m_pHvTcpClient, _NavLinkResendNum_, _NkCommandResendInterval_, arrData, arrResendData, command);
-	connect(this, SIGNAL(sigCommandResult(int, int)), &message, SLOT(onResult(int, int)));
-	message.start();
-	//阻塞等待结果
-	while (!message.isFinished()) {
-		if (!m_pHvTcpClient) return DeviceUnConnect;
-		QApplication::processEvents();
-	}
-	return message.getResult();
-}
-
 int DeviceControl::MavSendCommandLongMessage(int commandID, QByteArray arrData, QByteArray arrAgainData, bool bWait
 	, bool bAgainsend, unsigned int againNum, unsigned int againInterval, unsigned int nTimeout)
 {
-	static bool bConnect = false;
 	if (arrData.isEmpty()) return DeviceDataError;
 	if (bAgainsend && arrAgainData.isEmpty()) return DeviceDataError;
-	if (!m_pHvTcpClient) return DeviceUnConnect;
-
+	if (!isConnectDevice()) return DeviceUnConnect;
 	static bool bWaiting = true;
 	bWaiting = true;
 	int res = DeviceWaiting;
 	//新此信号及接受者都为全局指针，顾此信号会出现重复绑定，通过静态bConnect控制只绑定一次信号槽
+	static bool bConnect = false;
 	if (false == bConnect) {
 		//等待指令返回结果
-		connect(this, &DeviceControl::sigCommandResult, [&, this](int result, int commandid) {
+		connect(this, &DeviceControl::sigCommandResult, [&, this](QString name, int result, int commandid) {
 			if (false == bWaiting) return;
 			if (commandID != commandid) return;
 			res = result;
@@ -348,7 +332,7 @@ int DeviceControl::MavSendCommandLongMessage(int commandID, QByteArray arrData, 
 	if (bAgainsend) {
 		//通过MessageThread控制重发数据及处理消息响应
 		pMessageThread = new ResendMessage(m_pHvTcpClient, againNum, againInterval, arrData, arrAgainData, commandID);
-		connect(this, SIGNAL(sigCommandResult(int, int)), pMessageThread, SLOT(onResult(int, int)));
+		connect(this, SIGNAL(sigCommandResult(QString, int, int)), pMessageThread, SLOT(onResult(QString, int, int)));
 		//连接主动断开时TCPclient指针会释放,需求停止线程,否则造成崩溃
 		connect(this, SIGNAL(sigRenewTcpClient()), pMessageThread, SLOT(stopThread()));
 		pMessageThread->start();

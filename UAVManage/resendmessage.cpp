@@ -50,7 +50,7 @@ void ResendMessage::setAutoDelete(bool bauto)
 	m_bAutoDelete = bauto;
 }
 
-void ResendMessage::onResult(int res, int id)
+void ResendMessage::onResult(QString name, int res, int id)
 {
 	if (m_nMessageID != id) return;
 	m_mutexResult.lock();

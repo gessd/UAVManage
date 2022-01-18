@@ -56,7 +56,7 @@ public:
 	 * @param Mode        [in] 模式类型 1姿态模式|2定高模式|3航点模式
 	 * @return 返回消息错误值 [0成功]
 	 */
-	int Fun_MAV_CMD_DO_SET_MODE(float Mode, bool wait = false);
+	int Fun_MAV_CMD_DO_SET_MODE(float Mode, bool wait = true, bool again = true);
 
 	/**
 	 * @brief 无人机起飞
@@ -70,7 +70,7 @@ public:
 	 * @param wait         [in] 阻塞等待消息返回结果
 	 * @return 返回消息错误值 [0成功]
 	 */
-	int Fun_MAV_CMD_NAV_TAKEOFF_LOCAL(float Pitch , float Empty, float AscendRate, float Yaw, float X, float Y, float Z, bool wait=false);
+	int Fun_MAV_CMD_NAV_TAKEOFF_LOCAL(float Pitch, float Empty, float AscendRate, float Yaw, float X, float Y, float Z, bool wait = true, bool again = true);
 
 	/**
 	 * @brief 无人机降落
@@ -84,12 +84,12 @@ public:
 	 * @param wait         [in] 阻塞等待消息返回结果
 	 * @return 返回消息错误值 [0成功]
 	 */
-	int Fun_MAV_CMD_NAV_LAND_LOCAL(float Target, float Offset, float DescendRate, float Yaw, float X, float Y, float Z, bool wait = false);
+	int Fun_MAV_CMD_NAV_LAND_LOCAL(float Target, float Offset, float DescendRate, float Yaw, float X, float Y, float Z, bool wait = true, bool again = true);
 	
 	/**
 	 * @brief 无人机紧急停止
 	 */
-	int Fun_MAV_QUICK_STOP();
+	int Fun_MAV_QUICK_STOP(bool wait = true, bool again = true);
 
 	/**
 	 * @brief 航点命令
@@ -103,7 +103,7 @@ public:
 	 * @param wait         [in] 阻塞等待消息返回结果
 	 * @return 返回消息错误值 [0成功]
 	 */
-	int Fun_MAV_CMD_NAV_WAYPOINT(float Hold, float AcceptRadius, float PassRadius, float Yaw, float Latitude, float Longitude, float Altitude, bool wait = false);
+	int Fun_MAV_CMD_NAV_WAYPOINT(float Hold, float AcceptRadius, float PassRadius, float Yaw, float Latitude, float Longitude, float Altitude, bool wait = true, bool again = true);
 
 	/**
      * @brief  无人机校准命令
@@ -115,7 +115,7 @@ public:
      * @param6 未使用
      * @param7 电调校准
      */
-	int Fun_MAV_CALIBRATION(float p1, float p2, float p3, float p4, float p5, float p6, float p7, bool wait = false);
+	int Fun_MAV_CALIBRATION(float p1, float p2, float p3, float p4, float p5, float p6, float p7, bool wait = true, bool again = true);
 
 	/**
 	 * @brief  无人机列队
@@ -156,8 +156,6 @@ private:
 	*/
 	QByteArray mavMessageToBuffer(mavlink_message_t mesage);
 	QByteArray mavCommandLongToBuffer(float param1, float param2, float param3, float param4, float param5, float param6, float param7, int command, int confirmation = 1);
-	int sendNavCommandLong(float param1, float param2, float param3, float param4, float param5, float param6, float param7
-		, int command, bool wait);
 	/**
 	 * @brief 发送Mav指令消息
 	 * @param commandID     指令ID
@@ -183,17 +181,13 @@ signals:
 	 * @param 设备IP地址
 	 * @param 连接成功与断开
 	 */
-	void sigConnectStatus(QString ip, bool connect);
+	void sigConnectStatus(QString name, QString ip, bool connect);
 	/**
 	 * @brief COMMAND消息返回值
 	 * @param result    返回值
 	 * @param commandid 指令ID
 	 */
-	void sigCommandResult(int result, int commandid);
-	/**
-	 * @brief 指令执行结果
-	 */
-	void sigActionResult();
+	void sigCommandResult(QString name, int result, int commandid);
 private:
 	Ui::DeviceControl ui;
 	QString m_qstrIP;

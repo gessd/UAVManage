@@ -8,24 +8,22 @@
 //设备组件ID
 #define _DeviceCOMP_ID_ 1
 //消息重发标识
-#define _NavResendFlag_ 1
+#define _MavResendFlag_ 1
 
-//急停指令消息ID
-#define _NavStopFlyMessageID_ 15
 //设备TCP连接端口
 #define _DevicePort_ 8899
+
+//急停指令消息ID
+#define _MavStopFlyMessageID_ 15
+//急停超时间隔
+#define _MavQuickStopFlyTimeout_ 1000
+//指令消息重发发送次数
+#define _MavLinkResendNum_ 2
+//航点重复次数
+#define _MavWaypointRetryNum_ 2
 //心跳消息时间间隔
 #define _DeviceHeartbeatInterval_ 500
-
-//指令消息重发发送次数
-#define _NavLinkResendNum_ 2
 //指令消息重发间隔 毫秒
 #define _NkCommandResendInterval_ 3000
-
 //下发航点超时 毫秒
-#define _NavWaypointTimeout_ 2000
-//急停超时间隔
-#define _NavQuickStopFlyTimeout_ 1000
-//航点重复次数
-#define _NavWaypointRetryNum_ 3
-
+#define _MavWaypointTimeout_ 2000

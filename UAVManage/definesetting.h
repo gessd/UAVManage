@@ -10,6 +10,8 @@
 
 //设备名称前缀
 #define _DeviceNamePrefix_ "无人机"
+//无人机默认起飞高度 厘米
+#define _TakeoffLocalHeight_ 100
 
 //XML文件
 // <?xml version="1.0" encoding="UTF-8"?>
