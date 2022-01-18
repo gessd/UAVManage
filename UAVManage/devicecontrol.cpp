@@ -328,50 +328,61 @@ int DeviceControl::MavSendCommandLongMessage(int commandID, QByteArray arrData, 
 {
 	static bool bConnect = false;
 	if (arrData.isEmpty()) return DeviceDataError;
+	if (bAgainsend && arrAgainData.isEmpty()) return DeviceDataError;
 	if (!m_pHvTcpClient) return DeviceUnConnect;
-	if (false == bAgainsend) {
-		if (arrData.length() != m_pHvTcpClient->send(arrData.data(), arrData.length())) return DeviceDataError;
-		if (bWait) {
-			static bool bWaiting = true;
-			bWaiting = true;
-			int res = DeviceMessageToimeout;
-			//等待指令返回结果
-			if (false == bConnect) {
-				//防止信号槽反复绑定
-				connect(this, &DeviceControl::sigCommandResult, [&, this](int result, int commandid) {
-					if (false == bWaiting) return;
-					if (commandID != commandid) return;
-					res = result;
-					});
-				bConnect = true;
-			}
-			QTime timeStart;
-			timeStart.start();
-			while (DeviceMessageToimeout == res) {
-				QApplication::processEvents();
-				if(timeStart.elapsed()>nTimeout) break;
-			}
-			bWaiting = false;
-			return res;
-		}
-		return DeviceDataSucceed;
+
+	static bool bWaiting = true;
+	bWaiting = true;
+	int res = DeviceWaiting;
+	//新此信号及接受者都为全局指针，顾此信号会出现重复绑定，通过静态bConnect控制只绑定一次信号槽
+	if (false == bConnect) {
+		//等待指令返回结果
+		connect(this, &DeviceControl::sigCommandResult, [&, this](int result, int commandid) {
+			if (false == bWaiting) return;
+			if (commandID != commandid) return;
+			res = result;
+			});
+		bConnect = true;
 	}
-	else {
-		ResendMessage* pMessageThread = new ResendMessage(m_pHvTcpClient, againNum, againInterval, arrData, arrAgainData, commandID);
+	ResendMessage* pMessageThread = nullptr;
+	if (bAgainsend) {
+		//通过MessageThread控制重发数据及处理消息响应
+		pMessageThread = new ResendMessage(m_pHvTcpClient, againNum, againInterval, arrData, arrAgainData, commandID);
 		connect(this, SIGNAL(sigCommandResult(int, int)), pMessageThread, SLOT(onResult(int, int)));
 		//连接主动断开时TCPclient指针会释放,需求停止线程,否则造成崩溃
 		connect(this, SIGNAL(sigRenewTcpClient()), pMessageThread, SLOT(stopThread()));
 		pMessageThread->start();
-		if (bWait) {
-			//阻塞等待结果
-			while (!pMessageThread->isFinished()) {
-				QApplication::processEvents();
-			}
-			int res = pMessageThread->getResult();
-			pMessageThread->deleteLater();
-			return res;
-		}
-		pMessageThread->setAutoDelete(true);
+	} else
+		m_pHvTcpClient->send(arrData.data(), arrData.length());
+
+	if (false == bWait) {
+		//当使用重发消息但不等待返回结果时，MessageThread指针无法销毁，设置自动销毁，使用完后自动注销
+		if (pMessageThread) pMessageThread->setAutoDelete(true);
 		return DeviceDataSucceed;
 	}
+	if (pMessageThread) {
+		//阻塞等待结果
+		while (!pMessageThread->isFinished()) {
+			QApplication::processEvents();
+		}
+		bWaiting = false;
+		int res = pMessageThread->getResult();
+		pMessageThread->deleteLater();
+		return res;
+	}
+	else {
+		//当需要等待返回结果但不使用重发时，此处以定时器判断超时时间，直到消息返回结果
+		QTime timeStart;
+		timeStart.start();
+		while (DeviceWaiting == res) {
+			QApplication::processEvents();
+			if (timeStart.elapsed() > nTimeout) {
+				res = DeviceMessageToimeout;
+				break;
+			}
+		}
+		bWaiting = false;
+		return res;
+	}
+	return DeviceWaiting;
 }
