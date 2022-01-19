@@ -229,7 +229,7 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 		switch (comand)
 		{
 		case DeviceManage::_DeviceTakeoffLocal:
-			pDevice->Fun_MAV_CMD_NAV_TAKEOFF_LOCAL(0, 0, 0, 0, 0, 0, _TakeoffLocalHeight_, true, true);
+			pDevice->Fun_MAV_CMD_NAV_TAKEOFF_LOCAL(0, 0, 0, 0, 0, 0, _TakeoffLocalHeight_, false, true);
 			break;
 		case DeviceManage::_DeviceLandLocal:
 			pDevice->Fun_MAV_CMD_NAV_LAND_LOCAL(0, 0, 0, 0, 0, 0, 0, false, true);
@@ -248,7 +248,7 @@ bool DeviceManage::eventFilter(QObject* watched, QEvent* event)
 	if (ui.listWidget == watched) {
 		//设备列表菜单
 		if (QEvent::ContextMenu != event->type()) return false;
-		if (!ui.listWidget->itemAt(mapFromGlobal(QCursor::pos()))) return false;
+		if (!ui.listWidget->itemAt(ui.listWidget->mapFromGlobal(QCursor::pos()))) return false;
 		m_pMenu->exec(QCursor::pos());
 	}
 	return false;

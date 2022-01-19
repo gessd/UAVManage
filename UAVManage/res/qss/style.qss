@@ -3,6 +3,10 @@ QWidget{
 	color:rgb(255,255,255);
 	background:rgb(58,58,58);
 }
+QWidget:disabled{
+	color:rgb(100,100,100);
+}
+
 QToolButton, QPushButton, QDialog QPushButton{
     background:rgb(80, 80, 80);
 	/*border:1px solid red;*/
@@ -13,9 +17,6 @@ QToolButton:hover, QPushButton:hover, QDialog QPushButton:hover{
 }
 QToolButton:pressed, QPushButton:pressed, QDialog QPushButton:pressed{
     background:rgb(120,120,120);
-}
-QToolButton:disabled, QPushButton:disabled{
-	background:rgb(65,65,65);
 }
 
 QLineEdit, QListWidget{

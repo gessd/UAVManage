@@ -317,7 +317,7 @@ int DeviceControl::MavSendCommandLongMessage(int commandID, QByteArray arrData, 
 	static bool bWaiting = true;
 	bWaiting = true;
 	int res = DeviceWaiting;
-	//新此信号及接受者都为全局指针，顾此信号会出现重复绑定，通过静态bConnect控制只绑定一次信号槽
+	//此信号及接受者都为全局指针，顾此信号会出现重复绑定，通过bConnect控制只绑定一次信号槽
 	static bool bConnect = false;
 	if (false == bConnect) {
 		//等待指令返回结果
