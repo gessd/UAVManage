@@ -71,6 +71,10 @@ private slots:
      * @brief 设备列表中设备重命名
      */
     void onDeviceRename(QString newName, QString oldName);
+    /**
+     * @brief 程序间通讯
+     */
+    void onAppMessage(const QString& message);
 private:
     /**
      * @brief 新建项目工程文件

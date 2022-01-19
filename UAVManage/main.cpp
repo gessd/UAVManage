@@ -3,6 +3,8 @@
 #include <QDebug>
 #include <QFile>
 #include <QTextCodec>
+#include <QMessageBox>
+#include "qtsingleapplication.h"
 
 void outputMessage(QtMsgType type, const QMessageLogContext& context, const QString& msg)
 {
@@ -38,9 +40,14 @@ void outputMessage(QtMsgType type, const QMessageLogContext& context, const QStr
 }
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
-
-	//ע��MessageHandler
+	QtSingleApplication a("myapp_id", argc, argv);
+	if (a.isRunning())  //判断实例是否已经运行
+	{
+		qDebug() << "程序已运行";
+		a.sendMessage("raise_window_noop", 1000);
+		return EXIT_SUCCESS;
+	}
+	//注册MessageHandler
 	//qInstallMessageHandler(outputMessage);
 
 	QTextCodec* codec = QTextCodec::codecForName("utf-8");
@@ -54,5 +61,8 @@ int main(int argc, char *argv[])
 
     UAVManage w;
     w.show();
+	a.setActivationWindow(&w);
+	QObject::connect(&a, SIGNAL(messageReceived(const QString&)), &w, SLOT(onAppMessage(const QString&)));
+
     return a.exec();
 }

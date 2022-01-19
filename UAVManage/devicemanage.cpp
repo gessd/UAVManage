@@ -229,7 +229,7 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 		switch (comand)
 		{
 		case DeviceManage::_DeviceTakeoffLocal:
-			pDevice->Fun_MAV_CMD_NAV_TAKEOFF_LOCAL(0, 0, 0, 0, 0, 0, _TakeoffLocalHeight_, false, true);
+			pDevice->Fun_MAV_CMD_NAV_TAKEOFF_LOCAL(0, 0, 0, 0, 0, 0, _TakeoffLocalHeight_, true, true);
 			break;
 		case DeviceManage::_DeviceLandLocal:
 			pDevice->Fun_MAV_CMD_NAV_LAND_LOCAL(0, 0, 0, 0, 0, 0, 0, false, true);

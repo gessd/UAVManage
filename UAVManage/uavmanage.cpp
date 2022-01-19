@@ -460,6 +460,11 @@ void UAVManage::onDeviceRename(QString newName, QString oldName)
 	QFile::rename(qstrOldPythonFile, qstrNewPythonFile);
 }
 
+void UAVManage::onAppMessage(const QString& message)
+{
+	qDebug() << "---- app message" << message;
+}
+
 bool UAVManage::newProjectFile(QString qstrFile, float X, float Y)
 {	
 	const char* declaration = _XMLVersion_;

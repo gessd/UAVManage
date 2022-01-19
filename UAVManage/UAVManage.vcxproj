@@ -63,7 +63,7 @@
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <LanguageStandard>Default</LanguageStandard>
       <LanguageStandard_C>stdc11</LanguageStandard_C>
-      <AdditionalIncludeDirectories>.\python395-64\include;.\mavlink1-c\common;.\mavlink1-c;.\libhv\include;.\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\qtsingleapplication;.\python395-64\include;.\mavlink1-c\common;.\mavlink1-c;.\libhv\include;.\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>HV_STATICLIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
@@ -77,7 +77,7 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <PreprocessorDefinitions>HV_STATICLIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>.\python395-64\include;.\mavlink1-c\common;.\mavlink1-c\;.\libhv\include;.\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\qtsingleapplication;.\python395-64\include;.\mavlink1-c\common;.\mavlink1-c\;.\libhv\include;.\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
@@ -121,6 +121,8 @@
     <ClCompile Include="adddevicedialog.cpp" />
     <ClCompile Include="devicecontrol.cpp" />
     <ClCompile Include="devicemanage.cpp" />
+    <ClCompile Include="qtsingleapplication\qtlocalpeer.cpp" />
+    <ClCompile Include="qtsingleapplication\qtsingleapplication.cpp" />
     <ClCompile Include="resendmessage.cpp" />
     <ClCompile Include="setdevicedialog.cpp" />
     <ClCompile Include="threadpython.cpp" />
@@ -146,6 +148,8 @@
     <ClInclude Include="mavlinksetting.h" />
     <QtMoc Include="threadpython.h" />
     <ClInclude Include="mypythondefine.h" />
+    <QtMoc Include="qtsingleapplication\qtlocalpeer.h" />
+    <QtMoc Include="qtsingleapplication\qtsingleapplication.h" />
     <ClInclude Include="tinyxml2\tinyxml2.h" />
     <QtMoc Include="resendmessage.h" />
   </ItemGroup>
