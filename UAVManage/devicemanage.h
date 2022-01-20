@@ -71,9 +71,30 @@ public:
 	 */
 	void allDeviceControl(_AllDeviceCommand comand);
 signals:
+	/**
+	 * @brief 设备添加完成
+	 * @param 设备名
+	 * @param IP
+	 * @param 初始坐标
+	 * @param 初始坐标
+	 */
 	void deviceAddFinished(QString qstrName, QString ip, float x, float y);
+	/**
+	 * @brief 设备删除完成
+	 * @param 设备名
+	 */
 	void deviceRemoveFinished(QString qstrName);
+	/**
+	 * @brief 设备重命名完成
+	 * @param 新设备名
+	 * @param 旧设备名
+	 */
 	void deviceRenameFinished(QString newName, QString oldName);
+	/**
+	 * @brief 当前选中设备改变
+	 * @param 当前选中设备
+	 * @param 上一次选中设备，可能存在空
+	 */
 	void currentDeviceNameChanged(QString currentName, QString previousName);
 protected:
 	virtual bool eventFilter(QObject* watched, QEvent* event);

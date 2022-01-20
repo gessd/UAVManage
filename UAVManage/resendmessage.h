@@ -7,6 +7,7 @@
 enum _DeviceStatus
 {
 	DeviceMessageToimeout = -404,
+	DeviceMessageSending = -4,
 	DeviceDataError = -3,
 	DeviceUnConnect = -2,
 	DeviceWaiting = -1,

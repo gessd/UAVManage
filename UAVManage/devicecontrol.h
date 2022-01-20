@@ -53,24 +53,35 @@ public slots:
 	 * @brief 连接设备
 	 */
 	bool connectDevice();
+
 	/**
 	 * @brief 断开设备连接
 	 */
 	void disconnectDevice();
+
 	/**
 	 * @brief 设备是否连接
 	 */
 	bool isConnectDevice();
+
 	/**
 	 * @brief 发送数据
 	 * @param data [in] 二进制数据
 	 * @return 发送成功
 	 */
 	bool sendMessage(QByteArray data);
+
 	/**
 	 * @brief 启用心跳
 	 */
 	void setHeartbeatEnable(bool enable);
+
+	/**
+	 * @brief 准备下发航点数据，根据信号sigWaypointProcess处理进度
+	 * @param data 航点结构
+	 * @return 返回消息错误值 [0下发过程开始]
+	 */
+	int DeviceMavWaypointStart(QVector<NavWayPointData> data);
 
 	/**
 	 * @brief 无人机设置模式
@@ -78,12 +89,7 @@ public slots:
 	 * @return 返回消息错误值 [0成功]
 	 */
 	int Fun_MAV_CMD_DO_SET_MODE(float Mode, bool wait = true, bool again = true);
-	/**
-	 * @brief 发送航点数据
-	 * @param data 航点结构
-	 * @return 返回消息错误值 [0成功]
-	 */
-	int sendMavWaypoint(QVector<NavWayPointData> data);
+
 	/**
 	 * @brief 无人机起飞
 	 * @param Pitch        [in] 无效
@@ -195,19 +201,41 @@ public:
 	 */
 	int MavSendCommandLongMessage(int commandID, QByteArray arrData, QByteArray arrAgainData="", bool bWait = false
 		, unsigned int againNum = _MavLinkResendNum_, unsigned int againInterval = _NkCommandResendInterval_);
+	QByteArray getWaypointData(float param1, float param2, float param3, float param4
+		, int32_t x, int32_t y, float z, uint16_t seq, unsigned int again);
+	/**
+	 * @brief 开始发送航点
+	 */
+	void DeviceMavWaypointSend(QVector<NavWayPointData> data);
+	/**
+	 * @brief 发送航点结束指令
+	 */
+	void DeviceMavWaypointEnd(unsigned int count);
 signals:
 	/**
 	 * @brief COMMAND消息返回值
+	 * @param 设备名称
 	 * @param 设备IP地址
 	 * @param 连接成功与断开
 	 */
 	void sigConnectStatus(QString name, QString ip, bool connect);
 	/**
 	 * @brief COMMAND消息返回值
+	 * @param 设备名称
 	 * @param result    返回值
 	 * @param commandid 指令ID
 	 */
 	void sigCommandResult(QString name, int result, int commandid);
+	/**
+	 * @brief 航点下发进度
+	 * @param 设备名称
+	 * @param 当前航点序号
+	 * @param 航点总数
+	 * @param 下发过程中指令响应值
+	 * @param 整个下发过程是否完成，完成并不代表成功[0=res&&true=finish]才成功
+	 * @param 文字描述信息
+	 */
+	void sigWaypointProcess(QString name, unsigned int index, unsigned int count, int res, bool finish, QString text);
 private:
 	Ui::DeviceControl ui;
 	QString m_qstrIP;
@@ -217,4 +245,6 @@ private:
 	bool m_bHeartbeatEnable;
 	float m_fStartX;
 	float m_fStartY;
+	//航点下发中
+	bool m_bWaypointSending;
 };
