@@ -75,6 +75,7 @@ private slots:
      * @brief 程序间通讯
      */
     void onAppMessage(const QString& message);
+
 private:
     /**
      * @brief 新建项目工程文件

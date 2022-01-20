@@ -73,7 +73,7 @@ DeviceManage::DeviceManage(QWidget *parent)
 	connect(pFlyTo, &QAction::triggered, [this](bool checked) {
 		DeviceControl* pControl = getCurrentDevice();
 		if (!pControl) return;
-		int res = pControl->MavSendCommandLongMessage(MAV_CMD_NAV_TAKEOFF_LOCAL, "abc","abcd", true, true, 2, 3000, 3*1000);
+		int res = pControl->MavSendCommandLongMessage(MAV_CMD_NAV_TAKEOFF_LOCAL, "abc","abcd", true, 2, 3000);
 		qDebug() << "----device message:" << res;
 		//int nTest = pControl->Fun_MAV_CMD_NAV_TAKEOFF_LOCAL(1, 2, 3, 4, 5, 6, 7);
 		});

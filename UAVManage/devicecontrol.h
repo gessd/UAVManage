@@ -10,6 +10,26 @@
 #include "mavlinksetting.h"
 #include "resendmessage.h"
 
+//航点属性
+typedef struct __NavWayPointData
+{
+	float param1;       //停留时间
+	float param2;       //接受半径
+	float param3;       //轨迹控制
+	float param4;       //偏转角度
+	int32_t x;
+	int32_t y;
+	float z;
+	unsigned int commandID;
+	__NavWayPointData() {
+		param2 = 0.2;   //偏转角度需要有默认值
+		param1 = param3 = param4 = z = 0.0;
+		x = y = 0;
+		commandID = MAV_CMD_NAV_WAYPOINT;
+	}
+}NavWayPointData;
+
+
 class DeviceControl : public QWidget
 {
 	Q_OBJECT
@@ -28,6 +48,7 @@ public:
 	void setY(float y);
 	void setStartLocation(float x, float y);
 	QList<float> getStartLocation();
+public slots:
 	/**
 	 * @brief 连接设备
 	 */
@@ -57,7 +78,12 @@ public:
 	 * @return 返回消息错误值 [0成功]
 	 */
 	int Fun_MAV_CMD_DO_SET_MODE(float Mode, bool wait = true, bool again = true);
-
+	/**
+	 * @brief 发送航点数据
+	 * @param data 航点结构
+	 * @return 返回消息错误值 [0成功]
+	 */
+	int sendMavWaypoint(QVector<NavWayPointData> data);
 	/**
 	 * @brief 无人机起飞
 	 * @param Pitch        [in] 无效
@@ -156,26 +182,20 @@ private:
 	*/
 	QByteArray mavMessageToBuffer(mavlink_message_t mesage);
 	QByteArray mavCommandLongToBuffer(float param1, float param2, float param3, float param4, float param5, float param6, float param7, int command, int confirmation = 1);
+public:
 	/**
 	 * @brief 发送Mav指令消息
 	 * @param commandID     指令ID
 	 * @param arrData       发送的数据内容
-	 * @param arrAgainData  重发的数据内容
+	 * @param arrAgainData  重发的数据内容，部分协议重发数据与初始数据不同
 	 * @param bWait         等待发送结果
-	 * @param bAgainsend    是否重发数据
 	 * @param againNum      重发次数
-	 * @param againInterval 重发时间间隔[毫秒]
-	 * @param nTimeout      超时时间[毫秒]
+	 * @param againInterval 重发/超时时间间隔[毫秒]
 	 * @return 返回执行结果
 	 */
-public:
-	int MavSendCommandLongMessage(int commandID, QByteArray arrData, QByteArray arrAgainData, bool bWait
-		, bool bAgainsend, unsigned int againNum, unsigned int againInterval, unsigned int nTimeout);
+	int MavSendCommandLongMessage(int commandID, QByteArray arrData, QByteArray arrAgainData="", bool bWait = false
+		, unsigned int againNum = _MavLinkResendNum_, unsigned int againInterval = _NkCommandResendInterval_);
 signals:
-	/**
-	 * @brief 当主动断开tcp连接时,会释放Tcp指针
-	 */
-	void sigRenewTcpClient();
 	/**
 	 * @brief COMMAND消息返回值
 	 * @param 设备IP地址

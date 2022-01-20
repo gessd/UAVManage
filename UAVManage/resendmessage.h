@@ -3,7 +3,6 @@
 #include <QObject>
 #include <QThread>
 #include <QMutex>
-#include "libhvsetting.h"
 
 enum _DeviceStatus
 {
@@ -19,7 +18,7 @@ class ResendMessage : public QThread
 	Q_OBJECT
 
 public:
-	ResendMessage(hv::TcpClient* tcpClient, unsigned int againNum, unsigned int timeout, 
+	ResendMessage(unsigned int againNum, unsigned int timeout, 
 		QByteArray arrData, QByteArray arrAgainData, int messageid, _DeviceStatus initStatus = DeviceWaiting
 		, bool bauto = false, QObject *parent=nullptr);
 	~ResendMessage();
@@ -31,8 +30,9 @@ private slots:
 	void onResult(QString name, int res, int id);
 protected:
 	void run();
+signals:
+	void sigSendMessage(QByteArray data);
 private:
-	hv::TcpClient* m_pTcpClient;
 	unsigned int m_unAgainNumber;
 	unsigned int m_unTimeout;
 	QByteArray m_arrData;

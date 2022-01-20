@@ -50,13 +50,13 @@ UAVManage::UAVManage(QWidget *parent)
 	ui.menuBar->addMenu(pTestMenu);
 
 	QMenu* pProjectMenu = new QMenu(tr("项目"));
+	ui.menuBar->addMenu(pProjectMenu);
 	QAction* pActionNew = new QAction(style->standardIcon(QStyle::SP_FileDialogNewFolder), tr("新建"));
 	QAction* pActionOpen = new QAction(style->standardIcon(QStyle::SP_DialogOpenButton), tr("打开"));
 	QAction* pActionSaveas = new QAction(style->standardIcon(QStyle::SP_DirIcon), tr("另存为"));
 	pProjectMenu->addAction(pActionNew);
 	pProjectMenu->addAction(pActionOpen);
 	pProjectMenu->addAction(pActionSaveas);
-	ui.menuBar->addMenu(pProjectMenu);
 	connect(pActionNew, &QAction::triggered, [this]() { onNewProject(); });
 	connect(pActionOpen, &QAction::triggered, [this]() {
 		QString qstrFile = QFileDialog::getOpenFileName(this, tr("项目名"), "", "File(*.qz)");
@@ -64,6 +64,21 @@ UAVManage::UAVManage(QWidget *parent)
 		onOpenProject(qstrFile);
 		});
 	connect(pActionSaveas, &QAction::triggered, [this]() {onSaveasProject(); });
+
+	QMenu* pMenuFlyPrepare = new QMenu(tr("起飞准备"));
+	ui.menuBar->addMenu(pMenuFlyPrepare);
+	QAction* pActionFly1 = new QAction("1.检查舞步");
+	QAction* pActionFly2 = new QAction("2.三维仿真");
+	QAction* pActionFly3 = new QAction("3.基站标定");
+	QAction* pActionFly4 = new QAction("4.上传舞步");
+	QAction* pActionFly5 = new QAction("5.定桩授时");
+	QAction* pActionFly6 = new QAction("6.准备起飞");
+	pMenuFlyPrepare->addAction(pActionFly1);
+	pMenuFlyPrepare->addAction(pActionFly2);
+	pMenuFlyPrepare->addAction(pActionFly3);
+	pMenuFlyPrepare->addAction(pActionFly4);
+	pMenuFlyPrepare->addAction(pActionFly5);
+	pMenuFlyPrepare->addAction(pActionFly6);
 }
 
 UAVManage::~UAVManage()
