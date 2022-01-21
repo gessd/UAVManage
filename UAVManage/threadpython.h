@@ -3,6 +3,7 @@
 #include <QThread>
 #include <Python.h>
 #include "mypythondefine.h"
+#include "definesetting.h"
 
 #define _WaypintFile_ "/pythonapi/waypoint.csv"
 enum PythonRunState
@@ -54,6 +55,7 @@ public:
 	~ThreadPython();
 	bool compilePythonCode(QByteArray arrCode);
 	PythonRunState getLastState();
+	QVector<NavWayPointData> getWaypointData();
 private:
 	bool compilePythonFile(QString qstrFile);
 	QString checkWaypoint();

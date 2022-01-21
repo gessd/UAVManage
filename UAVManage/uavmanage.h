@@ -85,6 +85,7 @@ private:
      * @return 文件是否建立成功
      */
     bool newProjectFile(QString qstrFile, float X = 10.0, float Y = 10.0);
+    void deviceWaypoint();
 private:
     Ui::UAVManageClass ui;
     //设备列表

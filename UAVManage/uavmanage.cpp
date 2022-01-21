@@ -79,6 +79,7 @@ UAVManage::UAVManage(QWidget *parent)
 	pMenuFlyPrepare->addAction(pActionFly4);
 	pMenuFlyPrepare->addAction(pActionFly5);
 	pMenuFlyPrepare->addAction(pActionFly6);
+	connect(pActionFly1, &QAction::triggered, [this]() { deviceWaypoint(); });
 }
 
 UAVManage::~UAVManage()
@@ -508,4 +509,34 @@ bool UAVManage::newProjectFile(QString qstrFile, float X, float Y)
 	}
 	return true;
 	
+}
+
+void UAVManage::deviceWaypoint()
+{
+	QStringList list = m_pDeviceManage->getDeviceNameList();
+	foreach(QString name, list) {
+		if (name.isEmpty()) continue;
+		QFileInfo infoProject(m_qstrCurrentProjectFile);
+		QString qstrDevicePyFile = infoProject.path() + _ProjectDirName_ + name + _PyFileSuffix_;
+		if (false == QFile::exists(qstrDevicePyFile)) continue;
+		QFile file(qstrDevicePyFile);
+		if (!file.open(QIODevice::ReadOnly)) continue;
+		QByteArray arrData = file.readAll();
+		file.close();
+		//生成航点过程必须一个个生成，python交互函数是静态全局，同时只能执行一个设备生成航点
+		if (!ptyhon.compilePythonCode(arrData)) {
+			//生成航点失败
+			qDebug()<< "----解析航点失败" << name;
+			continue;
+		}
+		while (!ptyhon.isFinished()){
+			QApplication::processEvents();
+		}
+		if (PythonSuccessful != ptyhon.getLastState()) {
+			qDebug()<< "----航点转换失败" << name;
+			continue;
+		}
+		
+		m_pDeviceManage->sendWaypoint(name, ptyhon.getWaypointData());
+	}
 }

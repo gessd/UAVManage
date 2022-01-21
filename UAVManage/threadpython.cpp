@@ -4,6 +4,7 @@
 #include <QFile>
 #include <QMessageBox>
 
+QVector<NavWayPointData> g_waypointData;
 ////Python to c++ data start////
 PyMethodDef xWrapMethods[] = {
 	{ "Fly_Time", PythonToCplusplusClass::Fly_Time, METH_VARARGS, "Fly_Time" },
@@ -42,11 +43,11 @@ PyObject* PythonToCplusplusClass::Fly_Time(PyObject* self, PyObject* args)
 	QString qstrTime(t);
 	QStringList list = qstrTime.split(":");
 	if(2 != list.count()) return Py_BuildValue("i", 0);
-	//NavWayPointData data;
-	//data.param1 = list[0].toInt();
-	//data.param2 = list[1].toInt();
-	//data.commandID = MAV_CMD_SPATIAL_USER_1;
-	//ThreadMavlink::getInstance()->m_waypoint.append(data);
+	NavWayPointData data;
+	data.param1 = list[0].toInt();
+	data.param2 = list[1].toInt();
+	data.commandID = 31005;
+	g_waypointData.append(data);
 	return Py_BuildValue("i", 0);
 }
 
@@ -57,15 +58,15 @@ PyObject* PythonToCplusplusClass::Fly_Waypoint(PyObject* self, PyObject* args)
 		return Py_BuildValue("i", 0);
 	}
 	if (a < 0.2) a = 0.2;
-	//NavWayPointData data;
-	//data.x = x * 1000;
-	//data.y = y * 1000;
-	//data.z = z;
-	//data.param1 = h;
-	//data.param2 = a;
-	//data.param3 = p;
-	//data.param4 = w;
-	//ThreadMavlink::getInstance()->m_waypoint.append(data);
+	NavWayPointData data;
+	data.x = x * 1000;
+	data.y = y * 1000;
+	data.z = z;
+	data.param1 = h;
+	data.param2 = a;
+	data.param3 = p;
+	data.param4 = w;
+	g_waypointData.append(data);
 	return Py_BuildValue("i", 0);
 }
 
@@ -75,11 +76,11 @@ PyObject* PythonToCplusplusClass::Fly_Location(PyObject* self, PyObject* args)
 	if (!PyArg_ParseTuple(args, "f|f|f", &x, &y, &z)) {
 		return Py_BuildValue("i", 0);
 	}
-	//NavWayPointData data;
-	//data.x = x * 1000;
-	//data.y = y * 1000;
-	//data.z = z;
-	//ThreadMavlink::getInstance()->m_waypoint.append(data);
+	NavWayPointData data;
+	data.x = x * 1000;
+	data.y = y * 1000;
+	data.z = z;
+	g_waypointData.append(data);
 	return Py_BuildValue("i", 0);
 }
 
@@ -89,15 +90,15 @@ PyObject* PythonToCplusplusClass::Fly_hover(PyObject* self, PyObject* args)
 	if (!PyArg_ParseTuple(args, "f", &hold)) {
 		return Py_BuildValue("i", 0);
 	}
-	//if (ThreadMavlink::getInstance()->m_waypoint.isEmpty()) {
-	//	//TODO
-	//	//没有航点信息无法设置停留时间,需要提示,此处为子线程无法使用弹窗
-	//	//return Py_BuildValue("i", 0);
-	//}
-	//NavWayPointData data = ThreadMavlink::getInstance()->m_waypoint.back();
-	//data.param1 = hold;
-	//data.param4 = 0;
-	//ThreadMavlink::getInstance()->m_waypoint.append(data);
+	if (g_waypointData.isEmpty()) {
+		//TODO
+		//没有航点信息无法设置停留时间,需要提示,此处为子线程无法使用弹窗
+		//return Py_BuildValue("i", 0);
+	}
+	NavWayPointData data = g_waypointData.back();
+	data.param1 = hold;
+	data.param4 = 0;
+	g_waypointData.append(data);
 	return Py_BuildValue("i", 0);
 }
 
@@ -107,15 +108,15 @@ PyObject* PythonToCplusplusClass::Fly_revolve(PyObject* self, PyObject* args)
 	if (!PyArg_ParseTuple(args, "f", &yaw)) {
 		return Py_BuildValue("i", 0);
 	}
-	//if (ThreadMavlink::getInstance()->m_waypoint.isEmpty()) {
-	//	//TODO
-	//	//没有航点信息无法设置偏转角度,需要提示,此处为子线程无法使用弹窗
-	//	//return Py_BuildValue("i", 0);
-	//}
-	//NavWayPointData data = ThreadMavlink::getInstance()->m_waypoint.back();
-	//data.param1 = 0;
-	//data.param4 = yaw;
-	//ThreadMavlink::getInstance()->m_waypoint.append(data);
+	if (g_waypointData.isEmpty()) {
+		//TODO
+		//没有航点信息无法设置偏转角度,需要提示,此处为子线程无法使用弹窗
+		//return Py_BuildValue("i", 0);
+	}
+	NavWayPointData data = g_waypointData.back();
+	data.param1 = 0;
+	data.param4 = yaw;
+	g_waypointData.append(data);
 	return Py_BuildValue("i", 0);
 }
 
@@ -126,13 +127,13 @@ PyObject* PythonToCplusplusClass::Fly_speedWaypoint(PyObject* self, PyObject* ar
 	if (!PyArg_ParseTuple(args, "f|f|f|f", &x, &y, &z, &s)) {
 		return Py_BuildValue("i", 0);
 	}
-	//NavWayPointData data;
-	//data.x = x * 1000;
-	//data.y = y * 1000;
-	//data.z = z;
-	//data.param1 = s;
-	//data.commandID = MAV_CMD_WAYPOINT_USER_1;
-	//ThreadMavlink::getInstance()->m_waypoint.append(data);
+	NavWayPointData data;
+	data.x = x * 1000;
+	data.y = y * 1000;
+	data.z = z;
+	data.param1 = s;
+	data.commandID = 31000;
+	g_waypointData.append(data);
 	return Py_BuildValue("i", 0);
 }
 
@@ -142,10 +143,10 @@ PyObject* PythonToCplusplusClass::Fly_setSpeed(PyObject* self, PyObject* args)
 	if (!PyArg_ParseTuple(args, "f", &s)) {
 		return Py_BuildValue("i", 0);
 	}
-	//NavWayPointData data;
-	//data.param1 = s;
-	//data.commandID = MAV_CMD_WAYPOINT_USER_1;
-	//ThreadMavlink::getInstance()->m_waypoint.append(data);
+	NavWayPointData data;
+	data.param1 = s;
+	data.commandID = 31000;
+	g_waypointData.append(data);
 	return Py_BuildValue("i", 0);
 }
 
@@ -155,11 +156,11 @@ PyObject* PythonToCplusplusClass::Fly_StartLocation(PyObject* self, PyObject* ar
 	if (!PyArg_ParseTuple(args, "f|f", &x, &y)) {
 		return Py_BuildValue("i", 0);
 	}
-	//NavWayPointData data;
-	//data.x = x * 1000;
-	//data.y = y * 1000;
-	//data.commandID = MAV_CMD_WAYPOINT_USER_5;
-	//ThreadMavlink::getInstance()->m_waypoint.append(data);
+	NavWayPointData data;
+	data.x = x * 1000;
+	data.y = y * 1000;
+	data.commandID = 31004;
+	g_waypointData.append(data);
 	return Py_BuildValue("i", 0);
 }
 
@@ -169,10 +170,10 @@ PyObject* PythonToCplusplusClass::Fly_LedMode(PyObject* self, PyObject* args)
 	if (!PyArg_ParseTuple(args, "n", &m)) {
 		return Py_BuildValue("i", 0);
 	}
-	//NavWayPointData data;
-	//data.param1 = m;
-	//data.commandID = MAV_CMD_WAYPOINT_USER_4;
-	//ThreadMavlink::getInstance()->m_waypoint.append(data);
+	NavWayPointData data;
+	data.param1 = m;
+	data.commandID = 31003;
+	g_waypointData.append(data);
 	return Py_BuildValue("i", 0);
 }
 PyObject* PythonToCplusplusClass::Fly_Moveto(PyObject* self, PyObject* args)
@@ -182,16 +183,16 @@ PyObject* PythonToCplusplusClass::Fly_Moveto(PyObject* self, PyObject* args)
 	if (!PyArg_ParseTuple(args, "n|f", &d, &s)) {
 		return Py_BuildValue("i", 0);
 	}
-	//NavWayPointData data = ThreadMavlink::getInstance()->m_waypoint.back();
-	//switch (d)
-	//{
-	//case 1: data.x = s * 1000; break;
-	//case 2: data.y = s * 1000; break;
-	//case 3: data.z = s; break;
-	//}
-	//data.param1 = 0; 
-	//data.param4 = 0;
-	//ThreadMavlink::getInstance()->m_waypoint.append(data);
+	NavWayPointData data = g_waypointData.back();
+	switch (d)
+	{
+	case 1: data.x = s * 1000; break;
+	case 2: data.y = s * 1000; break;
+	case 3: data.z = s; break;
+	}
+	data.param1 = 0; 
+	data.param4 = 0;
+	g_waypointData.append(data);
 	return Py_BuildValue("i", 0);
 }
 
@@ -202,21 +203,21 @@ PyObject* PythonToCplusplusClass::Fly_MoveAddTo(PyObject* self, PyObject* args)
 	if (!PyArg_ParseTuple(args, "n|f", &d, &s)) {
 		return Py_BuildValue("i", 0);
 	}
-	//NavWayPointData data = ThreadMavlink::getInstance()->m_waypoint.back();
-	////TODO
-	////需要判断是否有效航点,commandID=16;
-	//switch (d)
-	//{
-	//case 1: data.x += s * 1000; break;
-	//case 2: data.x -= s * 1000; break;
-	//case 3: data.y += s * 1000; break;
-	//case 4: data.y -= s * 1000; break;
-	//case 5: data.z += s; break;
-	//case 6: data.z -= s; break;
-	//}
-	//data.param1 = 0;
-	//data.param4 = 0;
-	//ThreadMavlink::getInstance()->m_waypoint.append(data);
+	NavWayPointData data = g_waypointData.back();
+	//TODO
+	//需要判断是否有效航点,commandID=16;
+	switch (d)
+	{
+	case 1: data.x += s * 1000; break;
+	case 2: data.x -= s * 1000; break;
+	case 3: data.y += s * 1000; break;
+	case 4: data.y -= s * 1000; break;
+	case 5: data.z += s; break;
+	case 6: data.z -= s; break;
+	}
+	data.param1 = 0;
+	data.param4 = 0;
+	g_waypointData.append(data);
 	return Py_BuildValue("i", 0);
 }
 
@@ -238,6 +239,7 @@ ThreadPython::~ThreadPython()
 
 bool ThreadPython::compilePythonCode(QByteArray arrCode)
 {
+	g_waypointData.clear();
 	if(arrCode.isEmpty()) return false;
 	m_pythonState = PythonRunNone;
 	//保存至文件后执行
@@ -269,6 +271,11 @@ bool ThreadPython::compilePythonCode(QByteArray arrCode)
 PythonRunState ThreadPython::getLastState()
 {
 	return m_pythonState;
+}
+
+QVector<NavWayPointData> ThreadPython::getWaypointData()
+{
+	return g_waypointData;
 }
 
 bool ThreadPython::compilePythonFile(QString qstrFile)

@@ -70,6 +70,7 @@ public:
 	 * @brief 控制所有设备执行
 	 */
 	void allDeviceControl(_AllDeviceCommand comand);
+	int sendWaypoint(QString name, QVector<NavWayPointData> data);
 signals:
 	/**
 	 * @brief 设备添加完成

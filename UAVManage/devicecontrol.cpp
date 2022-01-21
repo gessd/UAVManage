@@ -11,6 +11,7 @@ DeviceControl::DeviceControl(QString name, float x, float y, QString ip, QWidget
 	m_pHvTcpClient = nullptr;
 	m_pHvTcpClient = new hv::TcpClient;
 	m_bHeartbeatEnable = true;
+	m_bWaypointSending = false;
 	setName(name);
 	setIp(ip);
 	setX(x);
@@ -125,7 +126,6 @@ bool DeviceControl::isConnectDevice()
 bool DeviceControl::sendMessage(QByteArray data)
 {
 	if (data.isEmpty()) return false;
-	if (nullptr == m_pHvTcpClient) return false;
 	if (!isConnectDevice()) return false;
 	int len = m_pHvTcpClient->send(data.data(), data.length());
 	if (len != data.length()) return false;
@@ -149,6 +149,7 @@ int DeviceControl::Fun_MAV_CMD_DO_SET_MODE(float Mode, bool wait, bool again)
 
 int DeviceControl::DeviceMavWaypointStart(QVector<NavWayPointData> data)
 {
+	qDebug() << "----准备发送航点" << ui.labelDeviceName->text();
 	if (!isConnectDevice()) return DeviceUnConnect;
 	int count = data.count();
 	if (count <= 0) return DeviceDataError;
@@ -156,6 +157,7 @@ int DeviceControl::DeviceMavWaypointStart(QVector<NavWayPointData> data)
 	//标记航点下发是否进行中
 	if (m_bWaypointSending) return DeviceMessageSending;
 	m_bWaypointSending = true;
+	qDebug() << "----航点数量" << ui.labelDeviceName->text() << count;
 	//先发送航点总数，消息响应成功后才能下发航点
 	mavlink_message_t msg;
 	mavlink_mission_count_t mission_count;
@@ -165,15 +167,16 @@ int DeviceControl::DeviceMavWaypointStart(QVector<NavWayPointData> data)
 	int len = mavlink_msg_mission_count_encode(_DeviceSYS_ID_, _DeviceCOMP_ID_, &msg, &mission_count);
 	QByteArray arrData = mavMessageToBuffer(msg);
 
-	ResendMessage* pMessageThread = pMessageThread = new ResendMessage(_MavWaypointRetryNum_, _MavWaypointTimeout_, arrData, arrData, MAVLINK_MSG_ID_MISSION_COUNT);
+	ResendMessage* pMessageThread = new ResendMessage(_MavWaypointRetryNum_, _MavWaypointTimeout_, arrData, arrData, MAVLINK_MSG_ID_MISSION_COUNT);
 	connect(this, SIGNAL(sigCommandResult(QString, int, int)), pMessageThread, SLOT(onResult(QString, int, int)));
 	connect(pMessageThread, SIGNAL(sigSendMessage(QByteArray)), this, SLOT(sendMessage(QByteArray)));
 	pMessageThread->start();
-	pMessageThread->setAutoDelete(true);
 	//线程完成，超时或者收到消息响应
-	connect(pMessageThread, &QThread::finished, [&, this]() {
+	connect(pMessageThread, &QThread::finished, [=]() {
 		//开始下发航点
 		int res = pMessageThread->getResult();
+		pMessageThread->deleteLater();
+		qDebug() << "----下发航点结果" << ui.labelDeviceName->text() << res;
 		if (DeviceDataSucceed != res) {
 			m_bWaypointSending = false;
 			emit sigWaypointProcess(ui.labelDeviceName->text(), 0, count, res, true, tr("请求下发航点"));
@@ -411,7 +414,7 @@ QByteArray DeviceControl::getWaypointData(float param1, float param2, float para
 void DeviceControl::DeviceMavWaypointSend(QVector<NavWayPointData> data)
 {
 	int count = data.count();
-	if (m_bWaypointSending || count <= 0) {
+	if (false == m_bWaypointSending || count <= 0) {
 		m_bWaypointSending = false;
 		emit sigWaypointProcess(ui.labelDeviceName->text(), 0, count, DeviceMessageSending, true, tr("下发航点中"));
 		return;
@@ -422,7 +425,7 @@ void DeviceControl::DeviceMavWaypointSend(QVector<NavWayPointData> data)
 	ResendMessage* pMessageThread = new ResendMessage(_MavWaypointRetryNum_, _MavWaypointTimeout_, arrData, arrAgainData, MAVLINK_MSG_ID_MISSION_ACK);
 	//接收设备回复的消息响应
 	connect(this, SIGNAL(sigCommandResult(QString, int, int)), pMessageThread, SLOT(onResult(QString, int, int)));
-	connect(pMessageThread, SIGNAL(sigSendMessage(QByteArray)), this, SLOT(sendMessage(QByteArray)));
+	connect(pMessageThread, SIGNAL(sigSendMessage(QByteArray)), this, SLOT(sendMessage(QByteArray)), Qt::DirectConnection);
 	pMessageThread->start();
 	//阻塞等待结果
 	while (!pMessageThread->isFinished()) {
@@ -444,7 +447,7 @@ void DeviceControl::DeviceMavWaypointSend(QVector<NavWayPointData> data)
 		QByteArray arrAgainData = getWaypointData(temp.param1, temp.param2, temp.param3, temp.param4, temp.x, temp.y, temp.z, i + 1, 1);
 		ResendMessage* pWaypointThread = new ResendMessage(_MavWaypointRetryNum_, _MavWaypointTimeout_, arrData, arrAgainData, MAVLINK_MSG_ID_MISSION_ACK);
 		connect(this, SIGNAL(sigCommandResult(QString, int, int)), pWaypointThread, SLOT(onResult(QString, int, int)));
-		connect(pWaypointThread, SIGNAL(sigSendMessage(QByteArray)), this, SLOT(sendMessage(QByteArray)));
+		connect(pWaypointThread, SIGNAL(sigSendMessage(QByteArray)), this, SLOT(sendMessage(QByteArray)), Qt::DirectConnection);
 		pWaypointThread->start();
 		while (!pWaypointThread->isFinished()) {
 			QApplication::processEvents();
@@ -477,7 +480,7 @@ void DeviceControl::DeviceMavWaypointEnd(unsigned int count)
 	ResendMessage* pMessageThread = new ResendMessage(_MavWaypointRetryNum_, _MavWaypointTimeout_, arrData, arrAgainData, MAVLINK_MSG_ID_MISSION_ACK);
 	//接收设备回复的消息响应
 	connect(this, SIGNAL(sigCommandResult(QString, int, int)), pMessageThread, SLOT(onResult(QString, int, int)));
-	connect(pMessageThread, SIGNAL(sigSendMessage(QByteArray)), this, SLOT(sendMessage(QByteArray)));
+	connect(pMessageThread, SIGNAL(sigSendMessage(QByteArray)), this, SLOT(sendMessage(QByteArray)), Qt::DirectConnection);
 	pMessageThread->start();
 	//阻塞等待结果
 	while (!pMessageThread->isFinished()) {
@@ -488,5 +491,5 @@ void DeviceControl::DeviceMavWaypointEnd(unsigned int count)
 	pMessageThread->deleteLater();
 	//整个下发航点过程结束
 	m_bWaypointSending = false;
-	emit sigWaypointProcess(ui.labelDeviceName->text(), 0, count, res, true, tr("准备结束下发航点"));
+	emit sigWaypointProcess(ui.labelDeviceName->text(), count, count, res, true, tr("下发航点完成"));
 }

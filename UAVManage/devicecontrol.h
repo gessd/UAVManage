@@ -9,26 +9,7 @@
 #include "libhvsetting.h"
 #include "mavlinksetting.h"
 #include "resendmessage.h"
-
-//航点属性
-typedef struct __NavWayPointData
-{
-	float param1;       //停留时间
-	float param2;       //接受半径
-	float param3;       //轨迹控制
-	float param4;       //偏转角度
-	int32_t x;
-	int32_t y;
-	float z;
-	unsigned int commandID;
-	__NavWayPointData() {
-		param2 = 0.2;   //偏转角度需要有默认值
-		param1 = param3 = param4 = z = 0.0;
-		x = y = 0;
-		commandID = MAV_CMD_NAV_WAYPOINT;
-	}
-}NavWayPointData;
-
+#include "definesetting.h"
 
 class DeviceControl : public QWidget
 {

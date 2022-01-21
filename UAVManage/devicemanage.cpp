@@ -115,6 +115,9 @@ QString DeviceManage::addDevice(QString qstrName, QString ip, float x, float y)
 	ui.listWidget->addItem(item);
 	//此处会耗时
 	DeviceControl* pControl = new DeviceControl(qstrName, x, y, ip);
+	connect(pControl, &DeviceControl::sigWaypointProcess, [](QString name, unsigned int index, unsigned int count, int res, bool finish, QString text) {
+		qDebug() << "--航点进度" << name << index << count << res << finish << text;
+		});
 	ui.listWidget->setItemWidget(item, pControl);
 	ui.listWidget->setCurrentItem(item);
 	emit deviceAddFinished(qstrName, ip, x, y);
@@ -240,6 +243,22 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 		default:
 			break;
 		}
+	}
+}
+
+int DeviceManage::sendWaypoint(QString name, QVector<NavWayPointData> data)
+{
+	qDebug() << "----航点数据" << name;
+	if (name.isEmpty()) return -1;
+	for (int i = 0; i < ui.listWidget->count(); i++) {
+		QListWidgetItem* pItem = ui.listWidget->item(i);
+		if (!pItem) continue;
+		QWidget* pWidget = ui.listWidget->itemWidget(pItem);
+		if (!pWidget) continue;
+		DeviceControl* pDevice = dynamic_cast<DeviceControl*>(pWidget);
+		if (!pDevice) continue;
+		if (name != pDevice->getName()) continue;
+		return pDevice->DeviceMavWaypointStart(data);
 	}
 }
 
