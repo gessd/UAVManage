@@ -33,6 +33,13 @@ QListWidget::item:selected{
 	border-width:0;
 }
 
+MessageListDialog, MessageListDialog QListWidget, MessageListDialog QListWidget::item:selected, MessageListDialog QListWidget::item:hover{
+	color:blue;
+	background:transparent;
+	border-radius:10px;
+	outline:0px;
+}
+
 QMenu::item {
 	background:transparent;
 }

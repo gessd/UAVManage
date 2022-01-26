@@ -115,12 +115,14 @@
     <QtUic Include="adddevicedialog.ui" />
     <QtUic Include="devicecontrol.ui" />
     <QtUic Include="devicemanage.ui" />
+    <QtUic Include="messagelistdialog.ui" />
     <QtUic Include="setdevicedialog.ui" />
     <QtUic Include="uavmanage.ui" />
     <QtMoc Include="uavmanage.h" />
     <ClCompile Include="adddevicedialog.cpp" />
     <ClCompile Include="devicecontrol.cpp" />
     <ClCompile Include="devicemanage.cpp" />
+    <ClCompile Include="messagelistdialog.cpp" />
     <ClCompile Include="qtsingleapplication\qtlocalpeer.cpp" />
     <ClCompile Include="qtsingleapplication\qtsingleapplication.cpp" />
     <ClCompile Include="resendmessage.cpp" />
@@ -147,6 +149,7 @@
     <ClInclude Include="libhvsetting.h" />
     <ClInclude Include="mavlinksetting.h" />
     <QtMoc Include="threadpython.h" />
+    <QtMoc Include="messagelistdialog.h" />
     <ClInclude Include="mypythondefine.h" />
     <QtMoc Include="qtsingleapplication\qtlocalpeer.h" />
     <QtMoc Include="qtsingleapplication\qtsingleapplication.h" />

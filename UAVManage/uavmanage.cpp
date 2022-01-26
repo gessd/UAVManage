@@ -14,6 +14,7 @@
 #include <QMessageBox>
 #include "definesetting.h"
 #include "tinyxml2/tinyxml2.h"
+#include "messagelistdialog.h"
 
 UAVManage::UAVManage(QWidget *parent)
     : QMainWindow(parent)
@@ -22,7 +23,8 @@ UAVManage::UAVManage(QWidget *parent)
 	m_pSocketServer = nullptr;
 	m_pWebSocket = nullptr;
 	m_pDeviceManage = nullptr;
-
+	
+	MessageListDialog::getInstance()->setParent(this);
 	//程序初始化
 	connect(ui.webEngineView, SIGNAL(loadProgress(int)), this, SLOT(onWebLoadProgress(int)));
 	connect(ui.webEngineView, SIGNAL(loadFinished(bool)), this, SLOT(onWebLoadFinished(bool)));
@@ -44,10 +46,16 @@ UAVManage::UAVManage(QWidget *parent)
 	//添加菜单
 	QStyle* style = QApplication::style();
 	QMenu* pTestMenu = new QMenu(tr("测试"));
-	QAction* pQssAction = new QAction(style->standardIcon(QStyle::SP_ComputerIcon), tr("更新样式"));
-	pTestMenu->addAction(pQssAction);
-	connect(pQssAction, &QAction::triggered, [this]() { updateStyle(); });
 	ui.menuBar->addMenu(pTestMenu);
+	QAction* pQssAction = new QAction(style->standardIcon(QStyle::SP_ComputerIcon), tr("更新样式"));
+	QAction* pMessage = new QAction("消息窗口");
+	pTestMenu->addAction(pQssAction);
+	pTestMenu->addAction(pMessage);
+	connect(pQssAction, &QAction::triggered, [this]() { updateStyle(); });
+	connect(pMessage, &QAction::triggered, [this]() { 
+		_ShowErrorMessage(QDateTime::currentDateTime().toString("hh:mm:ss.zzz")+"abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg");
+		_ShowErrorMessage(tr("这是测试消息这是测试消息这是测试消息这是测试消息"));
+		});
 
 	QMenu* pProjectMenu = new QMenu(tr("项目"));
 	ui.menuBar->addMenu(pProjectMenu);
@@ -135,8 +143,12 @@ QString UAVManage::getCurrentPythonFile()
 
 void UAVManage::onNewProject()
 {
-	m_pDeviceManage->setEnabled(true);
+	m_pDeviceManage->setEnabled(false);
 	//先清空数据
+	if (false == m_qstrCurrentProjectFile.isEmpty()) {
+		QFileInfo info(m_qstrCurrentProjectFile);
+		_ShowInfoMessage(tr("关闭工程")+ info.baseName());
+	}
 	m_qstrCurrentProjectFile.clear();
 	onWebClear();
 	if(m_pDeviceManage) m_pDeviceManage->clearDevice();
@@ -149,16 +161,19 @@ void UAVManage::onNewProject()
 	//新建项目文件夹
 	QDir dir;
 	if (!dir.mkdir(qstrDir)) {
-		QMessageBox::warning(this, tr("错误"), tr("新建项目失败"));
+		_ShowErrorMessage(info.baseName() + tr("项目创建失败"));
+		//QMessageBox::warning(this, tr("错误"), tr("新建项目失败"));
 		return;
 	}
 	//新建项目文件并写入初始化内容
 	if (!newProjectFile(qstrFile)) {
 		dir.rmdir(qstrDir);
-		QMessageBox::warning(this, tr("错误"), tr("新建项目文件失败"));
+		_ShowErrorMessage(info.baseName() + tr("创建项目文件失败"));
+		//QMessageBox::warning(this, tr("错误"), tr("新建项目文件失败"));
 		return;
 	}
 	dir.mkdir(qstrDir + _ProjectDirName_);
+	_ShowInfoMessage(info.baseName()+tr("新建项目完成"));
 	onOpenProject(qstrFile);
 }
 
@@ -173,17 +188,29 @@ void UAVManage::onOpenProject(QString qstrFile)
 	std::string filename = code->fromUnicode(qstrFile).data();
 	tinyxml2::XMLDocument doc;
 	tinyxml2::XMLError error = doc.LoadFile(filename.c_str());
-	if (error != tinyxml2::XMLError::XML_SUCCESS) return;
+	if (error != tinyxml2::XMLError::XML_SUCCESS) {
+		_ShowErrorMessage(tr("打开工程文件失败"));
+		return;
+	}
 	tinyxml2::XMLElement* root = doc.RootElement();
-	if (!root) return;
+	if (!root) {
+		_ShowErrorMessage(tr("读取工程文件失败"));
+		return;
+	}
 	tinyxml2::XMLElement* place = root->FirstChildElement(_ElementPlace_);
-	if (!place) return;
+	if (!place) {
+		_ShowErrorMessage(tr("工程文件损坏,无法读取"));
+		return;
+	}
 	//读取场地大小
 	float x = place->FloatAttribute(_AttributeX_);
 	float y = place->FloatAttribute(_AttributeY_);
 	QString qstrCurrnetName = place->Attribute(_AttributeName_);
 	tinyxml2::XMLElement* device = root->FirstChildElement(_ElementDevice_);
-	if (!device) return;
+	if (!device) {
+		_ShowErrorMessage(tr("工程中没有添加设备"));
+		return;
+	}
 	m_qstrCurrentProjectFile = qstrFile;
 	while (device){
 		//遍历无人机属性
@@ -194,10 +221,9 @@ void UAVManage::onOpenProject(QString qstrFile)
 		device = device->NextSiblingElement(_ElementDevice_);
 		if (m_pDeviceManage) m_pDeviceManage->addDevice(devicename, ip, dx, dy);
 	}
+	_ShowInfoMessage(tr("打开工程完成"));
 	qDebug() << "----工程打开完成";
 	m_pDeviceManage->setCurrentDevice(qstrCurrnetName);
-	QFileInfo info(qstrFile);
-	setWindowTitle(info.baseName());
 }
 
 //拷贝文件夹
@@ -275,7 +301,12 @@ void UAVManage::showEvent(QShowEvent* event)
 
 void UAVManage::closeEvent(QCloseEvent* event)
 {
+	MessageListDialog::getInstance()->exitDialog();
+}
 
+void UAVManage::resizeEvent(QResizeEvent* event)
+{
+	MessageListDialog::getInstance()->move((width() - MessageListDialog::getInstance()->width()) / 2, 0);
 }
 
 void UAVManage::onWebLoadProgress(int progress)

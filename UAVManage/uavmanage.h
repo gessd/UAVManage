@@ -8,6 +8,7 @@
 //python宏定义与mavlink中宏定义有冲突，python引用必须放到mavlink引用之前
 #include "threadpython.h"
 #include "devicemanage.h"
+#include "messagelistdialog.h"
 
 class UAVManage : public QMainWindow
 {
@@ -32,6 +33,7 @@ public slots:
 protected:
     virtual void showEvent(QShowEvent* event);
     virtual void closeEvent(QCloseEvent* event);
+    virtual void resizeEvent(QResizeEvent* event);
 private slots:
     /**
      * @brief WEB页面加载进度，百分制

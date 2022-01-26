@@ -1,0 +1,112 @@
+#include "messagelistdialog.h"
+#include <QTime>
+#include <QDateTime>
+#include <QColor>
+#include <QLabel>
+#include <QLayout>
+#include <QHBoxLayout>
+#include <QDebug>
+
+//消息初始时间
+#define _ItemTime_      Qt::UserRole+20
+//消息显示停留时间
+#define _ItemWaitTime_  Qt::UserRole+21
+//列表ITEM高度
+#define _ItemHeight_ 30
+//列表间隔
+#define _ItemSpacing 5
+//界面顶部固定高度
+#define _TitleHeight 60
+
+MessageListDialog* g_pMessage = NULL;
+MessageListDialog* MessageListDialog::getInstance()
+{
+	if (g_pMessage) return g_pMessage;
+	g_pMessage = new MessageListDialog;
+	return g_pMessage;
+}
+
+void MessageListDialog::addMessageTest(QString text, _Messagelevel level)
+{
+	show();
+	if (parent()) {
+		QWidget* pWidget = dynamic_cast<QWidget*>(parent());
+		if (pWidget) {
+			move((pWidget->width() - width()) / 2, 0);
+		}
+	}
+	
+	QListWidgetItem* pItem = new QListWidgetItem();
+	pItem->setData(_ItemTime_, QDateTime::currentDateTime().toTime_t());
+	QString qstrTextStyle = "color:rgb(255,255,255);background-color:rgb(100,100,100);border-radius:10px;";
+	switch (level)
+	{
+	case InfoMessage: 
+		pItem->setData(_ItemWaitTime_, 3);
+		break;
+	case WarningMessage:
+		pItem->setData(_ItemWaitTime_, 6);
+		pItem->setTextColor(QColor(Qt::yellow));
+		qstrTextStyle = "color:rgb(255,255,0);background-color:rgb(100,100,100);border-radius:10px;";
+		break;
+	case ErrorMessage:
+		pItem->setData(_ItemWaitTime_, 9);
+		pItem->setTextColor(QColor(Qt::red));
+		qstrTextStyle = "color:rgb(255,0,0);background-color:rgb(100,100,100);border-radius:10px;";
+		break;
+	default:
+		break;
+	}
+	pItem->setSizeHint(QSize(0, _ItemHeight_));
+	ui.listWidget->addItem(pItem);
+
+	QLabel* pLabel = new QLabel(text);
+	pLabel->setWordWrap(true);
+	pLabel->setStyleSheet(qstrTextStyle);
+	//pLabel->setFixedSize(width(), _ItemHeight_);
+	//QWidget* pWidget = new QWidget;
+	//QHBoxLayout* pLayout = new QHBoxLayout(pWidget);
+	//pWidget->setLayout(pLayout);
+	//pLayout->addWidget(pLabel);
+	ui.listWidget->setItemWidget(pItem, pLabel);
+
+	setFixedHeight(ui.listWidget->count() * (_ItemHeight_+ _ItemSpacing) + _TitleHeight);
+}
+
+void MessageListDialog::exitDialog()
+{
+	if (g_pMessage) {
+		g_pMessage->close();
+		delete g_pMessage;
+		g_pMessage = nullptr;
+	}
+}
+
+MessageListDialog::MessageListDialog(QWidget *parent)
+	: QDialog(parent)
+{
+	ui.setupUi(this);
+	m_timer.start(1000);
+	ui.listWidget->setSpacing(_ItemSpacing);
+	connect(&m_timer, &QTimer::timeout, [this]() {
+		int count = ui.listWidget->count();
+		for (int i = 0; i < count; i++) {
+			QListWidgetItem* pItem = ui.listWidget->item(i);
+			if(!pItem) continue;
+			unsigned int nTime = pItem->data(_ItemTime_).toUInt();
+			unsigned int nCurrent = QDateTime::currentDateTime().toTime_t();
+			unsigned int nWait = pItem->data(_ItemWaitTime_).toUInt();
+			if(nCurrent - nTime < nWait) continue;
+			ui.listWidget->takeItem(i);
+		}
+		setFixedHeight(ui.listWidget->count() * (_ItemHeight_ + _ItemSpacing) + _TitleHeight);
+		if (0 == ui.listWidget->count()) close();
+		});
+	connect(ui.btnClose, &QAbstractButton::clicked, [this]() {
+		close();
+		});
+}
+
+MessageListDialog::~MessageListDialog()
+{
+}
