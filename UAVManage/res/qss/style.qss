@@ -39,9 +39,19 @@ MessageListDialog, MessageListDialog QListWidget, MessageListDialog QListWidget:
 	border-radius:10px;
 	outline:0px;
 }
+
 MessageListDialog QListWidget::item:hover{
 	background-color:rgb(50,50,50);
 	border-radius:5px;
+}
+MessageListDialog #LabelInfoMessage{
+	color:rgb(250,250,250);background-color:rgb(100,100,100);border-radius:5px;
+}
+MessageListDialog #LabelWarningMessage{
+	color:rgb(250,250,50);background-color:rgb(100,100,100);border-radius:5px;
+}
+MessageListDialog #LabelErrorMessage{
+	color:rgb(250,100,100);background-color:rgb(100,100,100);border-radius:5px;
 }
 
 /*垂直滑条*/
