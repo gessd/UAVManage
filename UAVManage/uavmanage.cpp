@@ -53,8 +53,9 @@ UAVManage::UAVManage(QWidget *parent)
 	pTestMenu->addAction(pMessage);
 	connect(pQssAction, &QAction::triggered, [this]() { updateStyle(); });
 	connect(pMessage, &QAction::triggered, [this]() { 
-		_ShowErrorMessage(QDateTime::currentDateTime().toString("hh:mm:ss.zzz")+"abcdefg abcdefg abcdefg abcdefg abcdefg abcdefg");
-		_ShowErrorMessage(tr("这是测试消息这是测试消息这是测试消息这是测试消息"));
+		_ShowErrorMessage(tr("这是错误消息这是错误消息这是错误消息这是错误消息这是错误消息这是错误消息这是错误消息"));
+		_ShowWarningMessage(tr("警告消息警告消息警告消息警告消息警告消息警告消息警告消息警告消息"));
+		_ShowInfoMessage(tr("正常提示消息正常提示消息正常提示消息正常提示消息正常提示消息正常提示消息正常提示消息正常提示消息正常提示消息"));
 		});
 
 	QMenu* pProjectMenu = new QMenu(tr("项目"));

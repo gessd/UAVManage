@@ -12,7 +12,7 @@
 //消息显示停留时间
 #define _ItemWaitTime_  Qt::UserRole+21
 //列表ITEM高度
-#define _ItemHeight_ 30
+#define _ItemHeight_ 60
 //列表间隔
 #define _ItemSpacing 5
 //界面顶部固定高度
@@ -37,33 +37,34 @@ void MessageListDialog::addMessageTest(QString text, _Messagelevel level)
 	}
 	
 	QListWidgetItem* pItem = new QListWidgetItem();
+	ui.listWidget->addItem(pItem);
 	pItem->setData(_ItemTime_, QDateTime::currentDateTime().toTime_t());
-	QString qstrTextStyle = "color:rgb(255,255,255);background-color:rgb(100,100,100);border-radius:10px;";
+	QString qstrTextStyle = "color:rgb(250,250,250);background-color:rgb(100,100,100);border-radius:5px;";
 	switch (level)
 	{
 	case InfoMessage: 
-		pItem->setData(_ItemWaitTime_, 3);
+		pItem->setData(_ItemWaitTime_, 10);
 		break;
 	case WarningMessage:
-		pItem->setData(_ItemWaitTime_, 6);
+		pItem->setData(_ItemWaitTime_, 20);
 		pItem->setTextColor(QColor(Qt::yellow));
-		qstrTextStyle = "color:rgb(255,255,0);background-color:rgb(100,100,100);border-radius:10px;";
+		qstrTextStyle = "color:rgb(250,250,50);background-color:rgb(100,100,100);border-radius:5px;";
 		break;
 	case ErrorMessage:
-		pItem->setData(_ItemWaitTime_, 9);
+		pItem->setData(_ItemWaitTime_, 30);
 		pItem->setTextColor(QColor(Qt::red));
-		qstrTextStyle = "color:rgb(255,0,0);background-color:rgb(100,100,100);border-radius:10px;";
+		qstrTextStyle = "color:rgb(250,100,100);background-color:rgb(100,100,100);border-radius:5px;";
 		break;
 	default:
 		break;
 	}
 	pItem->setSizeHint(QSize(0, _ItemHeight_));
-	ui.listWidget->addItem(pItem);
 
 	QLabel* pLabel = new QLabel(text);
 	pLabel->setWordWrap(true);
 	pLabel->setStyleSheet(qstrTextStyle);
-	//pLabel->setFixedSize(width(), _ItemHeight_);
+	unsigned int nMaxWidth = ui.listWidget->width() - 17;
+	pLabel->setFixedSize(nMaxWidth, _ItemHeight_ - 2);
 	//QWidget* pWidget = new QWidget;
 	//QHBoxLayout* pLayout = new QHBoxLayout(pWidget);
 	//pWidget->setLayout(pLayout);
@@ -102,11 +103,13 @@ MessageListDialog::MessageListDialog(QWidget *parent)
 		setFixedHeight(ui.listWidget->count() * (_ItemHeight_ + _ItemSpacing) + _TitleHeight);
 		if (0 == ui.listWidget->count()) close();
 		});
-	connect(ui.btnClose, &QAbstractButton::clicked, [this]() {
-		close();
+	connect(ui.listWidget, &QListWidget::itemClicked, [this](QListWidgetItem* item) {
+		ui.listWidget->takeItem(ui.listWidget->currentRow());
 		});
+	connect(ui.btnClose, &QAbstractButton::clicked, [this]() {close();});
 }
 
 MessageListDialog::~MessageListDialog()
 {
 }
+

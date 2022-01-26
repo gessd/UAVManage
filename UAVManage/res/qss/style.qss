@@ -33,11 +33,34 @@ QListWidget::item:selected{
 	border-width:0;
 }
 
-MessageListDialog, MessageListDialog QListWidget, MessageListDialog QListWidget::item:selected, MessageListDialog QListWidget::item:hover{
+MessageListDialog, MessageListDialog QListWidget, MessageListDialog QListWidget::item:selected{
 	color:blue;
 	background:transparent;
 	border-radius:10px;
 	outline:0px;
+}
+MessageListDialog QListWidget::item:hover{
+	background-color:rgb(50,50,50);
+	border-radius:5px;
+}
+
+/*垂直滑条*/
+QScrollBar::vertical {
+	background:transparent;
+	width:8px;
+}
+/*垂直滑条上的滑块*/
+QScrollBar::handle:vertical{
+	background:rgba(100,100,100,80%);
+	border-radius:5px;
+}
+QScrollBar::handle:vertical:hover{
+	background:rgba(100,100,100,60%);
+}
+/*滑条上下箭头*/
+QScrollBar::sub-line:vertical, QScrollBar::add-line:vertical{
+	border: none; 
+    background: none; 
 }
 
 QMenu::item {
