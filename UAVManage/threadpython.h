@@ -4,19 +4,9 @@
 #include <Python.h>
 #include "mypythondefine.h"
 #include "definesetting.h"
+#include "globalfunction.h"
 
 #define _WaypintFile_ "/pythonapi/waypoint.csv"
-enum PythonRunState
-{
-	PythonRunNone = 0,
-	PythonSuccessful,
-	PythonError,
-	PythonFileError,
-	PythonTimeout,
-	PythonCodeError,
-	PythonWaypointError,
-	PythonWaypointNull
-};
 
 class PythonToCplusplusClass : public QObject
 {

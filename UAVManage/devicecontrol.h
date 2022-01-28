@@ -58,7 +58,7 @@ public slots:
 	void setHeartbeatEnable(bool enable);
 
 	/**
-	 * @brief 准备下发航点数据，根据信号sigWaypointProcess处理进度
+	 * @brief 准备上传航点数据，根据信号sigWaypointProcess处理进度
 	 * @param data 航点结构
 	 * @return 返回消息错误值 [0下发过程开始]
 	 */

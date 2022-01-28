@@ -2,6 +2,8 @@
 #include <QDebug>
 #include <QTime>
 #include <QDateTime>
+#include "globalfunction.h"
+#include "messagelistdialog.h"
 
 #define _CurrentTime_  QTime::currentTime().toString("hh:mm:ss.zzz")
 DeviceControl::DeviceControl(QString name, float x, float y, QString ip, QWidget *parent)
@@ -158,7 +160,7 @@ int DeviceControl::DeviceMavWaypointStart(QVector<NavWayPointData> data)
 	if (m_bWaypointSending) return DeviceMessageSending;
 	m_bWaypointSending = true;
 	qDebug() << "----航点数量" << ui.labelDeviceName->text() << count;
-	//先发送航点总数，消息响应成功后才能下发航点
+	//先发送航点总数，消息响应成功后才能上传航点
 	mavlink_message_t msg;
 	mavlink_mission_count_t mission_count;
 	mission_count.target_system = _DeviceSYS_ID_;
@@ -173,16 +175,16 @@ int DeviceControl::DeviceMavWaypointStart(QVector<NavWayPointData> data)
 	pMessageThread->start();
 	//线程完成，超时或者收到消息响应
 	connect(pMessageThread, &QThread::finished, [=]() {
-		//开始下发航点
+		//开始上传航点
 		int res = pMessageThread->getResult();
 		pMessageThread->deleteLater();
-		qDebug() << "----下发航点结果" << ui.labelDeviceName->text() << res;
+		qDebug() << "----上传航点结果" << ui.labelDeviceName->text() << res;
 		if (DeviceDataSucceed != res) {
 			m_bWaypointSending = false;
-			emit sigWaypointProcess(ui.labelDeviceName->text(), 0, count, res, true, tr("请求下发航点"));
+			emit sigWaypointProcess(ui.labelDeviceName->text(), 0, count, res, true, tr("请求上传航点"));
 			return;
 		}
-		//成功后开始下发航点
+		//成功后开始上传航点
 		DeviceMavWaypointSend(data);		
 		});
 	return DeviceDataSucceed;
@@ -416,10 +418,10 @@ void DeviceControl::DeviceMavWaypointSend(QVector<NavWayPointData> data)
 	int count = data.count();
 	if (false == m_bWaypointSending || count <= 0) {
 		m_bWaypointSending = false;
-		emit sigWaypointProcess(ui.labelDeviceName->text(), 0, count, DeviceMessageSending, true, tr("下发航点中"));
+		emit sigWaypointProcess(ui.labelDeviceName->text(), 0, count, DeviceMessageSending, true, tr("上传航点中"));
 		return;
 	}
-	//先发送0号全零航点，验证是否可以下发航点
+	//先发送0号全零航点，验证是否可以上传航点
 	QByteArray arrData = getWaypointData(0, 0, 0, 0, 0, 0, 0, 0, 0);
 	QByteArray arrAgainData = getWaypointData(0, 0, 0, 0, 0, 0, 0, 0, 1);
 	ResendMessage* pMessageThread = new ResendMessage(_MavWaypointRetryNum_, _MavWaypointTimeout_, arrData, arrAgainData, MAVLINK_MSG_ID_MISSION_ACK);
@@ -435,12 +437,12 @@ void DeviceControl::DeviceMavWaypointSend(QVector<NavWayPointData> data)
 	int res = pMessageThread->getResult();
 	pMessageThread->deleteLater();
 	if (DeviceDataSucceed != res) {
-		//下发航点失败或超时，整个过程结束
+		//上传航点失败或超时，整个过程结束
 		m_bWaypointSending = false;
 		emit sigWaypointProcess(ui.labelDeviceName->text(), 0, count, res, true, tr("0号航点"));
 		return;
 	}
-	//开始下发航点,循环发送航点数据
+	//开始上传航点,循环发送航点数据
 	for (int i = 0; i < count; i++) {
 		NavWayPointData temp = data.at(i);
 		QByteArray arrData = getWaypointData(temp.param1, temp.param2, temp.param3, temp.param4, temp.x, temp.y, temp.z, i + 1, 0);
@@ -455,9 +457,9 @@ void DeviceControl::DeviceMavWaypointSend(QVector<NavWayPointData> data)
 		int res = pWaypointThread->getResult();
 		pWaypointThread->deleteLater();
 		if (DeviceDataSucceed != res) {
-			//下发航点失败或超时，整个过程结束
+			//上传航点失败或超时，整个过程结束
 			m_bWaypointSending = false;
-			emit sigWaypointProcess(ui.labelDeviceName->text(), i + 1, count, res, true, tr("下发航点过程"));
+			emit sigWaypointProcess(ui.labelDeviceName->text(), i + 1, count, res, true, tr("上传航点过程"));
 			return;
 		}
 		emit sigWaypointProcess(ui.labelDeviceName->text(), i + 1, count, res, false, tr(""));
@@ -489,7 +491,7 @@ void DeviceControl::DeviceMavWaypointEnd(unsigned int count)
 	//线程结果后查询返回结果
 	int res = pMessageThread->getResult();
 	pMessageThread->deleteLater();
-	//整个下发航点过程结束
+	//整个上传航点过程结束
 	m_bWaypointSending = false;
-	emit sigWaypointProcess(ui.labelDeviceName->text(), count, count, res, true, tr("下发航点完成"));
+	emit sigWaypointProcess(ui.labelDeviceName->text(), count, count, res, true, tr("上传航点完成"));
 }

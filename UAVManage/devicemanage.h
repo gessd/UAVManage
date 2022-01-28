@@ -20,9 +20,10 @@ class DeviceManage : public QWidget
 	//Q_PROPERTY(QString deviceName READ getCurrentName WRITE setCurrentName)
 public:
 	enum _AllDeviceCommand {
-		_DeviceTakeoffLocal, //起飞
+		_DeviceTakeoffLocal=1, //起飞
 		_DeviceLandLocal,    //降落
-		_DeviceQuickStop     //急停
+		_DeviceQuickStop,    //急停
+		_DeviceSetout		 //准备起飞
 	};
 	DeviceManage(QWidget *parent = Q_NULLPTR);
 	~DeviceManage();
@@ -70,7 +71,7 @@ public:
 	 * @brief 控制所有设备执行
 	 */
 	void allDeviceControl(_AllDeviceCommand comand);
-	int sendWaypoint(QString name, QVector<NavWayPointData> data);
+	QString sendWaypoint(QString name, QVector<NavWayPointData> data);
 signals:
 	/**
 	 * @brief 设备添加完成
@@ -97,6 +98,10 @@ signals:
 	 * @param 上一次选中设备，可能存在空
 	 */
 	void currentDeviceNameChanged(QString currentName, QString previousName);
+	/**
+	 * @brief 航点下发进度
+	 */
+	void sigWaypointProcess(QString name, unsigned int index, unsigned int count, int res, bool finish, QString text);
 protected:
 	virtual bool eventFilter(QObject* watched, QEvent* event);
 private slots:

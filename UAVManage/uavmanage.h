@@ -77,7 +77,10 @@ private slots:
      * @brief 程序间通讯
      */
     void onAppMessage(const QString& message);
-
+    /**
+     * @brief 航点上传进度
+     */
+    void onWaypointProcess(QString name, unsigned int index, unsigned int count, int res, bool finish, QString text);
 private:
     /**
      * @brief 新建项目工程文件
@@ -87,7 +90,7 @@ private:
      * @return 文件是否建立成功
      */
     bool newProjectFile(QString qstrFile, float X = 10.0, float Y = 10.0);
-    void deviceWaypoint();
+    void deviceWaypoint(bool bUpload = false);
 private:
     Ui::UAVManageClass ui;
     //设备列表

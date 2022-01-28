@@ -25,8 +25,8 @@ MessageListDialog* MessageListDialog::getInstance()
 }
 
 void MessageListDialog::addMessageTest(QString text, _Messagelevel level)
-{
-	show();
+{	
+	qDebug() << text;
 	if (parent()) {
 		QWidget* pWidget = dynamic_cast<QWidget*>(parent());
 		if (pWidget) {
@@ -40,6 +40,7 @@ void MessageListDialog::addMessageTest(QString text, _Messagelevel level)
 	pItem->setData(_ItemTime_, QDateTime::currentDateTime().toTime_t());
 	QLabel* pLabel = new QLabel(text);
 	pLabel->setWordWrap(true);
+	pLabel->setAlignment(Qt::AlignHCenter|Qt::AlignVCenter);
 	unsigned int nMaxWidth = ui.listWidget->width() - 17;
 	pLabel->setFixedSize(nMaxWidth, _ItemHeight_ - 2);
 	switch (level)
@@ -61,6 +62,12 @@ void MessageListDialog::addMessageTest(QString text, _Messagelevel level)
 	}
 	ui.listWidget->setItemWidget(pItem, pLabel);
 	setFixedHeight(ui.listWidget->count() * (_ItemHeight_+ _ItemSpacing) + _ItemHeight_);
+
+	//setWindowFlag(Qt::FramelessWindowHint, true);
+	//setWindowFlag(Qt::Dialog, true);
+	//setModal(true);
+
+	show();
 }
 
 void MessageListDialog::exitDialog()

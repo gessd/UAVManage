@@ -42,6 +42,7 @@ UAVManage::UAVManage(QWidget *parent)
 	connect(m_pDeviceManage, SIGNAL(deviceAddFinished(QString, QString, float, float)), this, SLOT(onDeviceAdd(QString, QString, float, float)));
 	connect(m_pDeviceManage, SIGNAL(deviceRemoveFinished(QString)), this, SLOT(onDeviceRemove(QString)));
 	connect(m_pDeviceManage, SIGNAL(deviceRenameFinished(QString, QString)), this, SLOT(onDeviceRename(QString, QString)));
+	connect(m_pDeviceManage, &DeviceManage::sigWaypointProcess, this, &UAVManage::onWaypointProcess);
 
 	//添加菜单
 	QStyle* style = QApplication::style();
@@ -53,6 +54,7 @@ UAVManage::UAVManage(QWidget *parent)
 	pTestMenu->addAction(pMessage);
 	connect(pQssAction, &QAction::triggered, [this]() { updateStyle(); });
 	connect(pMessage, &QAction::triggered, [this]() { 
+
 		_ShowErrorMessage(tr("这是错误消息这是错误消息这是错误消息这是错误消息这是错误消息这是错误消息这是错误消息"));
 		_ShowWarningMessage(tr("警告消息警告消息警告消息警告消息警告消息警告消息警告消息警告消息"));
 		_ShowInfoMessage(tr("正常提示消息正常提示消息正常提示消息正常提示消息正常提示消息正常提示消息正常提示消息正常提示消息正常提示消息"));
@@ -89,6 +91,16 @@ UAVManage::UAVManage(QWidget *parent)
 	pMenuFlyPrepare->addAction(pActionFly5);
 	pMenuFlyPrepare->addAction(pActionFly6);
 	connect(pActionFly1, &QAction::triggered, [this]() { deviceWaypoint(); });
+	connect(pActionFly2, &QAction::triggered, [this]() { //暂无功能 
+		});
+	connect(pActionFly3, &QAction::triggered, [this]() { //暂无功能
+		});
+	connect(pActionFly4, &QAction::triggered, [this]() { deviceWaypoint(true); });
+	connect(pActionFly5, &QAction::triggered, [this]() {  //暂无功能
+		});
+	connect(pActionFly6, &QAction::triggered, [this]() { 
+		m_pDeviceManage->allDeviceControl(DeviceManage::_DeviceSetout); 
+		});
 }
 
 UAVManage::~UAVManage()
@@ -513,6 +525,17 @@ void UAVManage::onAppMessage(const QString& message)
 	qDebug() << "---- app message" << message;
 }
 
+void UAVManage::onWaypointProcess(QString name, unsigned int index, unsigned int count, int res, bool finish, QString text)
+{
+	if (_DeviceStatus::DeviceDataSucceed == res && finish) {
+		//航点上传完成并成功
+	}
+	else
+	{
+		_ShowErrorMessage(name+text+Utility::waypointMessgeFromStatus(res));
+	}
+}
+
 bool UAVManage::newProjectFile(QString qstrFile, float X, float Y)
 {	
 	const char* declaration = _XMLVersion_;
@@ -543,7 +566,7 @@ bool UAVManage::newProjectFile(QString qstrFile, float X, float Y)
 	
 }
 
-void UAVManage::deviceWaypoint()
+void UAVManage::deviceWaypoint(bool bUpload)
 {
 	QStringList list = m_pDeviceManage->getDeviceNameList();
 	foreach(QString name, list) {
@@ -555,20 +578,31 @@ void UAVManage::deviceWaypoint()
 		if (!file.open(QIODevice::ReadOnly)) continue;
 		QByteArray arrData = file.readAll();
 		file.close();
-		//生成航点过程必须一个个生成，python交互函数是静态全局，同时只能执行一个设备生成航点
+		//生成航点过程必须一个个生成，python交互函数是静态全局，所以同时只能执行一个设备生成航点
 		if (!ptyhon.compilePythonCode(arrData)) {
 			//生成航点失败
-			qDebug()<< "----解析航点失败" << name;
+			_ShowErrorMessage(name+tr("解析舞步积木块失败"));
 			continue;
 		}
 		while (!ptyhon.isFinished()){
 			QApplication::processEvents();
 		}
 		if (PythonSuccessful != ptyhon.getLastState()) {
-			qDebug()<< "----航点转换失败" << name;
+			_ShowErrorMessage(name + tr("舞步转换失败"));
 			continue;
 		}
-		
-		m_pDeviceManage->sendWaypoint(name, ptyhon.getWaypointData());
+		QVector<NavWayPointData> data = ptyhon.getWaypointData();
+		if (0 == data.count()) {
+			_ShowWarningMessage(name+tr("没有舞步信息"));
+			continue;
+		}
+		else{
+			_ShowInfoMessage(name + tr("生成舞步完成"));
+		}
+		//上传航点到飞控
+		if (bUpload) {
+			QString message = m_pDeviceManage->sendWaypoint(name, data);
+			if(!message.isEmpty()) _ShowWarningMessage(name + tr("上传舞步") + message);
+		}
 	}
 }

@@ -25,5 +25,5 @@
 #define _DeviceHeartbeatInterval_ 500
 //指令消息重发间隔 毫秒
 #define _NkCommandResendInterval_ 3000
-//下发航点超时 毫秒
+//上传航点超时 毫秒
 #define _MavWaypointTimeout_ 2000
