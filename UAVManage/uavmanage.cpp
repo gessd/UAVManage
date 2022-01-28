@@ -527,12 +527,14 @@ void UAVManage::onAppMessage(const QString& message)
 
 void UAVManage::onWaypointProcess(QString name, unsigned int index, unsigned int count, int res, bool finish, QString text)
 {
-	if (_DeviceStatus::DeviceDataSucceed == res && finish) {
-		//航点上传完成并成功
+	if (finish) {
+		m_pDeviceManage->setEnabled(true);
 	}
-	else
-	{
-		_ShowErrorMessage(name+text+Utility::waypointMessgeFromStatus(res));
+	if (_DeviceStatus::DeviceDataSucceed) {
+		//航点上传完成并成功
+		_ShowInfoMessage(name + ": " + text + Utility::waypointMessgeFromStatus(res));
+	} else{
+		_ShowErrorMessage(name + ": " + text + Utility::waypointMessgeFromStatus(res));
 	}
 }
 
@@ -568,6 +570,7 @@ bool UAVManage::newProjectFile(QString qstrFile, float X, float Y)
 
 void UAVManage::deviceWaypoint(bool bUpload)
 {
+	m_pDeviceManage->setEnabled(false);
 	QStringList list = m_pDeviceManage->getDeviceNameList();
 	foreach(QString name, list) {
 		if (name.isEmpty()) continue;
@@ -581,14 +584,14 @@ void UAVManage::deviceWaypoint(bool bUpload)
 		//生成航点过程必须一个个生成，python交互函数是静态全局，所以同时只能执行一个设备生成航点
 		if (!ptyhon.compilePythonCode(arrData)) {
 			//生成航点失败
-			_ShowErrorMessage(name+tr("解析舞步积木块失败"));
+			_ShowErrorMessage(name+tr(": 解析舞步积木块失败"));
 			continue;
 		}
 		while (!ptyhon.isFinished()){
 			QApplication::processEvents();
 		}
 		if (PythonSuccessful != ptyhon.getLastState()) {
-			_ShowErrorMessage(name + tr("舞步转换失败"));
+			_ShowErrorMessage(name + tr(": 舞步转换失败"));
 			continue;
 		}
 		QVector<NavWayPointData> data = ptyhon.getWaypointData();

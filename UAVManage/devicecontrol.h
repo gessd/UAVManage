@@ -217,6 +217,8 @@ signals:
 	 * @param 文字描述信息
 	 */
 	void sigWaypointProcess(QString name, unsigned int index, unsigned int count, int res, bool finish, QString text);
+private slots:
+	void onWaypointProcess(QString name, unsigned int index, unsigned int count, int res, bool finish, QString text);
 private:
 	Ui::DeviceControl ui;
 	QString m_qstrIP;

@@ -32,7 +32,17 @@ QListWidget::item:selected{
 	background-color:rgb(120,120,120);
 	border-width:0;
 }
-
+QProgressBar{
+	background:transparent;
+	color:white;
+}
+QProgressBar:disabled{
+	color:white;
+	border-bottom:1px solid white;
+}
+QProgressBar::chunk{
+	background:qlineargradient(spread:pad,x1:0,y1:0,x2:1,y2:0,stop:0 white,stop:1 blue);
+}
 MessageListDialog, MessageListDialog QListWidget, MessageListDialog QListWidget::item:selected{
 	color:blue;
 	background:transparent;

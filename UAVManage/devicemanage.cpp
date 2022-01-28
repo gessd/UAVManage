@@ -77,7 +77,8 @@ DeviceManage::DeviceManage(QWidget *parent)
 		qDebug() << "----device message:" << res;
 		//int nTest = pControl->Fun_MAV_CMD_NAV_TAKEOFF_LOCAL(1, 2, 3, 4, 5, 6, 7);
 		});
-
+	addDevice("测试名称1", "", 0,0);
+	addDevice("测试名称2", "", 0, 0);
 	connect(ui.btnAddDevice, &QAbstractButton::clicked, [this]() {
 		AddDeviceDialog dialog(getNewDefaultName(), this);
 		if (QDialog::Accepted != dialog.exec())return;
@@ -295,6 +296,7 @@ QString DeviceManage::sendWaypoint(QString name, QVector<NavWayPointData> data)
 
 bool DeviceManage::eventFilter(QObject* watched, QEvent* event)
 {
+	if (!isEnabled()) return false;
 	if (ui.listWidget == watched) {
 		//设备列表菜单
 		if (QEvent::ContextMenu != event->type()) return false;

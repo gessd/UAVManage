@@ -90,6 +90,10 @@ private:
      * @return 文件是否建立成功
      */
     bool newProjectFile(QString qstrFile, float X = 10.0, float Y = 10.0);
+    /**
+     * @brief 生成航点
+     * @param bUpload 上传航点到设备
+     */
     void deviceWaypoint(bool bUpload = false);
 private:
     Ui::UAVManageClass ui;
