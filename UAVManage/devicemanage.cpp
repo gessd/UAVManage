@@ -4,6 +4,7 @@
 #include <QInputDialog>
 #include <QDebug>
 #include "definesetting.h"
+#include "messagelistdialog.h"
 
 #define _ItemHeight_ 60
 DeviceManage::DeviceManage(QWidget *parent)
@@ -34,10 +35,15 @@ DeviceManage::DeviceManage(QWidget *parent)
 	QAction* pActionResetIP = new QAction(tr("修改IP"), this);
 	QAction* pActionDicconnect = new QAction(tr("连接/断开"), this);
 	QAction* pFlyTo = new QAction(tr("起飞"), this);
+	QAction* pLand = new QAction(tr("降落"), this);
+	QAction* pStop = new QAction(tr("急停"), this);
 	m_pMenu->addAction(pActionResetName);
 	m_pMenu->addAction(pActionResetIP);
 	m_pMenu->addAction(pActionDicconnect);
+	m_pMenu->addSeparator();
 	m_pMenu->addAction(pFlyTo);
+	m_pMenu->addAction(pLand);
+	m_pMenu->addAction(pStop);
 	//菜单响应处理
 	connect(pActionResetName, &QAction::triggered, [this](bool checked) {
 		DeviceControl* pControl = getCurrentDevice();
@@ -73,9 +79,26 @@ DeviceManage::DeviceManage(QWidget *parent)
 	connect(pFlyTo, &QAction::triggered, [this](bool checked) {
 		DeviceControl* pControl = getCurrentDevice();
 		if (!pControl) return;
-		int res = pControl->MavSendCommandLongMessage(MAV_CMD_NAV_TAKEOFF_LOCAL, "abc","abcd", true, 2, 3000);
-		qDebug() << "----device message:" << res;
-		//int nTest = pControl->Fun_MAV_CMD_NAV_TAKEOFF_LOCAL(1, 2, 3, 4, 5, 6, 7);
+		int res = pControl->Fun_MAV_CMD_NAV_TAKEOFF_LOCAL(0, 0, 0, 0, 0, 0, _TakeoffLocalHeight_);
+		if (res == _DeviceStatus::DeviceDataSucceed) return;
+		QString qstrText = Utility::waypointMessgeFromStatus(res);
+		_ShowErrorMessage(pControl->getName() + tr("起飞") + qstrText);
+		});
+	connect(pLand, &QAction::triggered, [this](bool checked) {
+		DeviceControl* pControl = getCurrentDevice();
+		if (!pControl) return;
+		int res = pControl->Fun_MAV_CMD_NAV_LAND_LOCAL(0, 0, 0, 0, 0, 0, 0);
+		if (res == _DeviceStatus::DeviceDataSucceed) return;
+		QString qstrText = Utility::waypointMessgeFromStatus(res);
+		_ShowErrorMessage(pControl->getName() + tr("降落") + qstrText);
+		});
+	connect(pStop, &QAction::triggered, [this](bool checked) {
+		DeviceControl* pControl = getCurrentDevice();
+		if (!pControl) return;
+		int res = pControl->Fun_MAV_QUICK_STOP();
+		if (res == _DeviceStatus::DeviceDataSucceed) return;
+		QString qstrText = Utility::waypointMessgeFromStatus(res);
+		_ShowErrorMessage(pControl->getName()+tr("急停")+qstrText);
 		});
 	addDevice("测试名称1", "", 0,0);
 	addDevice("测试名称2", "", 0, 0);

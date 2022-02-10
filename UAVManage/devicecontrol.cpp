@@ -207,7 +207,7 @@ int DeviceControl::Fun_MAV_CMD_NAV_TAKEOFF_LOCAL(float Pitch, float Empty, float
 	//参数2用了标记是否为重发的消息
 	QByteArray arrData = mavCommandLongToBuffer(0, 0, AscendRate, Yaw, X, Y, Z, MAV_CMD_NAV_TAKEOFF_LOCAL);
 	QByteArray againData = mavCommandLongToBuffer(0, _MavResendFlag_, AscendRate, Yaw, X, Y, Z, MAV_CMD_NAV_TAKEOFF_LOCAL);
-	return MavSendCommandLongMessage(MAV_CMD_NAV_TAKEOFF_LOCAL, arrData, again ? arrData : "", false);
+	return MavSendCommandLongMessage(MAV_CMD_NAV_TAKEOFF_LOCAL, arrData, again ? arrData : "", wait);
 }
 
 //无人机降落
@@ -215,28 +215,28 @@ int DeviceControl::Fun_MAV_CMD_NAV_LAND_LOCAL(float Target, float Offset, float 
 {
 	//参数1参数2无效
 	QByteArray arrData = mavCommandLongToBuffer(0, 0, DescendRate, Yaw, X, Y, Z, MAV_CMD_NAV_LAND_LOCAL);
-	return MavSendCommandLongMessage(MAV_CMD_NAV_LAND_LOCAL, arrData, again ? arrData : "", false);
+	return MavSendCommandLongMessage(MAV_CMD_NAV_LAND_LOCAL, arrData, again ? arrData : "", wait);
 }
 
 //无人机急停
 int DeviceControl::Fun_MAV_QUICK_STOP(bool wait, bool again)
 {
 	QByteArray arrData = mavCommandLongToBuffer(0, 0, 0, 0, 0, 0, 0, _MavStopFlyMessageID_);
-	return MavSendCommandLongMessage(_MavStopFlyMessageID_, arrData, again ? arrData : "", false, _MavLinkResendNum_, _MavQuickStopFlyTimeout_);
+	return MavSendCommandLongMessage(_MavStopFlyMessageID_, arrData, again ? arrData : "", wait, _MavLinkResendNum_, _MavQuickStopFlyTimeout_);
 }
 
 //无人机航点指令
 int DeviceControl::Fun_MAV_CMD_NAV_WAYPOINT(float Hold, float AcceptRadius, float PassRadius, float Yaw, float Latitude, float Longitude, float Altitude, bool wait, bool again)
 {
 	QByteArray arrData = mavCommandLongToBuffer(Hold, AcceptRadius, PassRadius, Yaw, Latitude, Longitude, Altitude, MAV_CMD_NAV_WAYPOINT);
-	return MavSendCommandLongMessage(MAV_CMD_NAV_WAYPOINT, arrData, again ? arrData : "", false);
+	return MavSendCommandLongMessage(MAV_CMD_NAV_WAYPOINT, arrData, again ? arrData : "", wait);
 }
 
 //无人机校准
 int DeviceControl::Fun_MAV_CALIBRATION(float p1, float p2, float p3, float p4, float p5, float p6, float p7, bool wait, bool again)
 {
 	QByteArray arrData = mavCommandLongToBuffer(p1, p2, p3, p4, p5, p6, p7, MAV_CMD_PREFLIGHT_CALIBRATION);
-	return MavSendCommandLongMessage(MAV_CMD_PREFLIGHT_CALIBRATION, arrData, again ? arrData : "", false);
+	return MavSendCommandLongMessage(MAV_CMD_PREFLIGHT_CALIBRATION, arrData, again ? arrData : "", wait);
 }
 
 //无人机列队

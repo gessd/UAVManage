@@ -14,7 +14,7 @@
     <ProjectGuid>{F8B79D5F-A59A-494D-9806-960F779D99EF}</ProjectGuid>
     <Keyword>QtVS_v304</Keyword>
     <WindowsTargetPlatformVersion Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">10.0.19041.0</WindowsTargetPlatformVersion>
-    <WindowsTargetPlatformVersion Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">10.0.19041.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">8.1</WindowsTargetPlatformVersion>
     <QtMsBuild Condition="'$(QtMsBuild)'=='' OR !Exists('$(QtMsBuild)\qt.targets')">$(MSBuildProjectDirectory)\QtMsBuild</QtMsBuild>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -114,6 +114,7 @@
     <QtRcc Include="uavmanage.qrc" />
     <QtUic Include="adddevicedialog.ui" />
     <QtUic Include="devicecontrol.ui" />
+    <QtUic Include="devicedebug.ui" />
     <QtUic Include="devicemanage.ui" />
     <QtUic Include="messagelistdialog.ui" />
     <QtUic Include="setdevicedialog.ui" />
@@ -126,6 +127,7 @@
       <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Release|x64'">input</DynamicSource>
       <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).moc</QtMocFileName>
     </ClCompile>
+    <ClCompile Include="devicedebugl.cpp" />
     <ClCompile Include="devicemanage.cpp" />
     <ClCompile Include="globalfunction.cpp" />
     <ClCompile Include="messagelistdialog.cpp" />
@@ -152,6 +154,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="definesetting.h" />
+    <QtMoc Include="devicedebug.h" />
     <ClInclude Include="globalfunction.h" />
     <ClInclude Include="libhvsetting.h" />
     <ClInclude Include="mavlinksetting.h" />

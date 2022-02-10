@@ -170,7 +170,7 @@ private:
 	*/
 	QByteArray mavMessageToBuffer(mavlink_message_t mesage);
 	QByteArray mavCommandLongToBuffer(float param1, float param2, float param3, float param4, float param5, float param6, float param7, int command, int confirmation = 1);
-public:
+private:
 	/**
 	 * @brief 发送Mav指令消息
 	 * @param commandID     指令ID

@@ -581,6 +581,10 @@ void UAVManage::deviceWaypoint(bool bUpload)
 		if (!file.open(QIODevice::ReadOnly)) continue;
 		QByteArray arrData = file.readAll();
 		file.close();
+		if (arrData.isEmpty()) {
+			_ShowErrorMessage(name + tr(": 没有编写舞步"));
+			continue;
+		}
 		//生成航点过程必须一个个生成，python交互函数是静态全局，所以同时只能执行一个设备生成航点
 		if (!ptyhon.compilePythonCode(arrData)) {
 			//生成航点失败
