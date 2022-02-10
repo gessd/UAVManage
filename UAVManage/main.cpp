@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
 		return EXIT_SUCCESS;
 	}
 	//注册MessageHandler
-	//qInstallMessageHandler(outputMessage);
+	qInstallMessageHandler(outputMessage);
 
 	QTextCodec* codec = QTextCodec::codecForName("utf-8");
 	QTextCodec::setCodecForLocale(codec);

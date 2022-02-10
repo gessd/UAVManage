@@ -2,10 +2,11 @@
 #include <QTime>
 #include <QDebug>
 
-ResendMessage::ResendMessage(unsigned int againNum, unsigned int timeout,
+ResendMessage::ResendMessage(QString qstrName, unsigned int againNum, unsigned int timeout,
 	QByteArray arrData, QByteArray arrAgainData, int messageid, _DeviceStatus initStatus, bool bauto, QObject *parent)
 	: QThread(parent)
 {
+	m_qstrName = qstrName;
 	m_unAgainNumber = againNum;
 	m_unTimeout = timeout;
 	m_arrData = arrData;
@@ -15,8 +16,9 @@ ResendMessage::ResendMessage(unsigned int againNum, unsigned int timeout,
 	m_bStop = false;
 	m_nMessageID = messageid;
 	setAutoDelete(bauto);
-
+	qDebug() << "----æ–°å»ºçº¿ç¨‹" << qstrName << this;
 	connect(this, &QThread::finished, [this]() {
+		qDebug() << "----çº¿ç¨‹æ‰§è¡Œå®Œæˆ" << this;
 		if (false == m_bAutoDelete) return;
 		deleteLater();
 		});
@@ -27,14 +29,16 @@ ResendMessage::~ResendMessage()
 	if (isRunning()) {
 		stopThread();
 	}
+	qDebug() << "----çº¿ç¨‹é‡Šæ”¾" << this;
 }
 
 void ResendMessage::stopThread()
 {
+	qDebug() << "----åœæ­¢çº¿ç¨‹" << m_qstrName << this;
 	m_mutexStop.lock();
 	m_bStop = true;
 	m_mutexStop.unlock();
-	//µÈ´ıÏß³ÌÍ£Ö¹
+	//ç­‰å¾…çº¿ç¨‹åœæ­¢
 	while (isRunning());
 }
 
@@ -52,6 +56,7 @@ void ResendMessage::setAutoDelete(bool bauto)
 void ResendMessage::onResult(QString name, int res, int id)
 {
 	if (m_nMessageID != id) return;
+	qDebug() << "----æ”¶åˆ°ç»“æœ" << m_qstrName << res << id << this;
 	m_mutexResult.lock();
 	m_nResult = res;
 	m_mutexResult.unlock();
@@ -60,18 +65,18 @@ void ResendMessage::onResult(QString name, int res, int id)
 
 void ResendMessage::run()
 {
-	//ÒòµÚÒ»´Î·¢ËÍÓëÖØ·¢ÄÚÈİ»á²»Í¬ËùÒÔÏÈ·¢µÚÒ»±é
+	//å› ç¬¬ä¸€æ¬¡å‘é€ä¸é‡å‘å†…å®¹ä¼šä¸åŒæ‰€ä»¥å…ˆå‘ç¬¬ä¸€é
 	QTime time;
 	time.start();
 	unsigned int index = 0;
 	emit sigSendMessage(m_arrData);
 	while (!m_bStop) {
-		//³¬Ê±ÖØ·¢
+		//è¶…æ—¶é‡å‘
 		msleep(10);
-		if(m_unTimeout > time.elapsed()) continue;
+		if (m_unTimeout > time.elapsed()) continue;	
 		index++;
 		if (index > m_unAgainNumber) {
-			//³¬³öÖØ·¢´ÎÊı
+			//è¶…å‡ºé‡å‘æ¬¡æ•°
 			m_bStop = true;
 			m_mutexResult.lock();
 			if (m_initStatus == m_nResult) m_nResult = DeviceMessageToimeout;

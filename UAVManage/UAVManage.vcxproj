@@ -120,7 +120,12 @@
     <QtUic Include="uavmanage.ui" />
     <QtMoc Include="uavmanage.h" />
     <ClCompile Include="adddevicedialog.cpp" />
-    <ClCompile Include="devicecontrol.cpp" />
+    <ClCompile Include="devicecontrol.cpp">
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">input</DynamicSource>
+      <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename).moc</QtMocFileName>
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Release|x64'">input</DynamicSource>
+      <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).moc</QtMocFileName>
+    </ClCompile>
     <ClCompile Include="devicemanage.cpp" />
     <ClCompile Include="globalfunction.cpp" />
     <ClCompile Include="messagelistdialog.cpp" />

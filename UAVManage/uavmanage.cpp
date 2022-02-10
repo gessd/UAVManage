@@ -54,7 +54,6 @@ UAVManage::UAVManage(QWidget *parent)
 	pTestMenu->addAction(pMessage);
 	connect(pQssAction, &QAction::triggered, [this]() { updateStyle(); });
 	connect(pMessage, &QAction::triggered, [this]() { 
-
 		_ShowErrorMessage(tr("这是错误消息这是错误消息这是错误消息这是错误消息这是错误消息这是错误消息这是错误消息"));
 		_ShowWarningMessage(tr("警告消息警告消息警告消息警告消息警告消息警告消息警告消息警告消息"));
 		_ShowInfoMessage(tr("正常提示消息正常提示消息正常提示消息正常提示消息正常提示消息正常提示消息正常提示消息正常提示消息正常提示消息"));
@@ -530,7 +529,8 @@ void UAVManage::onWaypointProcess(QString name, unsigned int index, unsigned int
 	if (finish) {
 		m_pDeviceManage->setEnabled(true);
 	}
-	if (_DeviceStatus::DeviceDataSucceed) {
+	if (text.isEmpty()) return;
+	if (_DeviceStatus::DeviceDataSucceed == res) {
 		//航点上传完成并成功
 		_ShowInfoMessage(name + ": " + text + Utility::waypointMessgeFromStatus(res));
 	} else{
@@ -584,7 +584,7 @@ void UAVManage::deviceWaypoint(bool bUpload)
 		//生成航点过程必须一个个生成，python交互函数是静态全局，所以同时只能执行一个设备生成航点
 		if (!ptyhon.compilePythonCode(arrData)) {
 			//生成航点失败
-			_ShowErrorMessage(name+tr(": 解析舞步积木块失败"));
+			_ShowErrorMessage(name + tr(": 解析舞步积木块失败"));
 			continue;
 		}
 		while (!ptyhon.isFinished()){
@@ -600,7 +600,7 @@ void UAVManage::deviceWaypoint(bool bUpload)
 			continue;
 		}
 		else{
-			_ShowInfoMessage(name + tr("生成舞步完成"));
+			if(!bUpload) _ShowInfoMessage(name + tr("生成舞步完成"));
 		}
 		//上传航点到飞控
 		if (bUpload) {

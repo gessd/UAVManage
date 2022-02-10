@@ -10,7 +10,7 @@ class ResendMessage : public QThread
 	Q_OBJECT
 
 public:
-	ResendMessage(unsigned int againNum, unsigned int timeout, 
+	ResendMessage(QString qstrName, unsigned int againNum, unsigned int timeout, 
 		QByteArray arrData, QByteArray arrAgainData, int messageid, _DeviceStatus initStatus = DeviceWaiting
 		, bool bauto = false, QObject *parent=nullptr);
 	~ResendMessage();
@@ -36,4 +36,5 @@ private:
 	int m_nMessageID;
 	bool m_bAutoDelete;
 	_DeviceStatus m_initStatus;
+	QString m_qstrName;
 };

@@ -6,6 +6,7 @@
 #include <QAction>
 #include <QMutex>
 #include <QTimer>
+#include <QEvent>
 #include "libhvsetting.h"
 #include "mavlinksetting.h"
 #include "resendmessage.h"
@@ -219,6 +220,7 @@ signals:
 	void sigWaypointProcess(QString name, unsigned int index, unsigned int count, int res, bool finish, QString text);
 private slots:
 	void onWaypointProcess(QString name, unsigned int index, unsigned int count, int res, bool finish, QString text);
+	void onWaypointNext();
 private:
 	Ui::DeviceControl ui;
 	QString m_qstrIP;
@@ -230,4 +232,5 @@ private:
 	float m_fStartY;
 	//航点下发中
 	bool m_bWaypointSending;
+	QVector<NavWayPointData> m_currentWaypointData;
 };
