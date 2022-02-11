@@ -35,6 +35,13 @@ void DeviceDebug::setIp(QString ip)
 	ui.lineEditIp->setText(ip);
 }
 
+void DeviceDebug::onConnectStatus(QString name, QString ip, bool connect)
+{
+	QString qstrText = QDateTime::currentDateTime().toString("[hh:mm:ss.zzz]:");
+	if (connect) ui.textBrowser->append(qstrText + tr("连接成功"));
+	else ui.textBrowser->append(qstrText + tr("连接断开"));
+}
+
 void DeviceDebug::onDeviceMessage(QByteArray arrData, bool bReceive)
 {
 	if (Qt::Checked == ui.checkBoxbOnlylog->checkState()) return;

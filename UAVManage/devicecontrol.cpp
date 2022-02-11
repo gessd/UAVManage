@@ -17,20 +17,33 @@ DeviceControl::DeviceControl(QString name, float x, float y, QString ip, QWidget
 	m_bHeartbeatEnable = true;
 	m_bWaypointSending = false;
 	ui.progressBar->setVisible(false);
-	setName(name);
-	setIp(ip);
-	setX(x);
-	setY(y);
+	
 	connect(this, &DeviceControl::sigWaypointProcess, this, &DeviceControl::onWaypointProcess);
 	connect(this, &DeviceControl::sigBatteryStatus, this, &DeviceControl::onUpdateBatteryStatus);
+	connect(this, &DeviceControl::sigConnectStatus, this, &DeviceControl::onUpdateConnectStatus);
+	connect(this, &DeviceControl::sigUpdateHeartbeat, this, &DeviceControl::onUpdateHeartBeat);
 	
 	qRegisterMetaType<QList<float>>("QList<float>");
 	m_pDebugDialog = new DeviceDebug(name, ip, this);
+	connect(this, &DeviceControl::sigConnectStatus, m_pDebugDialog, &DeviceDebug::onConnectStatus);
 	connect(this, &DeviceControl::sigMessageByte, m_pDebugDialog, &DeviceDebug::onDeviceMessage);
 	connect(this, &DeviceControl::sigHighresImu, m_pDebugDialog, &DeviceDebug::onUpdateHighresImu);
 	connect(this, &DeviceControl::sigAttitude, m_pDebugDialog, &DeviceDebug::onUpdateAttitude);
 	connect(this, &DeviceControl::sigLogMessage, m_pDebugDialog, &DeviceDebug::onMessageData);
 	connect(this, &DeviceControl::sigLocalPosition, m_pDebugDialog, &DeviceDebug::onUpdateLocalPosition);
+
+	ui.labelStatus->setVisible(false);
+	m_timerHeartbeat.start(1);
+	connect(&m_timerHeartbeat, &QTimer::timeout, [this]() {
+		unsigned int nLastTime = m_timerHeartbeat.property("time").toUInt();
+		if ((QDateTime::currentDateTime().toTime_t() - nLastTime) > 3) {
+			ui.labelStatus->setVisible(false);
+		}
+		});
+	setName(name);
+	setIp(ip);
+	setX(x);
+	setY(y);
 }
 
 DeviceControl::~DeviceControl()
@@ -292,11 +305,6 @@ void DeviceControl::hvcbConnectionStatus(const hv::SocketChannelPtr& channel)
 				m_pHvTcpClient->send(arrData.data(), arrData.length());
 			}
 			});
-		ui.labelConnect->setText(tr("已连接"));
-	}
-	else {
-		//连接断开
-		ui.labelConnect->setText(tr("已断开"));
 	}
 	emit sigConnectStatus(ui.labelDeviceName->text(), peeraddr.c_str(), channel->isConnected());
 }
@@ -335,6 +343,7 @@ void DeviceControl::hvcbReceiveMessage(const hv::SocketChannelPtr& channel, hv::
 		case MAVLINK_MSG_ID_HEARTBEAT://心跳
 			mavlink_heartbeat_t heart;
 			mavlink_msg_heartbeat_decode(&msg, &heart);
+			emit sigUpdateHeartbeat();
 			break;
 		case MAVLINK_MSG_ID_MISSION_COUNT:  //航点起始应答
 			mavlink_mission_count_t missionCount;
@@ -576,6 +585,19 @@ void DeviceControl::DeviceMavWaypointEnd(unsigned int count)
 	m_bWaypointSending = false;
 	emit sigWaypointProcess(ui.labelDeviceName->text(), count, count, res, true, tr("结束上传舞步"));
 	ui.progressBar->setVisible(false);
+}
+
+void DeviceControl::onUpdateHeartBeat()
+{
+	unsigned int nTime = QDateTime::currentDateTime().toTime_t();
+	m_timerHeartbeat.setProperty("time", nTime);
+	ui.labelStatus->setVisible(true);
+}
+
+void DeviceControl::onUpdateConnectStatus(QString name, QString ip, bool connect)
+{
+	if (connect)ui.labelConnect->setText(tr("<font color=#00FFFF>已连接</font>"));
+	else ui.labelConnect->setText(tr("<font color=#FFFF00>已断开</font>"));
 }
 
 void DeviceControl::onWaypointProcess(QString name, unsigned int index, unsigned int count, int res, bool finish, QString text)

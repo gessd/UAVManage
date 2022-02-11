@@ -196,7 +196,19 @@ private:
 	 * @brief 发送航点结束指令
 	 */
 	void DeviceMavWaypointEnd(unsigned int count);
+	/**
+	 * @brief 心跳响应更新
+	 */
+	void onUpdateHeartBeat();
+	/**
+	 * @brief 更新设备连接状态
+	 */
+	void onUpdateConnectStatus(QString name, QString ip, bool connect);
 signals:
+	/**
+	 * @brief 心跳响应更新
+	 */
+	void sigUpdateHeartbeat();
 	/**
 	 * @brief COMMAND消息返回值
 	 * @param 设备名称
@@ -254,4 +266,6 @@ private:
 	bool m_bWaypointSending;
 	QVector<NavWayPointData> m_currentWaypointData;
 	DeviceDebug* m_pDebugDialog;
+	//检测心跳定时器
+	QTimer m_timerHeartbeat;
 };

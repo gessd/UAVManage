@@ -17,6 +17,7 @@ public:
 protected:
 	void closeEvent(QCloseEvent* event);
 public slots:
+	void onConnectStatus(QString name, QString ip, bool connect);
 	void onDeviceMessage(QByteArray arrData, bool bReceive);
 	void onMessageData(QByteArray arrData);
 	void onSetBatteryStatus(float voltages, float battery, unsigned short electric);
