@@ -5,6 +5,7 @@
 #include <QDebug>
 #include "definesetting.h"
 #include "messagelistdialog.h"
+#include "devicedebug.h"
 
 #define _ItemHeight_ 60
 DeviceManage::DeviceManage(QWidget *parent)
@@ -37,6 +38,7 @@ DeviceManage::DeviceManage(QWidget *parent)
 	QAction* pFlyTo = new QAction(tr("起飞"), this);
 	QAction* pLand = new QAction(tr("降落"), this);
 	QAction* pStop = new QAction(tr("急停"), this);
+	QAction* pDebug = new QAction(tr("调试"), this);
 	m_pMenu->addAction(pActionResetName);
 	m_pMenu->addAction(pActionResetIP);
 	m_pMenu->addAction(pActionDicconnect);
@@ -44,6 +46,8 @@ DeviceManage::DeviceManage(QWidget *parent)
 	m_pMenu->addAction(pFlyTo);
 	m_pMenu->addAction(pLand);
 	m_pMenu->addAction(pStop);
+	m_pMenu->addSeparator();
+	m_pMenu->addAction(pDebug);
 	//菜单响应处理
 	connect(pActionResetName, &QAction::triggered, [this](bool checked) {
 		DeviceControl* pControl = getCurrentDevice();
@@ -99,6 +103,12 @@ DeviceManage::DeviceManage(QWidget *parent)
 		if (res == _DeviceStatus::DeviceDataSucceed) return;
 		QString qstrText = Utility::waypointMessgeFromStatus(res);
 		_ShowErrorMessage(pControl->getName()+tr("急停")+qstrText);
+		});
+	connect(pDebug, &QAction::triggered, [this](bool checked) {
+		DeviceControl* pControl = getCurrentDevice();
+		if (!pControl) return;
+		DeviceDebug* pDebug = pControl->getDeviceDebug();
+		if (pDebug) pDebug->show();
 		});
 	addDevice("测试名称1", "", 0,0);
 	addDevice("测试名称2", "", 0, 0);

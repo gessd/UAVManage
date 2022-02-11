@@ -5,24 +5,8 @@
 #include "globalfunction.h"
 #include "messagelistdialog.h"
 
-#define _CurrentTime_  QTime::currentTime().toString("hh:mm:ss.zzz")
 
-class WaypointProgressEvent : public QEvent
-{
-	
-public:
-	const static Type TYPE = static_cast<Type>(QEvent::User + 0x1020);
-	explicit WaypointProgressEvent(unsigned int index, unsigned int count) 
-		: QEvent(TYPE){
-		m_nIndex = index;
-		m_nCount = count;
-	};
-	unsigned int getIndex() { return m_nIndex; };
-	unsigned int getCount() { return m_nCount; };
-private:
-	unsigned int m_nIndex;
-	unsigned int m_nCount;
-};
+#define _CurrentTime_  QTime::currentTime().toString("hh:mm:ss.zzz")
 
 DeviceControl::DeviceControl(QString name, float x, float y, QString ip, QWidget *parent)
 	: QWidget(parent)
@@ -38,10 +22,24 @@ DeviceControl::DeviceControl(QString name, float x, float y, QString ip, QWidget
 	setX(x);
 	setY(y);
 	connect(this, &DeviceControl::sigWaypointProcess, this, &DeviceControl::onWaypointProcess);
+	connect(this, &DeviceControl::sigBatteryStatus, this, &DeviceControl::onUpdateBatteryStatus);
+	
+	qRegisterMetaType<QList<float>>("QList<float>");
+	m_pDebugDialog = new DeviceDebug(name, ip, this);
+	connect(this, &DeviceControl::sigMessageByte, m_pDebugDialog, &DeviceDebug::onDeviceMessage);
+	connect(this, &DeviceControl::sigHighresImu, m_pDebugDialog, &DeviceDebug::onUpdateHighresImu);
+	connect(this, &DeviceControl::sigAttitude, m_pDebugDialog, &DeviceDebug::onUpdateAttitude);
+	connect(this, &DeviceControl::sigLogMessage, m_pDebugDialog, &DeviceDebug::onMessageData);
+	connect(this, &DeviceControl::sigLocalPosition, m_pDebugDialog, &DeviceDebug::onUpdateLocalPosition);
 }
 
 DeviceControl::~DeviceControl()
 {
+	if (m_pDebugDialog) {
+		m_pDebugDialog->close();
+		delete m_pDebugDialog;
+		m_pDebugDialog = nullptr;
+	}
 	disconnectDevice();
 }
 
@@ -89,6 +87,11 @@ float DeviceControl::getY()
 void DeviceControl::setY(float y)
 {
 	m_fStartY = y;
+}
+
+DeviceDebug* DeviceControl::getDeviceDebug()
+{
+	return m_pDebugDialog;
 }
 
 void DeviceControl::setStartLocation(float x, float y)
@@ -260,6 +263,12 @@ int DeviceControl::Fun_MAV_LED_MODE()
 	return MavSendCommandLongMessage(MAV_CMD_WAYPOINT_USER_4, arrData, arrData, false);
 }
 
+void DeviceControl::onUpdateBatteryStatus(float voltages, float battery, unsigned short electric)
+{
+	ui.labelBattery->setText(QString(tr("电量：%1 %")).arg(electric));
+	m_pDebugDialog->onSetBatteryStatus(voltages, battery, electric);
+}
+
 //网络连接状态
 void DeviceControl::hvcbConnectionStatus(const hv::SocketChannelPtr& channel)
 {//子线程
@@ -300,6 +309,20 @@ void DeviceControl::hvcbReceiveMessage(const hv::SocketChannelPtr& channel, hv::
 	if (arrData.isEmpty()) return;
 	QString qstrName = ui.labelDeviceName->text();
 	qDebug() << "----收到消息" << _CurrentTime_ << qstrName << channel->peeraddr().c_str() << arrData.toHex().toUpper();
+	QByteArray arrTemp = QString(_DeviceLogPrefix_).toLocal8Bit();
+	if (arrData.contains(arrTemp)) {
+		//日志数据
+		QByteArray arrLog = arrData;
+		while (arrLog.contains(arrTemp)) {
+			int indexStart = arrLog.indexOf(arrTemp);
+			int indexEnd = arrLog.indexOf(_DeviceLogEnd_) + 1;
+			if (0 == indexEnd) indexEnd = arrLog.length();
+			QByteArray temp = arrLog.mid(indexStart, indexEnd);
+			emit sigLogMessage(temp);
+			arrLog = arrLog.right(arrLog.length() - indexEnd);
+		}
+	}
+	
 	//解包
 	mavlink_message_t msg;
 	mavlink_status_t status;
@@ -316,23 +339,57 @@ void DeviceControl::hvcbReceiveMessage(const hv::SocketChannelPtr& channel, hv::
 		case MAVLINK_MSG_ID_MISSION_COUNT:  //航点起始应答
 			mavlink_mission_count_t missionCount;
 			mavlink_msg_mission_count_decode(&msg, &missionCount);
+			emit sigMessageByte(mavMessageToBuffer(msg), true);
 			//0成功,成功后发送航点数据
 			emit sigCommandResult(ui.labelDeviceName->text(), missionCount.count>0?0:-1, MAVLINK_MSG_ID_MISSION_COUNT);
 			break;
 		case MAVLINK_MSG_ID_MISSION_ACK:    //航点应答
 			mavlink_mission_ack_t ack;
 			mavlink_msg_mission_ack_decode(&msg, &ack);
-			if ("无人机2" == ui.labelDeviceName->text()) {
-				qDebug() << "----航点测试";
-			}
+			emit sigMessageByte(mavMessageToBuffer(msg), true);
 			emit sigCommandResult(ui.labelDeviceName->text(), ack.type, MAVLINK_MSG_ID_MISSION_ACK);
 			break;
 		case MAVLINK_MSG_ID_COMMAND_ACK:	//命令应答
 		{
 			mavlink_command_ack_t ack;
 			mavlink_msg_command_ack_decode(&msg, &ack);
+			emit sigMessageByte(mavMessageToBuffer(msg), true);
 			emit sigCommandResult(ui.labelDeviceName->text(), ack.result, ack.command);
 			break;		
+		}
+		case MAVLINK_MSG_ID_BATTERY_STATUS:  //电池信息
+		{
+			mavlink_battery_status_t battery;
+			mavlink_msg_battery_status_decode(&msg, &battery);
+			//电压范围9.6-12.6
+			uint16_t v = battery.voltages[0];
+			int16_t b = battery.current_battery;
+			//计算剩余电量
+			uint16_t n = (float(v - 9600) / (12600 - 9600)) * 100;
+			n = QTime::currentTime().msec();
+			emit sigBatteryStatus((float)v / 1000, (float)b / 1000, n);
+			break;
+		}
+		case MAVLINK_MSG_ID_ATTITUDE:	//姿态角
+			mavlink_attitude_t attitude;
+			mavlink_msg_attitude_decode(&msg, &attitude);
+			emit sigAttitude(attitude.time_boot_ms, attitude.roll, attitude.pitch, attitude.yaw);
+			break;
+		case MAVLINK_MSG_ID_LOCAL_POSITION_NED: //位置信息
+		{
+			mavlink_local_position_ned_t t;
+			mavlink_msg_local_position_ned_decode(&msg, &t);
+			emit sigLocalPosition(t.time_boot_ms, QString::number(t.x, 'f', 3).toFloat(), QString::number(t.y, 'f', 3).toFloat(), QString::number(t.z, 'f', 3).toFloat());
+			break;
+		}
+		case MAVLINK_MSG_ID_HIGHRES_IMU:	//IMU数据
+		{
+			mavlink_highres_imu_t t;
+			mavlink_msg_highres_imu_decode(&msg, &t);
+			QList<float> list;
+			list << t.xacc << t.yacc << t.zacc << t.xgyro << t.ygyro << t.zgyro << t.xmag << t.ymag << t.zmag;
+			emit sigHighresImu(t.time_usec, list);
+			break;
 		}
 		default:
 			break;
@@ -346,6 +403,7 @@ void DeviceControl::hvcbWriteComplete(const hv::SocketChannelPtr& channel, hv::B
 	if (buf->size() <= 0) return;
 	QByteArray arrBuf((char*)buf->data(), buf->size());
 	if (arrBuf.isEmpty()) return;
+	emit sigMessageByte(arrBuf, false);
 	qDebug() << "----已发送消息" << ui.labelDeviceName->text() << _CurrentTime_ << channel->peeraddr().c_str() << arrBuf.toHex().toUpper();
 }
 

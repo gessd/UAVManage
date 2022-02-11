@@ -11,6 +11,7 @@
 #include "mavlinksetting.h"
 #include "resendmessage.h"
 #include "definesetting.h"
+#include "devicedebug.h"
 
 class DeviceControl : public QWidget
 {
@@ -28,6 +29,7 @@ public:
 	void setX(float x);
 	float getY();
 	void setY(float y);
+	DeviceDebug* getDeviceDebug();
 	void setStartLocation(float x, float y);
 	QList<float> getStartLocation();
 public slots:
@@ -145,6 +147,7 @@ public slots:
 	 * @brief 无人机灯光
 	 */
 	int Fun_MAV_LED_MODE();
+	void onUpdateBatteryStatus(float voltages, float battery, unsigned short electric);
 private:
 	/**
 	* @brief TCP连接状态，子线程回调函数
@@ -218,6 +221,23 @@ signals:
 	 * @param 文字描述信息
 	 */
 	void sigWaypointProcess(QString name, unsigned int index, unsigned int count, int res, bool finish, QString text);
+	/**
+	 * @brief 电池信息
+	 * @param 电压
+	 * @param 电流
+	 * @param 剩余电量，百分比
+	 */
+	void sigBatteryStatus(float voltages, float battery, unsigned short electric);
+	//已发送的的指令
+    void sigMessageByte(QByteArray, bool);
+	//日志消息
+	void sigLogMessage(QByteArray data);
+	//当前位置信息
+	void sigLocalPosition(unsigned int time_boot_ms, float x, float y, float z);
+	//IMU数据
+	void sigHighresImu(unsigned long long, QList<float>);
+	//姿态角
+	void sigAttitude(unsigned int time, float roll, float pitch, float yaw);
 private slots:
 	void onWaypointProcess(QString name, unsigned int index, unsigned int count, int res, bool finish, QString text);
 	void onWaypointNext();
@@ -233,4 +253,5 @@ private:
 	//航点下发中
 	bool m_bWaypointSending;
 	QVector<NavWayPointData> m_currentWaypointData;
+	DeviceDebug* m_pDebugDialog;
 };

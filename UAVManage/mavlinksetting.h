@@ -3,27 +3,32 @@
 #include "mavlink_types.h"
 #include "common/mavlink.h"
 
-//Éè±¸ÏµÍ³ID
+//è®¾å¤‡ç³»ç»ŸID
 #define _DeviceSYS_ID_  1
-//Éè±¸×é¼şID
+//è®¾å¤‡ç»„ä»¶ID
 #define _DeviceCOMP_ID_ 1
-//ÏûÏ¢ÖØ·¢±êÊ¶
+//æ¶ˆæ¯é‡å‘æ ‡è¯†
 #define _MavResendFlag_ 1
 
-//Éè±¸TCPÁ¬½Ó¶Ë¿Ú
+//è®¾å¤‡TCPè¿æ¥ç«¯å£
 #define _DevicePort_ 8899
 
-//¼±Í£Ö¸ÁîÏûÏ¢ID
+//æ€¥åœæŒ‡ä»¤æ¶ˆæ¯ID
 #define _MavStopFlyMessageID_ 15
-//¼±Í£³¬Ê±¼ä¸ô
+//æ€¥åœè¶…æ—¶é—´éš”
 #define _MavQuickStopFlyTimeout_ 1000
-//Ö¸ÁîÏûÏ¢ÖØ·¢·¢ËÍ´ÎÊı
+//æŒ‡ä»¤æ¶ˆæ¯é‡å‘å‘é€æ¬¡æ•°
 #define _MavLinkResendNum_ 2
-//º½µãÖØ¸´´ÎÊı
+//èˆªç‚¹é‡å¤æ¬¡æ•°
 #define _MavWaypointRetryNum_ 2
-//ĞÄÌøÏûÏ¢Ê±¼ä¼ä¸ô
+//å¿ƒè·³æ¶ˆæ¯æ—¶é—´é—´éš”
 #define _DeviceHeartbeatInterval_ 500
-//Ö¸ÁîÏûÏ¢ÖØ·¢¼ä¸ô ºÁÃë
+//æŒ‡ä»¤æ¶ˆæ¯é‡å‘é—´éš” æ¯«ç§’
 #define _NkCommandResendInterval_ 3000
-//ÉÏ´«º½µã³¬Ê± ºÁÃë
+//ä¸Šä¼ èˆªç‚¹è¶…æ—¶ æ¯«ç§’
 #define _MavWaypointTimeout_ 2000
+
+//æ—¥å¿—æ¶ˆæ¯å‰ç¼€
+#define _DeviceLogPrefix_   "æ—¥å¿—"
+//æ—¥å¿—æ¶ˆæ¯ç»“æŸ
+#define _DeviceLogEnd_   0x0D0A
