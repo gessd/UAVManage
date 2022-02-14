@@ -25,6 +25,15 @@ public:
 		_DeviceQuickStop,      //急停
 		_DeviceSetout		   //准备起飞
 	};
+	enum _CalibrationEnum {
+		_Gyro,				//陀螺校准
+		_Magnetometer,		//磁罗盘校准 
+		_MagEnable,			//磁罗盘使能开关
+		_Remote,			//无效值
+		_Accelerometer,		//加计校准
+		_Compmot,			//无效值
+		_Baro				//电调校准
+	};
 	DeviceManage(QWidget *parent = Q_NULLPTR);
 	~DeviceManage();
 	/**
@@ -71,6 +80,10 @@ public:
 	 * @brief 控制所有设备执行
 	 */
 	void allDeviceControl(_AllDeviceCommand comand);
+	/**
+	* @brief 设备校准
+	*/
+	void allDeviceCalibration(_CalibrationEnum c);
 	/**
 	 * @brief 上传舞步到飞控
 	 * @param name 设备名称
@@ -125,8 +138,6 @@ private:
 	DeviceControl* getCurrentDevice();
 private:
 	Ui::DeviceManage ui;
-	//已记录的设备，名称及IP不可以重复
-	//QMap<QString, _tagDeviceProperty> m_mapDevices;
 	//设备菜单
 	QMenu* m_pMenu;
 };

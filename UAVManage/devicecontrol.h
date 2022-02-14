@@ -32,7 +32,7 @@ public:
 	DeviceDebug* getDeviceDebug();
 	void setStartLocation(float x, float y);
 	QList<float> getStartLocation();
-public slots:
+
 	/**
 	 * @brief 连接设备
 	 */
@@ -47,13 +47,6 @@ public slots:
 	 * @brief 设备是否连接
 	 */
 	bool isConnectDevice();
-
-	/**
-	 * @brief 发送数据
-	 * @param data [in] 二进制数据
-	 * @return 发送成功
-	 */
-	bool sendMessage(QByteArray data);
 
 	/**
 	 * @brief 启用心跳
@@ -147,6 +140,13 @@ public slots:
 	 * @brief 无人机灯光
 	 */
 	int Fun_MAV_LED_MODE();
+public slots:
+	/**
+	* @brief 发送数据
+	* @param data [in] 二进制数据
+	* @return 发送成功
+	*/
+	bool sendMessage(QByteArray data);
 	/**
 	 * @brief 更新界面电量
 	 * @param 电压

@@ -125,6 +125,10 @@ DeviceManage::DeviceManage(QWidget *parent)
 	connect(ui.btnFlyTakeoff, &QAbstractButton::clicked, [this]() { allDeviceControl(_DeviceTakeoffLocal); });
 	connect(ui.btnFlyLand, &QAbstractButton::clicked, [this]() { allDeviceControl(_DeviceLandLocal); });
 	connect(ui.btnFlyStop, &QAbstractButton::clicked, [this]() { allDeviceControl(_DeviceQuickStop); });
+	connect(ui.checkBoxAutoLand, &QAbstractButton::clicked, [this]() { //低电降落
+		});
+	connect(ui.checkBoxMagnetismStatus, &QAbstractButton::clicked, [this]() { //磁开关
+		});
 }
 
 DeviceManage::~DeviceManage()
@@ -305,6 +309,11 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 			break;
 		}
 	}
+}
+
+void DeviceManage::allDeviceCalibration(_CalibrationEnum c)
+{
+
 }
 
 QString DeviceManage::sendWaypoint(QString name, QVector<NavWayPointData> data)

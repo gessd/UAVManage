@@ -32,6 +32,7 @@ void outputMessage(QtMsgType type, const QMessageLogContext& context, const QStr
 	QFile file(qstrFileName);
 	if (file.open(QIODevice::WriteOnly | QIODevice::Append)) {
 		QTextStream text_stream(&file);
+		text_stream.setCodec("gbk");
 		text_stream << message << "\r\n";
 		file.flush();
 		file.close();
