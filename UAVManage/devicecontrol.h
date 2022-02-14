@@ -63,7 +63,7 @@ public slots:
 	/**
 	 * @brief 准备上传航点数据，根据信号sigWaypointProcess处理进度
 	 * @param data 航点结构
-	 * @return 返回消息错误值 [0下发过程开始]
+	 * @return 返回消息错误值，0成功，根据舞步上传进度信号判断是否完成
 	 */
 	int DeviceMavWaypointStart(QVector<NavWayPointData> data);
 
@@ -147,6 +147,12 @@ public slots:
 	 * @brief 无人机灯光
 	 */
 	int Fun_MAV_LED_MODE();
+	/**
+	 * @brief 更新界面电量
+	 * @param 电压
+	 * @param 电流
+	 * @param 剩余电量，百分比
+	 */
 	void onUpdateBatteryStatus(float voltages, float battery, unsigned short electric);
 private:
 	/**
@@ -176,6 +182,7 @@ private:
 private:
 	/**
 	 * @brief 发送Mav指令消息
+	 * @param qstrText      指令名称
 	 * @param commandID     指令ID
 	 * @param arrData       发送的数据内容
 	 * @param arrAgainData  重发的数据内容，部分协议重发数据与初始数据不同
@@ -184,7 +191,7 @@ private:
 	 * @param againInterval 重发/超时时间间隔[毫秒]
 	 * @return 返回执行结果
 	 */
-	int MavSendCommandLongMessage(int commandID, QByteArray arrData, QByteArray arrAgainData="", bool bWait = false
+	int MavSendCommandLongMessage(QString name, int commandID, QByteArray arrData, QByteArray arrAgainData="", bool bWait = false
 		, unsigned int againNum = _MavLinkResendNum_, unsigned int againInterval = _NkCommandResendInterval_);
 	QByteArray getWaypointData(float param1, float param2, float param3, float param4
 		, int32_t x, int32_t y, float z, uint16_t seq, unsigned int again);
@@ -205,6 +212,13 @@ private:
 	 */
 	void onUpdateConnectStatus(QString name, QString ip, bool connect);
 signals:
+	/**
+	* @brief 设备命令控制返回结果
+	* @param 指令名称
+	* @param 消息返回结果
+	* @param 消息错误说明
+	*/
+	void sigConrolFinished(QString text, int res, QString explain);
 	/**
 	 * @brief 心跳响应更新
 	 */
@@ -253,6 +267,7 @@ signals:
 private slots:
 	void onWaypointProcess(QString name, unsigned int index, unsigned int count, int res, bool finish, QString text);
 	void onWaypointNext();
+	void onMessageThreadFinished();
 private:
 	Ui::DeviceControl ui;
 	QString m_qstrIP;

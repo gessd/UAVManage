@@ -2,7 +2,7 @@
 #include <QTime>
 #include <QDebug>
 
-ResendMessage::ResendMessage(QString qstrName, unsigned int againNum, unsigned int timeout,
+ResendMessage::ResendMessage(QString comName, QString qstrName, unsigned int againNum, unsigned int timeout,
 	QByteArray arrData, QByteArray arrAgainData, int messageid, _DeviceStatus initStatus, bool bauto, QObject *parent)
 	: QThread(parent)
 {
@@ -15,6 +15,7 @@ ResendMessage::ResendMessage(QString qstrName, unsigned int againNum, unsigned i
 	m_initStatus = initStatus;
 	m_bStop = false;
 	m_nMessageID = messageid;
+	m_qstrComName = comName;
 	setAutoDelete(bauto);
 	qDebug() << "----新建线程" << qstrName << this;
 	connect(this, &QThread::finished, [this]() {
@@ -30,6 +31,11 @@ ResendMessage::~ResendMessage()
 		stopThread();
 	}
 	qDebug() << "----线程释放" << this;
+}
+
+QString ResendMessage::getCommandName()
+{
+	return m_qstrComName;
 }
 
 void ResendMessage::stopThread()

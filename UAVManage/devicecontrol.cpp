@@ -182,7 +182,7 @@ int DeviceControl::Fun_MAV_CMD_DO_SET_MODE(float Mode, bool wait, bool again)
 	//参数2,3,4,5,6,7无效
 	//1姿态模式|2定高模式|3航点模式
 	QByteArray arrData = mavCommandLongToBuffer(Mode, 0, 0, 0, 0, 0, 0, MAV_CMD_DO_SET_MODE);
-	return MavSendCommandLongMessage(MAV_CMD_DO_SET_MODE, arrData, again ? arrData : "", false);
+	return MavSendCommandLongMessage(tr("准备起飞"), MAV_CMD_DO_SET_MODE, arrData, again ? arrData : "", false);
 }
 
 int DeviceControl::DeviceMavWaypointStart(QVector<NavWayPointData> data)
@@ -208,7 +208,7 @@ int DeviceControl::DeviceMavWaypointStart(QVector<NavWayPointData> data)
 	ui.progressBar->setValue(0);
 	ui.progressBar->setVisible(true);
 	m_currentWaypointData = data;
-	ResendMessage* pMessageThread = new ResendMessage(ui.labelDeviceName->text(), _MavWaypointRetryNum_, _MavWaypointTimeout_, arrData, arrData, MAVLINK_MSG_ID_MISSION_COUNT);
+	ResendMessage* pMessageThread = new ResendMessage(tr("准备上传舞步"), ui.labelDeviceName->text(), _MavWaypointRetryNum_, _MavWaypointTimeout_, arrData, arrData, MAVLINK_MSG_ID_MISSION_COUNT);
 	connect(this, SIGNAL(sigCommandResult(QString, int, int)), pMessageThread, SLOT(onResult(QString, int, int)));
 	connect(pMessageThread, SIGNAL(sigSendMessage(QByteArray)), this, SLOT(sendMessage(QByteArray)));
 	connect(pMessageThread, SIGNAL(finished()), this, SLOT(onWaypointNext()));
@@ -223,7 +223,7 @@ int DeviceControl::Fun_MAV_CMD_NAV_TAKEOFF_LOCAL(float Pitch, float Empty, float
 	//参数2用了标记是否为重发的消息
 	QByteArray arrData = mavCommandLongToBuffer(0, 0, AscendRate, Yaw, X, Y, Z, MAV_CMD_NAV_TAKEOFF_LOCAL);
 	QByteArray againData = mavCommandLongToBuffer(0, _MavResendFlag_, AscendRate, Yaw, X, Y, Z, MAV_CMD_NAV_TAKEOFF_LOCAL);
-	return MavSendCommandLongMessage(MAV_CMD_NAV_TAKEOFF_LOCAL, arrData, again ? arrData : "", wait);
+	return MavSendCommandLongMessage(tr("起飞"), MAV_CMD_NAV_TAKEOFF_LOCAL, arrData, again ? arrData : "", wait);
 }
 
 //无人机降落
@@ -231,49 +231,49 @@ int DeviceControl::Fun_MAV_CMD_NAV_LAND_LOCAL(float Target, float Offset, float 
 {
 	//参数1参数2无效
 	QByteArray arrData = mavCommandLongToBuffer(0, 0, DescendRate, Yaw, X, Y, Z, MAV_CMD_NAV_LAND_LOCAL);
-	return MavSendCommandLongMessage(MAV_CMD_NAV_LAND_LOCAL, arrData, again ? arrData : "", wait);
+	return MavSendCommandLongMessage(tr("降落"), MAV_CMD_NAV_LAND_LOCAL, arrData, again ? arrData : "", wait);
 }
 
 //无人机急停
 int DeviceControl::Fun_MAV_QUICK_STOP(bool wait, bool again)
 {
 	QByteArray arrData = mavCommandLongToBuffer(0, 0, 0, 0, 0, 0, 0, _MavStopFlyMessageID_);
-	return MavSendCommandLongMessage(_MavStopFlyMessageID_, arrData, again ? arrData : "", wait, _MavLinkResendNum_, _MavQuickStopFlyTimeout_);
+	return MavSendCommandLongMessage(tr("急停"), _MavStopFlyMessageID_, arrData, again ? arrData : "", wait, _MavLinkResendNum_, _MavQuickStopFlyTimeout_);
 }
 
 //无人机航点指令
 int DeviceControl::Fun_MAV_CMD_NAV_WAYPOINT(float Hold, float AcceptRadius, float PassRadius, float Yaw, float Latitude, float Longitude, float Altitude, bool wait, bool again)
 {
 	QByteArray arrData = mavCommandLongToBuffer(Hold, AcceptRadius, PassRadius, Yaw, Latitude, Longitude, Altitude, MAV_CMD_NAV_WAYPOINT);
-	return MavSendCommandLongMessage(MAV_CMD_NAV_WAYPOINT, arrData, again ? arrData : "", wait);
+	return MavSendCommandLongMessage(tr("舞步"), MAV_CMD_NAV_WAYPOINT, arrData, again ? arrData : "", wait);
 }
 
 //无人机校准
 int DeviceControl::Fun_MAV_CALIBRATION(float p1, float p2, float p3, float p4, float p5, float p6, float p7, bool wait, bool again)
 {
 	QByteArray arrData = mavCommandLongToBuffer(p1, p2, p3, p4, p5, p6, p7, MAV_CMD_PREFLIGHT_CALIBRATION);
-	return MavSendCommandLongMessage(MAV_CMD_PREFLIGHT_CALIBRATION, arrData, again ? arrData : "", wait);
+	return MavSendCommandLongMessage(tr("校准"), MAV_CMD_PREFLIGHT_CALIBRATION, arrData, again ? arrData : "", wait);
 }
 
 //无人机列队
 int DeviceControl::Fun_MAV_Defined_Queue()
 {
 	QByteArray arrData = mavCommandLongToBuffer(0, 0, 0, 0, 0, 0, 0, MAV_CMD_USER_1);
-	return MavSendCommandLongMessage(MAV_CMD_USER_1, arrData, arrData, false);
+	return MavSendCommandLongMessage(tr("列队"), MAV_CMD_USER_1, arrData, arrData, false);
 }
 
 //无人机回收
 int DeviceControl::Fun_MAV_Defined_Regain()
 {
 	QByteArray arrData = mavCommandLongToBuffer(0, 0, 0, 0, 0, 0, 0, MAV_CMD_USER_2);
-	return MavSendCommandLongMessage(MAV_CMD_USER_2, arrData, arrData, false);
+	return MavSendCommandLongMessage(tr("回收"), MAV_CMD_USER_2, arrData, arrData, false);
 }
 
 //无人机灯光
 int DeviceControl::Fun_MAV_LED_MODE()
 {
 	QByteArray arrData = mavCommandLongToBuffer(0, 0, 0, 0, 0, 0, 0, MAV_CMD_WAYPOINT_USER_4);
-	return MavSendCommandLongMessage(MAV_CMD_WAYPOINT_USER_4, arrData, arrData, false);
+	return MavSendCommandLongMessage(tr("灯光"), MAV_CMD_WAYPOINT_USER_4, arrData, arrData, false);
 }
 
 void DeviceControl::onUpdateBatteryStatus(float voltages, float battery, unsigned short electric)
@@ -445,13 +445,13 @@ QByteArray DeviceControl::mavCommandLongToBuffer(float param1, float param2, flo
 	return mavMessageToBuffer(message);
 }
 
-int DeviceControl::MavSendCommandLongMessage(int commandID, QByteArray arrData, QByteArray arrAgainData, bool bWait
+int DeviceControl::MavSendCommandLongMessage(QString name, int commandID, QByteArray arrData, QByteArray arrAgainData, bool bWait
 	, unsigned int againNum, unsigned int againInterval)
 {
 	if (arrData.isEmpty()) return DeviceDataError;
 	if (!isConnectDevice()) return DeviceUnConnect;
 	//通过MessageThread控制重发数据及处理消息响应
-	ResendMessage* pMessageThread = new ResendMessage(ui.labelDeviceName->text(), arrAgainData.isEmpty() ? 0 : againNum, againInterval, arrData, arrAgainData, commandID);
+	ResendMessage* pMessageThread = new ResendMessage(name, ui.labelDeviceName->text(), arrAgainData.isEmpty() ? 0 : againNum, againInterval, arrData, arrAgainData, commandID);
 	//接收设备回复的消息响应
 	connect(this, SIGNAL(sigCommandResult(QString, int, int)), pMessageThread, SLOT(onResult(QString, int, int)));
 	connect(pMessageThread, SIGNAL(sigSendMessage(QByteArray)), this, SLOT(sendMessage(QByteArray)));
@@ -459,8 +459,9 @@ int DeviceControl::MavSendCommandLongMessage(int commandID, QByteArray arrData, 
 
 	if (false == bWait) {
 		//当使用重发消息但不等待返回结果时，MessageThread指针无法销毁，设置自动销毁，使用完后自动注销
-		pMessageThread->setAutoDelete(true);
+		//pMessageThread->setAutoDelete(true);
 		//直接返回结果，线程超时或收到响应后自动销毁
+		connect(pMessageThread, &QThread::finished, this, &DeviceControl::onMessageThreadFinished);
 		return DeviceDataSucceed;
 	}
 	//阻塞等待结果
@@ -507,7 +508,7 @@ void DeviceControl::DeviceMavWaypointSend(QVector<NavWayPointData> data)
 	//先发送0号全零航点，验证是否可以上传航点
 	QByteArray arrData = getWaypointData(0, 0, 0, 0, 0, 0, 0, 0, 0);
 	QByteArray arrAgainData = getWaypointData(0, 0, 0, 0, 0, 0, 0, 0, 1);
-	ResendMessage* pMessageThread = new ResendMessage(ui.labelDeviceName->text(), _MavWaypointRetryNum_, _MavWaypointTimeout_, arrData, arrAgainData, MAVLINK_MSG_ID_MISSION_ACK);
+	ResendMessage* pMessageThread = new ResendMessage(tr("上传预制舞步"), ui.labelDeviceName->text(), _MavWaypointRetryNum_, _MavWaypointTimeout_, arrData, arrAgainData, MAVLINK_MSG_ID_MISSION_ACK);
 	//接收设备回复的消息响应
 	connect(this, SIGNAL(sigCommandResult(QString, int, int)), pMessageThread, SLOT(onResult(QString, int, int)));
 	connect(pMessageThread, SIGNAL(sigSendMessage(QByteArray)), this, SLOT(sendMessage(QByteArray)), Qt::DirectConnection);
@@ -534,7 +535,7 @@ void DeviceControl::DeviceMavWaypointSend(QVector<NavWayPointData> data)
 		NavWayPointData temp = data.at(i);
 		QByteArray arrData = getWaypointData(temp.param1, temp.param2, temp.param3, temp.param4, temp.x, temp.y, temp.z, i + 1, 0);
 		QByteArray arrAgainData = getWaypointData(temp.param1, temp.param2, temp.param3, temp.param4, temp.x, temp.y, temp.z, i + 1, 1);
-		ResendMessage* pWaypointThread = new ResendMessage(ui.labelDeviceName->text(), _MavWaypointRetryNum_, _MavWaypointTimeout_, arrData, arrAgainData, MAVLINK_MSG_ID_MISSION_ACK);
+		ResendMessage* pWaypointThread = new ResendMessage(tr("上传舞步"), ui.labelDeviceName->text(), _MavWaypointRetryNum_, _MavWaypointTimeout_, arrData, arrAgainData, MAVLINK_MSG_ID_MISSION_ACK);
 		connect(this, SIGNAL(sigCommandResult(QString, int, int)), pWaypointThread, SLOT(onResult(QString, int, int)));
 		//阻塞发送
 		connect(pWaypointThread, SIGNAL(sigSendMessage(QByteArray)), this, SLOT(sendMessage(QByteArray)), Qt::DirectConnection);
@@ -569,7 +570,7 @@ void DeviceControl::DeviceMavWaypointEnd(unsigned int count)
 	mavlink_msg_mission_ack_encode(_DeviceSYS_ID_, _DeviceCOMP_ID_, &msg, &ack);
 	QByteArray arrData = mavMessageToBuffer(msg);
 	QByteArray arrAgainData = arrData;
-	ResendMessage* pMessageThread = new ResendMessage(ui.labelDeviceName->text(), _MavWaypointRetryNum_, _MavWaypointTimeout_, arrData, arrAgainData, MAVLINK_MSG_ID_MISSION_ACK);
+	ResendMessage* pMessageThread = new ResendMessage(tr("结束舞步上传"), ui.labelDeviceName->text(), _MavWaypointRetryNum_, _MavWaypointTimeout_, arrData, arrAgainData, MAVLINK_MSG_ID_MISSION_ACK);
 	//接收设备回复的消息响应
 	connect(this, SIGNAL(sigCommandResult(QString, int, int)), pMessageThread, SLOT(onResult(QString, int, int)));
 	connect(pMessageThread, SIGNAL(sigSendMessage(QByteArray)), this, SLOT(sendMessage(QByteArray)), Qt::DirectConnection);
@@ -619,6 +620,14 @@ void DeviceControl::onWaypointNext()
 	delete pMessage;
 	//成功后开始上传航点
 	DeviceMavWaypointSend(m_currentWaypointData);
+}
+
+void DeviceControl::onMessageThreadFinished()
+{
+	ResendMessage* pMessage = dynamic_cast<ResendMessage*>(sender());
+	if (!pMessage) return;
+	emit sigConrolFinished(pMessage->getCommandName(), pMessage->getResult(), "");
+	delete pMessage;
 }
 
 

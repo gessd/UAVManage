@@ -21,9 +21,9 @@ class DeviceManage : public QWidget
 public:
 	enum _AllDeviceCommand {
 		_DeviceTakeoffLocal=1, //起飞
-		_DeviceLandLocal,    //降落
-		_DeviceQuickStop,    //急停
-		_DeviceSetout		 //准备起飞
+		_DeviceLandLocal,      //降落
+		_DeviceQuickStop,      //急停
+		_DeviceSetout		   //准备起飞
 	};
 	DeviceManage(QWidget *parent = Q_NULLPTR);
 	~DeviceManage();
@@ -71,6 +71,12 @@ public:
 	 * @brief 控制所有设备执行
 	 */
 	void allDeviceControl(_AllDeviceCommand comand);
+	/**
+	 * @brief 上传舞步到飞控
+	 * @param name 设备名称
+	 * @param data 航点列表 协议信息
+	 * @return 返回错误信息
+	 */
 	QString sendWaypoint(QString name, QVector<NavWayPointData> data);
 signals:
 	/**
@@ -99,13 +105,19 @@ signals:
 	 */
 	void currentDeviceNameChanged(QString currentName, QString previousName);
 	/**
-	 * @brief 航点下发进度
+	 * @brief 舞步上传进度
+	 * @param name 设备名称
+	 * @param index 舞步序号
+	 * @param count 舞步总数
+	 * @param res 上传舞步响应结果
+	 * @param finish 整个过程是否完成
+	 * @param text 当前进行的过程
 	 */
 	void sigWaypointProcess(QString name, unsigned int index, unsigned int count, int res, bool finish, QString text);
 protected:
 	virtual bool eventFilter(QObject* watched, QEvent* event);
-private slots:
-	
+public slots:
+	void onDeviceConrolFinished(QString text, int res, QString explain);
 private:
 	/**
 	 * @brief 当前选中的设备

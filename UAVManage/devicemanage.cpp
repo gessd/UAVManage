@@ -150,6 +150,7 @@ QString DeviceManage::addDevice(QString qstrName, QString ip, float x, float y)
 	//此处会耗时
 	DeviceControl* pControl = new DeviceControl(qstrName, x, y, ip);
 	connect(pControl, &DeviceControl::sigWaypointProcess, this, &DeviceManage::sigWaypointProcess);
+	connect(pControl, &DeviceControl::sigConrolFinished, this, &DeviceManage::onDeviceConrolFinished);
 	ui.listWidget->setItemWidget(item, pControl);
 	ui.listWidget->setCurrentItem(item);
 	emit deviceAddFinished(qstrName, ip, x, y);
@@ -158,7 +159,7 @@ QString DeviceManage::addDevice(QString qstrName, QString ip, float x, float y)
 
 void DeviceManage::removeDevice()
 {
-	//删除选择项目，如果没有选中则删除最后一个
+	//删除选中项目，如果没有选中则删除最后一个
 	int count = ui.listWidget->count();
 	if (0 >= count) return;
 	QListWidgetItem* item = ui.listWidget->currentItem();
@@ -289,13 +290,13 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 		switch (comand)
 		{
 		case DeviceManage::_DeviceTakeoffLocal:
-			pDevice->Fun_MAV_CMD_NAV_TAKEOFF_LOCAL(0, 0, 0, 0, 0, 0, _TakeoffLocalHeight_, false, true);
+			pDevice->Fun_MAV_CMD_NAV_TAKEOFF_LOCAL(0, 0, 0, 0, 0, 0, _TakeoffLocalHeight_, false);
 			break;
 		case DeviceManage::_DeviceLandLocal:
-			pDevice->Fun_MAV_CMD_NAV_LAND_LOCAL(0, 0, 0, 0, 0, 0, 0, false, true);
+			pDevice->Fun_MAV_CMD_NAV_LAND_LOCAL(0, 0, 0, 0, 0, 0, 0, false);
 			break;
 		case DeviceManage::_DeviceQuickStop:
-			pDevice->Fun_MAV_QUICK_STOP(false, true);
+			pDevice->Fun_MAV_QUICK_STOP(false);
 			break;
 		case DeviceManage::_DeviceSetout:
 			pDevice->Fun_MAV_CMD_DO_SET_MODE(3, false);
@@ -347,4 +348,31 @@ DeviceControl* DeviceManage::getCurrentDevice()
 	if (!pWidget) return nullptr;
 	DeviceControl* pDevice = dynamic_cast<DeviceControl*>(pWidget);
 	return pDevice;
+}
+
+void DeviceManage::onDeviceConrolFinished(QString text, int res, QString explain)
+{
+	if (DeviceDataSucceed == res) return;
+	DeviceControl* pControl = dynamic_cast<DeviceControl*>(sender());
+	if (!pControl) return;
+	text.prepend(pControl->getName());
+	switch (res) {
+	case DeviceMessageToimeout:
+		text.append(tr("错误:超时"));
+		break;
+	case DeviceMessageSending:
+		text.append(tr("错误:消息发送中"));
+		break;
+	case DeviceDataError:
+		text.append(tr("错误:消息错误"));
+		break;
+	case DeviceUnConnect:
+		text.append(tr("错误:未连接"));
+		break;
+	case DeviceWaiting:
+		text.append(tr("错误:超时"));
+		break;
+	default: break;
+	}
+	_ShowErrorMessage(text);
 }
