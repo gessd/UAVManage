@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>227</width>
-    <height>123</height>
+    <height>125</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -67,6 +67,9 @@
    </item>
    <item row="3" column="0" colspan="2">
     <layout class="QHBoxLayout" name="horizontalLayout">
+     <property name="spacing">
+      <number>10</number>
+     </property>
      <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">
@@ -81,14 +84,26 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="btnOK">
+      <widget class="QToolButton" name="btnOK">
+       <property name="minimumSize">
+        <size>
+         <width>65</width>
+         <height>25</height>
+        </size>
+       </property>
        <property name="text">
         <string>确定</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="btnCancel">
+      <widget class="QToolButton" name="btnCancel">
+       <property name="minimumSize">
+        <size>
+         <width>65</width>
+         <height>25</height>
+        </size>
+       </property>
        <property name="text">
         <string>取消</string>
        </property>

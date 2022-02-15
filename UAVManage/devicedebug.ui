@@ -46,7 +46,7 @@
     </rect>
    </property>
   </widget>
-  <widget class="QPushButton" name="btnSendHex">
+  <widget class="QToolButton" name="btnSendHex">
    <property name="geometry">
     <rect>
      <x>20</x>
@@ -59,7 +59,7 @@
     <string>HEX发送</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="btnMessageClear">
+  <widget class="QToolButton" name="btnMessageClear">
    <property name="geometry">
     <rect>
      <x>700</x>

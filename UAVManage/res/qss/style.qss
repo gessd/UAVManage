@@ -1,5 +1,4 @@
 QWidget{
-    border:none;
 	color:rgb(255,255,255);
 	background:rgb(58,58,58);
 }
@@ -7,15 +6,15 @@ QWidget:disabled{
 	color:rgb(100,100,100);
 }
 
-QToolButton, QPushButton, QDialog QPushButton{
+QToolButton{
     background:rgb(80, 80, 80);
 	/*border:1px solid red;*/
 	border-radius:10px;
 }
-QToolButton:hover, QPushButton:hover, QDialog QPushButton:hover{
+QToolButton:hover{
     background:rgb(100,100,100);
 }
-QToolButton:pressed, QPushButton:pressed, QDialog QPushButton:pressed{
+QToolButton:pressed{
     background:rgb(120,120,120);
 }
 
