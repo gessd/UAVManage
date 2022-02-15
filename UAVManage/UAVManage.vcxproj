@@ -32,12 +32,12 @@
   </ImportGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="QtSettings">
     <QtInstall>msvc2019_64</QtInstall>
-    <QtModules>core;network;gui;widgets;webchannel;websockets;webengine;webenginewidgets</QtModules>
+    <QtModules>core;network;gui;widgets;serialport;webchannel;websockets;webengine;webenginewidgets</QtModules>
     <QtBuildConfig>debug</QtBuildConfig>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="QtSettings">
     <QtInstall>msvc2019_64</QtInstall>
-    <QtModules>core;network;gui;widgets;webchannel;websockets;webengine;webenginewidgets</QtModules>
+    <QtModules>core;network;gui;widgets;serialport;webchannel;websockets;webengine;webenginewidgets</QtModules>
     <QtBuildConfig>release</QtBuildConfig>
   </PropertyGroup>
   <Target Name="QtMsBuildNotFound" BeforeTargets="CustomBuild;ClCompile" Condition="!Exists('$(QtMsBuild)\qt.targets') or !Exists('$(QtMsBuild)\qt.props')">
@@ -117,6 +117,7 @@
     <QtUic Include="devicedebug.ui" />
     <QtUic Include="devicemanage.ui" />
     <QtUic Include="messagelistdialog.ui" />
+    <QtUic Include="placeinfodialog.ui" />
     <QtUic Include="setdevicedialog.ui" />
     <QtUic Include="uavmanage.ui" />
     <QtMoc Include="uavmanage.h" />
@@ -131,6 +132,7 @@
     <ClCompile Include="devicemanage.cpp" />
     <ClCompile Include="globalfunction.cpp" />
     <ClCompile Include="messagelistdialog.cpp" />
+    <ClCompile Include="placeinfodialog.cpp" />
     <ClCompile Include="qtsingleapplication\qtlocalpeer.cpp" />
     <ClCompile Include="qtsingleapplication\qtsingleapplication.cpp" />
     <ClCompile Include="resendmessage.cpp" />
@@ -163,6 +165,7 @@
     <ClInclude Include="mypythondefine.h" />
     <QtMoc Include="qtsingleapplication\qtlocalpeer.h" />
     <QtMoc Include="qtsingleapplication\qtsingleapplication.h" />
+    <QtMoc Include="placeinfodialog.h" />
     <ClInclude Include="tinyxml2\tinyxml2.h" />
     <QtMoc Include="resendmessage.h" />
   </ItemGroup>

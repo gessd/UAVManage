@@ -15,6 +15,7 @@
 #include "definesetting.h"
 #include "tinyxml2/tinyxml2.h"
 #include "messagelistdialog.h"
+#include "placeinfodialog.h"
 
 UAVManage::UAVManage(QWidget *parent)
     : QMainWindow(parent)
@@ -92,7 +93,9 @@ UAVManage::UAVManage(QWidget *parent)
 	connect(pActionFly1, &QAction::triggered, [this]() { deviceWaypoint(); });
 	connect(pActionFly2, &QAction::triggered, [this]() { //暂无功能 
 		});
-	connect(pActionFly3, &QAction::triggered, [this]() { //暂无功能
+	connect(pActionFly3, &QAction::triggered, [this]() { 
+		PlaceInfoDialog info(this);
+		info.exec();
 		});
 	connect(pActionFly4, &QAction::triggered, [this]() { deviceWaypoint(true); });
 	connect(pActionFly5, &QAction::triggered, [this]() {  //暂无功能
