@@ -155,6 +155,7 @@
     <QtMoc Include="setdevicedialog.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="define3d.h" />
     <ClInclude Include="definesetting.h" />
     <QtMoc Include="devicedebug.h" />
     <ClInclude Include="globalfunction.h" />

@@ -177,14 +177,12 @@ void UAVManage::onNewProject()
 	QDir dir;
 	if (!dir.mkdir(qstrDir)) {
 		_ShowErrorMessage(info.baseName() + tr("项目创建失败"));
-		//QMessageBox::warning(this, tr("错误"), tr("新建项目失败"));
 		return;
 	}
 	//新建项目文件并写入初始化内容
 	if (!newProjectFile(qstrFile)) {
 		dir.rmdir(qstrDir);
 		_ShowErrorMessage(info.baseName() + tr("创建项目文件失败"));
-		//QMessageBox::warning(this, tr("错误"), tr("新建项目文件失败"));
 		return;
 	}
 	dir.mkdir(qstrDir + _ProjectDirName_);
@@ -279,6 +277,7 @@ bool copyDirectoryFiles(const QString& fromDir, const QString& toDir, bool cover
 
 void UAVManage::onSaveasProject()
 {
+	if (m_qstrCurrentProjectFile.isEmpty()) return;
 	//复制工程到新文件夹并重命名
 	QString qstrName = QFileDialog::getSaveFileName(this, tr("项目名"), "", "File(*.qz)");
 	if (qstrName.isEmpty()) return;
@@ -534,7 +533,7 @@ void UAVManage::onWaypointProcess(QString name, unsigned int index, unsigned int
 	}
 	if (text.isEmpty()) return;
 	if (_DeviceStatus::DeviceDataSucceed == res) {
-		//航点上传完成并成功
+		//舞步上传完成并成功
 		_ShowInfoMessage(name + ": " + text + Utility::waypointMessgeFromStatus(res));
 	} else{
 		_ShowErrorMessage(name + ": " + text + Utility::waypointMessgeFromStatus(res));
@@ -588,9 +587,9 @@ void UAVManage::deviceWaypoint(bool bUpload)
 			_ShowErrorMessage(name + tr(": 没有编写舞步"));
 			continue;
 		}
-		//生成航点过程必须一个个生成，python交互函数是静态全局，所以同时只能执行一个设备生成航点
+		//生成舞步过程必须一个个生成，python交互函数是静态全局，所以同时只能执行一个设备生成舞步
 		if (!ptyhon.compilePythonCode(arrData)) {
-			//生成航点失败
+			//生成舞步失败
 			_ShowErrorMessage(name + tr(": 解析舞步积木块失败"));
 			continue;
 		}
@@ -609,10 +608,9 @@ void UAVManage::deviceWaypoint(bool bUpload)
 		else{
 			if(!bUpload) _ShowInfoMessage(name + tr("生成舞步完成"));
 		}
-		//上传航点到飞控
-		if (bUpload) {
-			QString message = m_pDeviceManage->sendWaypoint(name, data);
-			if(!message.isEmpty()) _ShowWarningMessage(name + tr("上传舞步") + message);
-		}
+
+		//上传舞步到飞控/更新三维舞步
+		QString message = m_pDeviceManage->sendWaypoint(name, data, bUpload);
+		if(!message.isEmpty()) _ShowWarningMessage(name + tr("上传舞步") + message);
 	}
 }

@@ -140,7 +140,7 @@ public:
 	 * @brief 无人机灯光
 	 */
 	int Fun_MAV_LED_MODE();
-public slots:
+private slots:
 	/**
 	* @brief 发送数据
 	* @param data [in] 二进制数据

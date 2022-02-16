@@ -6,6 +6,7 @@
 #include "definesetting.h"
 #include "messagelistdialog.h"
 #include "devicedebug.h"
+#include "define3d.h"
 
 #define _ItemHeight_ 60
 DeviceManage::DeviceManage(QWidget *parent)
@@ -55,20 +56,36 @@ DeviceManage::DeviceManage(QWidget *parent)
 		QString qstrOldName = pControl->getName();
 		QString qstrNewName = QInputDialog::getText(this, tr("重命名"), tr("请输入新名称"), QLineEdit::Normal, qstrOldName);
 		if (qstrNewName.isEmpty()) return;
+		if (qstrOldName == qstrNewName) return;
 		if (isRepetitionName(qstrNewName)) {
 			QMessageBox::warning(this, tr("提示"), tr("无法修改，名称重复"));
 			return;
 		}
 		pControl->setName(qstrNewName);
 		emit deviceRenameFinished(qstrNewName, qstrOldName);
+
+		if (m_p3dTcpSocket) {
+			QJsonObject obj3dmsg;
+			obj3dmsg.insert(_Ver_, _VerNum_);
+			obj3dmsg.insert(_Tag_, _TabName_);
+			obj3dmsg.insert(_ID_, _3dDeviceRename);
+			obj3dmsg.insert(_Time_, QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"));
+			QJsonObject data;
+			data.insert("oldName", qstrOldName);
+			data.insert("newName", qstrNewName);
+			obj3dmsg.insert(_Data_, data);
+			QJsonDocument doc(obj3dmsg);
+			QByteArray msg3d = doc.toJson();
+			m_p3dTcpSocket->write(msg3d);
+		}
 		});
 	connect(pActionResetIP, &QAction::triggered, [this](bool checked) {
 		DeviceControl* pControl = getCurrentDevice();
 		if (!pControl) return;
 		QString qstrNewIP = QInputDialog::getText(this, tr("IP"), tr("请输入设备IP"), QLineEdit::Normal, pControl->getIP());
 		if (qstrNewIP.isEmpty()) return;
+		if (pControl->getIP() == qstrNewIP) return;
 		pControl->setIp(qstrNewIP);
-		emit deviceAddFinished(pControl->getName(), qstrNewIP, pControl->getX(), pControl->getY());
 		});
 	connect(pActionDicconnect, &QAction::triggered, [this](bool checked) {
 		DeviceControl* pControl = getCurrentDevice();
@@ -85,24 +102,21 @@ DeviceManage::DeviceManage(QWidget *parent)
 		if (!pControl) return;
 		int res = pControl->Fun_MAV_CMD_NAV_TAKEOFF_LOCAL(0, 0, 0, 0, 0, 0, _TakeoffLocalHeight_);
 		if (res == _DeviceStatus::DeviceDataSucceed) return;
-		QString qstrText = Utility::waypointMessgeFromStatus(res);
-		_ShowErrorMessage(pControl->getName() + tr("起飞") + qstrText);
+		_ShowErrorMessage(pControl->getName() + tr("起飞") + Utility::waypointMessgeFromStatus(res));
 		});
 	connect(pLand, &QAction::triggered, [this](bool checked) {
 		DeviceControl* pControl = getCurrentDevice();
 		if (!pControl) return;
 		int res = pControl->Fun_MAV_CMD_NAV_LAND_LOCAL(0, 0, 0, 0, 0, 0, 0);
 		if (res == _DeviceStatus::DeviceDataSucceed) return;
-		QString qstrText = Utility::waypointMessgeFromStatus(res);
-		_ShowErrorMessage(pControl->getName() + tr("降落") + qstrText);
+		_ShowErrorMessage(pControl->getName() + tr("降落") + Utility::waypointMessgeFromStatus(res));
 		});
 	connect(pStop, &QAction::triggered, [this](bool checked) {
 		DeviceControl* pControl = getCurrentDevice();
 		if (!pControl) return;
 		int res = pControl->Fun_MAV_QUICK_STOP();
 		if (res == _DeviceStatus::DeviceDataSucceed) return;
-		QString qstrText = Utility::waypointMessgeFromStatus(res);
-		_ShowErrorMessage(pControl->getName()+tr("急停")+qstrText);
+		_ShowErrorMessage(pControl->getName() + tr("急停") + Utility::waypointMessgeFromStatus(res));;
 		});
 	connect(pDebug, &QAction::triggered, [this](bool checked) {
 		DeviceControl* pControl = getCurrentDevice();
@@ -128,10 +142,25 @@ DeviceManage::DeviceManage(QWidget *parent)
 
 	ui.checkBoxAutoLand->setVisible(false);
 	ui.checkBoxMagnetismStatus->setVisible(false);
+
+	m_p3dTcpSocket = NULL;
+	m_p3dTcpServer = new QTcpServer(this);
+	m_p3dTcpServer->listen(QHostAddress::Any, _TcpPort_);
+	connect(m_p3dTcpServer, SIGNAL(newConnection()), this, SLOT(on3dNewConnection()));
 }
 
 DeviceManage::~DeviceManage()
 {
+	if (m_p3dTcpSocket) {
+		m_p3dTcpSocket->close();
+		delete m_p3dTcpSocket;
+		m_p3dTcpSocket = nullptr;
+	}
+	if (m_p3dTcpServer) {
+		m_p3dTcpServer->close();
+		delete m_p3dTcpServer;
+		m_p3dTcpServer = nullptr;
+	}
 }
 
 QString DeviceManage::addDevice(QString qstrName, QString ip, float x, float y)
@@ -157,6 +186,21 @@ QString DeviceManage::addDevice(QString qstrName, QString ip, float x, float y)
 	ui.listWidget->setItemWidget(item, pControl);
 	ui.listWidget->setCurrentItem(item);
 	emit deviceAddFinished(qstrName, ip, x, y);
+	if (m_p3dTcpSocket) {
+		QJsonObject obj3dmsg;
+		obj3dmsg.insert(_Ver_, _VerNum_);
+		obj3dmsg.insert(_Tag_, _TabName_);
+		obj3dmsg.insert(_ID_, _3dDeviceAdd);
+		obj3dmsg.insert(_Time_, QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"));
+		QJsonObject data;
+		data.insert("name", qstrName);
+		data.insert("x", x);
+		data.insert("y", y);
+		obj3dmsg.insert(_Data_, data);
+		QJsonDocument doc(obj3dmsg);
+		QByteArray msg3d = doc.toJson();
+		m_p3dTcpSocket->write(msg3d);
+	}
 	return "";
 }
 
@@ -172,6 +216,20 @@ void DeviceManage::removeDevice()
 	QString name = m_pControl->getName();
 	ui.listWidget->takeItem(ui.listWidget->currentRow());
 	emit deviceRemoveFinished(name);
+
+	if (m_p3dTcpSocket) {
+		QJsonObject obj3dmsg;
+		obj3dmsg.insert(_Ver_, _VerNum_);
+		obj3dmsg.insert(_Tag_, _TabName_);
+		obj3dmsg.insert(_ID_, _3dDeviceList);
+		obj3dmsg.insert(_Time_, QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"));
+		QJsonObject data;
+		data.insert("name", name);
+		obj3dmsg.insert(_Data_, data);
+		QJsonDocument doc(obj3dmsg);
+		QByteArray msg3d = doc.toJson();
+		m_p3dTcpSocket->write(msg3d);
+	}
 }
 
 void DeviceManage::clearDevice()
@@ -315,7 +373,7 @@ void DeviceManage::allDeviceCalibration(_CalibrationEnum c)
 
 }
 
-QString DeviceManage::sendWaypoint(QString name, QVector<NavWayPointData> data)
+QString DeviceManage::sendWaypoint(QString name, QVector<NavWayPointData> data, bool upload)
 {
 	if (name.isEmpty()) return tr("设备名称错误");
 	if (0 == data.count()) return tr("舞步数据为空");
@@ -328,12 +386,12 @@ QString DeviceManage::sendWaypoint(QString name, QVector<NavWayPointData> data)
 		DeviceControl* pDevice = dynamic_cast<DeviceControl*>(pWidget);
 		if (!pDevice) continue;
 		if (name != pDevice->getName()) continue;
-		int status = pDevice->DeviceMavWaypointStart(data);
-		if (_DeviceStatus::DeviceDataSucceed != status)
-			return Utility::waypointMessgeFromStatus(status);
-		return "";
+		if (upload) {
+			int status = pDevice->DeviceMavWaypointStart(data);
+			if (_DeviceStatus::DeviceDataSucceed != status) return Utility::waypointMessgeFromStatus(status);
+		}
 	}
-	return tr("没有可用设备");
+	return "";
 }
 
 bool DeviceManage::eventFilter(QObject* watched, QEvent* event)
@@ -346,6 +404,47 @@ bool DeviceManage::eventFilter(QObject* watched, QEvent* event)
 		m_pMenu->exec(QCursor::pos());
 	}
 	return false;
+}
+
+void DeviceManage::on3dNewConnection()
+{
+	if (!m_p3dTcpServer) return;
+	if (m_p3dTcpSocket) {
+		m_p3dTcpSocket->disconnect();
+		m_p3dTcpSocket->close();
+	}
+	m_p3dTcpSocket = m_p3dTcpServer->nextPendingConnection();
+	connect(m_p3dTcpSocket, &QTcpSocket::readyRead, [this]() {
+		QByteArray arrData = m_p3dTcpSocket->readAll();
+		qDebug() << "--tcp server:" << arrData;
+		});
+	connect(m_p3dTcpSocket, &QTcpSocket::disconnected, [this]() {
+		m_p3dTcpSocket = nullptr;
+		});
+	//发送无人机设备列表
+	QJsonObject obj3dmsg;
+	obj3dmsg.insert(_Ver_, _VerNum_);
+	obj3dmsg.insert(_Tag_, _TabName_);
+	obj3dmsg.insert(_ID_, 1);
+	obj3dmsg.insert(_Time_, QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"));
+	QJsonArray jsonArr;
+	for (int i = 0; i < ui.listWidget->count(); i++) {
+		QListWidgetItem* pItem = ui.listWidget->item(i);
+		if (!pItem) continue;
+		QWidget* pWidget = ui.listWidget->itemWidget(pItem);
+		if (!pWidget) continue;
+		DeviceControl* pDevice = dynamic_cast<DeviceControl*>(pWidget);
+		if (!pDevice) continue;
+		QJsonObject device;
+		device.insert("name", pDevice->getName());
+		device.insert("x", pDevice->getX());
+		device.insert("y", pDevice->getY());
+		jsonArr.append(device);
+	}
+	obj3dmsg.insert(_Data_, jsonArr);
+	QJsonDocument document(obj3dmsg);
+	QByteArray arrData = document.toJson();
+	m_p3dTcpSocket->write(arrData);
 }
 
 DeviceControl* DeviceManage::getCurrentDevice()

@@ -47,7 +47,7 @@ public:
 protected:
 	virtual void showEvent(QShowEvent* event);
 	virtual void closeEvent(QCloseEvent* event);
-public slots:
+private slots:
 	void onBtnOpenClicked();
 	void onBtnReadClicked();
 	void onBtnWriteClicked();

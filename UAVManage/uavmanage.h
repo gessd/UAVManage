@@ -21,10 +21,19 @@ public:
     void loadWeb();
     QString getCurrentBlocklyFile();
     QString getCurrentPythonFile();
-public slots:
+private slots:
+    /**
+    * @brief 新建项目
+    */
     void onNewProject();
+    /**
+    * @brief 打开项目
+    */
     void onOpenProject(QString qstrFile);
     //每一步都自动保存,无需手动保存,不自动保存会造成切换无人机后blockly新编辑内容丢失
+    /**
+    * @brief 项目另存为
+    */
     void onSaveasProject();
     /**
      * @brief 清空WEB积木块
@@ -91,8 +100,8 @@ private:
      */
     bool newProjectFile(QString qstrFile, float X = 10.0, float Y = 10.0);
     /**
-     * @brief 生成航点
-     * @param bUpload 上传航点到设备
+     * @brief 生成舞步
+     * @param bUpload 是否上传舞步到设备
      */
     void deviceWaypoint(bool bUpload = false);
 private:

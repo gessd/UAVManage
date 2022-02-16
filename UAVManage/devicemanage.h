@@ -11,6 +11,12 @@
 #include <QFileInfo>
 #include <QTextCodec>
 #include <QMessageBox>
+#include <QTcpServer>
+#include <QTcpSocket>
+#include <QJsonParseError>
+#include <QJsonArray>
+#include <QJsonObject>
+#include <QJsonDocument>
 #include "definesetting.h"
 
 class DeviceManage : public QWidget
@@ -85,12 +91,13 @@ public:
 	*/
 	void allDeviceCalibration(_CalibrationEnum c);
 	/**
-	 * @brief 上传舞步到飞控
+	 * @brief 上传舞步到飞控/三维舞步更新
 	 * @param name 设备名称
 	 * @param data 航点列表 协议信息
+	 * @param upload 是否上传舞步到飞控
 	 * @return 返回错误信息
 	 */
-	QString sendWaypoint(QString name, QVector<NavWayPointData> data);
+	QString sendWaypoint(QString name, QVector<NavWayPointData> data, bool upload);
 signals:
 	/**
 	 * @brief 设备添加完成
@@ -129,8 +136,9 @@ signals:
 	void sigWaypointProcess(QString name, unsigned int index, unsigned int count, int res, bool finish, QString text);
 protected:
 	virtual bool eventFilter(QObject* watched, QEvent* event);
-public slots:
+private slots:
 	void onDeviceConrolFinished(QString text, int res, QString explain);
+	void on3dNewConnection();
 private:
 	/**
 	 * @brief 当前选中的设备
@@ -140,4 +148,7 @@ private:
 	Ui::DeviceManage ui;
 	//设备菜单
 	QMenu* m_pMenu;
+	//三维模拟通讯使用
+	QTcpServer* m_p3dTcpServer;
+	QTcpSocket* m_p3dTcpSocket;
 };
