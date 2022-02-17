@@ -14,6 +14,11 @@ DeviceManage::DeviceManage(QWidget *parent)
 {
 	ui.setupUi(this);
 	
+	m_p3dTcpSocket = nullptr;
+	m_p3dTcpServer = new QTcpServer(this);
+	m_p3dTcpServer->listen(QHostAddress::Any, _TcpPort_);
+	connect(m_p3dTcpServer, SIGNAL(newConnection()), this, SLOT(on3dNewConnection()));
+
 	//设置设备列表
 	ui.listWidget->installEventFilter(this);
 	connect(ui.listWidget, &QListWidget::currentItemChanged, [this](QListWidgetItem* current, QListWidgetItem* previous) {
@@ -142,11 +147,6 @@ DeviceManage::DeviceManage(QWidget *parent)
 
 	ui.checkBoxAutoLand->setVisible(false);
 	ui.checkBoxMagnetismStatus->setVisible(false);
-
-	m_p3dTcpSocket = NULL;
-	m_p3dTcpServer = new QTcpServer(this);
-	m_p3dTcpServer->listen(QHostAddress::Any, _TcpPort_);
-	connect(m_p3dTcpServer, SIGNAL(newConnection()), this, SLOT(on3dNewConnection()));
 }
 
 DeviceManage::~DeviceManage()
@@ -348,24 +348,35 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 		if (!pWidget) continue;
 		DeviceControl* pDevice = dynamic_cast<DeviceControl*>(pWidget);
 		if (!pDevice) continue;
+		QString qstrName = pDevice->getName();
+		int res = DeviceDataSucceed;
+		QString qstrText;
 		switch (comand)
 		{
 		case DeviceManage::_DeviceTakeoffLocal:
-			pDevice->Fun_MAV_CMD_NAV_TAKEOFF_LOCAL(0, 0, 0, 0, 0, 0, _TakeoffLocalHeight_, false);
+			res = pDevice->Fun_MAV_CMD_NAV_TAKEOFF_LOCAL(0, 0, 0, 0, 0, 0, _TakeoffLocalHeight_, false);
+			qstrText = tr("起飞");
 			break;
 		case DeviceManage::_DeviceLandLocal:
-			pDevice->Fun_MAV_CMD_NAV_LAND_LOCAL(0, 0, 0, 0, 0, 0, 0, false);
+			res = pDevice->Fun_MAV_CMD_NAV_LAND_LOCAL(0, 0, 0, 0, 0, 0, 0, false);
+			qstrText = tr("降落");
 			break;
 		case DeviceManage::_DeviceQuickStop:
-			pDevice->Fun_MAV_QUICK_STOP(false);
+			res = pDevice->Fun_MAV_QUICK_STOP(false);
+			qstrText = tr("急停");
 			break;
 		case DeviceManage::_DeviceSetout:
-			pDevice->Fun_MAV_CMD_DO_SET_MODE(3, false);
+			res = pDevice->Fun_MAV_CMD_DO_SET_MODE(3, false);
+			qstrText = tr("准备起飞");
 			break;
 		default:
 			break;
 		}
+		if (_DeviceStatus::DeviceDataSucceed != res) {
+			_ShowErrorMessage(qstrName+qstrText+tr("出错:")+ Utility::waypointMessgeFromStatus(res));
+		}
 	}
+	if (DeviceManage::_DeviceTakeoffLocal == comand) emit sigTakeoffFinished();
 }
 
 void DeviceManage::allDeviceCalibration(_CalibrationEnum c)
@@ -463,23 +474,5 @@ void DeviceManage::onDeviceConrolFinished(QString text, int res, QString explain
 	DeviceControl* pControl = dynamic_cast<DeviceControl*>(sender());
 	if (!pControl) return;
 	text.prepend(pControl->getName());
-	switch (res) {
-	case DeviceMessageToimeout:
-		text.append(tr("错误:超时"));
-		break;
-	case DeviceMessageSending:
-		text.append(tr("错误:消息发送中"));
-		break;
-	case DeviceDataError:
-		text.append(tr("错误:消息错误"));
-		break;
-	case DeviceUnConnect:
-		text.append(tr("错误:未连接"));
-		break;
-	case DeviceWaiting:
-		text.append(tr("错误:超时"));
-		break;
-	default: break;
-	}
-	_ShowErrorMessage(text);
+	_ShowErrorMessage(text + tr("错误:") + Utility::waypointMessgeFromStatus(res));
 }

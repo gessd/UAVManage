@@ -6,7 +6,7 @@ QString Utility::waypointMessgeFromStatus(int status)
 	switch (status)
 	{
 	case DeviceMessageToimeout:
-		qstrMessage = QObject::tr("超时");
+		qstrMessage = QObject::tr("没有回应");
 		break;
 	case DeviceMessageSending:
 		qstrMessage = QObject::tr("进行中");

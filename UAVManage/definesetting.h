@@ -29,6 +29,7 @@
 #define _ElementRoot_      "root"
 #define _ElementPlace_     "place"
 #define _ElementDevice_    "device"
+#define _ElementMusic_      "music"
 #define _AttributeX_       "x"
 #define _AttributeY_       "y"
 #define _AttributeZ_       "z"

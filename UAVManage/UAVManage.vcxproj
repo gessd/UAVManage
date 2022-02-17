@@ -32,12 +32,12 @@
   </ImportGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="QtSettings">
     <QtInstall>msvc2019_64</QtInstall>
-    <QtModules>core;network;gui;widgets;serialport;webchannel;websockets;webengine;webenginewidgets</QtModules>
+    <QtModules>core;network;gui;multimedia;widgets;serialport;webchannel;websockets;webengine;webenginewidgets;charts</QtModules>
     <QtBuildConfig>debug</QtBuildConfig>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="QtSettings">
     <QtInstall>msvc2019_64</QtInstall>
-    <QtModules>core;network;gui;widgets;serialport;webchannel;websockets;webengine;webenginewidgets</QtModules>
+    <QtModules>core;network;gui;multimedia;widgets;serialport;webchannel;websockets;webengine;webenginewidgets;charts</QtModules>
     <QtBuildConfig>release</QtBuildConfig>
   </PropertyGroup>
   <Target Name="QtMsBuildNotFound" BeforeTargets="CustomBuild;ClCompile" Condition="!Exists('$(QtMsBuild)\qt.targets') or !Exists('$(QtMsBuild)\qt.props')">
@@ -119,9 +119,11 @@
     <QtUic Include="messagelistdialog.ui" />
     <QtUic Include="placeinfodialog.ui" />
     <QtUic Include="setdevicedialog.ui" />
+    <QtUic Include="SoundGrade.ui" />
     <QtUic Include="uavmanage.ui" />
     <QtMoc Include="uavmanage.h" />
     <ClCompile Include="adddevicedialog.cpp" />
+    <ClCompile Include="AudioDecoder.cpp" />
     <ClCompile Include="devicecontrol.cpp">
       <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">input</DynamicSource>
       <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename).moc</QtMocFileName>
@@ -135,8 +137,10 @@
     <ClCompile Include="placeinfodialog.cpp" />
     <ClCompile Include="qtsingleapplication\qtlocalpeer.cpp" />
     <ClCompile Include="qtsingleapplication\qtsingleapplication.cpp" />
+    <ClCompile Include="qwchartview.cpp" />
     <ClCompile Include="resendmessage.cpp" />
     <ClCompile Include="setdevicedialog.cpp" />
+    <ClCompile Include="SoundGrade.cpp" />
     <ClCompile Include="threadpython.cpp" />
     <ClCompile Include="tinyxml2\tinyxml2.cpp" />
     <ClCompile Include="uavmanage.cpp" />
@@ -155,6 +159,7 @@
     <QtMoc Include="setdevicedialog.h" />
   </ItemGroup>
   <ItemGroup>
+    <QtMoc Include="AudioDecoder.h" />
     <ClInclude Include="define3d.h" />
     <ClInclude Include="definesetting.h" />
     <QtMoc Include="devicedebug.h" />
@@ -167,6 +172,8 @@
     <QtMoc Include="qtsingleapplication\qtlocalpeer.h" />
     <QtMoc Include="qtsingleapplication\qtsingleapplication.h" />
     <QtMoc Include="placeinfodialog.h" />
+    <QtMoc Include="qwchartview.h" />
+    <QtMoc Include="SoundGrade.h" />
     <ClInclude Include="tinyxml2\tinyxml2.h" />
     <QtMoc Include="resendmessage.h" />
   </ItemGroup>

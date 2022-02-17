@@ -134,6 +134,10 @@ signals:
 	 * @param text 当前进行的过程
 	 */
 	void sigWaypointProcess(QString name, unsigned int index, unsigned int count, int res, bool finish, QString text);
+	/**
+	* @brief 设备起飞指令下发完成
+	*/
+	void sigTakeoffFinished();
 protected:
 	virtual bool eventFilter(QObject* watched, QEvent* event);
 private slots:

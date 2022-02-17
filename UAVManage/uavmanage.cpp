@@ -16,6 +16,7 @@
 #include "tinyxml2/tinyxml2.h"
 #include "messagelistdialog.h"
 #include "placeinfodialog.h"
+#include "SoundGrade.h"
 
 UAVManage::UAVManage(QWidget *parent)
     : QMainWindow(parent)
@@ -44,6 +45,7 @@ UAVManage::UAVManage(QWidget *parent)
 	connect(m_pDeviceManage, SIGNAL(deviceRemoveFinished(QString)), this, SLOT(onDeviceRemove(QString)));
 	connect(m_pDeviceManage, SIGNAL(deviceRenameFinished(QString, QString)), this, SLOT(onDeviceRename(QString, QString)));
 	connect(m_pDeviceManage, &DeviceManage::sigWaypointProcess, this, &UAVManage::onWaypointProcess);
+	connect(m_pDeviceManage, &DeviceManage::sigTakeoffFinished, this, &UAVManage::onDeviceTakeoffFinished);
 
 	//添加菜单
 	QStyle* style = QApplication::style();
@@ -91,7 +93,7 @@ UAVManage::UAVManage(QWidget *parent)
 	pMenuFlyPrepare->addAction(pActionFly5);
 	pMenuFlyPrepare->addAction(pActionFly6);
 	connect(pActionFly1, &QAction::triggered, [this]() { deviceWaypoint(); });
-	connect(pActionFly2, &QAction::triggered, [this]() { //暂无功能 
+	connect(pActionFly2, &QAction::triggered, [this]() { 
 		});
 	connect(pActionFly3, &QAction::triggered, [this]() { 
 		PlaceInfoDialog info(this);
@@ -103,6 +105,11 @@ UAVManage::UAVManage(QWidget *parent)
 	connect(pActionFly6, &QAction::triggered, [this]() { 
 		m_pDeviceManage->allDeviceControl(DeviceManage::_DeviceSetout); 
 		});
+
+	m_pSoundWidget = new SoundGrade(this);
+	m_pSoundWidget->setEnabled(false);
+	ui.horizontalLayoutSound->addWidget(m_pSoundWidget);
+	connect(m_pSoundWidget, &SoundGrade::sigUpdateMusic, this, &UAVManage::onUpdateMusic);
 }
 
 UAVManage::~UAVManage()
@@ -159,6 +166,7 @@ QString UAVManage::getCurrentPythonFile()
 void UAVManage::onNewProject()
 {
 	m_pDeviceManage->setEnabled(false);
+	m_pSoundWidget->setEnabled(false);
 	//先清空数据
 	if (false == m_qstrCurrentProjectFile.isEmpty()) {
 		QFileInfo info(m_qstrCurrentProjectFile);
@@ -192,7 +200,6 @@ void UAVManage::onNewProject()
 
 void UAVManage::onOpenProject(QString qstrFile)
 {
-	m_pDeviceManage->setEnabled(true);
 	qDebug() << "----打开工程" << qstrFile;
 	m_qstrCurrentProjectFile.clear();
 	onWebClear();
@@ -218,6 +225,8 @@ void UAVManage::onOpenProject(QString qstrFile)
 	//读取场地大小
 	float x = place->FloatAttribute(_AttributeX_);
 	float y = place->FloatAttribute(_AttributeY_);
+	QFileInfo infoProject(qstrFile);
+	QString qstrMusicFilePath = infoProject.path() + _ProjectDirName_ + place->Attribute(_ElementMusic_);
 	QString qstrCurrnetName = place->Attribute(_AttributeName_);
 	tinyxml2::XMLElement* device = root->FirstChildElement(_ElementDevice_);
 	if (!device) {
@@ -237,6 +246,9 @@ void UAVManage::onOpenProject(QString qstrFile)
 	_ShowInfoMessage(tr("打开工程完成"));
 	qDebug() << "----工程打开完成";
 	m_pDeviceManage->setCurrentDevice(qstrCurrnetName);
+	m_pSoundWidget->updateLoadMusic(qstrMusicFilePath);
+	m_pDeviceManage->setEnabled(true);
+	m_pSoundWidget->setEnabled(true);
 }
 
 //拷贝文件夹
@@ -521,6 +533,11 @@ void UAVManage::onDeviceRename(QString newName, QString oldName)
 	QFile::rename(qstrOldPythonFile, qstrNewPythonFile);
 }
 
+void UAVManage::onDeviceTakeoffFinished()
+{
+	m_pSoundWidget->startPlayMusic();
+}
+
 void UAVManage::onAppMessage(const QString& message)
 {
 	qDebug() << "---- app message" << message;
@@ -538,6 +555,32 @@ void UAVManage::onWaypointProcess(QString name, unsigned int index, unsigned int
 	} else{
 		_ShowErrorMessage(name + ": " + text + Utility::waypointMessgeFromStatus(res));
 	}
+}
+
+void UAVManage::onUpdateMusic(QString qstrFilePath)
+{
+	QFileInfo info(qstrFilePath);
+	if (!info.exists()) return;
+	QString fileName = info.fileName();
+
+	QFileInfo infoProject(m_qstrCurrentProjectFile);
+	QString qstrNewFile = infoProject.path() + _ProjectDirName_ + fileName;
+	if (qstrFilePath == qstrNewFile) return;
+	QFile::copy(qstrFilePath, qstrNewFile);
+
+	QTextCodec* code = QTextCodec::codecForName(_XMLNameCoding_);
+	std::string filename = code->fromUnicode(m_qstrCurrentProjectFile).data();
+	tinyxml2::XMLDocument doc;
+	tinyxml2::XMLError error = doc.LoadFile(filename.c_str());
+	if (error != tinyxml2::XMLError::XML_SUCCESS) return;
+	tinyxml2::XMLElement* root = doc.RootElement();
+	if (!root) return;
+	tinyxml2::XMLElement* place = root->FirstChildElement(_ElementPlace_);
+	if (!place) return;
+	QString qstrOldMusic = infoProject.path() + _ProjectDirName_ + place->Attribute(_ElementMusic_);
+	QFile::remove(qstrOldMusic);
+	place->SetAttribute(_ElementMusic_, fileName.toUtf8().data());
+	error = doc.SaveFile(filename.c_str());
 }
 
 bool UAVManage::newProjectFile(QString qstrFile, float X, float Y)

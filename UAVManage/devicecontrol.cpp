@@ -17,7 +17,7 @@ DeviceControl::DeviceControl(QString name, float x, float y, QString ip, QWidget
 	m_bHeartbeatEnable = true;
 	m_bWaypointSending = false;
 	ui.progressBar->setVisible(false);
-	
+	ui.btnSet->setVisible(false);
 	connect(this, &DeviceControl::sigWaypointProcess, this, &DeviceControl::onWaypointProcess);
 	connect(this, &DeviceControl::sigBatteryStatus, this, &DeviceControl::onUpdateBatteryStatus);
 	connect(this, &DeviceControl::sigConnectStatus, this, &DeviceControl::onUpdateConnectStatus);

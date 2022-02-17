@@ -10,6 +10,7 @@
 #include "devicemanage.h"
 #include "messagelistdialog.h"
 
+class SoundGrade;
 class UAVManage : public QMainWindow
 {
     Q_OBJECT
@@ -82,6 +83,10 @@ private slots:
      * @brief 设备列表中设备重命名
      */
     void onDeviceRename(QString newName, QString oldName);
+        /**
+        * @brief 设备起飞指令下发完成
+        */
+    void onDeviceTakeoffFinished();
     /**
      * @brief 程序间通讯
      */
@@ -90,6 +95,10 @@ private slots:
      * @brief 航点上传进度
      */
     void onWaypointProcess(QString name, unsigned int index, unsigned int count, int res, bool finish, QString text);
+    /**
+    * @brief 更新加载音乐文件
+    */
+    void onUpdateMusic(QString qstrFilePath);
 private:
     /**
      * @brief 新建项目工程文件
@@ -116,4 +125,5 @@ private:
     //当前工程文件
     QString m_qstrCurrentProjectFile;
     ThreadPython ptyhon;
+    SoundGrade* m_pSoundWidget;
 };
