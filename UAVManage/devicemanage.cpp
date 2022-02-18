@@ -81,7 +81,7 @@ DeviceManage::DeviceManage(QWidget *parent)
 			obj3dmsg.insert(_Data_, data);
 			QJsonDocument doc(obj3dmsg);
 			QByteArray msg3d = doc.toJson();
-			m_p3dTcpSocket->write(msg3d);
+			m_p3dTcpSocket->write(QString::fromUtf8(msg3d.data()).toLocal8Bit());
 		}
 		});
 	connect(pActionResetIP, &QAction::triggered, [this](bool checked) {
@@ -199,7 +199,7 @@ QString DeviceManage::addDevice(QString qstrName, QString ip, float x, float y)
 		obj3dmsg.insert(_Data_, data);
 		QJsonDocument doc(obj3dmsg);
 		QByteArray msg3d = doc.toJson();
-		m_p3dTcpSocket->write(msg3d);
+		m_p3dTcpSocket->write(QString::fromUtf8(msg3d.data()).toLocal8Bit());
 	}
 	return "";
 }
@@ -221,19 +221,39 @@ void DeviceManage::removeDevice()
 		QJsonObject obj3dmsg;
 		obj3dmsg.insert(_Ver_, _VerNum_);
 		obj3dmsg.insert(_Tag_, _TabName_);
-		obj3dmsg.insert(_ID_, _3dDeviceList);
+		obj3dmsg.insert(_ID_, _3dDeviceRemove);
 		obj3dmsg.insert(_Time_, QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"));
 		QJsonObject data;
 		data.insert("name", name);
 		obj3dmsg.insert(_Data_, data);
 		QJsonDocument doc(obj3dmsg);
 		QByteArray msg3d = doc.toJson();
-		m_p3dTcpSocket->write(msg3d);
+		m_p3dTcpSocket->write(QString::fromUtf8(msg3d.data()).toLocal8Bit());
 	}
 }
 
 void DeviceManage::clearDevice()
 {
+	if (m_p3dTcpSocket) {
+		
+		for (int i = 0; i < ui.listWidget->count(); i++) {
+			QListWidgetItem* pItem = ui.listWidget->item(i);
+			if (!pItem) continue;
+			QWidget* pWidget = ui.listWidget->itemWidget(pItem);
+			if (!pWidget) continue;
+			DeviceControl* pDevice = dynamic_cast<DeviceControl*>(pWidget);
+			if (!pDevice) continue;
+			QJsonObject obj3dmsg;
+			obj3dmsg.insert(_Ver_, _VerNum_);
+			obj3dmsg.insert(_Tag_, _TabName_);
+			obj3dmsg.insert(_ID_, _3dDeviceRemove);
+			obj3dmsg.insert(_Time_, QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"));
+			obj3dmsg.insert("name", pDevice->getName());
+			QJsonDocument document(obj3dmsg);
+			QByteArray arrData = document.toJson();
+			m_p3dTcpSocket->write(QString::fromUtf8(arrData.data()).toLocal8Bit());
+		}
+	}
 	ui.listWidget->clear();
 }
 
@@ -419,8 +439,7 @@ QString DeviceManage::sendWaypoint(QString name, QVector<NavWayPointData> data, 
 			obj3dmsg.insert(_Data_, arrData);
 			QJsonDocument document(obj3dmsg);
 			QByteArray temp = document.toJson();
-			qDebug() << "--航点:" << temp;
-			m_p3dTcpSocket->write(temp);
+			m_p3dTcpSocket->write(QString::fromUtf8(temp.data()).toLocal8Bit());
 		}
 		if (upload) {
 			int status = pDevice->DeviceMavWaypointStart(data);
@@ -461,7 +480,7 @@ void DeviceManage::on3dNewConnection()
 	QJsonObject obj3dmsg;
 	obj3dmsg.insert(_Ver_, _VerNum_);
 	obj3dmsg.insert(_Tag_, _TabName_);
-	obj3dmsg.insert(_ID_, _3dDeviceRemove);
+	obj3dmsg.insert(_ID_, _3dDeviceList);
 	obj3dmsg.insert(_Time_, QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"));
 	QJsonArray jsonArr;
 	for (int i = 0; i < ui.listWidget->count(); i++) {
@@ -478,7 +497,7 @@ void DeviceManage::on3dNewConnection()
 	obj3dmsg.insert(_Data_, jsonArr);
 	QJsonDocument document(obj3dmsg);
 	QByteArray arrData = document.toJson();
-	m_p3dTcpSocket->write(arrData);
+	m_p3dTcpSocket->write(QString::fromUtf8(arrData.data()).toLocal8Bit());
 }
 
 DeviceControl* DeviceManage::getCurrentDevice()
