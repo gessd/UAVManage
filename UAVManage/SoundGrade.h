@@ -38,6 +38,7 @@ signals:
 	void isPlaying(bool);			//是否在播放中信号
 	void playeState(qint8);			//播放状态信号 1:开始 2:暂停 3:结束	
 	void sigUpdateMusic(QString path);
+	void sigMsuicTime(int mesc);
 private:
 	void signalConnectSlot();
 private slots:

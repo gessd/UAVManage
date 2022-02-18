@@ -397,6 +397,31 @@ QString DeviceManage::sendWaypoint(QString name, QVector<NavWayPointData> data, 
 		DeviceControl* pDevice = dynamic_cast<DeviceControl*>(pWidget);
 		if (!pDevice) continue;
 		if (name != pDevice->getName()) continue;
+		if (m_p3dTcpSocket) {
+			QJsonObject obj3dmsg;
+			obj3dmsg.insert(_Ver_, _VerNum_);
+			obj3dmsg.insert(_Tag_, _TabName_);
+			obj3dmsg.insert(_ID_, _3dDeviceWaypoint);
+			obj3dmsg.insert(_Time_, QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"));
+			QJsonObject objDevice;
+			objDevice.insert("name", name);
+			QJsonArray arrWaypoint;
+			for (int i = 0; i < data.count(); i++) {
+				QList<QVariant> value;
+				value << data.at(i).param1 << data.at(i).param2 << data.at(i).param3 << data.at(i).param4 
+					<< data.at(i).x << data.at(i).y << data.at(i).z 
+					<< data.at(i).commandID;
+				arrWaypoint.append(QJsonArray::fromVariantList(value));
+			}
+			objDevice.insert("list", arrWaypoint);
+			QJsonArray arrData;
+			arrData.append(objDevice);
+			obj3dmsg.insert(_Data_, arrData);
+			QJsonDocument document(obj3dmsg);
+			QByteArray temp = document.toJson();
+			qDebug() << "--航点:" << temp;
+			m_p3dTcpSocket->write(temp);
+		}
 		if (upload) {
 			int status = pDevice->DeviceMavWaypointStart(data);
 			if (_DeviceStatus::DeviceDataSucceed != status) return Utility::waypointMessgeFromStatus(status);
@@ -436,7 +461,7 @@ void DeviceManage::on3dNewConnection()
 	QJsonObject obj3dmsg;
 	obj3dmsg.insert(_Ver_, _VerNum_);
 	obj3dmsg.insert(_Tag_, _TabName_);
-	obj3dmsg.insert(_ID_, 1);
+	obj3dmsg.insert(_ID_, _3dDeviceRemove);
 	obj3dmsg.insert(_Time_, QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"));
 	QJsonArray jsonArr;
 	for (int i = 0; i < ui.listWidget->count(); i++) {
@@ -448,8 +473,6 @@ void DeviceManage::on3dNewConnection()
 		if (!pDevice) continue;
 		QJsonObject device;
 		device.insert("name", pDevice->getName());
-		device.insert("x", pDevice->getX());
-		device.insert("y", pDevice->getY());
 		jsonArr.append(device);
 	}
 	obj3dmsg.insert(_Data_, jsonArr);

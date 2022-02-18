@@ -15,5 +15,5 @@ enum _MsgID {
 	_3dDeviceRemove,
 	_3dDeviceRename,
 	_3dDeviceStatus,
-	_3dDeviceFly
+	_3dDeviceWaypoint,
 };
