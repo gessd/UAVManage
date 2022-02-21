@@ -110,6 +110,8 @@ UAVManage::UAVManage(QWidget *parent)
 	m_pSoundWidget->setEnabled(false);
 	ui.horizontalLayoutSound->addWidget(m_pSoundWidget);
 	connect(m_pSoundWidget, &SoundGrade::sigUpdateMusic, this, &UAVManage::onUpdateMusic);
+	connect(m_pSoundWidget, &SoundGrade::sigMsuicTime, this, &UAVManage::onCurrentMusicTime);
+	connect(m_pSoundWidget, &SoundGrade::playeState, this, &UAVManage::onCurrentPlayeState);
 }
 
 UAVManage::~UAVManage()
@@ -581,6 +583,17 @@ void UAVManage::onUpdateMusic(QString qstrFilePath)
 	QFile::remove(qstrOldMusic);
 	place->SetAttribute(_ElementMusic_, fileName.toUtf8().data());
 	error = doc.SaveFile(filename.c_str());
+}
+
+void UAVManage::onCurrentMusicTime(int mesc)
+{
+	m_pDeviceManage->setUpdateWaypointTime(mesc);
+}
+
+void UAVManage::onCurrentPlayeState(qint8 state)
+{
+	//播放状态 1:开始 2 : 暂停 3 : 结束
+	m_pDeviceManage->setCurrentPlayeState(state);
 }
 
 bool UAVManage::newProjectFile(QString qstrFile, float X, float Y)

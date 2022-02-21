@@ -99,6 +99,14 @@ private slots:
     * @brief 更新加载音乐文件
     */
     void onUpdateMusic(QString qstrFilePath);
+    /**
+    * @brief 当前音乐播放进度
+    */
+    void onCurrentMusicTime(int mesc);
+    /**
+    * @brief 当前音乐播放状态
+    */
+    void onCurrentPlayeState(qint8 state);
 private:
     /**
      * @brief 新建项目工程文件

@@ -98,6 +98,15 @@ public:
 	 * @return 返回错误信息
 	 */
 	QString sendWaypoint(QString name, QVector<NavWayPointData> data, bool upload);
+	/**
+	* @brief 根据音乐进度更新舞步时间
+	* @param 毫秒值
+	*/
+	void setUpdateWaypointTime(int mesc);
+	/**
+	* @brief 设置当前音频播放状态
+	*/
+	void setCurrentPlayeState(qint8 state);
 signals:
 	/**
 	 * @brief 设备添加完成

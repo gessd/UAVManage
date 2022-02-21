@@ -235,7 +235,6 @@ void DeviceManage::removeDevice()
 void DeviceManage::clearDevice()
 {
 	if (m_p3dTcpSocket) {
-		
 		for (int i = 0; i < ui.listWidget->count(); i++) {
 			QListWidgetItem* pItem = ui.listWidget->item(i);
 			if (!pItem) continue;
@@ -447,6 +446,32 @@ QString DeviceManage::sendWaypoint(QString name, QVector<NavWayPointData> data, 
 		}
 	}
 	return "";
+}
+
+void DeviceManage::setUpdateWaypointTime(int mesc)
+{
+	QJsonObject obj3dmsg;
+	obj3dmsg.insert(_Ver_, _VerNum_);
+	obj3dmsg.insert(_Tag_, _TabName_);
+	obj3dmsg.insert(_ID_, _3dDeviceTime);
+	obj3dmsg.insert(_Time_, QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"));
+	obj3dmsg.insert(_Data_, mesc);
+	QJsonDocument document(obj3dmsg);
+	QByteArray arrData = document.toJson();
+	m_p3dTcpSocket->write(QString::fromUtf8(arrData.data()).toLocal8Bit());
+}
+
+void DeviceManage::setCurrentPlayeState(qint8 state)
+{
+	QJsonObject obj3dmsg;
+	obj3dmsg.insert(_Ver_, _VerNum_);
+	obj3dmsg.insert(_Tag_, _TabName_);
+	obj3dmsg.insert(_ID_, _3dDeviceAction);
+	obj3dmsg.insert(_Time_, QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"));
+	obj3dmsg.insert(_Data_, state);
+	QJsonDocument document(obj3dmsg);
+	QByteArray arrData = document.toJson();
+	m_p3dTcpSocket->write(QString::fromUtf8(arrData.data()).toLocal8Bit());
 }
 
 bool DeviceManage::eventFilter(QObject* watched, QEvent* event)

@@ -37,10 +37,9 @@ void SoundGrade::signalConnectSlot()
 
 	connect(player, SIGNAL(durationChanged(qint64)),             //持续时间改变
 		this, SLOT(onDurationChanged(qint64)));
-	connect(m_ui.m_pHslider, &QAbstractSlider::valueChanged, [this](int value) {
+	connect(m_ui.m_pHslider, &QAbstractSlider::valueChanged, [this](int value) {		
 		emit sigMsuicTime(value);
 		});
-
 }
 
 SoundGrade::~SoundGrade()
