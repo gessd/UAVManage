@@ -62,7 +62,7 @@ DeviceManage::DeviceManage(QWidget *parent)
 		QString qstrNewName = QInputDialog::getText(this, tr("重命名"), tr("请输入新名称"), QLineEdit::Normal, qstrOldName);
 		if (qstrNewName.isEmpty()) return;
 		if (qstrOldName == qstrNewName) return;
-		if (isRepetitionName(qstrNewName)) {
+		if (isRepetitionDevice(qstrNewName, "",0,0)) {
 			QMessageBox::warning(this, tr("提示"), tr("无法修改，名称重复"));
 			return;
 		}
@@ -90,6 +90,10 @@ DeviceManage::DeviceManage(QWidget *parent)
 		QString qstrNewIP = QInputDialog::getText(this, tr("IP"), tr("请输入设备IP"), QLineEdit::Normal, pControl->getIP());
 		if (qstrNewIP.isEmpty()) return;
 		if (pControl->getIP() == qstrNewIP) return;
+		if (isRepetitionDevice("", qstrNewIP, 0, 0)) {
+			QMessageBox::warning(this, tr("提示"), tr("无法修改，设备地址重复"));
+			return;
+		}
 		pControl->setIp(qstrNewIP);
 		});
 	connect(pActionDicconnect, &QAction::triggered, [this](bool checked) {
@@ -168,13 +172,10 @@ QString DeviceManage::addDevice(QString qstrName, QString ip, float x, float y)
 	if (qstrName.isEmpty()) {
 		return tr("设备名称为空");
 	}
-	//判断设备名称是否重复
-	if (isRepetitionName(qstrName)) {
+	//判断设备是否重复
+	if (isRepetitionDevice(qstrName, ip, x, y, true)) {
 		return tr("设备名称重复");
 	}
-	//TODO
-	//判断设备IP是否重复
-	//判断初始位置是否重复
 
 	QListWidgetItem* item = new QListWidgetItem();
 	item->setSizeHint(QSize(0, _ItemHeight_));
@@ -317,8 +318,10 @@ QString DeviceManage::getNewDefaultName()
 }
 
 //设备名称是否重复
-bool DeviceManage::isRepetitionName(QString qstrName)
+bool DeviceManage::isRepetitionDevice(QString qstrName, QString ip, float x, float y, bool location)
 {
+
+	location = false;
 	if (0 >= ui.listWidget->count()) return false;
 	for (int i = 0; i < ui.listWidget->count(); i++) {
 		QListWidgetItem* pItem = ui.listWidget->item(i);
@@ -327,8 +330,15 @@ bool DeviceManage::isRepetitionName(QString qstrName)
 		if (!pWidget) continue;
 		DeviceControl* pDevice = dynamic_cast<DeviceControl*>(pWidget);
 		if (!pDevice) continue;
-		if(qstrName != pDevice->getName()) continue;
-		return true;
+		if (!qstrName.isEmpty()) {
+			if (qstrName == pDevice->getName()) return true;
+		}
+		if (!ip.isEmpty()) {
+			if (ip == pDevice->getIP()) return true;
+		}
+		if (location) {
+			if (x == pDevice->getX() && y == pDevice->getY()) return true;
+		}
 	}
 	return false;
 }

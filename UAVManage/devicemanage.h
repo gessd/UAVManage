@@ -77,11 +77,15 @@ public:
 	*/
 	QString getNewDefaultName();
 	/**
-	* @brief 判断名称是否重复
+	* @brief 判断是否重复,为空则不判断
 	* @param [in] qstrName 设备名
-	* @return 如果和已存在的设备名称重复返回TRUE
+	* @param [in] ip 设备IP
+	* @param [in] 坐标X
+	* @param [in] 坐标Y
+	* @param [in] 是否判断坐标重复
+	* @return 如果设备属于有冲突则返回TRUE
 	*/
-	bool isRepetitionName(QString qstrName);
+	bool isRepetitionDevice(QString qstrName, QString ip, float x, float y, bool location = false);
 	/**
 	 * @brief 控制所有设备执行
 	 */
