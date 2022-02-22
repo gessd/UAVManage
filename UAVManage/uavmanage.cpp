@@ -116,6 +116,10 @@ UAVManage::UAVManage(QWidget *parent)
 
 UAVManage::~UAVManage()
 {
+	if (m_pSoundWidget) {
+		delete m_pSoundWidget;
+		m_pSoundWidget = nullptr;
+	}
 	if (m_pSocketServer) {
 		m_pSocketServer->close();
 		delete m_pSocketServer;
@@ -243,7 +247,12 @@ void UAVManage::onOpenProject(QString qstrFile)
 		float dx = device->FloatAttribute(_AttributeX_);
 		float dy = device->FloatAttribute(_AttributeY_);
 		device = device->NextSiblingElement(_ElementDevice_);
-		if (m_pDeviceManage) m_pDeviceManage->addDevice(devicename, ip, dx, dy);
+		if (m_pDeviceManage) {
+			QString error = m_pDeviceManage->addDevice(devicename, ip, dx, dy);
+			if (!error.isEmpty()) {
+				_ShowErrorMessage(tr("无法添加设备") + devicename + error);
+			}
+		}
 	}
 	_ShowInfoMessage(tr("打开工程完成"));
 	qDebug() << "----工程打开完成";

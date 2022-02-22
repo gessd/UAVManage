@@ -125,9 +125,9 @@ private:
     Ui::UAVManageClass ui;
     //设备列表
     DeviceManage* m_pDeviceManage;
-    //websocket服务
+    //websocket服务 积木块界面
     QWebSocketServer* m_pSocketServer;
-    //web连接
+    //web连接 积木块界面
     QWebSocket* m_pWebSocket;
     QString m_qstrLastWebMessage;
     //当前工程文件

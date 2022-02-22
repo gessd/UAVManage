@@ -85,7 +85,7 @@ public:
 	* @param [in] 是否判断坐标重复
 	* @return 如果设备属于有冲突则返回TRUE
 	*/
-	bool isRepetitionDevice(QString qstrName, QString ip, float x, float y, bool location = false);
+	QString isRepetitionDevice(QString qstrName, QString ip, float x, float y, bool location = false);
 	/**
 	 * @brief 控制所有设备执行
 	 */
