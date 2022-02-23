@@ -258,6 +258,7 @@ void UAVManage::onOpenProject(QString qstrFile)
 	qDebug() << "----工程打开完成";
 	m_pDeviceManage->setCurrentDevice(qstrCurrnetName);
 	m_pSoundWidget->updateLoadMusic(qstrMusicFilePath);
+	m_pDeviceManage->setCurrentMusicPath(qstrMusicFilePath);
 	m_pDeviceManage->setEnabled(true);
 	m_pSoundWidget->setEnabled(true);
 }
@@ -573,11 +574,11 @@ void UAVManage::onUpdateMusic(QString qstrFilePath)
 	QFileInfo info(qstrFilePath);
 	if (!info.exists()) return;
 	QString fileName = info.fileName();
-
 	QFileInfo infoProject(m_qstrCurrentProjectFile);
 	QString qstrNewFile = infoProject.path() + _ProjectDirName_ + fileName;
 	if (qstrFilePath == qstrNewFile) return;
 	QFile::copy(qstrFilePath, qstrNewFile);
+	m_pDeviceManage->setCurrentMusicPath(qstrNewFile);
 
 	QTextCodec* code = QTextCodec::codecForName(_XMLNameCoding_);
 	std::string filename = code->fromUnicode(m_qstrCurrentProjectFile).data();
@@ -594,9 +595,9 @@ void UAVManage::onUpdateMusic(QString qstrFilePath)
 	error = doc.SaveFile(filename.c_str());
 }
 
-void UAVManage::onCurrentMusicTime(int mesc)
+void UAVManage::onCurrentMusicTime(int second)
 {
-	m_pDeviceManage->setUpdateWaypointTime(mesc);
+	m_pDeviceManage->setUpdateWaypointTime(second);
 }
 
 void UAVManage::onCurrentPlayeState(qint8 state)

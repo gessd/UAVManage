@@ -104,13 +104,17 @@ public:
 	QString sendWaypoint(QString name, QVector<NavWayPointData> data, bool upload);
 	/**
 	* @brief 根据音乐进度更新舞步时间
-	* @param 毫秒值
+	* @param 秒值
 	*/
-	void setUpdateWaypointTime(int mesc);
+	void setUpdateWaypointTime(int second);
 	/**
 	* @brief 设置当前音频播放状态
 	*/
 	void setCurrentPlayeState(qint8 state);
+	/**
+	* @brief 三维设置音乐文件路径
+	*/
+	void setCurrentMusicPath(QString filePath);
 signals:
 	/**
 	 * @brief 设备添加完成

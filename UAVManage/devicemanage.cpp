@@ -413,7 +413,7 @@ QString DeviceManage::sendWaypoint(QString name, QVector<NavWayPointData> data, 
 {
 	if (name.isEmpty()) return tr("设备名称错误");
 	if (0 == data.count()) return tr("舞步数据为空");
-	QString qstrMessage;
+	
 	for (int i = 0; i < ui.listWidget->count(); i++) {
 		QListWidgetItem* pItem = ui.listWidget->item(i);
 		if (!pItem) continue;
@@ -422,6 +422,13 @@ QString DeviceManage::sendWaypoint(QString name, QVector<NavWayPointData> data, 
 		DeviceControl* pDevice = dynamic_cast<DeviceControl*>(pWidget);
 		if (!pDevice) continue;
 		if (name != pDevice->getName()) continue;
+		//舞步前添加起始位置
+		NavWayPointData startLocation;
+		startLocation.x = pDevice->getX() * 1000;
+		startLocation.y = pDevice->getX() * 1000;
+		startLocation.commandID = 31004;
+		data.prepend(startLocation);
+
 		if (m_p3dTcpSocket) {
 			QJsonObject obj3dmsg;
 			obj3dmsg.insert(_Ver_, _VerNum_);
@@ -454,14 +461,14 @@ QString DeviceManage::sendWaypoint(QString name, QVector<NavWayPointData> data, 
 	return "";
 }
 
-void DeviceManage::setUpdateWaypointTime(int mesc)
+void DeviceManage::setUpdateWaypointTime(int second)
 {
 	QJsonObject obj3dmsg;
 	obj3dmsg.insert(_Ver_, _VerNum_);
 	obj3dmsg.insert(_Tag_, _TabName_);
 	obj3dmsg.insert(_ID_, _3dDeviceTime);
 	obj3dmsg.insert(_Time_, QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"));
-	obj3dmsg.insert(_Data_, mesc);
+	obj3dmsg.insert(_Data_, second);
 	QJsonDocument document(obj3dmsg);
 	QByteArray arrData = document.toJson();
 	if(m_p3dTcpSocket) m_p3dTcpSocket->write(QString::fromUtf8(arrData.data()).toLocal8Bit());
@@ -475,6 +482,22 @@ void DeviceManage::setCurrentPlayeState(qint8 state)
 	obj3dmsg.insert(_ID_, _3dDeviceAction);
 	obj3dmsg.insert(_Time_, QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"));
 	obj3dmsg.insert(_Data_, state);
+	QJsonDocument document(obj3dmsg);
+	QByteArray arrData = document.toJson();
+	if (nullptr != m_p3dTcpSocket) {
+		m_p3dTcpSocket->write(QString::fromUtf8(arrData.data()).toLocal8Bit());
+	}
+}
+
+void DeviceManage::setCurrentMusicPath(QString filePath)
+{
+	if (!QFile::exists(filePath)) return;
+	QJsonObject obj3dmsg;
+	obj3dmsg.insert(_Ver_, _VerNum_);
+	obj3dmsg.insert(_Tag_, _TabName_);
+	obj3dmsg.insert(_ID_, _3dDeviceMusicPath);
+	obj3dmsg.insert(_Time_, QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"));
+	obj3dmsg.insert(_Data_, filePath);
 	QJsonDocument document(obj3dmsg);
 	QByteArray arrData = document.toJson();
 	if (nullptr != m_p3dTcpSocket) {

@@ -102,7 +102,7 @@ private slots:
     /**
     * @brief 当前音乐播放进度
     */
-    void onCurrentMusicTime(int mesc);
+    void onCurrentMusicTime(int second);
     /**
     * @brief 当前音乐播放状态
     */

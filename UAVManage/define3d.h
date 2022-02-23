@@ -17,6 +17,7 @@ enum _MsgID {
 	_3dDeviceLocation,
 	_3dDeviceWaypoint,
 	_3dDeviceBattery,
+	_3dDeviceMusicPath,
 	_3dDeviceAction = 201,
 	_3dDeviceTime
 };
