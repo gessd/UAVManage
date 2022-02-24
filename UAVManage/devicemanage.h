@@ -153,8 +153,13 @@ signals:
 	void sigWaypointProcess(QString name, unsigned int index, unsigned int count, int res, bool finish, QString text);
 	/**
 	* @brief 设备起飞指令下发完成
+	* @param 起飞|降落
 	*/
-	void sigTakeoffFinished();
+	void sigTakeoffFinished(bool takeoff);
+	/**
+	* @brief 三维窗口连接状态
+	*/
+	void sig3DDialogStatus(bool connect);
 protected:
 	virtual bool eventFilter(QObject* watched, QEvent* event);
 private slots:

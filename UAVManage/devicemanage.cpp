@@ -401,7 +401,8 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 			_ShowErrorMessage(qstrName+qstrText+tr("出错:")+ Utility::waypointMessgeFromStatus(res));
 		}
 	}
-	if (DeviceManage::_DeviceTakeoffLocal == comand) emit sigTakeoffFinished();
+	if (DeviceManage::_DeviceTakeoffLocal == comand) emit sigTakeoffFinished(true);
+	else emit sigTakeoffFinished(false);
 }
 
 void DeviceManage::allDeviceCalibration(_CalibrationEnum c)
@@ -476,6 +477,7 @@ void DeviceManage::setUpdateWaypointTime(int second)
 
 void DeviceManage::setCurrentPlayeState(qint8 state)
 {
+	return;
 	QJsonObject obj3dmsg;
 	obj3dmsg.insert(_Ver_, _VerNum_);
 	obj3dmsg.insert(_Tag_, _TabName_);
@@ -513,7 +515,7 @@ bool DeviceManage::eventFilter(QObject* watched, QEvent* event)
 		if (QEvent::ContextMenu != event->type()) return false;
 		if (!ui.listWidget->itemAt(ui.listWidget->mapFromGlobal(QCursor::pos()))) return false;
 		m_pMenu->exec(QCursor::pos());
-	}
+	} 
 	return false;
 }
 
@@ -530,6 +532,7 @@ void DeviceManage::on3dNewConnection()
 		qDebug() << "--tcp server:" << arrData;
 		});
 	connect(m_p3dTcpSocket, &QTcpSocket::disconnected, [this]() {
+		emit sig3DDialogStatus(false);
 		m_p3dTcpSocket = nullptr;
 		});
 	//发送无人机设备列表
@@ -554,6 +557,7 @@ void DeviceManage::on3dNewConnection()
 	QJsonDocument document(obj3dmsg);
 	QByteArray arrData = document.toJson();
 	m_p3dTcpSocket->write(QString::fromUtf8(arrData.data()).toLocal8Bit());
+	emit sig3DDialogStatus(true);
 }
 
 DeviceControl* DeviceManage::getCurrentDevice()

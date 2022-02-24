@@ -46,6 +46,7 @@ UAVManage::UAVManage(QWidget *parent)
 	connect(m_pDeviceManage, SIGNAL(deviceRenameFinished(QString, QString)), this, SLOT(onDeviceRename(QString, QString)));
 	connect(m_pDeviceManage, &DeviceManage::sigWaypointProcess, this, &UAVManage::onWaypointProcess);
 	connect(m_pDeviceManage, &DeviceManage::sigTakeoffFinished, this, &UAVManage::onDeviceTakeoffFinished);
+	connect(m_pDeviceManage, &DeviceManage::sig3DDialogStatus, this, &UAVManage::on3DDialogStauts);
 
 	//添加菜单
 	QStyle* style = QApplication::style();
@@ -94,8 +95,12 @@ UAVManage::UAVManage(QWidget *parent)
 	pMenuFlyPrepare->addAction(pActionFly6);
 	connect(pActionFly1, &QAction::triggered, [this]() { deviceWaypoint(); });
 	connect(pActionFly2, &QAction::triggered, [this]() { 
+		if (m_qstrCurrentProjectFile.isEmpty()) return;
+		QProcess pro;
+		pro.start("");
 		});
 	connect(pActionFly3, &QAction::triggered, [this]() { 
+		if (m_qstrCurrentProjectFile.isEmpty()) return;
 		PlaceInfoDialog info(this);
 		info.exec();
 		});
@@ -103,6 +108,7 @@ UAVManage::UAVManage(QWidget *parent)
 	connect(pActionFly5, &QAction::triggered, [this]() {  //暂无功能
 		});
 	connect(pActionFly6, &QAction::triggered, [this]() { 
+		if (m_qstrCurrentProjectFile.isEmpty()) return;
 		m_pDeviceManage->allDeviceControl(DeviceManage::_DeviceSetout); 
 		});
 
@@ -545,9 +551,10 @@ void UAVManage::onDeviceRename(QString newName, QString oldName)
 	QFile::rename(qstrOldPythonFile, qstrNewPythonFile);
 }
 
-void UAVManage::onDeviceTakeoffFinished()
+void UAVManage::onDeviceTakeoffFinished(bool takeoff)
 {
-	m_pSoundWidget->startPlayMusic();
+	if(takeoff) m_pSoundWidget->startPlayMusic();
+	else m_pSoundWidget->stopPlayMusic();
 }
 
 void UAVManage::onAppMessage(const QString& message)
@@ -606,6 +613,25 @@ void UAVManage::onCurrentPlayeState(qint8 state)
 	m_pDeviceManage->setCurrentPlayeState(state);
 }
 
+void UAVManage::on3DDialogStauts(bool connect)
+{
+	if (connect) {
+		deviceWaypoint();
+		QFileInfo infoProject(m_qstrCurrentProjectFile);
+		QTextCodec* code = QTextCodec::codecForName(_XMLNameCoding_);
+		std::string filename = code->fromUnicode(m_qstrCurrentProjectFile).data();
+		tinyxml2::XMLDocument doc;
+		tinyxml2::XMLError error = doc.LoadFile(filename.c_str());
+		if (error != tinyxml2::XMLError::XML_SUCCESS) return;
+		tinyxml2::XMLElement* root = doc.RootElement();
+		if (!root) return;
+		tinyxml2::XMLElement* place = root->FirstChildElement(_ElementPlace_);
+		if (!place) return;
+		QString qstrMusicPath = infoProject.path() + _ProjectDirName_ + place->Attribute(_ElementMusic_);
+		m_pDeviceManage->setCurrentMusicPath(qstrMusicPath);
+	}
+}
+
 bool UAVManage::newProjectFile(QString qstrFile, float X, float Y)
 {	
 	const char* declaration = _XMLVersion_;
@@ -638,7 +664,7 @@ bool UAVManage::newProjectFile(QString qstrFile, float X, float Y)
 
 void UAVManage::deviceWaypoint(bool bUpload)
 {
-	m_pDeviceManage->setEnabled(false);
+	if (m_qstrCurrentProjectFile.isEmpty()) return;
 	QStringList list = m_pDeviceManage->getDeviceNameList();
 	foreach(QString name, list) {
 		if (name.isEmpty()) continue;

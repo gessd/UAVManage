@@ -83,10 +83,11 @@ private slots:
      * @brief 设备列表中设备重命名
      */
     void onDeviceRename(QString newName, QString oldName);
-        /**
-        * @brief 设备起飞指令下发完成
-        */
-    void onDeviceTakeoffFinished();
+    /**
+    * @brief 设备起飞指令下发完成
+    * @param 起飞|降落
+    */
+    void onDeviceTakeoffFinished(bool takeoff);
     /**
      * @brief 程序间通讯
      */
@@ -107,6 +108,10 @@ private slots:
     * @brief 当前音乐播放状态
     */
     void onCurrentPlayeState(qint8 state);
+    /**
+    * @brief 三维窗口连接状态
+    */
+    void on3DDialogStauts(bool connect);
 private:
     /**
      * @brief 新建项目工程文件
