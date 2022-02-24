@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file>res/qss/style.qss</file>
+		<file>res/translations/qt_zh_CN.qm</file>
     </qresource>
 </RCC>

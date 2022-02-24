@@ -4,6 +4,7 @@
 #include <QFile>
 #include <QTextCodec>
 #include <QMessageBox>
+#include <QTranslator>
 #include "qtsingleapplication.h"
 
 void outputMessage(QtMsgType type, const QMessageLogContext& context, const QString& msg)
@@ -53,6 +54,10 @@ int main(int argc, char *argv[])
 
 	//QTextCodec* codec = QTextCodec::codecForName("utf-8");
 	//QTextCodec::setCodecForLocale(codec);
+	QTranslator translator;
+	if (translator.load(":/res/translations/qt_zh_CN.qm")) {
+		a.installTranslator(&translator);
+	}
 
     QFile file(":/res/qss/style.qss");
     if (file.open(QIODevice::ReadOnly)) {

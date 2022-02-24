@@ -25,6 +25,7 @@ UAVManage::UAVManage(QWidget *parent)
 	m_pSocketServer = nullptr;
 	m_pWebSocket = nullptr;
 	m_pDeviceManage = nullptr;
+	m_p3DProcess = nullptr;
 	
 	MessageListDialog::getInstance()->setParent(this);
 	//程序初始化
@@ -62,7 +63,7 @@ UAVManage::UAVManage(QWidget *parent)
 		_ShowWarningMessage(tr("警告消息警告消息警告消息警告消息警告消息警告消息警告消息警告消息"));
 		_ShowInfoMessage(tr("正常提示消息正常提示消息正常提示消息正常提示消息正常提示消息正常提示消息正常提示消息正常提示消息正常提示消息"));
 		});
-
+	//项目管理菜单
 	QMenu* pProjectMenu = new QMenu(tr("项目"));
 	ui.menuBar->addMenu(pProjectMenu);
 	QAction* pActionNew = new QAction(style->standardIcon(QStyle::SP_FileDialogNewFolder), tr("新建"));
@@ -79,6 +80,9 @@ UAVManage::UAVManage(QWidget *parent)
 		});
 	connect(pActionSaveas, &QAction::triggered, [this]() {onSaveasProject(); });
 
+	//三维预览进程
+	m_p3DProcess = new QProcess(this);
+	//起飞准备菜单
 	QMenu* pMenuFlyPrepare = new QMenu(tr("起飞准备"));
 	ui.menuBar->addMenu(pMenuFlyPrepare);
 	QAction* pActionFly1 = new QAction("1.检查舞步");
@@ -95,9 +99,9 @@ UAVManage::UAVManage(QWidget *parent)
 	pMenuFlyPrepare->addAction(pActionFly6);
 	connect(pActionFly1, &QAction::triggered, [this]() { deviceWaypoint(); });
 	connect(pActionFly2, &QAction::triggered, [this]() { 
-		if (m_qstrCurrentProjectFile.isEmpty()) return;
-		QProcess pro;
-		pro.start("");
+		//if (m_qstrCurrentProjectFile.isEmpty()) return;
+		m_p3DProcess->start("notepad.exe");
+		//m_p3DProcess->waitForFinished();
 		});
 	connect(pActionFly3, &QAction::triggered, [this]() { 
 		if (m_qstrCurrentProjectFile.isEmpty()) return;

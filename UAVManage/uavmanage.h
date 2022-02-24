@@ -3,6 +3,7 @@
 #include <QtWidgets/QMainWindow>
 #include "ui_uavmanage.h"
 #include <QDebug>
+#include <QProcess>
 #include <QWebSocket>
 #include <QWebSocketServer>
 //python宏定义与mavlink中宏定义有冲突，python引用必须放到mavlink引用之前
@@ -139,4 +140,5 @@ private:
     QString m_qstrCurrentProjectFile;
     ThreadPython ptyhon;
     SoundGrade* m_pSoundWidget;
+    QProcess* m_p3DProcess;
 };
