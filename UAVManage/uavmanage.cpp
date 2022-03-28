@@ -338,7 +338,6 @@ void UAVManage::onSaveasProject()
 void UAVManage::onWebClear()
 {
 	if (!m_pWebSocket) return;
-	qDebug() << "----清空WEB界面";
 	m_pWebSocket->sendTextMessage("");
 }
 
@@ -359,12 +358,12 @@ void UAVManage::resizeEvent(QResizeEvent* event)
 
 void UAVManage::onWebLoadProgress(int progress)
 {
-	qDebug() << "----webload:" << progress;
+	//网页加载进度
 }
 
 void UAVManage::onWebLoadFinished(bool finished)
 {
-	qDebug() << "----webFinished:" << finished;
+	//网页加载完成
 }
 
 void UAVManage::onSocketNewConnection()
@@ -382,7 +381,6 @@ void UAVManage::onSocketTextMessageReceived(QString message)
 	//防止数据大量重复处理
 	if (m_qstrLastWebMessage == message) return;
 	m_qstrLastWebMessage = message;
-	qDebug() << "----websocket message:" << message;
 	//更新blockly及python文件
 	message = message.right(message.size() - 7);						//减去 JsonData 字符串
 	QStringList strList = message.split("pythonData");
@@ -411,7 +409,6 @@ void UAVManage::onSocketTextMessageReceived(QString message)
 
 void UAVManage::onSocketDisconnected()
 {
-	qDebug() << "----websocket Disconnected";
 	m_pWebSocket = nullptr;
 }
 
@@ -563,7 +560,7 @@ void UAVManage::onDeviceTakeoffFinished(bool takeoff)
 
 void UAVManage::onAppMessage(const QString& message)
 {
-	qDebug() << "---- app message" << message;
+	
 }
 
 void UAVManage::onWaypointProcess(QString name, unsigned int index, unsigned int count, int res, bool finish, QString text)
