@@ -133,8 +133,8 @@ DeviceManage::DeviceManage(QWidget *parent)
 		DeviceDebug* pDebug = pControl->getDeviceDebug();
 		if (pDebug) pDebug->show();
 		});
-	addDevice("测试名称1", "", 0,0);
-	addDevice("测试名称2", "", 0, 0);
+	//addDevice("测试名称1", "", 0,0);
+	//addDevice("测试名称2", "", 0, 0);
 	connect(ui.btnAddDevice, &QAbstractButton::clicked, [this]() {
 		AddDeviceDialog dialog(getNewDefaultName(), this);
 		if (QDialog::Accepted != dialog.exec())return;
