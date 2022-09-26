@@ -134,6 +134,7 @@
     <ClCompile Include="devicemanage.cpp" />
     <ClCompile Include="globalfunction.cpp" />
     <ClCompile Include="messagelistdialog.cpp" />
+    <ClCompile Include="paramreadwrite.cpp" />
     <ClCompile Include="placeinfodialog.cpp" />
     <ClCompile Include="qtsingleapplication\qtlocalpeer.cpp" />
     <ClCompile Include="qtsingleapplication\qtsingleapplication.cpp" />
@@ -174,6 +175,7 @@
     <QtMoc Include="placeinfodialog.h" />
     <QtMoc Include="qwchartview.h" />
     <QtMoc Include="SoundGrade.h" />
+    <QtMoc Include="paramreadwrite.h" />
     <ClInclude Include="tinyxml2\tinyxml2.h" />
     <QtMoc Include="resendmessage.h" />
   </ItemGroup>

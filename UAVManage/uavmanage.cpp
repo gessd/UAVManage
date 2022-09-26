@@ -17,6 +17,7 @@
 #include "messagelistdialog.h"
 #include "placeinfodialog.h"
 #include "SoundGrade.h"
+#include "paramreadwrite.h"
 
 UAVManage::UAVManage(QWidget *parent)
     : QMainWindow(parent)
@@ -271,6 +272,7 @@ void UAVManage::onOpenProject(QString qstrFile)
 	m_pDeviceManage->setCurrentMusicPath(qstrMusicFilePath);
 	m_pDeviceManage->setEnabled(true);
 	m_pSoundWidget->setEnabled(true);
+	ParamReadWrite::writeParam(_Path_, m_qstrCurrentProjectFile);
 }
 
 //拷贝文件夹
@@ -364,6 +366,13 @@ void UAVManage::onWebLoadProgress(int progress)
 void UAVManage::onWebLoadFinished(bool finished)
 {
 	//网页加载完成
+	static bool bInit = false;
+	if (bInit) return;
+	bInit = true;
+	QString qstrPath = ParamReadWrite::readParam(_Path_).toString();
+	if (qstrPath.isEmpty()) return;
+	if (!QFile::exists(qstrPath)) return;
+	onOpenProject(qstrPath);
 }
 
 void UAVManage::onSocketNewConnection()
