@@ -26,7 +26,7 @@
   <widget class="QLineEdit" name="lineEditIp">
    <property name="geometry">
     <rect>
-     <x>20</x>
+     <x>140</x>
      <y>20</y>
      <width>111</width>
      <height>20</height>
@@ -749,7 +749,7 @@
   <widget class="QLineEdit" name="lineEditName">
    <property name="geometry">
     <rect>
-     <x>140</x>
+     <x>20</x>
      <y>20</y>
      <width>113</width>
      <height>20</height>

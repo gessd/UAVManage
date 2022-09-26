@@ -131,7 +131,10 @@ DeviceManage::DeviceManage(QWidget *parent)
 		DeviceControl* pControl = getCurrentDevice();
 		if (!pControl) return;
 		DeviceDebug* pDebug = pControl->getDeviceDebug();
-		if (pDebug) pDebug->show();
+		if (!pDebug) return;
+		pDebug->setName(pControl->getName());
+		pDebug->setIp(pControl->getIP());
+		pDebug->show();
 		});
 	//addDevice("测试名称1", "", 0,0);
 	//addDevice("测试名称2", "", 0, 0);

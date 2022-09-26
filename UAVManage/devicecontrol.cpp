@@ -24,7 +24,7 @@ DeviceControl::DeviceControl(QString name, float x, float y, QString ip, QWidget
 	connect(this, &DeviceControl::sigUpdateHeartbeat, this, &DeviceControl::onUpdateHeartBeat);
 	
 	qRegisterMetaType<QList<float>>("QList<float>");
-	m_pDebugDialog = new DeviceDebug(name, ip, this);
+	m_pDebugDialog = new DeviceDebug(ip, name, this);
 	connect(this, &DeviceControl::sigConnectStatus, m_pDebugDialog, &DeviceDebug::onConnectStatus);
 	connect(this, &DeviceControl::sigMessageByte, m_pDebugDialog, &DeviceDebug::onDeviceMessage);
 	connect(this, &DeviceControl::sigHighresImu, m_pDebugDialog, &DeviceDebug::onUpdateHighresImu);
