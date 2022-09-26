@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>227</width>
-    <height>125</height>
+    <width>315</width>
+    <height>195</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -84,7 +84,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="QToolButton" name="btnOK">
+      <widget class="QPushButton" name="btnOK">
        <property name="minimumSize">
         <size>
          <width>65</width>
@@ -97,7 +97,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QToolButton" name="btnCancel">
+      <widget class="QPushButton" name="btnCancel">
        <property name="minimumSize">
         <size>
          <width>65</width>

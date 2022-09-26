@@ -35,6 +35,9 @@
    <property name="text">
     <string/>
    </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
   </widget>
   <widget class="QLineEdit" name="lineEditMsg">
    <property name="geometry">
@@ -754,6 +757,9 @@
      <width>113</width>
      <height>20</height>
     </rect>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
    </property>
   </widget>
  </widget>
