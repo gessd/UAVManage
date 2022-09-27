@@ -58,6 +58,13 @@
        <property name="text">
         <string>添加</string>
        </property>
+       <property name="icon">
+        <iconset resource="uavmanage.qrc">
+         <normaloff>:/res/images/add.png</normaloff>:/res/images/add.png</iconset>
+       </property>
+       <property name="toolButtonStyle">
+        <enum>Qt::ToolButtonTextBesideIcon</enum>
+       </property>
       </widget>
      </item>
      <item>
@@ -70,6 +77,13 @@
        </property>
        <property name="text">
         <string>删除</string>
+       </property>
+       <property name="icon">
+        <iconset resource="uavmanage.qrc">
+         <normaloff>:/res/images/delete.png</normaloff>:/res/images/delete.png</iconset>
+       </property>
+       <property name="toolButtonStyle">
+        <enum>Qt::ToolButtonTextBesideIcon</enum>
        </property>
       </widget>
      </item>
@@ -133,6 +147,25 @@
         <property name="text">
          <string>急停</string>
         </property>
+        <property name="icon">
+         <iconset resource="uavmanage.qrc">
+          <normaloff>:/res/images/flystop.png</normaloff>:/res/images/flystop.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>32</width>
+          <height>32</height>
+         </size>
+        </property>
+        <property name="toolButtonStyle">
+         <enum>Qt::ToolButtonTextBesideIcon</enum>
+        </property>
+        <property name="autoRaise">
+         <bool>false</bool>
+        </property>
+        <property name="arrowType">
+         <enum>Qt::NoArrow</enum>
+        </property>
        </widget>
       </item>
       <item row="2" column="2">
@@ -171,6 +204,16 @@
         <property name="text">
          <string>降落</string>
         </property>
+        <property name="icon">
+         <iconset resource="uavmanage.qrc">
+          <normaloff>:/res/images/flyland.png</normaloff>:/res/images/flyland.png</iconset>
+        </property>
+        <property name="toolButtonStyle">
+         <enum>Qt::ToolButtonTextBesideIcon</enum>
+        </property>
+        <property name="autoRaise">
+         <bool>false</bool>
+        </property>
        </widget>
       </item>
       <item row="1" column="1">
@@ -189,6 +232,13 @@
         </property>
         <property name="text">
          <string>起飞</string>
+        </property>
+        <property name="icon">
+         <iconset resource="uavmanage.qrc">
+          <normaloff>:/res/images/flytakeoff.png</normaloff>:/res/images/flytakeoff.png</iconset>
+        </property>
+        <property name="toolButtonStyle">
+         <enum>Qt::ToolButtonTextBesideIcon</enum>
         </property>
        </widget>
       </item>
@@ -269,6 +319,8 @@
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources/>
+ <resources>
+  <include location="uavmanage.qrc"/>
+ </resources>
  <connections/>
 </ui>

@@ -9,29 +9,35 @@ QWidget:disabled{
 /*通用按钮样式*/
 QPushButton,QToolButton{
     background:rgb(80, 80, 80);
-	border:1px solid rgba(248,248,255,200);
+	border:0px solid rgba(248,248,255,200);
 	border-radius:10px;
 }
 QPushButton:hover,QToolButton:hover{
-    background:rgb(100,100,100);
-	color:rgb(0,0,0);
+    background:rgb(180,180,180);
+	color:rgb(50,50,50);
 }
 QPushButton:pressed,QToolButton:pressed{
-    background:rgb(120,120,120);
+    background:rgb(140,140,140);
 }
 #btnFlyStop{
+	padding-left:40px;
 	background:rgb(199,21,133);
 }
 #btnFlyStop:hover{
 	background:rgb(255,0,255);
 }
 #btnFlyStop:pressed{
-	background:rgb(255,105,180);
+	background:rgb(255,105,255);
 }
 #btnFlyStop:disabled{
 	background:rgb(216,191,216);
 }
-
+#btnFlyTakeoff,#btnFlyLand,#btnAddDevice,#btnRemoveDevice{
+	padding-left:15px;
+}
+#m_pBtnLoad,#m_pBtnPlay,#m_pbtnStop{
+	padding-left:8px;
+}
 /*弹窗框及添加设备弹窗框*/
 AddDeviceDialog QPushButton, QInputDialog QPushButton{background:rgb(26,179,148); color:rgb(255,255,255); border-radius:3px; min-height:30px; min-width:60px; font-size:22px;}
 AddDeviceDialog QPushButton:hover, QInputDialog QPushButton:hover{background:rgb(24,166,137);}

@@ -112,12 +112,19 @@
       <widget class="QToolButton" name="btnLED">
        <property name="maximumSize">
         <size>
-         <width>32</width>
+         <width>50</width>
          <height>32</height>
         </size>
        </property>
        <property name="text">
         <string>点亮</string>
+       </property>
+       <property name="icon">
+        <iconset resource="uavmanage.qrc">
+         <normaloff>:/res/images/lighting.png</normaloff>:/res/images/lighting.png</iconset>
+       </property>
+       <property name="toolButtonStyle">
+        <enum>Qt::ToolButtonTextBesideIcon</enum>
        </property>
       </widget>
      </item>
@@ -161,6 +168,8 @@
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources/>
+ <resources>
+  <include location="uavmanage.qrc"/>
+ </resources>
  <connections/>
 </ui>

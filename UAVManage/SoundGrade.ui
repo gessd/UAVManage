@@ -54,11 +54,18 @@
        <property name="text">
         <string>添加</string>
        </property>
+       <property name="icon">
+        <iconset resource="uavmanage.qrc">
+         <normaloff>:/res/images/add.png</normaloff>:/res/images/add.png</iconset>
+       </property>
        <property name="iconSize">
         <size>
          <width>16</width>
          <height>16</height>
         </size>
+       </property>
+       <property name="toolButtonStyle">
+        <enum>Qt::ToolButtonTextBesideIcon</enum>
        </property>
       </widget>
      </item>
@@ -98,8 +105,16 @@
        <property name="text">
         <string>播放</string>
        </property>
+       <property name="icon">
+        <iconset resource="uavmanage.qrc">
+         <normaloff>:/res/images/playmusic.png</normaloff>
+         <activeon>:/res/images/pausemusic.png</activeon>:/res/images/playmusic.png</iconset>
+       </property>
        <property name="checkable">
         <bool>true</bool>
+       </property>
+       <property name="toolButtonStyle">
+        <enum>Qt::ToolButtonTextBesideIcon</enum>
        </property>
       </widget>
      </item>
@@ -113,6 +128,13 @@
        </property>
        <property name="text">
         <string>停止</string>
+       </property>
+       <property name="icon">
+        <iconset resource="uavmanage.qrc">
+         <normaloff>:/res/images/stopmusic.png</normaloff>:/res/images/stopmusic.png</iconset>
+       </property>
+       <property name="toolButtonStyle">
+        <enum>Qt::ToolButtonTextBesideIcon</enum>
        </property>
       </widget>
      </item>
@@ -221,6 +243,8 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="uavmanage.qrc"/>
+ </resources>
  <connections/>
 </ui>

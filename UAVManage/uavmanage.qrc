@@ -1,6 +1,15 @@
 <RCC>
     <qresource prefix="/">
         <file>res/qss/style.qss</file>
-		<file>res/translations/qt_zh_CN.qm</file>
+        <file>res/translations/qt_zh_CN.qm</file>
+        <file>res/images/flyland.png</file>
+        <file>res/images/flytakeoff.png</file>
+        <file>res/images/flystop.png</file>
+        <file>res/images/add.png</file>
+        <file>res/images/delete.png</file>
+        <file>res/images/playmusic.png</file>
+        <file>res/images/stopmusic.png</file>
+        <file>res/images/pausemusic.png</file>
+        <file>res/images/lighting.png</file>
     </qresource>
 </RCC>
