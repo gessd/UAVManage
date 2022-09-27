@@ -11,5 +11,11 @@
         <file>res/images/stopmusic.png</file>
         <file>res/images/pausemusic.png</file>
         <file>res/images/lighting.png</file>
+        <file>res/images/inspect.png</file>
+        <file>res/images/prepare.png</file>
+        <file>res/images/stereoscopic.png</file>
+        <file>res/images/upload.png</file>
+        <file>res/images/basestation.png</file>
+        <file>res/images/time.png</file>
     </qresource>
 </RCC>

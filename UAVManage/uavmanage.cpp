@@ -40,6 +40,7 @@ UAVManage::UAVManage(QWidget *parent)
 	//增加设备列表
     m_pDeviceManage = new DeviceManage(this);
 	m_pDeviceManage->setEnabled(false);
+	ui.toolBar->setEnabled(false);
 	m_pDeviceManage->setMaximumWidth(200);
     ui.gridLayoutMain->addWidget(m_pDeviceManage, 0,1);
 	connect(m_pDeviceManage, SIGNAL(currentDeviceNameChanged(QString, QString)), this, SLOT(onCurrentDeviceNameChanged(QString, QString)));
@@ -86,18 +87,25 @@ UAVManage::UAVManage(QWidget *parent)
 	//起飞准备菜单
 	QMenu* pMenuFlyPrepare = new QMenu(tr("起飞准备"));
 	ui.menuBar->addMenu(pMenuFlyPrepare);
-	QAction* pActionFly1 = new QAction("1.检查舞步");
-	QAction* pActionFly2 = new QAction("2.三维仿真");
-	QAction* pActionFly3 = new QAction("3.基站标定");
-	QAction* pActionFly4 = new QAction("4.上传舞步");
-	QAction* pActionFly5 = new QAction("5.定桩授时");
-	QAction* pActionFly6 = new QAction("6.准备起飞");
+	QAction* pActionFly1 = new QAction(QIcon(":/res/images/inspect.png"), tr("1.检查舞步"));
+	QAction* pActionFly2 = new QAction(QIcon(":/res/images/stereoscopic.png"), tr("2.三维仿真"));
+	QAction* pActionFly3 = new QAction(QIcon(":/res/images/basestation.png"), tr("3.基站标定"));
+	QAction* pActionFly4 = new QAction(QIcon(":/res/images/upload.png"), tr("4.上传舞步"));
+	QAction* pActionFly5 = new QAction(QIcon(":/res/images/time.png"), tr("5.定桩授时"));
+	QAction* pActionFly6 = new QAction(QIcon(":/res/images/prepare.png"), tr("6.准备起飞"));
 	pMenuFlyPrepare->addAction(pActionFly1);
 	pMenuFlyPrepare->addAction(pActionFly2);
 	pMenuFlyPrepare->addAction(pActionFly3);
 	pMenuFlyPrepare->addAction(pActionFly4);
 	pMenuFlyPrepare->addAction(pActionFly5);
 	pMenuFlyPrepare->addAction(pActionFly6);
+	ui.toolBar->layout()->setSpacing(10);
+	ui.toolBar->addAction(pActionFly1);
+	ui.toolBar->addAction(pActionFly2);
+	ui.toolBar->addAction(pActionFly3);
+	ui.toolBar->addAction(pActionFly4);
+	ui.toolBar->addAction(pActionFly5);
+	ui.toolBar->addAction(pActionFly6);
 	connect(pActionFly1, &QAction::triggered, [this]() { deviceWaypoint(); });
 	connect(pActionFly2, &QAction::triggered, [this]() { 
 		//if (m_qstrCurrentProjectFile.isEmpty()) return;
@@ -184,6 +192,7 @@ void UAVManage::onNewProject()
 {
 	m_pDeviceManage->setEnabled(false);
 	m_pSoundWidget->setEnabled(false);
+	ui.toolBar->setEnabled(false);
 	//先清空数据
 	if (false == m_qstrCurrentProjectFile.isEmpty()) {
 		QFileInfo info(m_qstrCurrentProjectFile);
@@ -272,6 +281,7 @@ void UAVManage::onOpenProject(QString qstrFile)
 	m_pDeviceManage->setCurrentMusicPath(qstrMusicFilePath);
 	m_pDeviceManage->setEnabled(true);
 	m_pSoundWidget->setEnabled(true);
+	ui.toolBar->setEnabled(true);
 	ParamReadWrite::writeParam(_Path_, m_qstrCurrentProjectFile);
 }
 
