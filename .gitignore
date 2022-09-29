@@ -53,3 +53,4 @@ build*
 /x64
 /UAVManage/x64
 /.vs
+*.aps

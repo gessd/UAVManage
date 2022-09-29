@@ -179,6 +179,9 @@
     <ClInclude Include="tinyxml2\tinyxml2.h" />
     <QtMoc Include="resendmessage.h" />
   </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="logo.rc" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">
     <Import Project="$(QtMsBuild)\qt.targets" />
