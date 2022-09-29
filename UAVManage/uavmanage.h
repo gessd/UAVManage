@@ -85,6 +85,12 @@ private slots:
      */
     void onDeviceRename(QString newName, QString oldName);
     /**
+     * @brief 设备IP地址已修改
+     * @param 设备名
+     * @param IP地址
+     */
+    void onDeviceResetIp(QString name, QString ip);
+    /**
     * @brief 设备起飞指令下发完成
     * @param 起飞|降落
     */

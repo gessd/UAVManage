@@ -47,6 +47,7 @@ UAVManage::UAVManage(QWidget *parent)
 	connect(m_pDeviceManage, SIGNAL(deviceAddFinished(QString, QString, float, float)), this, SLOT(onDeviceAdd(QString, QString, float, float)));
 	connect(m_pDeviceManage, SIGNAL(deviceRemoveFinished(QString)), this, SLOT(onDeviceRemove(QString)));
 	connect(m_pDeviceManage, SIGNAL(deviceRenameFinished(QString, QString)), this, SLOT(onDeviceRename(QString, QString)));
+	connect(m_pDeviceManage, SIGNAL(deviceResetIp(QString, QString)), this, SLOT(onDeviceResetIp(QString, QString)));
 	connect(m_pDeviceManage, &DeviceManage::sigWaypointProcess, this, &UAVManage::onWaypointProcess);
 	connect(m_pDeviceManage, &DeviceManage::sigTakeoffFinished, this, &UAVManage::onDeviceTakeoffFinished);
 	connect(m_pDeviceManage, &DeviceManage::sig3DDialogStatus, this, &UAVManage::on3DDialogStauts);
@@ -569,6 +570,32 @@ void UAVManage::onDeviceRename(QString newName, QString oldName)
 	QString qstrOldPythonFile = QString("%1%2%3.py").arg(qstrPath).arg(_ProjectDirName_).arg(oldName);
 	QFile::rename(qstrOldBlocklyFile, qstrNewBlocklyFile);
 	QFile::rename(qstrOldPythonFile, qstrNewPythonFile);
+}
+
+void UAVManage::onDeviceResetIp(QString name, QString ip)
+{
+	if (m_qstrCurrentProjectFile.isEmpty()) return;
+	QTextCodec* code = QTextCodec::codecForName(_XMLNameCoding_);
+	std::string filename = code->fromUnicode(m_qstrCurrentProjectFile).data();
+	tinyxml2::XMLDocument doc;
+	tinyxml2::XMLError error = doc.LoadFile(filename.c_str());
+	if (error != tinyxml2::XMLError::XML_SUCCESS) return;
+	tinyxml2::XMLElement* root = doc.RootElement();
+	if (!root) return;
+	tinyxml2::XMLElement* device = root->FirstChildElement(_ElementDevice_);
+	if (!device) return;
+	while (device) {
+		//遍历无人机属性
+		QString devicename = device->Attribute(_AttributeName_);
+		if (devicename != name) {
+			device = device->NextSiblingElement(_ElementDevice_);
+			continue;
+		}
+		device->SetAttribute(_AttributeIP_, ip.toUtf8().data());
+		break;
+	}
+	doc.SaveFile(filename.c_str());
+	if (error != tinyxml2::XMLError::XML_SUCCESS) return;
 }
 
 void UAVManage::onDeviceTakeoffFinished(bool takeoff)

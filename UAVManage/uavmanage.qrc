@@ -17,5 +17,8 @@
         <file>res/images/upload.png</file>
         <file>res/images/basestation.png</file>
         <file>res/images/time.png</file>
+        <file>res/images/uavgreen.png</file>
+        <file>res/images/uavred.png</file>
+        <file>res/images/uavyellow.png</file>
     </qresource>
 </RCC>

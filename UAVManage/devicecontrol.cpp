@@ -12,12 +12,13 @@ DeviceControl::DeviceControl(QString name, float x, float y, QString ip, QWidget
 	: QWidget(parent)
 {
 	ui.setupUi(this);
-	m_pHvTcpClient = nullptr;
 	m_pHvTcpClient = new hv::TcpClient;
 	m_bHeartbeatEnable = true;
 	m_bWaypointSending = false;
 	ui.progressBar->setVisible(false);
 	ui.btnSet->setVisible(false);
+	QPixmap pixmap(":/res/images/uavred.png");
+	ui.labelConnect->setPixmap(pixmap.scaled(24, 24));
 	connect(this, &DeviceControl::sigWaypointProcess, this, &DeviceControl::onWaypointProcess);
 	connect(this, &DeviceControl::sigBatteryStatus, this, &DeviceControl::onUpdateBatteryStatus);
 	connect(this, &DeviceControl::sigConnectStatus, this, &DeviceControl::onUpdateConnectStatus);
@@ -597,8 +598,17 @@ void DeviceControl::onUpdateHeartBeat()
 
 void DeviceControl::onUpdateConnectStatus(QString name, QString ip, bool connect)
 {
-	if (connect)ui.labelConnect->setText(tr("<font color=#00FFFF>已连接</font>"));
-	else ui.labelConnect->setText(tr("<font color=#FFFF00>已断开</font>"));
+	
+	if (connect) {
+		//ui.labelConnect->setText(tr("<font color=#00FFFF>已连接</font>"));
+		QPixmap pixmap(":/res/images/uavgreen.png");
+		ui.labelConnect->setPixmap(pixmap.scaled(24, 24));
+	}
+	else {
+		//ui.labelConnect->setText(tr("<font color=#FFFF00>已断开</font>"));
+		QPixmap pixmap(":/res/images/uavred.png");
+		ui.labelConnect->setPixmap(pixmap.scaled(24, 24));
+	}
 }
 
 void DeviceControl::onWaypointProcess(QString name, unsigned int index, unsigned int count, int res, bool finish, QString text)

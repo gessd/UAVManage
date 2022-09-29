@@ -95,6 +95,7 @@ DeviceManage::DeviceManage(QWidget *parent)
 			return;
 		}
 		pControl->setIp(qstrNewIP);
+		emit deviceResetIp(pControl->getName(), qstrNewIP);
 		});
 	connect(pActionDicconnect, &QAction::triggered, [this](bool checked) {
 		DeviceControl* pControl = getCurrentDevice();

@@ -136,6 +136,12 @@ signals:
 	 */
 	void deviceRenameFinished(QString newName, QString oldName);
 	/**
+	 * @brief 设备修改IP地址
+	 * @param 设备名
+	 * @param IP地址
+	 */
+	void deviceResetIp(QString qstrName, QString ip);
+	/**
 	 * @brief 当前选中设备改变
 	 * @param 当前选中设备
 	 * @param 上一次选中设备，可能存在空

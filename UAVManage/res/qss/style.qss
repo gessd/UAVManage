@@ -50,7 +50,7 @@ AddDeviceDialog QPushButton, QInputDialog QPushButton{background:rgb(26,179,148)
 AddDeviceDialog QPushButton:hover, QInputDialog QPushButton:hover{background:rgb(24,166,137);}
 AddDeviceDialog QPushButton:pressed, QInputDialog QPushButton:pressed{background:rgb(32,178,170);}
 AddDeviceDialog QLineEdit, QInputDialog QLineEdit{border:2px solid rgb(229,230,231);padding:4px;padding-left:10px;border-radius:3px;color:rgb(255,255,255);font-size:22px;}
-AddDeviceDialog QLineEditt:focus, QInputDialog QLineEdit:focus{border:2px solid rgb(26,179,148);}
+AddDeviceDialog QLineEdit:focus, QInputDialog QLineEdit:focus{border:2px solid rgb(26,179,148);}
 AddDeviceDialog QLineEdit:disabled, QInputDialog QLineEdit:disabled{background-color:rgb(238,238,238);}
 AddDeviceDialog QLabel, QInputDialog QLabel{color:rgb(255,255,255); font-size:22px;}
 
