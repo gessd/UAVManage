@@ -176,6 +176,11 @@ private:
 	 * @brief 当前选中的设备
 	 */
 	DeviceControl* getCurrentDevice();
+
+	/**
+	 * @brief 通过TCP向三维发送消息
+	 */
+	void sendMessageTo3D(QJsonObject json3d);
 private:
 	Ui::DeviceManage ui;
 	//设备菜单

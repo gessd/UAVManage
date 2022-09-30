@@ -18,7 +18,8 @@ DeviceControl::DeviceControl(QString name, float x, float y, QString ip, QWidget
 	ui.progressBar->setVisible(false);
 	ui.btnSet->setVisible(false);
 	QPixmap pixmap(":/res/images/uavred.png");
-	ui.labelConnect->setPixmap(pixmap.scaled(24, 24));
+	ui.labelStatus->setPixmap(pixmap.scaled(ui.labelStatus->size()));
+	//发送消息为了转移到主线程中处理，需要对界面进行处理
 	connect(this, &DeviceControl::sigWaypointProcess, this, &DeviceControl::onWaypointProcess);
 	connect(this, &DeviceControl::sigBatteryStatus, this, &DeviceControl::onUpdateBatteryStatus);
 	connect(this, &DeviceControl::sigConnectStatus, this, &DeviceControl::onUpdateConnectStatus);
@@ -33,12 +34,11 @@ DeviceControl::DeviceControl(QString name, float x, float y, QString ip, QWidget
 	connect(this, &DeviceControl::sigLogMessage, m_pDebugDialog, &DeviceDebug::onMessageData);
 	connect(this, &DeviceControl::sigLocalPosition, m_pDebugDialog, &DeviceDebug::onUpdateLocalPosition);
 
-	ui.labelStatus->setVisible(false);
-	m_timerHeartbeat.start(1);
 	connect(&m_timerHeartbeat, &QTimer::timeout, [this]() {
 		unsigned int nLastTime = m_timerHeartbeat.property("time").toUInt();
-		if ((QDateTime::currentDateTime().toTime_t() - nLastTime) > 3) {
-			ui.labelStatus->setVisible(false);
+		if ((QDateTime::currentDateTime().toTime_t() - nLastTime) > 10) {
+			//超过N次没有收到心跳数据断开重新连接
+			//connectDevice();
 		}
 		});
 	setName(name);
@@ -188,7 +188,7 @@ int DeviceControl::Fun_MAV_CMD_DO_SET_MODE(float Mode, bool wait, bool again)
 
 int DeviceControl::DeviceMavWaypointStart(QVector<NavWayPointData> data)
 {
-	qDebug() << "----准备发送航点" << ui.labelDeviceName->text() << _CurrentTime_;
+	qDebug() << "准备发送航点" << ui.labelDeviceName->text() << _CurrentTime_;
 	if (!isConnectDevice()) return DeviceUnConnect;
 	int count = data.count();
 	if (count <= 0) return DeviceDataError;
@@ -196,7 +196,7 @@ int DeviceControl::DeviceMavWaypointStart(QVector<NavWayPointData> data)
 	//标记航点下发是否进行中
 	if (m_bWaypointSending) return DeviceMessageSending;
 	m_bWaypointSending = true;
-	qDebug() << "----航点数量" << ui.labelDeviceName->text() << count << _CurrentTime_;
+	qDebug() << "航点数量" << ui.labelDeviceName->text() << count << _CurrentTime_;
 	//先发送航点总数，消息响应成功后才能上传航点
 	mavlink_message_t msg;
 	mavlink_mission_count_t mission_count;
@@ -291,7 +291,6 @@ void DeviceControl::hvcbConnectionStatus(const hv::SocketChannelPtr& channel)
 		//连接成功
 		channel->setHeartbeat(_DeviceHeartbeatInterval_, [&, this]() {
 			//设置心跳
-			return;
 			if (!m_bHeartbeatEnable) return;
 			QTime time = QTime::currentTime();
 			mavlink_message_t message;
@@ -304,6 +303,7 @@ void DeviceControl::hvcbConnectionStatus(const hv::SocketChannelPtr& channel)
 			if (mavlink_msg_heartbeat_encode(_DeviceSYS_ID_, _DeviceCOMP_ID_, &message, &heard) > 0) {
 				QByteArray arrData = mavMessageToBuffer(message);
 				m_pHvTcpClient->send(arrData.data(), arrData.length());
+				qDebug() << time<<"心跳消息" << arrData;
 			}
 			});
 	}
@@ -317,7 +317,7 @@ void DeviceControl::hvcbReceiveMessage(const hv::SocketChannelPtr& channel, hv::
 	QByteArray arrData((char*)buf->data(), buf->size());
 	if (arrData.isEmpty()) return;
 	QString qstrName = ui.labelDeviceName->text();
-	qDebug() << "----收到消息" << _CurrentTime_ << qstrName << channel->peeraddr().c_str() << arrData.toHex().toUpper();
+	qDebug() << "收到消息" << _CurrentTime_ << qstrName << channel->peeraddr().c_str() << arrData.toHex().toUpper();
 	QByteArray arrTemp = QString(_DeviceLogPrefix_).toLocal8Bit();
 	if (arrData.contains(arrTemp)) {
 		//日志数据
@@ -338,7 +338,7 @@ void DeviceControl::hvcbReceiveMessage(const hv::SocketChannelPtr& channel, hv::
 	for (int i = 0; i < arrData.length(); i++) {
 		uint8_t par = mavlink_parse_char(0, arrData[i], &msg, &status);
 		if (!par) continue;
-		qDebug() << "----消息类型" << qstrName << msg.msgid;
+		qDebug() << "消息类型" << qstrName << msg.msgid;
 		switch (msg.msgid)
 		{
 		case MAVLINK_MSG_ID_HEARTBEAT://心跳
@@ -414,7 +414,7 @@ void DeviceControl::hvcbWriteComplete(const hv::SocketChannelPtr& channel, hv::B
 	QByteArray arrBuf((char*)buf->data(), buf->size());
 	if (arrBuf.isEmpty()) return;
 	emit sigMessageByte(arrBuf, false);
-	qDebug() << "----已发送消息" << ui.labelDeviceName->text() << _CurrentTime_ << channel->peeraddr().c_str() << arrBuf.toHex().toUpper();
+	qDebug() << "已发送消息" << ui.labelDeviceName->text() << _CurrentTime_ << channel->peeraddr().c_str() << arrBuf.toHex().toUpper();
 }
 
 QByteArray DeviceControl::mavMessageToBuffer(mavlink_message_t mesage)
@@ -505,7 +505,7 @@ void DeviceControl::DeviceMavWaypointSend(QVector<NavWayPointData> data)
 		emit sigWaypointProcess(ui.labelDeviceName->text(), 0, count, DeviceMessageSending, true, tr("上传舞步中"));
 		return;
 	}
-	qDebug() << "----0号航点" << ui.labelDeviceName->text() << _CurrentTime_;
+	qDebug() << "0号航点" << ui.labelDeviceName->text() << _CurrentTime_;
 	//先发送0号全零航点，验证是否可以上传航点
 	QByteArray arrData = getWaypointData(0, 0, 0, 0, 0, 0, 0, 0, 0);
 	QByteArray arrAgainData = getWaypointData(0, 0, 0, 0, 0, 0, 0, 0, 1);
@@ -529,10 +529,10 @@ void DeviceControl::DeviceMavWaypointSend(QVector<NavWayPointData> data)
 		return;
 	}
 	QString qstrTemp = ui.labelDeviceName->text();
-	qDebug() << "----循环发送航点" << ui.labelDeviceName->text() << _CurrentTime_;
+	qDebug() << "循环发送航点" << ui.labelDeviceName->text() << _CurrentTime_;
 	//开始上传航点,循环发送航点数据
 	for (int i = 0; i < count; i++) {
-		qDebug() << "----舞步序号" << ui.labelDeviceName->text() << i + 1<< _CurrentTime_;
+		qDebug() << "舞步序号" << ui.labelDeviceName->text() << i + 1<< _CurrentTime_;
 		NavWayPointData temp = data.at(i);
 		QByteArray arrData = getWaypointData(temp.param1, temp.param2, temp.param3, temp.param4, temp.x, temp.y, temp.z, i + 1, 0);
 		QByteArray arrAgainData = getWaypointData(temp.param1, temp.param2, temp.param3, temp.param4, temp.x, temp.y, temp.z, i + 1, 1);
@@ -562,7 +562,7 @@ void DeviceControl::DeviceMavWaypointSend(QVector<NavWayPointData> data)
 
 void DeviceControl::DeviceMavWaypointEnd(unsigned int count)
 {
-	qDebug() << "----结束舞步" << ui.labelDeviceName->text() << _CurrentTime_;
+	qDebug() << "结束舞步" << ui.labelDeviceName->text() << _CurrentTime_;
 	mavlink_message_t msg;
 	mavlink_mission_ack_t ack;
 	ack.target_system = _DeviceSYS_ID_;
@@ -594,20 +594,32 @@ void DeviceControl::onUpdateHeartBeat()
 	unsigned int nTime = QDateTime::currentDateTime().toTime_t();
 	m_timerHeartbeat.setProperty("time", nTime);
 	ui.labelStatus->setVisible(true);
+	QString qstrImagePath = ":/res/images/uavgreen.png";
+	QString qstrCurrent = ui.labelStatus->property("iamgepath").toString();
+	if (qstrCurrent == qstrImagePath) {
+		qstrImagePath = ":/res/images/uavyellow.png";
+	}
+	else {
+		qstrImagePath = ":/res/images/uavgreen.png";
+	}
+	QPixmap pixmap(qstrImagePath);
+	ui.labelStatus->setPixmap(pixmap.scaled(ui.labelStatus->size()));
+	ui.labelStatus->setProperty("iamgepath", qstrImagePath);
 }
 
 void DeviceControl::onUpdateConnectStatus(QString name, QString ip, bool connect)
 {
-	
 	if (connect) {
-		//ui.labelConnect->setText(tr("<font color=#00FFFF>已连接</font>"));
+		m_timerHeartbeat.setProperty("time", QDateTime::currentDateTime().toTime_t());
+		m_timerHeartbeat.start(_DeviceHeartbeatInterval_);
 		QPixmap pixmap(":/res/images/uavgreen.png");
-		ui.labelConnect->setPixmap(pixmap.scaled(24, 24));
+		ui.labelStatus->setPixmap(pixmap.scaled(ui.labelStatus->size()));
 	}
 	else {
-		//ui.labelConnect->setText(tr("<font color=#FFFF00>已断开</font>"));
+		m_timerHeartbeat.stop();
 		QPixmap pixmap(":/res/images/uavred.png");
-		ui.labelConnect->setPixmap(pixmap.scaled(24, 24));
+		ui.labelStatus->setPixmap(pixmap.scaled(ui.labelStatus->size()));
+		
 	}
 }
 

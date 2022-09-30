@@ -662,6 +662,7 @@ void UAVManage::onCurrentPlayeState(qint8 state)
 
 void UAVManage::on3DDialogStauts(bool connect)
 {
+	return;
 	if (connect) {
 		deviceWaypoint();
 		QFileInfo infoProject(m_qstrCurrentProjectFile);

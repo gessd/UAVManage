@@ -21,8 +21,8 @@
 #define _MavLinkResendNum_ 2
 //航点重复次数
 #define _MavWaypointRetryNum_ 2
-//心跳消息时间间隔
-#define _DeviceHeartbeatInterval_ 500
+//心跳消息时间间隔 毫秒
+#define _DeviceHeartbeatInterval_ 1000
 //指令消息重发间隔 毫秒
 #define _NkCommandResendInterval_ 3000
 //上传航点超时 毫秒

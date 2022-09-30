@@ -748,6 +748,9 @@
    <property name="text">
     <string>只显示日志</string>
    </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
   </widget>
   <widget class="QLineEdit" name="lineEditName">
    <property name="geometry">
