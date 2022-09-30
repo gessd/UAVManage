@@ -171,6 +171,7 @@ protected:
 private slots:
 	void onDeviceConrolFinished(QString text, int res, QString explain);
 	void on3dNewConnection();
+	void onUpdateStatusTo3D();
 private:
 	/**
 	 * @brief 当前选中的设备
@@ -188,4 +189,6 @@ private:
 	//三维模拟通讯使用
 	QTcpServer* m_p3dTcpServer;
 	QTcpSocket* m_p3dTcpSocket;
+	//定时发送无人机姿态数据到三维
+	QTimer m_timerUpdateStatus;
 };

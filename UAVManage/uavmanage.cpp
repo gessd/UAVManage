@@ -227,7 +227,7 @@ void UAVManage::onNewProject()
 
 void UAVManage::onOpenProject(QString qstrFile)
 {
-	qDebug() << "----打开工程" << qstrFile;
+	qDebug() << "打开工程" << qstrFile;
 	m_qstrCurrentProjectFile.clear();
 	onWebClear();
 	if (m_pDeviceManage) m_pDeviceManage->clearDevice();
@@ -276,7 +276,7 @@ void UAVManage::onOpenProject(QString qstrFile)
 		}
 	}
 	_ShowInfoMessage(tr("打开工程完成"));
-	qDebug() << "----工程打开完成";
+	qDebug() << "工程打开完成";
 	m_pDeviceManage->setCurrentDevice(qstrCurrnetName);
 	m_pSoundWidget->updateLoadMusic(qstrMusicFilePath);
 	m_pDeviceManage->setCurrentMusicPath(qstrMusicFilePath);
@@ -413,7 +413,7 @@ void UAVManage::onSocketTextMessageReceived(QString message)
 	qDebug() << pythonData;
 	QString blocklyFileName = getCurrentBlocklyFile();
 	QString pythonFileName = getCurrentPythonFile();
-	qDebug() << "---update file" << blocklyFileName << pythonFileName;
+	qDebug() << "update file" << blocklyFileName << pythonFileName;
 	if (blocklyFileName.isEmpty() || pythonFileName.isEmpty()) return;
 	QFile blocklyFile(blocklyFileName);
 	if (blocklyFile.open(QIODevice::WriteOnly | QIODevice::Text)){
@@ -434,7 +434,7 @@ void UAVManage::onSocketDisconnected()
 
 void UAVManage::onCurrentDeviceNameChanged(QString currentName, QString previousName)
 {
-	qDebug() << "----设备切换" << currentName << previousName;
+	qDebug() << "设备切换" << currentName << previousName;
 	QString blocklyFilePath = getCurrentBlocklyFile();
 	if (blocklyFilePath.isEmpty()) return;
 	QFile file(blocklyFilePath);
@@ -443,7 +443,7 @@ void UAVManage::onCurrentDeviceNameChanged(QString currentName, QString previous
 		arrBlockly = file.readAll();
 		file.close();
 	}
-	qDebug() << "----更新WEB界面" << blocklyFilePath << arrBlockly;
+	qDebug() << "更新WEB界面" << blocklyFilePath << arrBlockly;
 	if(m_pWebSocket) m_pWebSocket->sendTextMessage(arrBlockly);
 	
 	//更新项目工程中选中设备
@@ -463,7 +463,7 @@ void UAVManage::onCurrentDeviceNameChanged(QString currentName, QString previous
 void UAVManage::onDeviceAdd(QString name, QString ip, float x, float y)
 {
 	if (m_qstrCurrentProjectFile.isEmpty()) return;
-	qDebug() << "----设备新增" << name << ip << x << y;
+	qDebug() << "设备新增" << name << ip << x << y;
 	QTextCodec* code = QTextCodec::codecForName(_XMLNameCoding_);
 	std::string filename = code->fromUnicode(m_qstrCurrentProjectFile).data();
 	tinyxml2::XMLDocument doc;
@@ -479,7 +479,7 @@ void UAVManage::onDeviceAdd(QString name, QString ip, float x, float y)
 		QString devicename = temp->Attribute(_AttributeName_);
 		if (devicename == name) {
 			bExist = true;
-			qDebug() << "----新增设备已存在直接更新属性" << name;
+			qDebug() << "新增设备已存在直接更新属性" << name;
 			break;
 		}
 		temp = temp->NextSiblingElement(_ElementDevice_);

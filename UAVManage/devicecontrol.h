@@ -13,6 +13,22 @@
 #include "definesetting.h"
 #include "devicedebug.h"
 
+//无人机当前姿态
+struct _stDeviceCurrentStatus
+{
+	int x;
+	int y;
+	int z;
+	int roll;
+	int pitch;
+	int yaw;
+	int led;
+	int battery;
+	_stDeviceCurrentStatus() {
+		x = y = z = roll = pitch = yaw = led = battery = 0;
+	}
+};
+
 class DeviceControl : public QWidget
 {
 	Q_OBJECT
@@ -32,7 +48,7 @@ public:
 	DeviceDebug* getDeviceDebug();
 	void setStartLocation(float x, float y);
 	QList<float> getStartLocation();
-
+	_stDeviceCurrentStatus getCurrentStatus();
 	/**
 	 * @brief 连接设备
 	 */
@@ -283,4 +299,5 @@ private:
 	DeviceDebug* m_pDebugDialog;
 	//检测心跳定时器
 	QTimer m_timerHeartbeat;
+	_stDeviceCurrentStatus m_deviceStatus;
 };

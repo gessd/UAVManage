@@ -121,6 +121,11 @@ QList<float> DeviceControl::getStartLocation()
 	return list;
 }
 
+_stDeviceCurrentStatus DeviceControl::getCurrentStatus()
+{
+	return m_deviceStatus;
+}
+
 //连接设备
 bool DeviceControl::connectDevice()
 {
@@ -303,7 +308,7 @@ void DeviceControl::hvcbConnectionStatus(const hv::SocketChannelPtr& channel)
 			if (mavlink_msg_heartbeat_encode(_DeviceSYS_ID_, _DeviceCOMP_ID_, &message, &heard) > 0) {
 				QByteArray arrData = mavMessageToBuffer(message);
 				m_pHvTcpClient->send(arrData.data(), arrData.length());
-				qDebug() << time<<"心跳消息" << arrData;
+				//qDebug() << time<<"心跳消息" << arrData;
 			}
 			});
 	}
@@ -317,7 +322,7 @@ void DeviceControl::hvcbReceiveMessage(const hv::SocketChannelPtr& channel, hv::
 	QByteArray arrData((char*)buf->data(), buf->size());
 	if (arrData.isEmpty()) return;
 	QString qstrName = ui.labelDeviceName->text();
-	qDebug() << "收到消息" << _CurrentTime_ << qstrName << channel->peeraddr().c_str() << arrData.toHex().toUpper();
+	qDebug() << "收到消息" << qstrName << channel->peeraddr().c_str() << arrData.toHex().toUpper();
 	QByteArray arrTemp = QString(_DeviceLogPrefix_).toLocal8Bit();
 	if (arrData.contains(arrTemp)) {
 		//日志数据
@@ -376,19 +381,25 @@ void DeviceControl::hvcbReceiveMessage(const hv::SocketChannelPtr& channel, hv::
 			int16_t b = battery.current_battery;
 			//计算剩余电量
 			uint16_t n = (float(v - 9600) / (12600 - 9600)) * 100;
-			n = QTime::currentTime().msec();
 			emit sigBatteryStatus((float)v / 1000, (float)b / 1000, n);
+			m_deviceStatus.battery = n;
 			break;
 		}
 		case MAVLINK_MSG_ID_ATTITUDE:	//姿态角
 			mavlink_attitude_t attitude;
 			mavlink_msg_attitude_decode(&msg, &attitude);
+			m_deviceStatus.roll = attitude.roll;
+			m_deviceStatus.pitch = attitude.pitch;
+			m_deviceStatus.yaw = attitude.yaw;
 			emit sigAttitude(attitude.time_boot_ms, attitude.roll, attitude.pitch, attitude.yaw);
 			break;
 		case MAVLINK_MSG_ID_LOCAL_POSITION_NED: //位置信息
 		{
 			mavlink_local_position_ned_t t;
 			mavlink_msg_local_position_ned_decode(&msg, &t);
+			m_deviceStatus.x = QString::number(t.x, 'f', 3).toInt() * 100;
+			m_deviceStatus.y = QString::number(t.x, 'y', 3).toInt() * 100;
+			m_deviceStatus.z = QString::number(t.x, 'z', 3).toInt() * 100;
 			emit sigLocalPosition(t.time_boot_ms, QString::number(t.x, 'f', 3).toFloat(), QString::number(t.y, 'f', 3).toFloat(), QString::number(t.z, 'f', 3).toFloat());
 			break;
 		}
@@ -414,7 +425,7 @@ void DeviceControl::hvcbWriteComplete(const hv::SocketChannelPtr& channel, hv::B
 	QByteArray arrBuf((char*)buf->data(), buf->size());
 	if (arrBuf.isEmpty()) return;
 	emit sigMessageByte(arrBuf, false);
-	qDebug() << "已发送消息" << ui.labelDeviceName->text() << _CurrentTime_ << channel->peeraddr().c_str() << arrBuf.toHex().toUpper();
+	qDebug() << "已发送消息" << ui.labelDeviceName->text() << channel->peeraddr().c_str() << arrBuf.toHex().toUpper();
 }
 
 QByteArray DeviceControl::mavMessageToBuffer(mavlink_message_t mesage)

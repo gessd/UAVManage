@@ -153,6 +153,9 @@ DeviceManage::DeviceManage(QWidget *parent)
 
 	ui.checkBoxAutoLand->setVisible(false);
 	ui.checkBoxMagnetismStatus->setVisible(false);
+
+	m_timerUpdateStatus.start(1000);
+	connect(&m_timerUpdateStatus, &QTimer::timeout, this, &DeviceManage::onUpdateStatusTo3D);
 }
 
 DeviceManage::~DeviceManage()
@@ -510,12 +513,14 @@ void DeviceManage::on3dNewConnection()
 		m_p3dTcpSocket->close();
 	}
 	m_p3dTcpSocket = m_p3dTcpServer->nextPendingConnection();
+	qDebug() << "三维窗口新连接" << m_p3dTcpSocket;
 	connect(m_p3dTcpSocket, &QTcpSocket::readyRead, [this]() {
 		QByteArray arrData = m_p3dTcpSocket->readAll();
 		qDebug() << "收到3D消息:" << arrData;
 		});
 	connect(m_p3dTcpSocket, &QTcpSocket::disconnected, [this]() {
 		emit sig3DDialogStatus(false);
+		qDebug() << "三维窗口关闭";
 		m_p3dTcpSocket = nullptr;
 		});
 	//发送无人机设备列表
@@ -541,6 +546,38 @@ void DeviceManage::on3dNewConnection()
 	obj3dmsg.insert(_Data_, jsonArr);
 	sendMessageTo3D(obj3dmsg);
 	emit sig3DDialogStatus(true);
+}
+
+void DeviceManage::onUpdateStatusTo3D()
+{
+	QJsonObject obj3dmsg;
+	obj3dmsg.insert(_Ver_, _VerNum_);
+	obj3dmsg.insert(_Tag_, _TabName_);
+	obj3dmsg.insert(_ID_, _3dDeviceLocation);
+	obj3dmsg.insert(_Time_, QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"));
+	QJsonArray jsonArr;
+	for (int i = 0; i < ui.listWidget->count(); i++) {
+		QListWidgetItem* pItem = ui.listWidget->item(i);
+		if (!pItem) continue;
+		QWidget* pWidget = ui.listWidget->itemWidget(pItem);
+		if (!pWidget) continue;
+		DeviceControl* pDevice = dynamic_cast<DeviceControl*>(pWidget);
+		if (!pDevice) continue;
+		_stDeviceCurrentStatus status = pDevice->getCurrentStatus();
+		QJsonObject device;
+		device.insert("name", pDevice->getName());
+		device.insert("x", status.x);
+		device.insert("y", status.y);
+		device.insert("z", status.z);
+		device.insert("pitch", status.pitch);
+		device.insert("pitch", status.pitch);
+		device.insert("roll", status.roll);
+		device.insert("led", status.led);
+		device.insert("battery", status.battery);
+		jsonArr.append(device);
+	}
+	obj3dmsg.insert(_Data_, jsonArr);
+	sendMessageTo3D(obj3dmsg);
 }
 
 DeviceControl* DeviceManage::getCurrentDevice()

@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
 	}
 	qDebug() << "程序启动";
 	//注册MessageHandler
-	//qInstallMessageHandler(outputMessage);
+	qInstallMessageHandler(outputMessage);
 	//添加翻译文件，用于界面控件中的英文翻译
 	QTranslator translator;
 	if (translator.load(":/res/translations/qt_zh_CN.qm")) {
