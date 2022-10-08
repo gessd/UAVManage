@@ -19,13 +19,14 @@ struct _stDeviceCurrentStatus
 	int x;
 	int y;
 	int z;
-	int roll;
-	int pitch;
-	int yaw;
+	float roll;
+	float pitch;
+	float yaw;
 	int led;
 	int battery;
 	_stDeviceCurrentStatus() {
-		x = y = z = roll = pitch = yaw = led = battery = 0;
+		x = y = z = led = battery = 0;
+		roll = pitch = yaw = 0.0;
 	}
 };
 

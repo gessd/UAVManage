@@ -397,9 +397,9 @@ void DeviceControl::hvcbReceiveMessage(const hv::SocketChannelPtr& channel, hv::
 		{
 			mavlink_local_position_ned_t t;
 			mavlink_msg_local_position_ned_decode(&msg, &t);
-			m_deviceStatus.x = QString::number(t.x, 'f', 3).toInt() * 100;
-			m_deviceStatus.y = QString::number(t.x, 'y', 3).toInt() * 100;
-			m_deviceStatus.z = QString::number(t.x, 'z', 3).toInt() * 100;
+			m_deviceStatus.x = QString::number(t.x, 'f', 3).toFloat() * 10;
+			m_deviceStatus.y = QString::number(t.y, 'f', 3).toFloat() * 10;
+			m_deviceStatus.z = QString::number(t.z, 'f', 3).toFloat() * 10;
 			emit sigLocalPosition(t.time_boot_ms, QString::number(t.x, 'f', 3).toFloat(), QString::number(t.y, 'f', 3).toFloat(), QString::number(t.z, 'f', 3).toFloat());
 			break;
 		}

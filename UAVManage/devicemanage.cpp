@@ -596,6 +596,9 @@ void DeviceManage::sendMessageTo3D(QJsonObject json3d)
 	QJsonDocument document(json3d);
 	QByteArray msg3d = document.toJson(QJsonDocument::Compact);
 	qDebug() << "3dmessage" << json3d;
+	//消息头部增加标识#，尾部增加标识*
+	msg3d.prepend("#");
+	msg3d.append("*");
 	m_p3dTcpSocket->write(msg3d);
 }
 
