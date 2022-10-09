@@ -38,6 +38,7 @@ DeviceManage::DeviceManage(QWidget *parent)
 
 	//添加右键菜单
 	m_pMenu = new QMenu(this);
+	QAction* pActionParam = new QAction(tr("修改"), this);
 	QAction* pActionResetName = new QAction(tr("重命名"), this);
 	QAction* pActionResetIP = new QAction(tr("修改IP"), this);
 	QAction* pActionDicconnect = new QAction(tr("连接/断开"), this);
@@ -45,8 +46,9 @@ DeviceManage::DeviceManage(QWidget *parent)
 	QAction* pLand = new QAction(tr("降落"), this);
 	QAction* pStop = new QAction(tr("急停"), this);
 	QAction* pDebug = new QAction(tr("调试"), this);
-	m_pMenu->addAction(pActionResetName);
-	m_pMenu->addAction(pActionResetIP);
+	m_pMenu->addAction(pActionParam);
+	//m_pMenu->addAction(pActionResetName);
+	//m_pMenu->addAction(pActionResetIP);
 	m_pMenu->addAction(pActionDicconnect);
 	m_pMenu->addSeparator();
 	m_pMenu->addAction(pFlyTo);
@@ -55,6 +57,55 @@ DeviceManage::DeviceManage(QWidget *parent)
 	m_pMenu->addSeparator();
 	m_pMenu->addAction(pDebug);
 	//菜单响应处理
+	connect(pActionParam, &QAction::triggered, [this](bool checked) {
+		DeviceControl* pControl = getCurrentDevice();
+		if (!pControl) return;
+		QString qstrName = pControl->getName();
+		AddDeviceDialog dialog(qstrName, this);
+		dialog.setParam(qstrName, pControl->getIP(), pControl->getX(), pControl->getY());
+		if (QDialog::Accepted != dialog.exec())return;
+		QString qstrNewName = dialog.getName();
+		QString qstrNewIP = dialog.getIP();
+		float fNewX = dialog.getX();
+		float fNewY = dialog.getY();
+		if (qstrNewName != qstrName) {
+			//修改设备名称
+			if (!isRepetitionDevice(qstrNewName, "", 0, 0).isEmpty()) {
+				QMessageBox::warning(this, tr("提示"), tr("无法修改，名称重复"));
+				return;
+			}
+			qDebug() << "修改设备名称" << qstrName << qstrNewName;
+			pControl->setName(qstrNewName);
+			emit deviceRenameFinished(qstrNewName, qstrName);
+			if (m_p3dTcpSocket) {
+				QJsonObject obj3dmsg;
+				obj3dmsg.insert(_Ver_, _VerNum_);
+				obj3dmsg.insert(_Tag_, _TabName_);
+				obj3dmsg.insert(_ID_, _3dDeviceRename);
+				obj3dmsg.insert(_Time_, QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"));
+				QJsonObject data;
+				data.insert("oldName", qstrName);
+				data.insert("newName", qstrNewName);
+				obj3dmsg.insert(_Data_, data);
+				sendMessageTo3D(obj3dmsg);
+			}
+		}
+		if (qstrNewIP != pControl->getIP()) {
+			//修改设备IP
+			if (!isRepetitionDevice("", qstrNewIP, 0, 0).isEmpty()) {
+				QMessageBox::warning(this, tr("提示"), tr("无法修改，设备地址重复"));
+				return;
+			}
+			qDebug() << "修改设备IP" << qstrNewName << qstrNewIP;
+			pControl->setIp(qstrNewIP);
+			emit deviceResetIp(pControl->getName(), qstrNewIP);
+		}
+		if (fNewX != pControl->getX() || fNewY != pControl->getY()) {
+			//修改设备初始位置
+			qDebug() << "修改初始位置" << qstrNewName << fNewX << fNewY;
+			pControl->setStartLocation(fNewX, fNewY);
+		}
+		});
 	connect(pActionResetName, &QAction::triggered, [this](bool checked) {
 		DeviceControl* pControl = getCurrentDevice();
 		if (!pControl) return;

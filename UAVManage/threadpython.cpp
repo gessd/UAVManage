@@ -2,6 +2,7 @@
 #include <QApplication>
 #include <QDebug>
 #include <QFile>
+#include <QDir>
 #include <QMessageBox>
 
 QVector<NavWayPointData> g_waypointData;
@@ -290,6 +291,8 @@ bool ThreadPython::compilePythonFile(QString qstrFile)
 	//设置python运行环境目录
 	QString qstrPythonRunPath = QApplication::applicationDirPath() + _PyDllPath_;
 	//TODO检查python必要文件是否存在，防止执行python接口引起程序崩溃
+	QDir dirPython(qstrPythonRunPath);
+	if (false == dirPython.exists()) return false;
 	std::wstring wstrpath = qstrPythonRunPath.toStdWString();
 	Py_SetPythonHome((wchar_t*)wstrpath.c_str());
 	if (!QFile::exists(QApplication::applicationDirPath() + _PyNeceFie_)) return false;
