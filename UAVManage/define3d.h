@@ -11,13 +11,17 @@
 
 enum _MsgID {
 	_3dDeviceList = 101,
-	_3dDeviceAdd,
-	_3dDeviceRemove,
-	_3dDeviceRename,
-	_3dDeviceLocation,
-	_3dDeviceWaypoint,
-	_3dDeviceBattery,
-	_3dDeviceMusicPath,
+	_3dDeviceAdd = 102,
+	_3dDeviceRemove = 103,
+	_3dDeviceRename = 104,
+	_3dDeviceLocation = 105,
+	_3dDeviceWaypoint = 106,
+	_3dDeviceBattery = 107,
+	_3dDeviceMusicPath = 108,
 	_3dDeviceAction = 201,
-	_3dDeviceTime
+	_3dDeviceTime = 202
 };
+
+//三维消息头部尾部字符
+#define _MsgHead '*'
+#define _MsgTail '#'

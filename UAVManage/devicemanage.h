@@ -171,6 +171,13 @@ protected:
 private slots:
 	void onDeviceConrolFinished(QString text, int res, QString explain);
 	void on3dNewConnection();
+	/**
+	 * @brief 定时处理三维消息发送记录
+	 */
+	void onTimeout3DMessage();
+	/**
+	 * @brief 定时发送设备状态到三维
+	 */
 	void onUpdateStatusTo3D();
 private:
 	/**
@@ -182,6 +189,10 @@ private:
 	 * @brief 通过TCP向三维发送消息
 	 */
 	void sendMessageTo3D(QJsonObject json3d);
+	/**
+	 * @@brief 处理接收的三维消息
+	 */
+	void analyzeMessageFrom3D(QByteArray data);
 private:
 	Ui::DeviceManage ui;
 	//设备菜单
@@ -189,6 +200,10 @@ private:
 	//三维模拟通讯使用
 	QTcpServer* m_p3dTcpServer;
 	QTcpSocket* m_p3dTcpSocket;
+	//三维消息记录，用于发送失败重发
+	QMap<int, QJsonObject> m_map3DMsgRecord;
+	QTimer m_timerMessage3D;
 	//定时发送无人机姿态数据到三维
 	QTimer m_timerUpdateStatus;
+	
 };

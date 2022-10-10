@@ -205,8 +205,8 @@ DeviceManage::DeviceManage(QWidget *parent)
 	ui.checkBoxAutoLand->setVisible(false);
 	ui.checkBoxMagnetismStatus->setVisible(false);
 
-	m_timerUpdateStatus.start(1000);
 	connect(&m_timerUpdateStatus, &QTimer::timeout, this, &DeviceManage::onUpdateStatusTo3D);
+	connect(&m_timerMessage3D, &QTimer::timeout, this, &DeviceManage::onTimeout3DMessage);
 }
 
 DeviceManage::~DeviceManage()
@@ -568,12 +568,23 @@ void DeviceManage::on3dNewConnection()
 	connect(m_p3dTcpSocket, &QTcpSocket::readyRead, [this]() {
 		QByteArray arrData = m_p3dTcpSocket->readAll();
 		qDebug() << "收到3D消息:" << arrData;
+		//解析三维消息并把发送记录中的消息删除
+		QList<QByteArray> list = arrData.split(_MsgTail);
+		foreach (QByteArray data, list){
+			data = data.replace(_MsgHead, "");
+			analyzeMessageFrom3D(data);
+		}
 		});
 	connect(m_p3dTcpSocket, &QTcpSocket::disconnected, [this]() {
 		emit sig3DDialogStatus(false);
 		qDebug() << "三维窗口关闭";
 		m_p3dTcpSocket = nullptr;
+		m_map3DMsgRecord.clear();
+		if (m_timerUpdateStatus.isActive()) m_timerUpdateStatus.stop();
+		if (m_timerMessage3D.isActive()) m_timerMessage3D.stop();
 		});
+	if (!m_timerUpdateStatus.isActive()) m_timerUpdateStatus.start(1000);
+	if (!m_timerMessage3D.isActive()) m_timerMessage3D.start(10 * 1000);
 	//发送无人机设备列表
 	QJsonObject obj3dmsg;
 	obj3dmsg.insert(_Ver_, _VerNum_);
@@ -597,6 +608,17 @@ void DeviceManage::on3dNewConnection()
 	obj3dmsg.insert(_Data_, jsonArr);
 	sendMessageTo3D(obj3dmsg);
 	emit sig3DDialogStatus(true);
+}
+
+void DeviceManage::onTimeout3DMessage()
+{
+	QList<int> listKey = m_map3DMsgRecord.keys();
+	if (listKey.isEmpty())  return;
+	qDebug() << "重发三维消息";
+	foreach(int id, listKey) {
+		QJsonObject obj = m_map3DMsgRecord[id];
+		sendMessageTo3D(obj);
+	}
 }
 
 void DeviceManage::onUpdateStatusTo3D()
@@ -625,6 +647,15 @@ void DeviceManage::onUpdateStatusTo3D()
 		device.insert("roll", status.roll);
 		device.insert("led", status.led);
 		device.insert("battery", status.battery);
+		//TODO 三维测试用，便于更新无人机位置
+		if (0 == i) {
+			int z = QDateTime::currentDateTime().toString("ss").toInt();
+			int x = z / 10;
+			int y = z;
+			device.insert("x", x);
+			device.insert("y", y);
+			device.insert("z", z);
+		}
 		jsonArr.append(device);
 	}
 	obj3dmsg.insert(_Data_, jsonArr);
@@ -644,13 +675,32 @@ DeviceControl* DeviceManage::getCurrentDevice()
 void DeviceManage::sendMessageTo3D(QJsonObject json3d)
 {
 	if (nullptr == m_p3dTcpSocket) return;
+	int id = json3d.value(_ID_).toInt();
+	if (id != _3dDeviceLocation) {
+		//使用MAP模式，相同消息只保留最后一条
+		m_map3DMsgRecord.insert(id, json3d);
+	}
 	QJsonDocument document(json3d);
 	QByteArray msg3d = document.toJson(QJsonDocument::Compact);
 	qDebug() << "3dmessage" << json3d;
 	//消息头部增加标识#，尾部增加标识*
-	msg3d.prepend("#");
-	msg3d.append("*");
+	msg3d.prepend(_MsgHead);
+	msg3d.append(_MsgTail);
 	m_p3dTcpSocket->write(msg3d);
+}
+
+void DeviceManage::analyzeMessageFrom3D(QByteArray data)
+{
+	QJsonParseError jsonError;
+	QJsonDocument jsonDoc = QJsonDocument::fromJson(data, &jsonError);
+	if (QJsonParseError::NoError != jsonError.error || jsonDoc.isEmpty() || !jsonDoc.isObject()) {
+		return;
+	}
+	QJsonObject jsonObj = jsonDoc.object();
+	int id = jsonObj.value(_ID_).toInt();
+	if (m_map3DMsgRecord.contains(id)) {
+		m_map3DMsgRecord.remove(id);
+	}
 }
 
 void DeviceManage::onDeviceConrolFinished(QString text, int res, QString explain)
