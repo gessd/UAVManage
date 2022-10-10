@@ -91,6 +91,10 @@ private slots:
      */
     void onDeviceResetIp(QString name, QString ip);
     /**
+     * @brief 修改设备初始位置
+     */
+    void onDeviceResetLocation(QString name, long x, long y);
+    /**
     * @brief 设备起飞指令下发完成
     * @param 起飞|降落
     */

@@ -66,12 +66,12 @@ DeviceManage::DeviceManage(QWidget *parent)
 		if (QDialog::Accepted != dialog.exec())return;
 		QString qstrNewName = dialog.getName();
 		QString qstrNewIP = dialog.getIP();
-		float fNewX = dialog.getX();
-		float fNewY = dialog.getY();
+		long nNewX = dialog.getX();
+		long nNewY = dialog.getY();
 		if (qstrNewName != qstrName) {
 			//修改设备名称
-			if (!isRepetitionDevice(qstrNewName, "", 0, 0).isEmpty()) {
-				QMessageBox::warning(this, tr("提示"), tr("无法修改，名称重复"));
+			if (!isRepetitionDevice(qstrNewName, "", 0, 0, "100").isEmpty()) {
+				QMessageBox::warning(this, tr("提示"), tr("设备名称重复"));
 				return;
 			}
 			qDebug() << "修改设备名称" << qstrName << qstrNewName;
@@ -92,18 +92,23 @@ DeviceManage::DeviceManage(QWidget *parent)
 		}
 		if (qstrNewIP != pControl->getIP()) {
 			//修改设备IP
-			if (!isRepetitionDevice("", qstrNewIP, 0, 0).isEmpty()) {
-				QMessageBox::warning(this, tr("提示"), tr("无法修改，设备地址重复"));
+			if (!isRepetitionDevice("", qstrNewIP, 0, 0, "010").isEmpty()) {
+				QMessageBox::warning(this, tr("提示"), tr("设备地址重复"));
 				return;
 			}
 			qDebug() << "修改设备IP" << qstrNewName << qstrNewIP;
 			pControl->setIp(qstrNewIP);
-			emit deviceResetIp(pControl->getName(), qstrNewIP);
+			emit deviceResetIp(qstrNewName, qstrNewIP);
 		}
-		if (fNewX != pControl->getX() || fNewY != pControl->getY()) {
+		if (nNewX != pControl->getX() || nNewY != pControl->getY()) {
 			//修改设备初始位置
-			qDebug() << "修改初始位置" << qstrNewName << fNewX << fNewY;
-			pControl->setStartLocation(fNewX, fNewY);
+			if (!isRepetitionDevice("", "", nNewX, nNewY, "001").isEmpty()) {
+				QMessageBox::warning(this, tr("提示"), tr("初始位置重复"));
+				return;
+			}
+			qDebug() << "修改初始位置" << qstrNewName << nNewX << nNewY;
+			pControl->setStartLocation(nNewX, nNewY);
+			emit deviceResetLocation(qstrNewName, nNewX, nNewY);
 		}
 		});
 	connect(pActionResetName, &QAction::triggered, [this](bool checked) {
@@ -113,7 +118,7 @@ DeviceManage::DeviceManage(QWidget *parent)
 		QString qstrNewName = QInputDialog::getText(this, tr("重命名"), tr("请输入新名称"), QLineEdit::Normal, qstrOldName);
 		if (qstrNewName.isEmpty()) return;
 		if (qstrOldName == qstrNewName) return;
-		if (!isRepetitionDevice(qstrNewName, "",0,0).isEmpty()) {
+		if (!isRepetitionDevice(qstrNewName, "",0,0, "100").isEmpty()) {
 			QMessageBox::warning(this, tr("提示"), tr("无法修改，名称重复"));
 			return;
 		}
@@ -139,7 +144,7 @@ DeviceManage::DeviceManage(QWidget *parent)
 		QString qstrNewIP = QInputDialog::getText(this, tr("IP"), tr("请输入设备IP"), QLineEdit::Normal, pControl->getIP());
 		if (qstrNewIP.isEmpty()) return;
 		if (pControl->getIP() == qstrNewIP) return;
-		if (!isRepetitionDevice("", qstrNewIP, 0, 0).isEmpty()) {
+		if (!isRepetitionDevice("", qstrNewIP, 0, 0, "010").isEmpty()) {
 			QMessageBox::warning(this, tr("提示"), tr("无法修改，设备地址重复"));
 			return;
 		}
@@ -223,11 +228,11 @@ DeviceManage::~DeviceManage()
 	}
 }
 
-QString DeviceManage::addDevice(QString qstrName, QString ip, float x, float y)
+QString DeviceManage::addDevice(QString qstrName, QString ip, long x, long y)
 {
 	if (qstrName.isEmpty()) return tr("设备名称不能为空");
 	//判断设备是否重复
-	QString temp = isRepetitionDevice(qstrName, ip, x, y, true);
+	QString temp = isRepetitionDevice(qstrName, ip, x, y, "111");
 	if (!temp.isEmpty())  return temp;
 
 	QListWidgetItem* item = new QListWidgetItem();
@@ -365,9 +370,9 @@ QString DeviceManage::getNewDefaultName()
 }
 
 //设备名称是否重复
-QString DeviceManage::isRepetitionDevice(QString qstrName, QString ip, float x, float y, bool location)
+QString DeviceManage::isRepetitionDevice(QString qstrName, QString ip, long x, long y, QString type)
 {
-	location = false;
+	//location = false;
 	if (0 >= ui.listWidget->count()) return false;
 	for (int i = 0; i < ui.listWidget->count(); i++) {
 		QListWidgetItem* pItem = ui.listWidget->item(i);
@@ -376,13 +381,17 @@ QString DeviceManage::isRepetitionDevice(QString qstrName, QString ip, float x, 
 		if (!pWidget) continue;
 		DeviceControl* pDevice = dynamic_cast<DeviceControl*>(pWidget);
 		if (!pDevice) continue;
-		if (!qstrName.isEmpty()) {
+		QString qstrRep = type;
+		while (qstrRep.length() < 3) {
+			qstrRep.prepend("0");
+		}
+		if (!qstrName.isEmpty() && 0 != qstrRep.at(0)) {
 			if (qstrName == pDevice->getName()) return tr("设备名称重复");
 		}
-		if (!ip.isEmpty()) {
+		if (!ip.isEmpty() && 0 != qstrRep.at(1)) {
 			if (ip == pDevice->getIP()) return tr("设备IP重复");
 		}
-		if (location) {
+		if (0 != qstrRep.at(2)) {
 			if (x == pDevice->getX() && y == pDevice->getY()) return tr("设备初始位置重复");
 		}
 	}
@@ -614,7 +623,7 @@ void DeviceManage::onTimeout3DMessage()
 {
 	QList<int> listKey = m_map3DMsgRecord.keys();
 	if (listKey.isEmpty())  return;
-	qDebug() << "重发三维消息";
+	qDebug() << "重发三维消息" << listKey;
 	foreach(int id, listKey) {
 		QJsonObject obj = m_map3DMsgRecord[id];
 		sendMessageTo3D(obj);

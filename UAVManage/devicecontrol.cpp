@@ -83,24 +83,24 @@ void DeviceControl::setIp(QString ip)
 	connectDevice();
 }
 
-float DeviceControl::getX()
+long DeviceControl::getX()
 {
-	return m_fStartX;
+	return m_nStartX;
 }
 
-void DeviceControl::setX(float x)
+void DeviceControl::setX(long x)
 {
-	m_fStartX = x;
+	m_nStartX = x;
 }
 
-float DeviceControl::getY()
+long DeviceControl::getY()
 {
-	return m_fStartY;
+	return m_nStartY;
 }
 
-void DeviceControl::setY(float y)
+void DeviceControl::setY(long y)
 {
-	m_fStartY = y;
+	m_nStartY = y;
 }
 
 DeviceDebug* DeviceControl::getDeviceDebug()
@@ -108,15 +108,15 @@ DeviceDebug* DeviceControl::getDeviceDebug()
 	return m_pDebugDialog;
 }
 
-void DeviceControl::setStartLocation(float x, float y)
+void DeviceControl::setStartLocation(long x, long y)
 {
 	setX(x);
 	setY(y);
 }
 
-QList<float> DeviceControl::getStartLocation()
+QList<long> DeviceControl::getStartLocation()
 {
-	QList<float> list;
+	QList<long> list;
 	list << getX() << getY();
 	return list;
 }

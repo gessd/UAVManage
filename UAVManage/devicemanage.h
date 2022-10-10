@@ -50,7 +50,7 @@ public:
 	* @param [in] y 初始位置
 	* @return 错误信息,成功为空
 	*/
-	QString addDevice(QString qstrName, QString ip, float x, float y);
+	QString addDevice(QString qstrName, QString ip, long x, long y);
 	/**
 	* @brief 删除设备
 	*/
@@ -83,9 +83,8 @@ public:
 	* @param [in] 坐标X
 	* @param [in] 坐标Y
 	* @param [in] 是否判断坐标重复
-	* @return 如果设备属于有冲突则返回TRUE
 	*/
-	QString isRepetitionDevice(QString qstrName, QString ip, float x, float y, bool location = false);
+	QString isRepetitionDevice(QString qstrName, QString ip, long x, long y, QString type);
 	/**
 	 * @brief 控制所有设备执行
 	 */
@@ -141,6 +140,11 @@ signals:
 	 * @param IP地址
 	 */
 	void deviceResetIp(QString qstrName, QString ip);
+	/**
+	 * @brief 设备初始位置被修改
+	 * @param 设备名
+	 */
+	void deviceResetLocation(QString name, long x, long y);
 	/**
 	 * @brief 当前选中设备改变
 	 * @param 当前选中设备

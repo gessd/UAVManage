@@ -43,11 +43,12 @@ UAVManage::UAVManage(QWidget *parent)
 	ui.toolBar->setEnabled(false);
 	m_pDeviceManage->setMaximumWidth(200);
     ui.gridLayoutMain->addWidget(m_pDeviceManage, 0,1);
-	connect(m_pDeviceManage, SIGNAL(currentDeviceNameChanged(QString, QString)), this, SLOT(onCurrentDeviceNameChanged(QString, QString)));
-	connect(m_pDeviceManage, SIGNAL(deviceAddFinished(QString, QString, float, float)), this, SLOT(onDeviceAdd(QString, QString, float, float)));
-	connect(m_pDeviceManage, SIGNAL(deviceRemoveFinished(QString)), this, SLOT(onDeviceRemove(QString)));
-	connect(m_pDeviceManage, SIGNAL(deviceRenameFinished(QString, QString)), this, SLOT(onDeviceRename(QString, QString)));
-	connect(m_pDeviceManage, SIGNAL(deviceResetIp(QString, QString)), this, SLOT(onDeviceResetIp(QString, QString)));
+	connect(m_pDeviceManage, &DeviceManage::currentDeviceNameChanged, this, &UAVManage::onCurrentDeviceNameChanged);
+	connect(m_pDeviceManage, &DeviceManage::deviceAddFinished, this, &UAVManage::onDeviceAdd);
+	connect(m_pDeviceManage, &DeviceManage::deviceRemoveFinished, this, &UAVManage::onDeviceRemove);
+	connect(m_pDeviceManage, &DeviceManage::deviceRenameFinished, this, &UAVManage::onDeviceRename);
+	connect(m_pDeviceManage, &DeviceManage::deviceResetIp, this, &UAVManage::onDeviceResetIp);
+	connect(m_pDeviceManage, &DeviceManage::deviceResetLocation, this, &UAVManage::onDeviceResetLocation);
 	connect(m_pDeviceManage, &DeviceManage::sigWaypointProcess, this, &UAVManage::onWaypointProcess);
 	connect(m_pDeviceManage, &DeviceManage::sigTakeoffFinished, this, &UAVManage::onDeviceTakeoffFinished);
 	connect(m_pDeviceManage, &DeviceManage::sig3DDialogStatus, this, &UAVManage::on3DDialogStauts);
@@ -250,8 +251,8 @@ void UAVManage::onOpenProject(QString qstrFile)
 		return;
 	}
 	//读取场地大小
-	float x = place->FloatAttribute(_AttributeX_);
-	float y = place->FloatAttribute(_AttributeY_);
+	long x = place->Int64Attribute(_AttributeX_);
+	long y = place->Int64Attribute(_AttributeY_);
 	QFileInfo infoProject(qstrFile);
 	QString qstrMusicFilePath = infoProject.path() + _ProjectDirName_ + place->Attribute(_ElementMusic_);
 	QString qstrCurrnetName = place->Attribute(_AttributeName_);
@@ -265,11 +266,11 @@ void UAVManage::onOpenProject(QString qstrFile)
 		//遍历无人机属性
 		QString devicename = device->Attribute(_AttributeName_);
 		QString ip = device->Attribute(_AttributeIP_);
-		float dx = device->FloatAttribute(_AttributeX_);
-		float dy = device->FloatAttribute(_AttributeY_);
+		long x = device->Int64Attribute(_AttributeX_);
+		long y = device->Int64Attribute(_AttributeY_);
 		device = device->NextSiblingElement(_ElementDevice_);
 		if (m_pDeviceManage) {
-			QString error = m_pDeviceManage->addDevice(devicename, ip, dx, dy);
+			QString error = m_pDeviceManage->addDevice(devicename, ip, x, y);
 			if (!error.isEmpty()) {
 				_ShowErrorMessage(tr("无法添加设备") + devicename + error);
 			}
@@ -592,6 +593,33 @@ void UAVManage::onDeviceResetIp(QString name, QString ip)
 			continue;
 		}
 		device->SetAttribute(_AttributeIP_, ip.toUtf8().data());
+		break;
+	}
+	doc.SaveFile(filename.c_str());
+	if (error != tinyxml2::XMLError::XML_SUCCESS) return;
+}
+
+void UAVManage::onDeviceResetLocation(QString name, long x, long y)
+{
+	if (m_qstrCurrentProjectFile.isEmpty()) return;
+	QTextCodec* code = QTextCodec::codecForName(_XMLNameCoding_);
+	std::string filename = code->fromUnicode(m_qstrCurrentProjectFile).data();
+	tinyxml2::XMLDocument doc;
+	tinyxml2::XMLError error = doc.LoadFile(filename.c_str());
+	if (error != tinyxml2::XMLError::XML_SUCCESS) return;
+	tinyxml2::XMLElement* root = doc.RootElement();
+	if (!root) return;
+	tinyxml2::XMLElement* device = root->FirstChildElement(_ElementDevice_);
+	if (!device) return;
+	while (device) {
+		//遍历无人机属性
+		QString devicename = device->Attribute(_AttributeName_);
+		if (devicename != name) {
+			device = device->NextSiblingElement(_ElementDevice_);
+			continue;
+		}
+		device->SetAttribute(_AttributeX_, x);
+		device->SetAttribute(_AttributeY_, y);
 		break;
 	}
 	doc.SaveFile(filename.c_str());

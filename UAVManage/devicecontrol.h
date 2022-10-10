@@ -42,13 +42,13 @@ public:
 	void setName(QString name);
 	QString getIP();
 	void setIp(QString ip);
-	float getX();
-	void setX(float x);
-	float getY();
-	void setY(float y);
+	long getX();
+	void setX(long x);
+	long getY();
+	void setY(long y);
 	DeviceDebug* getDeviceDebug();
-	void setStartLocation(float x, float y);
-	QList<float> getStartLocation();
+	void setStartLocation(long x, long y);
+	QList<long> getStartLocation();
 	_stDeviceCurrentStatus getCurrentStatus();
 	/**
 	 * @brief 连接设备
@@ -292,8 +292,8 @@ private:
 	hv::TcpClient* m_pHvTcpClient;
 	QMutex m_mutexMavMessageToBurrer;
 	bool m_bHeartbeatEnable;
-	float m_fStartX;
-	float m_fStartY;
+	long m_nStartX;
+	long m_nStartY;
 	//航点下发中
 	bool m_bWaypointSending;
 	QVector<NavWayPointData> m_currentWaypointData;

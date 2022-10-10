@@ -44,6 +44,8 @@ void outputMessage(QtMsgType type, const QMessageLogContext& context, const QStr
 int main(int argc, char *argv[])
 {
 	QtSingleApplication a("myapp_id", argc, argv);
+	//注册MessageHandler
+	qInstallMessageHandler(outputMessage);
 	if (a.isRunning())  //判断实例是否已经运行
 	{
 		qDebug() << "程序已运行";
@@ -51,8 +53,6 @@ int main(int argc, char *argv[])
 		return EXIT_SUCCESS;
 	}
 	qDebug() << "程序启动";
-	//注册MessageHandler
-	qInstallMessageHandler(outputMessage);
 	//添加翻译文件，用于界面控件中的英文翻译
 	QTranslator translator;
 	if (translator.load(":/res/translations/qt_zh_CN.qm")) {

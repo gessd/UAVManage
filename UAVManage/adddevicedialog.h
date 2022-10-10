@@ -14,11 +14,11 @@ public:
 	QString getName() { return ui.lineEditName->text().trimmed(); }
 	QString getIP() { return ui.lineEditIP->text().trimmed(); }
 	void setIp(QString ip) { ui.lineEditIP->setText(ip); };
-	float getX() { return ui.lineEditX->text().trimmed().toFloat(); }
-	void setX(float x) { ui.lineEditX->setText(QString::number(x, 'f', 2)); }
-	float getY() { return ui.lineEditY->text().trimmed().toFloat(); }
-	void setY(float y) { ui.lineEditY->setText(QString::number(y, 'f', 2)); }
-	void setParam(QString name, QString ip, float x, float y) {
+	long getX() { return ui.lineEditX->text().trimmed().toLong(); }
+	void setX(long x) { ui.lineEditX->setText(QString::number(x)); }
+	long getY() { return ui.lineEditY->text().trimmed().toLong(); }
+	void setY(long y) { ui.lineEditY->setText(QString::number(y)); }
+	void setParam(QString name, QString ip, long x, long y) {
 		setName(name);
 		setIp(ip);
 		setX(x);
