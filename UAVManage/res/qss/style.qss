@@ -19,6 +19,11 @@ QPushButton:hover,QToolButton:hover{
 QPushButton:pressed,QToolButton:pressed{
     background:rgb(140,140,140);
 }
+QDialogButtonBox QPushButton{
+	min-height:30px;
+	min-width:100px;
+}
+
 QToolBar{
 	border:0px;
 	border-radius:0px;
