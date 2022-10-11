@@ -483,34 +483,13 @@ QString DeviceManage::sendWaypoint(QString name, QVector<NavWayPointData> data, 
 		if (name != pDevice->getName()) continue;
 		//舞步前添加起始位置
 		NavWayPointData startLocation;
-		startLocation.x = pDevice->getX() * 1000;
-		startLocation.y = pDevice->getX() * 1000;
+		startLocation.x = pDevice->getX();
+		startLocation.y = pDevice->getY();
 		startLocation.commandID = 31004;
 		data.prepend(startLocation);
 
-		if (m_p3dTcpSocket) {
-			QJsonObject obj3dmsg;
-			obj3dmsg.insert(_Ver_, _VerNum_);
-			obj3dmsg.insert(_Tag_, _TabName_);
-			obj3dmsg.insert(_ID_, _3dDeviceWaypoint);
-			obj3dmsg.insert(_Time_, QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"));
-			QJsonObject objDevice;
-			objDevice.insert("name", name);
-			QJsonArray arrWaypoint;
-			for (int i = 0; i < data.count(); i++) {
-				QList<QVariant> value;
-				value << data.at(i).param1 << data.at(i).param2 << data.at(i).param3 << data.at(i).param4 
-					<< data.at(i).x << data.at(i).y << data.at(i).z 
-					<< data.at(i).commandID;
-				arrWaypoint.append(QJsonArray::fromVariantList(value));
-			}
-			objDevice.insert("list", arrWaypoint);
-			QJsonArray arrData;
-			arrData.append(objDevice);
-			obj3dmsg.insert(_Data_, arrData);
-			sendMessageTo3D(obj3dmsg);
-		}
 		if (upload) {
+			//上传航点到飞控
 			int status = pDevice->DeviceMavWaypointStart(data);
 			if (_DeviceStatus::DeviceDataSucceed != status) return Utility::waypointMessgeFromStatus(status);
 		}
@@ -531,7 +510,6 @@ void DeviceManage::setUpdateWaypointTime(int second)
 
 void DeviceManage::setCurrentPlayeState(qint8 state)
 {
-	return;
 	QJsonObject obj3dmsg;
 	obj3dmsg.insert(_Ver_, _VerNum_);
 	obj3dmsg.insert(_Tag_, _TabName_);
@@ -550,6 +528,67 @@ void DeviceManage::setCurrentMusicPath(QString filePath)
 	obj3dmsg.insert(_ID_, _3dDeviceMusicPath);
 	obj3dmsg.insert(_Time_, QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"));
 	obj3dmsg.insert(_Data_, filePath);
+	sendMessageTo3D(obj3dmsg);
+}
+
+void DeviceManage::sendWaypointTo3D(QMap<QString, QVector<NavWayPointData>> map)
+{
+	qDebug() << "发送航点列表到三维界面";
+	if (!m_p3dTcpSocket) return;
+	QStringList listNmae = map.keys();
+	QJsonObject obj3dmsg;
+	obj3dmsg.insert(_Ver_, _VerNum_);
+	obj3dmsg.insert(_Tag_, _TabName_);
+	obj3dmsg.insert(_ID_, _3dDeviceWaypoint);
+	obj3dmsg.insert(_Time_, QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"));
+	QJsonArray jsonData;
+
+	
+	foreach(QString name, listNmae) {
+		QVector<NavWayPointData> data = map[name];
+		QJsonObject objDevice;
+		objDevice.insert("name", name);
+		QJsonArray arrWaypoint;
+
+		//无人机航点预设值
+		//TODO 暂时定义默认飞行速度
+		int speed = 60;
+		int timesum = 0;
+		int lastX = 0;
+		int lastY = 0;
+		int lastZ = 0;
+
+		for (int i = 0; i < data.count(); i++) {
+			NavWayPointData waypoint = data.at(i);
+			if (31000 == waypoint.commandID) {
+				//设置飞行速度
+				speed = waypoint.param1;
+				if (speed <= 0) speed = 60;
+			}
+			//TODO 非航点信息暂时不处理
+			if(16 != waypoint.commandID) continue;
+			int x = waypoint.x / 1000;
+			int y = waypoint.y / 1000;
+			int z = waypoint.z;
+			//计算空间点距离
+			double d = getDistance(lastX, lastY, lastZ, x, y, z);
+			//计算飞行时间 时间使用毫秒单位
+			int time = d / speed * 1000;
+			if (16 == waypoint.commandID && waypoint.param1 > 0) {
+				time = time + waypoint.param1 * 1000;
+			}
+			timesum += time;
+			QList<QVariant> value;
+			value << timesum << 20 << 0 << 0 << x << y << z << 16;
+			arrWaypoint.append(QJsonArray::fromVariantList(value));
+			lastX = x;
+			lastY = y;
+			lastZ = z;
+		}
+		objDevice.insert("list", arrWaypoint);
+		jsonData.append(objDevice);
+	}
+	obj3dmsg.insert(_Data_, jsonData);
 	sendMessageTo3D(obj3dmsg);
 }
 
@@ -632,6 +671,7 @@ void DeviceManage::onTimeout3DMessage()
 
 void DeviceManage::onUpdateStatusTo3D()
 {
+	return;
 	QJsonObject obj3dmsg;
 	obj3dmsg.insert(_Ver_, _VerNum_);
 	obj3dmsg.insert(_Tag_, _TabName_);
@@ -710,6 +750,12 @@ void DeviceManage::analyzeMessageFrom3D(QByteArray data)
 	if (m_map3DMsgRecord.contains(id)) {
 		m_map3DMsgRecord.remove(id);
 	}
+}
+
+double DeviceManage::getDistance(int x1, int y1, int z1, int x2, int y2, int z2)
+{
+	double d = qSqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2) + (z1 - z2) * (z1 - z2));
+	return d;
 }
 
 void DeviceManage::onDeviceConrolFinished(QString text, int res, QString explain)

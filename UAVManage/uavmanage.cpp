@@ -659,7 +659,10 @@ void UAVManage::onUpdateMusic(QString qstrFilePath)
 	QFileInfo infoProject(m_qstrCurrentProjectFile);
 	QString qstrNewFile = infoProject.path() + _ProjectDirName_ + fileName;
 	if (qstrFilePath == qstrNewFile) return;
-	QFile::copy(qstrFilePath, qstrNewFile);
+	if (false == QFile::copy(qstrFilePath, qstrNewFile)) {
+		QMessageBox::warning(this, tr("提示"), tr("音乐选择失败"));
+		return;
+	}
 	m_pDeviceManage->setCurrentMusicPath(qstrNewFile);
 
 	QTextCodec* code = QTextCodec::codecForName(_XMLNameCoding_);
@@ -690,7 +693,6 @@ void UAVManage::onCurrentPlayeState(qint8 state)
 
 void UAVManage::on3DDialogStauts(bool connect)
 {
-	return;
 	if (connect) {
 		deviceWaypoint();
 		QFileInfo infoProject(m_qstrCurrentProjectFile);
@@ -742,6 +744,7 @@ void UAVManage::deviceWaypoint(bool bUpload)
 {
 	if (m_qstrCurrentProjectFile.isEmpty()) return;
 	QStringList list = m_pDeviceManage->getDeviceNameList();
+	QMap<QString, QVector<NavWayPointData>> map;
 	foreach(QString name, list) {
 		if (name.isEmpty()) continue;
 		QFileInfo infoProject(m_qstrCurrentProjectFile);
@@ -761,6 +764,7 @@ void UAVManage::deviceWaypoint(bool bUpload)
 			_ShowErrorMessage(name + tr(": 解析舞步积木块失败"));
 			continue;
 		}
+		//TODO 等待python文件执行完成，此处需要优化，有可能造成死循环
 		while (!ptyhon.isFinished()){
 			QApplication::processEvents();
 		}
@@ -776,9 +780,17 @@ void UAVManage::deviceWaypoint(bool bUpload)
 		else{
 			if(!bUpload) _ShowInfoMessage(name + tr("生成舞步完成"));
 		}
+		qDebug() << "航点信息" << name << data.count();
+		for (int i = 0; i < data.count(); i++) {
+			NavWayPointData waypoint = data.at(i);
+			qDebug() << QString("第%1条航点信息").arg(i) << waypoint.param1 << waypoint.param2 << waypoint.param3 << waypoint.param4
+				<< waypoint.x << waypoint.y << waypoint.z << waypoint.commandID;
+		}
 
 		//上传舞步到飞控/更新三维舞步
 		QString message = m_pDeviceManage->sendWaypoint(name, data, bUpload);
 		if(!message.isEmpty()) _ShowWarningMessage(name + tr("上传舞步") + message);
+		map.insert(name, data);
 	}
+	m_pDeviceManage->sendWaypointTo3D(map);
 }

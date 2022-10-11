@@ -114,6 +114,12 @@ public:
 	* @brief 三维设置音乐文件路径
 	*/
 	void setCurrentMusicPath(QString filePath);
+	/**
+	 * @brief 发送航点列表到三维
+	 * @param 所有设备航点,根据名称区分
+	 * 因设备航点是每个设备单独发送，故发的三维的航点与设备分开
+	 */
+	void sendWaypointTo3D(QMap<QString, QVector<NavWayPointData>> map);
 signals:
 	/**
 	 * @brief 设备添加完成
@@ -197,6 +203,10 @@ private:
 	 * @@brief 处理接收的三维消息
 	 */
 	void analyzeMessageFrom3D(QByteArray data);
+	/**
+	 * @@brief 计算两点直接距离
+	 */
+	double getDistance(int x1, int y1, int z1, int x2, int y2, int z2);
 private:
 	Ui::DeviceManage ui;
 	//设备菜单

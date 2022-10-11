@@ -144,8 +144,12 @@ PyObject* PythonToCplusplusClass::Fly_setSpeed(PyObject* self, PyObject* args)
 	if (!PyArg_ParseTuple(args, "f", &s)) {
 		return Py_BuildValue("i", 0);
 	}
-	NavWayPointData data;
+	//设置航点速度
+	//TODO 航点位置使用上一次位置
+	NavWayPointData data = g_waypointData.back();
 	data.param1 = s;
+	data.param3 = 0;
+	data.param4 = 4;
 	data.commandID = 31000;
 	g_waypointData.append(data);
 	return Py_BuildValue("i", 0);
@@ -218,6 +222,7 @@ PyObject* PythonToCplusplusClass::Fly_MoveAddTo(PyObject* self, PyObject* args)
 	}
 	data.param1 = 0;
 	data.param4 = 0;
+	data.commandID = 16;
 	g_waypointData.append(data);
 	return Py_BuildValue("i", 0);
 }

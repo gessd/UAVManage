@@ -16,7 +16,7 @@ enum _MsgID {
 	_3dDeviceRename = 104,
 	_3dDeviceLocation = 105,
 	_3dDeviceWaypoint = 106,
-	_3dDeviceBattery = 107,
+	//_3dDeviceBattery = 107,
 	_3dDeviceMusicPath = 108,
 	_3dDeviceAction = 201,
 	_3dDeviceTime = 202
