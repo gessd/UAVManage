@@ -50,10 +50,10 @@ Blockly.Python['QzrobotUnLock'] = function(block) {
     return code;
 };
 
-Blockly.Blocks['Block_Inittime'] = {
+Blockly.Blocks['Block_TimeGroup'] = {
     init: function() {
         this.appendDummyInput()
-            .appendField("Start at:")
+            .appendField("时间范围:")
             .appendField(new Blockly.FieldTextInput("00:01", function(newValue) {
                 var reg = RegExp("^[0-5]{0,1}[0-9]{1,1}:[0-5]{1,1}[0-9]{1,1}$");
                 if (!reg.test(newValue)) {
@@ -86,8 +86,7 @@ Blockly.Blocks['Block_Inittime'] = {
                 }
                 return newValue;
 
-            }), "timeParam")
-            .appendField(new Blockly.FieldColour("#FFFFFF"), "color");
+            }), "timeParam");
         this.appendStatementInput("functionIntit")
             .setCheck(null);
         this.setPreviousStatement(true, "time");
@@ -97,10 +96,10 @@ Blockly.Blocks['Block_Inittime'] = {
     }
 };
 
-Blockly.Python['Block_Inittime'] = function(block) {
+Blockly.Python['Block_TimeGroup'] = function(block) {
     var text_time = block.getFieldValue('timeParam');
     var statements_functionintit = Blockly.Python.statementToCode(block, 'functionIntit');
-    var code = 'inittime(' + text_time + ')' + '\n' + statements_functionintit;
+    var code = 'TimeGroup(' + text_time + ')' + '\n' + statements_functionintit;
     return code;
 };
 
@@ -311,7 +310,7 @@ Blockly.Python['SpecifiedpeedTakeOff'] = function(block) {
 Blockly.Blocks['SetFlyLocation'] = {
     init: function() {
         this.appendDummyInput()
-            .appendField("飞行");
+            .appendField("飞行到");
         this.appendValueInput("coordinateX")
             .setCheck("Number")
             .appendField("X");
@@ -346,7 +345,7 @@ Blockly.Python['SetFlyLocation'] = function(block) {
 Blockly.Blocks['SetFlyLocationAndStay'] = {
     init: function() {
         this.appendDummyInput()
-            .appendField("飞行");
+            .appendField("飞行到");
         this.appendValueInput("coordinateX")
             .setCheck("Number")
             .appendField("X");
