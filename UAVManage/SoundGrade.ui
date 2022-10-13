@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>656</width>
-    <height>116</height>
+    <height>138</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -29,11 +29,36 @@
    <property name="bottomMargin">
     <number>10</number>
    </property>
+   <property name="verticalSpacing">
+    <number>3</number>
+   </property>
+   <item row="0" column="1">
+    <widget class="QListWidget" name="m_pPlayList">
+     <property name="minimumSize">
+      <size>
+       <width>300</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>16777215</height>
+      </size>
+     </property>
+    </widget>
+   </item>
    <item row="0" column="0">
     <widget class="QWChartView" name="m_pCuverPlot" native="true"/>
    </item>
-   <item row="1" column="0" colspan="2">
+   <item row="2" column="0" colspan="2">
     <layout class="QHBoxLayout" name="horizontalLayout">
+     <property name="spacing">
+      <number>10</number>
+     </property>
+     <property name="topMargin">
+      <number>3</number>
+     </property>
      <item>
       <widget class="QToolButton" name="m_pBtnLoad">
        <property name="sizePolicy">
@@ -214,19 +239,16 @@
      </item>
     </layout>
    </item>
-   <item row="0" column="1">
-    <widget class="QListWidget" name="m_pPlayList">
+   <item row="1" column="0" colspan="2">
+    <widget class="QLabel" name="labelMusicName">
      <property name="minimumSize">
       <size>
-       <width>300</width>
-       <height>0</height>
+       <width>0</width>
+       <height>20</height>
       </size>
      </property>
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
-       <height>16777215</height>
-      </size>
+     <property name="text">
+      <string/>
      </property>
     </widget>
    </item>

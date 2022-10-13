@@ -92,8 +92,7 @@ PyObject* PythonToCplusplusClass::Fly_hover(PyObject* self, PyObject* args)
 		return Py_BuildValue("i", 0);
 	}
 	if (g_waypointData.isEmpty()) {
-		//TODO
-		//没有航点信息无法设置停留时间,需要提示,此处为子线程无法使用弹窗
+		//TODO 没有航点信息无法设置停留时间,需要提示,此处为子线程无法使用弹窗
 		//return Py_BuildValue("i", 0);
 	}
 	NavWayPointData data = g_waypointData.back();
@@ -149,7 +148,7 @@ PyObject* PythonToCplusplusClass::Fly_setSpeed(PyObject* self, PyObject* args)
 	NavWayPointData data = g_waypointData.back();
 	data.param1 = s;
 	data.param3 = 0;
-	data.param4 = 4;
+	data.param4 = 0;
 	data.commandID = 31000;
 	g_waypointData.append(data);
 	return Py_BuildValue("i", 0);

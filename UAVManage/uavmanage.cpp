@@ -278,6 +278,9 @@ void UAVManage::onOpenProject(QString qstrFile)
 	}
 	_ShowInfoMessage(tr("打开工程完成"));
 	qDebug() << "工程打开完成";
+	QFileInfo info(m_qstrCurrentProjectFile);
+	QString name = info.baseName();
+	this->setWindowTitle(name);
 	m_pDeviceManage->setCurrentDevice(qstrCurrnetName);
 	m_pSoundWidget->updateLoadMusic(qstrMusicFilePath);
 	m_pDeviceManage->setCurrentMusicPath(qstrMusicFilePath);

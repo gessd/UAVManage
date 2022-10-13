@@ -53,7 +53,9 @@ void SoundGrade::updateLoadMusic(QString filePath)
 	m_decoder = new AudioDecoder(this);
 	connect(m_decoder, SIGNAL(finished()), this, SLOT(onDecoderFinished()));
 	m_decoder->analysisAudioFile(filePath);
-	
+	QFileInfo info(filePath);
+	QString name = info.fileName();
+	m_ui.labelMusicName->setText(name);
 	m_ui.m_pBtnPlay->setEnabled(true);
 	m_ui.m_pbtnStop->setEnabled(true);
 }
