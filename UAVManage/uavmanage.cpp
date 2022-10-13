@@ -682,14 +682,7 @@ void UAVManage::onUpdateMusic(QString qstrFilePath)
 	if (!info.exists()) return;
 	QString fileName = info.fileName();
 	QFileInfo infoProject(m_qstrCurrentProjectFile);
-	QString qstrNewFile = infoProject.path() + _ProjectDirName_ + fileName;
-	if (qstrFilePath == qstrNewFile) return;
-	if (false == QFile::copy(qstrFilePath, qstrNewFile)) {
-		QMessageBox::warning(this, tr("提示"), tr("音乐选择失败"));
-		return;
-	}
-	m_pDeviceManage->setCurrentMusicPath(qstrNewFile);
-
+	
 	QTextCodec* code = QTextCodec::codecForName(_XMLNameCoding_);
 	std::string filename = code->fromUnicode(m_qstrCurrentProjectFile).data();
 	tinyxml2::XMLDocument doc;
@@ -699,8 +692,18 @@ void UAVManage::onUpdateMusic(QString qstrFilePath)
 	if (!root) return;
 	tinyxml2::XMLElement* place = root->FirstChildElement(_ElementPlace_);
 	if (!place) return;
+	//删除旧的音乐文件，先删除旧文件再复制新文件到工程目录，防止因文件名重复无法复制
 	QString qstrOldMusic = infoProject.path() + _ProjectDirName_ + place->Attribute(_ElementMusic_);
 	QFile::remove(qstrOldMusic);
+	//复制音乐文件到工程目录
+	QString qstrNewFile = infoProject.path() + _ProjectDirName_ + fileName;
+	if (qstrFilePath == qstrNewFile) return;
+	if (false == QFile::copy(qstrFilePath, qstrNewFile)) {
+		QMessageBox::warning(this, tr("提示"), tr("音乐选择失败"));
+		return;
+	}
+	m_pDeviceManage->setCurrentMusicPath(qstrNewFile);
+
 	place->SetAttribute(_ElementMusic_, fileName.toUtf8().data());
 	error = doc.SaveFile(filename.c_str());
 }

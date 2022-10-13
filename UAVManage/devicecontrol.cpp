@@ -37,7 +37,7 @@ DeviceControl::DeviceControl(QString name, float x, float y, QString ip, QWidget
 	connect(&m_timerHeartbeat, &QTimer::timeout, [this]() {
 		unsigned int nLastTime = m_timerHeartbeat.property("time").toUInt();
 		if ((QDateTime::currentDateTime().toTime_t() - nLastTime) > 10) {
-			//超过N次没有收到心跳数据断开重新连接
+			//TODO 超过N次没有收到心跳数据断开重新连接
 			//connectDevice();
 		}
 		});
