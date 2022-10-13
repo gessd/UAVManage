@@ -94,7 +94,7 @@ public:
 	*/
 	void allDeviceCalibration(_CalibrationEnum c);
 	/**
-	 * @brief 上传舞步到飞控/三维舞步更新
+	 * @brief 上传舞步到飞控
 	 * @param name 设备名称
 	 * @param data 航点列表 协议信息
 	 * @param upload 是否上传舞步到飞控
@@ -180,6 +180,9 @@ protected:
 	virtual bool eventFilter(QObject* watched, QEvent* event);
 private slots:
 	void onDeviceConrolFinished(QString text, int res, QString explain);
+	/**
+	 * @brief 三维窗口建立连接
+	 */
 	void on3dNewConnection();
 	/**
 	 * @brief 定时处理三维消息发送记录
@@ -194,7 +197,10 @@ private:
 	 * @brief 当前选中的设备
 	 */
 	DeviceControl* getCurrentDevice();
-
+	/**
+	 * @brief 根据设备名称获取设备控制对象
+	 */
+	DeviceControl* getDeviceFromName(QString name);
 	/**
 	 * @brief 通过TCP向三维发送消息
 	 */

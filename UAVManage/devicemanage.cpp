@@ -543,14 +543,12 @@ void DeviceManage::sendWaypointTo3D(QMap<QString, QVector<NavWayPointData>> map)
 	obj3dmsg.insert(_Time_, QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"));
 	QJsonArray jsonData;
 
-	
 	foreach(QString name, listNmae) {
 		QVector<NavWayPointData> data = map[name];
 		QJsonObject objDevice;
 		objDevice.insert("name", name);
 		QJsonArray arrWaypoint;
 
-		//无人机航点预设值
 		//TODO 暂时定义默认飞行速度
 		int speed = 60;
 		int timesum = 0;
@@ -570,6 +568,13 @@ void DeviceManage::sendWaypointTo3D(QMap<QString, QVector<NavWayPointData>> map)
 			int x = waypoint.x / 1000;
 			int y = waypoint.y / 1000;
 			int z = waypoint.z;
+			if (i == 0) {
+				//第一个航点需要使用默认起飞位置
+				DeviceControl* pDevcie = getDeviceFromName(name);
+				if (!pDevcie) continue;
+				x = pDevcie->getX();
+				y = pDevcie->getY();
+			}
 			//计算空间点距离
 			double d = getDistance(lastX, lastY, lastZ, x, y, z);
 			//计算飞行时间 时间使用毫秒单位
@@ -671,6 +676,7 @@ void DeviceManage::onTimeout3DMessage()
 
 void DeviceManage::onUpdateStatusTo3D()
 {
+	//TODO 暂时屏蔽向三维发送实时位置信息
 	return;
 	QJsonObject obj3dmsg;
 	obj3dmsg.insert(_Ver_, _VerNum_);
@@ -719,6 +725,22 @@ DeviceControl* DeviceManage::getCurrentDevice()
 	if (!pWidget) return nullptr;
 	DeviceControl* pDevice = dynamic_cast<DeviceControl*>(pWidget);
 	return pDevice;
+}
+
+DeviceControl* DeviceManage::getDeviceFromName(QString name)
+{
+	if (name.isEmpty()) return nullptr;
+	for (int i = 0; i < ui.listWidget->count(); i++) {
+		QListWidgetItem* pItem = ui.listWidget->item(i);
+		if (!pItem) continue;
+		QWidget* pWidget = ui.listWidget->itemWidget(pItem);
+		if (!pWidget) continue;
+		DeviceControl* pDevice = dynamic_cast<DeviceControl*>(pWidget);
+		if (!pDevice) continue;
+		if(pDevice->getName() != name) continue;
+		return pDevice;
+	}
+	return nullptr;
 }
 
 void DeviceManage::sendMessageTo3D(QJsonObject json3d)

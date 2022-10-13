@@ -51,7 +51,11 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="lineEditX"/>
+      <widget class="QLineEdit" name="lineEditX">
+       <property name="text">
+        <string>0</string>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QLabel" name="label_6">
@@ -61,7 +65,11 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="lineEditY"/>
+      <widget class="QLineEdit" name="lineEditY">
+       <property name="text">
+        <string>0</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>
