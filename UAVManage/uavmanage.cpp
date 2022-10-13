@@ -498,7 +498,29 @@ void UAVManage::onDeviceAdd(QString name, QString ip, float x, float y)
 		QString qstrBlocklyFile = QString("%1%2%3.blockly").arg(qstrPath).arg(_ProjectDirName_).arg(name);
 		QString qstrPythonFile = QString("%1%2%3.py").arg(qstrPath).arg(_ProjectDirName_).arg(name);
 		QFile file(qstrBlocklyFile);
-		if (file.open(QIODevice::ReadWrite)) file.close();
+		if (file.open(QIODevice::ReadWrite)) {
+			//当设备不存在写入默认blockly控件
+			QString qstrBlock = "<xml xmlns=\"https://developers.google.com/blockly/xml\">\
+								  <block type=\"QzrobotTakeOff\" id=\"hZkt:t([/FZPOZEgkDdx\" x=\"213\" y=\"113\">\
+								    <value name=\"height\">\
+								      <shadow type=\"math_number\" id=\"@T7]yY$K~9Rq4@W(xIGq\">\
+								        <field name=\"NUM\">100</field>\
+								      </shadow>\
+								    </value>\
+								    <next>\
+								      <block type=\"Block_TimeGroup\" id=\"#ZrOCzud3FeD:s2d!7q:\">\
+								        <field name=\"timeParam\">00:01</field>\
+								        <next>\
+								          <block type=\"QzrobotLand\" id=\"I}~[gy|99HvWaWki2YMm\"></block>\
+								        </next>\
+								      </block>\
+								    </next>\
+								  </block>\
+								</xml>";
+			file.write(qstrBlock.toUtf8());
+			file.waitForBytesWritten(1000);
+			file.close();
+		}
 		file.setFileName(qstrPythonFile);
 		if (file.open(QIODevice::ReadWrite)) file.close();
 	}

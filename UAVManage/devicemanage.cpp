@@ -242,9 +242,10 @@ QString DeviceManage::addDevice(QString qstrName, QString ip, long x, long y)
 	DeviceControl* pControl = new DeviceControl(qstrName, x, y, ip);
 	connect(pControl, &DeviceControl::sigWaypointProcess, this, &DeviceManage::sigWaypointProcess);
 	connect(pControl, &DeviceControl::sigConrolFinished, this, &DeviceManage::onDeviceConrolFinished);
+	//需要先发送添加设备信息，用于创建默认blockly布局，当ui.listWidget->setCurrentItem触发设备切换时可以显示有布局的WEB界面
+	emit deviceAddFinished(qstrName, ip, x, y);
 	ui.listWidget->setItemWidget(item, pControl);
 	ui.listWidget->setCurrentItem(item);
-	emit deviceAddFinished(qstrName, ip, x, y);
 	if (m_p3dTcpSocket) {
 		QJsonObject obj3dmsg;
 		obj3dmsg.insert(_Ver_, _VerNum_);
