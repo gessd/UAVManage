@@ -108,7 +108,6 @@ Blockly.Blocks['QzrobotLand'] = {
         this.appendDummyInput()
             .appendField("降落 ")
         this.setPreviousStatement(true);
-        this.setNextStatement(true);
         this.setColour('#FF6680');
         this.setTooltip('');
     }
@@ -254,7 +253,7 @@ Blockly.Blocks['Fly_StartLocation'] = {
 };
 
 Blockly.Python['Fly_StartLocation'] = function(block) {
-    //起飞至
+    //初始位置
     var x = Blockly.Python.valueToCode(this,'x',Blockly.Python.ORDER_ATOMIC);
     var y = Blockly.Python.valueToCode(this,'y',Blockly.Python.ORDER_ATOMIC);
     var code = 'SetStartLocation('+ x + ','+y + ')' + '\n';
@@ -268,8 +267,7 @@ Blockly.Blocks['QzrobotTakeOff'] = {
             .appendField("起飞至");
         this.appendDummyInput()
             .appendField("cm高度");
-        this.setPreviousStatement(true, ["action", "notReachAction", "ReachAction"]);
-        this.setNextStatement(true, ["action", "notReachAction", "ReachAction"]);
+        this.setNextStatement(true, ["action", "notReachAction", "ReachAction", "time"]);
         this.setColour('#FF6680');
         this.setTooltip('');
     }
