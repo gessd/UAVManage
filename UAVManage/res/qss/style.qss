@@ -51,13 +51,39 @@ QToolBar QPushButton{
 	padding-left:8px;
 }
 /*弹窗框及添加设备弹窗框*/
-AddDeviceDialog QPushButton, QInputDialog QPushButton{background:rgb(26,179,148); color:rgb(255,255,255); border-radius:3px; min-height:30px; min-width:60px; font-size:22px;}
-AddDeviceDialog QPushButton:hover, QInputDialog QPushButton:hover{background:rgb(24,166,137);}
-AddDeviceDialog QPushButton:pressed, QInputDialog QPushButton:pressed{background:rgb(32,178,170);}
-AddDeviceDialog QLineEdit, QInputDialog QLineEdit{border:2px solid rgb(229,230,231);padding:4px;padding-left:10px;border-radius:3px;color:rgb(255,255,255);font-size:22px;}
-AddDeviceDialog QLineEdit:focus, QInputDialog QLineEdit:focus{border:2px solid rgb(26,179,148);}
-AddDeviceDialog QLineEdit:disabled, QInputDialog QLineEdit:disabled{background-color:rgb(238,238,238);}
-AddDeviceDialog QLabel, QInputDialog QLabel{color:rgb(255,255,255); font-size:22px;}
+AddDeviceDialog QPushButton, QInputDialog QPushButton, SpaceParam QPushButton{
+	background:rgb(26,179,148); 
+	color:rgb(255,255,255); 
+	border-radius:3px; 
+	min-height:30px; 
+	min-width:60px; 
+	font-size:20px;
+}
+AddDeviceDialog QPushButton:hover, QInputDialog QPushButton:hover, SpaceParam QPushButton:hover{
+background:rgb(24,166,137);
+}
+AddDeviceDialog QPushButton:pressed, QInputDialog QPushButton:pressed, SpaceParam QPushButton:pressed{
+	background:rgb(32,178,170);
+}
+AddDeviceDialog QLabel, QInputDialog QLabel, SpaceParam QLabel{
+	color:rgb(255,255,255); 
+	font-size:18px;
+}
+
+QLineEdit{
+	border:2px solid rgb(229,230,231);
+	padding:4px;
+	padding-left:10px;
+	border-radius:3px;
+	color:rgb(255,255,255);
+	font-size:18px;
+}
+QLineEdit:focus{
+	border:2px solid rgb(26,179,148);
+}
+QLineEdit:disabled{
+	background-color:rgb(238,238,238);
+}
 
 QTableWidget::item:selected{
     background-color:rgb(75,85,97);
@@ -73,13 +99,16 @@ QHeaderView::section{
 QTableWidget QTableCornerButton::section {
     background:rgb(58,58,58);
 }
- 
+
+/*
 QLineEdit, QListWidget, QGroupBox, QTextBrowser{
 	border:1px dashed rgb(255,255,255);
 }
-QLineEdit{
-	border-bottom:1px solid rgba(248,248,255,200);
+*/
+DeviceDebug QLineEdit{
+	border-width:1px;
 }
+
 QListWidget QLabel{
     background:transparent;
 }

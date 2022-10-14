@@ -18,6 +18,7 @@
 #include "placeinfodialog.h"
 #include "SoundGrade.h"
 #include "paramreadwrite.h"
+#include "spaceparam.h"
 
 UAVManage::UAVManage(QWidget *parent)
     : QMainWindow(parent)
@@ -203,8 +204,14 @@ void UAVManage::onNewProject()
 	m_qstrCurrentProjectFile.clear();
 	onWebClear();
 	if(m_pDeviceManage) m_pDeviceManage->clearDevice();
+
+	//TODO 弹窗设置场地大小
+	SpaceParam space(this);
+	if (QDialog::Accepted != space.exec())return;
+	int x = space.getSpaceX();
+	int y = space.getSpaceY();
 	//选择新建路径
-	QString qstrName = QFileDialog::getSaveFileName(this, tr("项目名"), "", "File(*.qz)");
+	QString qstrName = QFileDialog::getSaveFileName(this, tr("项目名"), "", tr("File(*.qz)"));
 	if (qstrName.isEmpty()) return;
 	QFileInfo info(qstrName);
 	QString qstrDir = info.path() + "/" + info.baseName();
@@ -216,7 +223,7 @@ void UAVManage::onNewProject()
 		return;
 	}
 	//新建项目文件并写入初始化内容
-	if (!newProjectFile(qstrFile)) {
+	if (!newProjectFile(qstrFile, x, y)) {
 		dir.rmdir(qstrDir);
 		_ShowErrorMessage(info.baseName() + tr("创建项目文件失败"));
 		return;
@@ -738,7 +745,7 @@ void UAVManage::on3DDialogStauts(bool connect)
 	}
 }
 
-bool UAVManage::newProjectFile(QString qstrFile, float X, float Y)
+bool UAVManage::newProjectFile(QString qstrFile, unsigned int X, unsigned int Y)
 {	
 	const char* declaration = _XMLVersion_;
 	tinyxml2::XMLDocument doc;

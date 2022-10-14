@@ -120,6 +120,7 @@
     <QtUic Include="placeinfodialog.ui" />
     <QtUic Include="setdevicedialog.ui" />
     <QtUic Include="SoundGrade.ui" />
+    <QtUic Include="spaceparam.ui" />
     <QtUic Include="uavmanage.ui" />
     <QtMoc Include="uavmanage.h" />
     <ClCompile Include="adddevicedialog.cpp" />
@@ -142,6 +143,7 @@
     <ClCompile Include="resendmessage.cpp" />
     <ClCompile Include="setdevicedialog.cpp" />
     <ClCompile Include="SoundGrade.cpp" />
+    <ClCompile Include="spaceparam.cpp" />
     <ClCompile Include="threadpython.cpp" />
     <ClCompile Include="tinyxml2\tinyxml2.cpp" />
     <ClCompile Include="uavmanage.cpp" />
@@ -176,6 +178,7 @@
     <QtMoc Include="qwchartview.h" />
     <QtMoc Include="SoundGrade.h" />
     <QtMoc Include="paramreadwrite.h" />
+    <QtMoc Include="spaceparam.h" />
     <ClInclude Include="tinyxml2\tinyxml2.h" />
     <QtMoc Include="resendmessage.h" />
   </ItemGroup>
