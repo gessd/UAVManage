@@ -22,7 +22,6 @@ DeviceManage::DeviceManage(QWidget *parent)
 	//设置设备列表
 	ui.listWidget->installEventFilter(this);
 	connect(ui.listWidget, &QListWidget::currentItemChanged, [this](QListWidgetItem* current, QListWidgetItem* previous) {
-		qDebug() << "list currentItemChanged" << current; 
 		QString name;
 		QString previousname;
 		if (current) {

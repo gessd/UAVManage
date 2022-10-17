@@ -5,25 +5,35 @@
 #include <QDir>
 #include <QMessageBox>
 
+struct _SpacePoint
+{
+	int x;
+	int y;
+	int z;
+	_SpacePoint() {
+		x = y = z = 0;
+	}
+}; 
 QVector<NavWayPointData> g_waypointData;
+QMap<QString, _SpacePoint> g_mapMarkPoint;
 ////Python to c++ data start////
-PyMethodDef xWrapMethods[] = {
-	{ "Fly_Time", PythonToCplusplusClass::Fly_Time, METH_VARARGS, "Fly_Time" },
-	{ "Fly_Waypoint", PythonToCplusplusClass::Fly_Waypoint, METH_VARARGS, "Fly_Waypoint" },
-	{ "Fly_Location", PythonToCplusplusClass::Fly_Location, METH_VARARGS, "Fly_Location" },
-	{ "Fly_hover",     PythonToCplusplusClass::Fly_hover, METH_VARARGS, "Fly_hover" },
-	{ "Fly_revolve",  PythonToCplusplusClass::Fly_revolve, METH_VARARGS, "Fly_revolve" },
-	{ "Fly_speedWaypoint", PythonToCplusplusClass::Fly_speedWaypoint, METH_VARARGS, "Fly_speedWaypoint" },
-	{ "Fly_setSpeed", PythonToCplusplusClass::Fly_setSpeed, METH_VARARGS, "Fly_setSpeed" },
-	{ "Fly_StartLocation", PythonToCplusplusClass::Fly_StartLocation, METH_VARARGS, "Fly_StartLocation" },
-	{ "Fly_LedMode", PythonToCplusplusClass::Fly_LedMode, METH_VARARGS, "Fly_LedMode" },
-	{ "Fly_Moveto", PythonToCplusplusClass::Fly_Moveto, METH_VARARGS, "Fly_Moveto" },
-	{ "Fly_MoveAddTo", PythonToCplusplusClass::Fly_MoveAddTo, METH_VARARGS, "Fly_MoveAddTo" },
+PyMethodDef xWrapMethods[] = {	
+	{"FlyAddMarkPoint", QZAPI::FlyAddMarkPoint,		METH_VARARGS, "FlyAddMarkPoint"},
+	{"FlySetSpeed",		QZAPI::FlySetSpeed,			METH_VARARGS, "FlySetSpeed"},
+	{"FlySetLed",		QZAPI::FlySetLed,			METH_VARARGS, "FlySetLed"},
+	{"FlyHover",		QZAPI::FlyHover,			METH_VARARGS, "FlyHover"},
+	{"FlyTakeoff",		QZAPI::FlyTakeoff,			METH_VARARGS, "FlyTakeoff"},
+	{"FlyLand",			QZAPI::FlyLand,				METH_VARARGS, "FlyLand"},
+	{"FlyTimeGroup",	QZAPI::FlyTimeGroup,		METH_VARARGS, "FlyTimeGroup"},
+	{"FlyRevolve",		QZAPI::FlyRevolve,			METH_VARARGS, "FlyRevolve"},
+	{"FlyTo",			QZAPI::FlyTo,				METH_VARARGS, "FlyTo"},
+	{"FlyMove",			QZAPI::FlyMove,				METH_VARARGS, "FlyMove"},
+	{"FlyToPoint",		QZAPI::FlyToPoint,			METH_VARARGS, "FlyToPoint"},
 	{ NULL, NULL, 0, NULL }
 };
 static struct PyModuleDef BicubicModule = {
 	PyModuleDef_HEAD_INIT,
-	"PythonToCplusplusClass",
+	"QZAPI",
 	NULL,
 	-1,
 	xWrapMethods
@@ -35,7 +45,7 @@ PyMODINIT_FUNC PyInit_PythonCallBack(void)
 	module = PyModule_Create(&BicubicModule);
 	return module;
 }
-PyObject* PythonToCplusplusClass::Fly_Time(PyObject* self, PyObject* args)
+PyObject* QZAPI::Fly_Time(PyObject* self, PyObject* args)
 {
 	char* t = NULL;
 	if (!PyArg_ParseTuple(args, "s", &t)) {
@@ -52,7 +62,7 @@ PyObject* PythonToCplusplusClass::Fly_Time(PyObject* self, PyObject* args)
 	return Py_BuildValue("i", 0);
 }
 
-PyObject* PythonToCplusplusClass::Fly_Waypoint(PyObject* self, PyObject* args)
+PyObject* QZAPI::Fly_Waypoint(PyObject* self, PyObject* args)
 {
 	float x, y, z, h, a, p, w;
 	if (!PyArg_ParseTuple(args, "f|f|f|f|f|f|f", &x, &y, &z, & h, &a, & p, &w)) {
@@ -71,7 +81,7 @@ PyObject* PythonToCplusplusClass::Fly_Waypoint(PyObject* self, PyObject* args)
 	return Py_BuildValue("i", 0);
 }
 
-PyObject* PythonToCplusplusClass::Fly_Location(PyObject* self, PyObject* args)
+PyObject* QZAPI::Fly_Location(PyObject* self, PyObject* args)
 {
 	float x, y, z;
 	if (!PyArg_ParseTuple(args, "f|f|f", &x, &y, &z)) {
@@ -85,7 +95,7 @@ PyObject* PythonToCplusplusClass::Fly_Location(PyObject* self, PyObject* args)
 	return Py_BuildValue("i", 0);
 }
 
-PyObject* PythonToCplusplusClass::Fly_hover(PyObject* self, PyObject* args)
+PyObject* QZAPI::Fly_hover(PyObject* self, PyObject* args)
 {
 	float hold;
 	if (!PyArg_ParseTuple(args, "f", &hold)) {
@@ -102,7 +112,7 @@ PyObject* PythonToCplusplusClass::Fly_hover(PyObject* self, PyObject* args)
 	return Py_BuildValue("i", 0);
 }
 
-PyObject* PythonToCplusplusClass::Fly_revolve(PyObject* self, PyObject* args)
+PyObject* QZAPI::Fly_revolve(PyObject* self, PyObject* args)
 {
 	float yaw;
 	if (!PyArg_ParseTuple(args, "f", &yaw)) {
@@ -120,7 +130,7 @@ PyObject* PythonToCplusplusClass::Fly_revolve(PyObject* self, PyObject* args)
 	return Py_BuildValue("i", 0);
 }
 
-PyObject* PythonToCplusplusClass::Fly_speedWaypoint(PyObject* self, PyObject* args)
+PyObject* QZAPI::Fly_speedWaypoint(PyObject* self, PyObject* args)
 {
 	//带速度航点
 	float x, y, z, s;
@@ -137,7 +147,7 @@ PyObject* PythonToCplusplusClass::Fly_speedWaypoint(PyObject* self, PyObject* ar
 	return Py_BuildValue("i", 0);
 }
 
-PyObject* PythonToCplusplusClass::Fly_setSpeed(PyObject* self, PyObject* args)
+PyObject* QZAPI::Fly_setSpeed(PyObject* self, PyObject* args)
 {
 	float s;
 	if (!PyArg_ParseTuple(args, "f", &s)) {
@@ -154,21 +164,7 @@ PyObject* PythonToCplusplusClass::Fly_setSpeed(PyObject* self, PyObject* args)
 	return Py_BuildValue("i", 0);
 }
 
-PyObject* PythonToCplusplusClass::Fly_StartLocation(PyObject* self, PyObject* args)
-{
-	float x, y;
-	if (!PyArg_ParseTuple(args, "f|f", &x, &y)) {
-		return Py_BuildValue("i", 0);
-	}
-	NavWayPointData data;
-	data.x = x * 1000;
-	data.y = y * 1000;
-	data.commandID = 31004;
-	g_waypointData.append(data);
-	return Py_BuildValue("i", 0);
-}
-
-PyObject* PythonToCplusplusClass::Fly_LedMode(PyObject* self, PyObject* args)
+PyObject* QZAPI::Fly_LedMode(PyObject* self, PyObject* args)
 {
 	int m;
 	if (!PyArg_ParseTuple(args, "n", &m)) {
@@ -180,7 +176,7 @@ PyObject* PythonToCplusplusClass::Fly_LedMode(PyObject* self, PyObject* args)
 	g_waypointData.append(data);
 	return Py_BuildValue("i", 0);
 }
-PyObject* PythonToCplusplusClass::Fly_Moveto(PyObject* self, PyObject* args)
+PyObject* QZAPI::Fly_Moveto(PyObject* self, PyObject* args)
 {
 	float s;
 	int d;
@@ -200,7 +196,7 @@ PyObject* PythonToCplusplusClass::Fly_Moveto(PyObject* self, PyObject* args)
 	return Py_BuildValue("i", 0);
 }
 
-PyObject* PythonToCplusplusClass::Fly_MoveAddTo(PyObject* self, PyObject* args)
+PyObject* QZAPI::Fly_MoveAddTo(PyObject* self, PyObject* args)
 {
 	float s;
 	int d;
@@ -226,6 +222,123 @@ PyObject* PythonToCplusplusClass::Fly_MoveAddTo(PyObject* self, PyObject* args)
 	return Py_BuildValue("i", 0);
 }
 
+PyObject* QZAPI::FlyAddMarkPoint(PyObject* self, PyObject* args)
+{
+	char* name = NULL;
+	int x, y, z;
+	x = y = z = 0;
+	if (!PyArg_ParseTuple(args, "s|i|i|i", &name, &x, &y, &z)) {
+		return Py_BuildValue("i", 0);
+	}
+	if (NULL == name) return Py_BuildValue("i", 0);
+	//TODO 判断标定点名称或位置重复
+	QString qstrName(name);
+	qDebug() << "添加标定点" << qstrName << x << y << z;
+	return Py_BuildValue("i", 0);
+}
+
+PyObject* QZAPI::FlySetSpeed(PyObject* self, PyObject* args)
+{
+	int n = 0;
+	if (!PyArg_ParseTuple(args, "i", &n)) {
+		return Py_BuildValue("i", 0);
+	}
+	qDebug() << "设置飞行速度" << n;
+	return Py_BuildValue("i", 0);
+}
+
+PyObject* QZAPI::FlySetLed(PyObject* self, PyObject* args)
+{
+	int n = 0;
+	if (!PyArg_ParseTuple(args, "i", &n)) {
+		return Py_BuildValue("i", 0);
+	}
+	qDebug() << "设置LED灯模式" << n;
+	return Py_BuildValue("i", 0);
+}
+
+PyObject* QZAPI::FlyHover(PyObject* self, PyObject* args)
+{
+	int n = 0;
+	if (!PyArg_ParseTuple(args, "i", &n)) {
+		return Py_BuildValue("i", 0);
+	}
+	qDebug() << "悬停时间" << n;
+	return Py_BuildValue("i", 0);
+}
+
+PyObject* QZAPI::FlyTakeoff(PyObject* self, PyObject* args)
+{
+	int n = 0;
+	if (!PyArg_ParseTuple(args, "i", &n)) {
+		return Py_BuildValue("i", 0);
+	}
+	qDebug() << "起飞高度" << n;
+	return Py_BuildValue("i", 0);
+}
+
+PyObject* QZAPI::FlyLand(PyObject* self, PyObject* args)
+{
+	qDebug() << "降落";
+	return Py_BuildValue("i", 0);
+}
+
+PyObject* QZAPI::FlyTimeGroup(PyObject* self, PyObject* args)
+{
+	self;
+	int m, s;
+	m = s = 0;
+	if (!PyArg_ParseTuple(args, "i|i", &m, &s)) {
+		return Py_BuildValue("i", 0);
+	}
+	qDebug() << "时间组范围" << m << s;
+	return Py_BuildValue("i", 0);
+}
+
+PyObject* QZAPI::FlyRevolve(PyObject* self, PyObject* args)
+{
+	float angle = 0.0;
+	if (!PyArg_ParseTuple(args, "f", &angle)) {
+		return Py_BuildValue("i", 0);
+	}
+	qDebug() << "无人机旋转" << angle;
+	return Py_BuildValue("i", 0);
+}
+
+PyObject* QZAPI::FlyTo(PyObject* self, PyObject* args)
+{
+	int x, y, z;
+	x = y = z = 0;
+	if (!PyArg_ParseTuple(args, "i|i|i", &x, &y, &z)) {
+		return Py_BuildValue("i", 0);
+	}
+	qDebug() << "飞行到绝对位置" << x << y << z;
+	return Py_BuildValue("i", 0);
+}
+
+PyObject* QZAPI::FlyMove(PyObject* self, PyObject* args)
+{
+	int direction, n;
+	direction = n = 0;
+	if (!PyArg_ParseTuple(args, "i|i", &direction, &n)) {
+		return Py_BuildValue("i", 0);
+	}
+	qDebug() << "相对移动" << direction << n;
+	return Py_BuildValue("i", 0);
+}
+
+PyObject* QZAPI::FlyToPoint(PyObject* self, PyObject* args)
+{
+	char* name = NULL;
+	if (!PyArg_ParseTuple(args, "s", &name)) {
+		return Py_BuildValue("i", 0);
+	}
+	if(NULL == name) return Py_BuildValue("i", 0);
+	QString qstrName(name);
+	qDebug() << "飞行到标定点" << name;
+	return Py_BuildValue("i", 0);
+}
+
 ////Python to c++ data end////
 
 ThreadPython::ThreadPython(QObject *parent)
@@ -247,18 +360,18 @@ bool ThreadPython::compilePythonCode(QByteArray arrCode)
 	g_waypointData.clear();
 	if(arrCode.isEmpty()) return false;
 	m_pythonState = PythonRunNone;
-	//保存至文件后执行
-	QString qstrHeadFile = QApplication::applicationDirPath() + _PyHeadFile_;
-	if (!QFile::exists(qstrHeadFile)) return false;
-	QFile fileHead(qstrHeadFile);
-	if (!fileHead.open(QIODevice::ReadOnly)) return false;
-	QByteArray arrHead = fileHead.readAll();
-	if (arrHead.isEmpty()) {
-		fileHead.close();
-		return false;
-	}
-	arrCode.prepend(arrHead+"\r\n");
-	fileHead.close();
+	////保存至文件后执行
+	//QString qstrHeadFile = QApplication::applicationDirPath() + _PyHeadFile_;
+	//if (!QFile::exists(qstrHeadFile)) return false;
+	//QFile fileHead(qstrHeadFile);
+	//if (!fileHead.open(QIODevice::ReadOnly)) return false;
+	//QByteArray arrHead = fileHead.readAll();
+	//if (arrHead.isEmpty()) {
+	//	fileHead.close();
+	//	return false;
+	//}
+	//arrCode.prepend(arrHead + "\r\n");
+	//fileHead.close();
 
 	QString qstrRunFile = QApplication::applicationDirPath() + _PyRunFilePath_;
 	QFile filePython(qstrRunFile);
@@ -288,7 +401,7 @@ bool ThreadPython::compilePythonFile(QString qstrFile)
 	if (!QFile::exists(qstrFile)) return false;
 	m_qstrFilePath = qstrFile;
 	//添加接口类
-	if (PyImport_AppendInittab("PythonToCplusplusClass", PyInit_PythonCallBack) == -1) {
+	if (PyImport_AppendInittab("QZAPI", PyInit_PythonCallBack) == -1) {
 		qDebug() << "----init callback error";
 		return false;
 	}
@@ -317,10 +430,10 @@ void ThreadPython::run()
 {
 	if (!QFile::exists(m_qstrFilePath)) return;
 	int n = PyRun_SimpleString("import sys");
-	QString qstrPythonApiPath = QString("sys.path.append('%1')").arg(QApplication::applicationDirPath() + _PythonApiFilePath_);
+	//QString qstrPythonApiPath = QString("sys.path.append('%1')").arg(QApplication::applicationDirPath() + _PythonApiFilePath_);
 	QString qstrPythonPath = QString("sys.path.append('%1')").arg(QApplication::applicationDirPath());
 	//设置python执行文件路径
-	PyRun_SimpleString(qstrPythonApiPath.toStdString().c_str());
+	//PyRun_SimpleString(qstrPythonApiPath.toStdString().c_str());
 	PyRun_SimpleString(qstrPythonPath.toStdString().c_str());
 	//执行python文件,生成航点列表
 	PyObject* pPyFile = PyImport_ImportModule(_PyFileName_);

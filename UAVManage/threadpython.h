@@ -8,32 +8,93 @@
 
 #define _WaypintFile_ "/pythonapi/waypoint.csv"
 
-class PythonToCplusplusClass : public QObject
+class QZAPI : public QObject
 {
 	Q_OBJECT
 public:
-	//ʱ��
+	//时间
 	static PyObject* Fly_Time(PyObject* self, PyObject* args);
-	//����������Ϣ
+	//完整航点信息
 	static PyObject* Fly_Waypoint(PyObject* self, PyObject* args);
-	//�����е�������Ϣ
+	//航点中的坐标信息
 	static PyObject* Fly_Location(PyObject* self, PyObject* args);
-	//�����е�ͣ��ʱ��
+	//航点中的停留时间
 	static PyObject* Fly_hover(PyObject* self, PyObject* args);
-	//�����е���ת�Ƕ�
+	//航点中的旋转角度
 	static PyObject* Fly_revolve(PyObject* self, PyObject* args);
-	//���ٶȺ���
+	//带速度航点
 	static PyObject* Fly_speedWaypoint(PyObject* self, PyObject* args);
-	//�����ٶ�
+	//设置速度
 	static PyObject* Fly_setSpeed(PyObject* self, PyObject* args);
-	//��ʼλ��
-	static PyObject* Fly_StartLocation(PyObject* self, PyObject* args);
-	//����LEDģʽ
+	//设置LED模式
 	static PyObject* Fly_LedMode(PyObject* self, PyObject* args);
-	//��������������
+	//单方向增量飞行
 	static PyObject* Fly_Moveto(PyObject* self, PyObject* args);
-	//���������
+	//单方向飞行
 	static PyObject* Fly_MoveAddTo(PyObject* self, PyObject* args);
+
+	/**
+	 *  @brief 预设飞行点
+	 * 	@param string 预设点名称，不能重复
+	 *	@param int    x位置
+	 *	@param int    y位置
+	 *	@param int    z位置
+	 */
+	static PyObject* FlyAddMarkPoint(PyObject* self, PyObject* args);
+	/**
+	 * @brief 设置速度
+	 * @param int 速度 cm/s
+	 */
+	static PyObject* FlySetSpeed(PyObject* self, PyObject* args);
+	/**
+	 * @brief 设置LED
+	 * @param int 模式
+	 */
+	static PyObject* FlySetLed(PyObject* self, PyObject* args);
+	/**
+	 * @brief 悬停
+	 * @param int 时间 s
+	 */
+	static PyObject* FlyHover(PyObject* self, PyObject* args);
+	/**
+	 * @brief 起飞
+	 * @param int 高度 cm
+	 */
+	static PyObject* FlyTakeoff(PyObject* self, PyObject* args);
+	/**
+	 * @brief 降落
+	 */
+	static PyObject* FlyLand(PyObject* self, PyObject* args);
+	/**
+	 * @brief 时间范围
+	 * @param int 分钟
+	 * @param int 秒
+	 */
+	static PyObject* FlyTimeGroup(PyObject* self, PyObject* args);
+	/**
+	 * @brief 旋转
+	 * @param int 旋转方向[0左|1右]
+	 * @param float 角度
+	 */
+	static PyObject* FlyRevolve(PyObject* self, PyObject* args);
+	/**
+	 * @brief 飞行到绝对位置
+	 * @param int  x位置
+	 * @param int  y位置
+	 * @param int  z位置
+	 */
+	static PyObject* FlyTo(PyObject* self, PyObject* args);
+	/**
+	 * @brief 增量飞行，相对移动
+	 * @param int 方向[1前|2后|3右|4左|5上|6下]
+	 * @param int 距离
+	 */
+	static PyObject* FlyMove(PyObject* self, PyObject* args);
+	/**
+	 * @brief 飞行到定位点
+	 * @param string 名字 FlyAddMarkPoint预先设置
+	 */
+	static PyObject* FlyToPoint(PyObject* self, PyObject* args);
 };
 
 class ThreadPython : public QThread
