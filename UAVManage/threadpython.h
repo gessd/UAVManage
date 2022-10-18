@@ -104,8 +104,27 @@ class ThreadPython : public QThread
 public:
 	ThreadPython(QObject *parent = NULL);
 	~ThreadPython();
+	/**
+	 * @brief 设定无人机初始位置
+	 * @param X轴 厘米
+	 * @param Y轴 厘米
+	 */
+	void initStartlocation(int x, int y);
+	/**
+	 * @brief 通过Python代码交互得到航点数据
+	 * @param python代码
+	 * @return 执行结果
+	 */
 	bool compilePythonCode(QByteArray arrCode);
+	/**
+	 * @brief 获取执行Python代码执行状态
+	 * @return python执行状态
+	 */
 	PythonRunState getLastState();
+	/**
+	 * @brief 得到航点数据
+	 * @return 通过python代码交互得到的航点数据
+	 */
 	QVector<NavWayPointData> getWaypointData();
 private:
 	bool compilePythonFile(QString qstrFile);

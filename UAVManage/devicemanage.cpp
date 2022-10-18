@@ -468,28 +468,11 @@ void DeviceManage::allDeviceCalibration(_CalibrationEnum c)
 
 }
 
-QString DeviceManage::sendWaypoint(QString name, QVector<NavWayPointData> data, bool upload)
+void DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upload)
 {
-	if (name.isEmpty()) return tr("设备名称错误");
-	if (0 == data.count()) return tr("舞步数据为空");
-
-	//TODO 保存航点数据到本地
-	QFile file(QApplication::applicationDirPath() + "/waypoint/"+ name+".csv");
-	if (file.open(QIODevice::ReadWrite | QIODevice::Truncate)) {
-		QTextStream text_stream(&file);
-		text_stream.setCodec("utf-8");
-		QString title = "参数一,参数二,参数三,参数四,X,Y,Z,ID";
-		text_stream << title << "\r\n";
-		for (int i = 0; i < data.count(); i++) {
-			NavWayPointData wp = data.at(i);
-			QString text = QString("%1,%2,%3,%4,%5,%6,%7,%8")
-				.arg(wp.param1).arg(wp.param2).arg(wp.param3).arg(wp.param4).arg(wp.x).arg(wp.y).arg(wp.z).arg(wp.commandID);
-			text_stream << text << "\r\n";
-		}
-		file.flush();
-		file.close();
-	}
-	
+	//MAP用于统一发送航点信息到三维
+	QMap<QString, QVector<NavWayPointData>> map;
+	qDebug() << "准备生成舞步信息";
 	for (int i = 0; i < ui.listWidget->count(); i++) {
 		QListWidgetItem* pItem = ui.listWidget->item(i);
 		if (!pItem) continue;
@@ -497,20 +480,69 @@ QString DeviceManage::sendWaypoint(QString name, QVector<NavWayPointData> data, 
 		if (!pWidget) continue;
 		DeviceControl* pDevice = dynamic_cast<DeviceControl*>(pWidget);
 		if (!pDevice) continue;
-		if (name != pDevice->getName()) continue;
-		//舞步前添加起始位置
-		NavWayPointData startLocation;
-		startLocation.x = pDevice->getX();
-		startLocation.y = pDevice->getY();
-		startLocation.commandID = _WaypointStart;
-		data.prepend(startLocation);
-		if (upload) {
+		QString name = pDevice->getName();
+		if (name.isEmpty()) continue;
+		QFileInfo infoProject(qstrProjectFile);
+		QString qstrDevicePyFile = infoProject.path() + _ProjectDirName_ + name + _PyFileSuffix_;
+		if (false == QFile::exists(qstrDevicePyFile)) continue;
+		QFile file(qstrDevicePyFile);
+		if (!file.open(QIODevice::ReadOnly)) continue;
+		QByteArray arrData = file.readAll();
+		file.close();
+		if (arrData.isEmpty()) {
+			_ShowErrorMessage(name + tr(": 没有编写舞步"));
+			continue;
+		}
+		pythonThread.initStartlocation(pDevice->getX(), pDevice->getY());
+		//生成舞步过程必须一个个生成，python交互函数是静态全局，所以同时只能执行一个设备生成舞步
+		if (!pythonThread.compilePythonCode(arrData)) {
+			//生成舞步失败
+			_ShowErrorMessage(name + tr(": 解析舞步积木块失败"));
+			continue;
+		}
+		//TODO 等待python文件执行完成，此处需要优化，有可能造成死循环
+		while (!pythonThread.isFinished()) {
+			QApplication::processEvents();
+		}
+		if (PythonSuccessful != pythonThread.getLastState()) {
+			_ShowErrorMessage(name + tr(": 舞步转换失败"));
+			continue;
+		}
+		QVector<NavWayPointData> data = pythonThread.getWaypointData();
+		if (0 == data.count()) {
+			_ShowWarningMessage(name + tr("没有舞步信息"));
+			continue;
+		}
+		qDebug() << name << "航点数据" << data.count();
+		map.insert(name, data);
+		//保存航点数据到本地，便于查看
+		QFile fileSvg(QApplication::applicationDirPath() + "/waypoint/" + name + ".csv");
+		if (fileSvg.open(QIODevice::ReadWrite | QIODevice::Truncate)) {
+			QTextStream text_stream(&fileSvg);
+			text_stream.setCodec("utf-8");
+			QString title = "参数一,参数二,参数三,参数四,X,Y,Z,ID";
+			text_stream << title << "\r\n";
+			for (int i = 0; i < data.count(); i++) {
+				NavWayPointData wp = data.at(i);
+				QString text = QString("%1,%2,%3,%4,%5,%6,%7,%8")
+					.arg(wp.param1).arg(wp.param2).arg(wp.param3).arg(wp.param4).arg(wp.x).arg(wp.y).arg(wp.z).arg(wp.commandID);
+				text_stream << text << "\r\n";
+				qDebug() << name << QString("第%1条航点").arg(i) << text;
+			}
+			fileSvg.flush();
+			fileSvg.close();
+		}
+		if (false == upload) {
+			_ShowInfoMessage(name + tr("生成舞步完成"));
+		}
+		else {
 			//上传航点到飞控
 			int status = pDevice->DeviceMavWaypointStart(data);
-			if (_DeviceStatus::DeviceDataSucceed != status) return Utility::waypointMessgeFromStatus(status);
+			if (_DeviceStatus::DeviceDataSucceed != status) _ShowWarningMessage(Utility::waypointMessgeFromStatus(status));
 		}
 	}
-	return "";
+	//发送航点到三维
+	sendWaypointTo3D(map);
 }
 
 void DeviceManage::setUpdateWaypointTime(int second)
@@ -567,6 +599,7 @@ void DeviceManage::sendWaypointTo3D(QMap<QString, QVector<NavWayPointData>> map)
 
 		//TODO 暂时定义默认飞行速度
 		int speed = 60;
+		//飞行总时间 毫秒
 		int timesum = 0;
 		int lastX = 0;
 		int lastY = 0;
@@ -574,15 +607,22 @@ void DeviceManage::sendWaypointTo3D(QMap<QString, QVector<NavWayPointData>> map)
 
 		for (int i = 0; i < data.count(); i++) {
 			NavWayPointData waypoint = data.at(i);
-			if (31000 == waypoint.commandID) {
+			if (_WaypointSpeed == waypoint.commandID) {
 				//设置飞行速度
 				speed = waypoint.param1;
+				continue;
 				if (speed <= 0) speed = 60;
 			}
+			if (_WaypointHover == waypoint.commandID) {
+				waypoint.x = lastX;
+				waypoint.y = lastY;
+				waypoint.z = lastZ;
+				waypoint.commandID = _WaypointFly;
+			}
 			//TODO 非航点信息暂时不处理
-			if(16 != waypoint.commandID) continue;
-			int x = waypoint.x / 1000;
-			int y = waypoint.y / 1000;
+			if(_WaypointFly != waypoint.commandID) continue;
+			int x = waypoint.x;
+			int y = waypoint.y;
 			int z = waypoint.z;
 			if (i == 0) {
 				//第一个航点需要使用默认起飞位置
@@ -595,7 +635,7 @@ void DeviceManage::sendWaypointTo3D(QMap<QString, QVector<NavWayPointData>> map)
 			double d = getDistance(lastX, lastY, lastZ, x, y, z);
 			//计算飞行时间 时间使用毫秒单位
 			int time = d / speed * 1000;
-			if (16 == waypoint.commandID && waypoint.param1 > 0) {
+			if (waypoint.param1 > 0) {
 				time = time + waypoint.param1 * 1000;
 			}
 			timesum += time;

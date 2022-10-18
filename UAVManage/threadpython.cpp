@@ -4,6 +4,7 @@
 #include <QFile>
 #include <QDir>
 #include <QMessageBox>
+#include "messagelistdialog.h"
 
 struct _SpacePoint
 {
@@ -15,6 +16,7 @@ struct _SpacePoint
 	}
 }; 
 QVector<NavWayPointData> g_waypointData;
+
 QMap<QString, _SpacePoint> g_mapMarkPoint;
 ////Python to c++ data start////
 PyMethodDef xWrapMethods[] = {	
@@ -244,6 +246,14 @@ PyObject* QZAPI::FlySetSpeed(PyObject* self, PyObject* args)
 		return Py_BuildValue("i", 0);
 	}
 	qDebug() << "设置飞行速度" << n;
+	NavWayPointData last = g_waypointData.back();
+	NavWayPointData data;
+	data.x = last.x;
+	data.y = last.y;
+	data.z = last.z;
+	data.param1 = n;
+	data.commandID = _WaypointSpeed;
+	g_waypointData.append(data);
 	return Py_BuildValue("i", 0);
 }
 
@@ -254,6 +264,14 @@ PyObject* QZAPI::FlySetLed(PyObject* self, PyObject* args)
 		return Py_BuildValue("i", 0);
 	}
 	qDebug() << "设置LED灯模式" << n;
+	NavWayPointData last = g_waypointData.back();
+	NavWayPointData data;
+	data.x = last.x;
+	data.y = last.y;
+	data.z = last.z;
+	data.param1 = n;
+	data.commandID = _WaypointLed;
+	g_waypointData.append(data);
 	return Py_BuildValue("i", 0);
 }
 
@@ -264,6 +282,18 @@ PyObject* QZAPI::FlyHover(PyObject* self, PyObject* args)
 		return Py_BuildValue("i", 0);
 	}
 	qDebug() << "悬停时间" << n;
+	NavWayPointData last = g_waypointData.back();
+	if (last.z <= 0.0) {
+		//判断是否已经飞离地面
+		return Py_BuildValue("i", 0);
+	}
+	NavWayPointData data;
+	data.x = last.x;
+	data.y = last.y;
+	data.z = last.z;
+	data.param1 = n;
+	data.commandID = _WaypointHover;
+	g_waypointData.append(data);
 	return Py_BuildValue("i", 0);
 }
 
@@ -274,12 +304,25 @@ PyObject* QZAPI::FlyTakeoff(PyObject* self, PyObject* args)
 		return Py_BuildValue("i", 0);
 	}
 	qDebug() << "起飞高度" << n;
+	//TODO 需要判断是否已经设置起始位置
+	NavWayPointData lastWaypoint = g_waypointData.back();
+	NavWayPointData data;
+	data.x = lastWaypoint.x;
+	data.y = lastWaypoint.y;
+	data.z = lastWaypoint.z + n;
+	g_waypointData.append(data);
 	return Py_BuildValue("i", 0);
 }
 
 PyObject* QZAPI::FlyLand(PyObject* self, PyObject* args)
 {
 	qDebug() << "降落";
+	NavWayPointData lastWaypoint = g_waypointData.back();
+	NavWayPointData data;
+	data.x = lastWaypoint.x;
+	data.y = lastWaypoint.y;
+	data.z = 0;
+	g_waypointData.append(data);
 	return Py_BuildValue("i", 0);
 }
 
@@ -302,6 +345,14 @@ PyObject* QZAPI::FlyRevolve(PyObject* self, PyObject* args)
 		return Py_BuildValue("i", 0);
 	}
 	qDebug() << "无人机旋转" << angle;
+	NavWayPointData last = g_waypointData.back();
+	NavWayPointData data;
+	data.x = last.x;
+	data.y = last.y;
+	data.z = last.z;
+	data.param1 = angle;
+	data.commandID = _WaypointRevolve;
+	g_waypointData.append(data);
 	return Py_BuildValue("i", 0);
 }
 
@@ -313,6 +364,11 @@ PyObject* QZAPI::FlyTo(PyObject* self, PyObject* args)
 		return Py_BuildValue("i", 0);
 	}
 	qDebug() << "飞行到绝对位置" << x << y << z;
+	NavWayPointData data;
+	data.x = x;
+	data.y = y;
+	data.z = z;
+	g_waypointData.append(data);
 	return Py_BuildValue("i", 0);
 }
 
@@ -324,6 +380,28 @@ PyObject* QZAPI::FlyMove(PyObject* self, PyObject* args)
 		return Py_BuildValue("i", 0);
 	}
 	qDebug() << "相对移动" << direction << n;
+	//TODO 需要找到最后一个有效航点 id=16
+	NavWayPointData lastWaypoint = g_waypointData.back();
+	NavWayPointData data;
+	data.x = lastWaypoint.x;
+	data.y = lastWaypoint.y;
+	data.z = lastWaypoint.z;
+	//["前", "1"] ,
+	//["后", "2"],
+	//["右", "3"],
+	//["左", "4"],
+	//["上", "5"],
+	//["下", "6"],
+	switch (direction)
+	{
+	case 1: data.x += n * 1000; break;
+	case 2: data.x -= n * 1000; break;
+	case 3: data.y += n * 1000; break;
+	case 4: data.y -= n * 1000; break;
+	case 5: data.z += n; break;
+	case 6: data.z -= n; break;
+	}
+	g_waypointData.append(data);
 	return Py_BuildValue("i", 0);
 }
 
@@ -355,12 +433,23 @@ ThreadPython::~ThreadPython()
 	}
 }
 
+void ThreadPython::initStartlocation(int x, int y)
+{
+	//因为是全局变量，使用前清空内容
+	g_waypointData.clear();
+	//舞步前添加起始位置
+	NavWayPointData startLocation;
+	startLocation.x = x;
+	startLocation.y = y;
+	startLocation.commandID = _WaypointStart;
+	g_waypointData.prepend(startLocation);
+}
+
 bool ThreadPython::compilePythonCode(QByteArray arrCode)
 {
-	g_waypointData.clear();
 	if(arrCode.isEmpty()) return false;
 	m_pythonState = PythonRunNone;
-	////保存至文件后执行
+	////python代码添加必要头部数据
 	//QString qstrHeadFile = QApplication::applicationDirPath() + _PyHeadFile_;
 	//if (!QFile::exists(qstrHeadFile)) return false;
 	//QFile fileHead(qstrHeadFile);
@@ -373,6 +462,7 @@ bool ThreadPython::compilePythonCode(QByteArray arrCode)
 	//arrCode.prepend(arrHead + "\r\n");
 	//fileHead.close();
 
+	//python代码保存至文件后执行
 	QString qstrRunFile = QApplication::applicationDirPath() + _PyRunFilePath_;
 	QFile filePython(qstrRunFile);
 	if (!filePython.open(QIODevice::ReadWrite | QIODevice::Truncate)) return false;
@@ -402,17 +492,23 @@ bool ThreadPython::compilePythonFile(QString qstrFile)
 	m_qstrFilePath = qstrFile;
 	//添加接口类
 	if (PyImport_AppendInittab("QZAPI", PyInit_PythonCallBack) == -1) {
-		qDebug() << "----init callback error";
+		qDebug() << "python运行库加载失败";
 		return false;
 	}
 	//设置python运行环境目录
 	QString qstrPythonRunPath = QApplication::applicationDirPath() + _PyDllPath_;
 	//TODO检查python必要文件是否存在，防止执行python接口引起程序崩溃
 	QDir dirPython(qstrPythonRunPath);
-	if (false == dirPython.exists()) return false;
+	if (false == dirPython.exists()) {
+		qDebug() << "python文件夹不存在";
+		return false;
+	}
 	std::wstring wstrpath = qstrPythonRunPath.toStdWString();
 	Py_SetPythonHome((wchar_t*)wstrpath.c_str());
-	if (!QFile::exists(QApplication::applicationDirPath() + _PyNeceFie_)) return false;
+	if (!QFile::exists(QApplication::applicationDirPath() + _PyNeceFie_)) {
+		qDebug() << "python缺少必要文件";
+		return false;
+	}
 	//初始化python环境
 	if (!Py_IsInitialized()) Py_Initialize();
 	if (!Py_IsInitialized()) return false;
@@ -429,6 +525,7 @@ QString ThreadPython::checkWaypoint()
 void ThreadPython::run()
 {
 	if (!QFile::exists(m_qstrFilePath)) return;
+	qDebug() << "python文件开始执行" << m_qstrFilePath;
 	int n = PyRun_SimpleString("import sys");
 	//QString qstrPythonApiPath = QString("sys.path.append('%1')").arg(QApplication::applicationDirPath() + _PythonApiFilePath_);
 	QString qstrPythonPath = QString("sys.path.append('%1')").arg(QApplication::applicationDirPath());
@@ -438,7 +535,8 @@ void ThreadPython::run()
 	//执行python文件,生成航点列表
 	PyObject* pPyFile = PyImport_ImportModule(_PyFileName_);
 	if (!pPyFile) {
-		qDebug() << "---- python error:";
+		PyErr_CheckSignals();
+		qDebug() << "python执行出错";
 		Py_Finalize();
 		m_pythonState = PythonCodeError;
 		return;

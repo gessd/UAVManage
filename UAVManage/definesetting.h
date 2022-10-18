@@ -36,6 +36,17 @@
 #define _AttributeName_    "name"
 #define _AttributeIP_      "ip"
 
+
+enum _WaypointType {
+	_WaypointFly		= 16,		//飞行动作航点
+	_WaypointSpeed		= 31000,	//设置飞行速度
+	_WaypointRevolve	= 31001,	//旋转信息
+	_WaypointHover		= 31002,	//悬停信息
+	_WaypointLed		= 31003,    //LED灯状态信息
+	_WaypointStart		= 31004,	//初始位置信息
+	_WaypointTime		= 31005		//时间信息
+};
+
 //航点属性
 typedef struct __NavWayPointData
 {

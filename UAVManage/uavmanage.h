@@ -6,7 +6,7 @@
 #include <QProcess>
 #include <QWebSocket>
 #include <QWebSocketServer>
-//pythonºê¶¨ÒåÓëmavlinkÖĞºê¶¨ÒåÓĞ³åÍ»£¬pythonÒıÓÃ±ØĞë·Åµ½mavlinkÒıÓÃÖ®Ç°
+//pythonå®å®šä¹‰ä¸mavlinkä¸­å®å®šä¹‰æœ‰å†²çªï¼Œpythonå¼•ç”¨å¿…é¡»æ”¾åˆ°mavlinkå¼•ç”¨ä¹‹å‰
 #include "threadpython.h"
 #include "devicemanage.h"
 #include "messagelistdialog.h"
@@ -25,22 +25,22 @@ public:
     QString getCurrentPythonFile();
 private slots:
     /**
-    * @brief ĞÂ½¨ÏîÄ¿
+    * @brief æ–°å»ºé¡¹ç›®
     */
     void onNewProject();
     /**
-    * @brief ´ò¿ªÏîÄ¿
-    * @param ÏîÄ¿¾ø¶ÔÂ·¾¶
+    * @brief æ‰“å¼€é¡¹ç›®
+    * @param é¡¹ç›®ç»å¯¹è·¯å¾„
     */
     void onOpenProject(QString qstrFile);
 
-    //Ã¿Ò»²½¶¼×Ô¶¯±£´æ,ÎŞĞèÊÖ¶¯±£´æ,²»×Ô¶¯±£´æ»áÔì³ÉÇĞ»»ÎŞÈË»úºóblocklyĞÂ±à¼­ÄÚÈİ¶ªÊ§
+    //æ¯ä¸€æ­¥éƒ½è‡ªåŠ¨ä¿å­˜,æ— éœ€æ‰‹åŠ¨ä¿å­˜,ä¸è‡ªåŠ¨ä¿å­˜ä¼šé€ æˆåˆ‡æ¢æ— äººæœºåblocklyæ–°ç¼–è¾‘å†…å®¹ä¸¢å¤±
     /**
-    * @brief ÏîÄ¿Áí´æÎª
+    * @brief é¡¹ç›®å¦å­˜ä¸º
     */
     void onSaveasProject();
     /**
-     * @brief Çå¿ÕWEB»ıÄ¾¿é
+     * @brief æ¸…ç©ºWEBç§¯æœ¨å—
      */
     void onWebClear();
 protected:
@@ -49,108 +49,103 @@ protected:
     virtual void resizeEvent(QResizeEvent* event);
 private slots:
     /**
-     * @brief WEBÒ³Ãæ¼ÓÔØ½ø¶È£¬°Ù·ÖÖÆ
+     * @brief WEBé¡µé¢åŠ è½½è¿›åº¦ï¼Œç™¾åˆ†åˆ¶
      */
     void onWebLoadProgress(int progress);
     /**
-     * @brief WEBÒ³Ãæ¼ÓÔØÍê³É
+     * @brief WEBé¡µé¢åŠ è½½å®Œæˆ
      */
     void onWebLoadFinished(bool finished);
     /**
-     * @brief WEBĞÂ½¨Á¬½Ó
+     * @brief WEBæ–°å»ºè¿æ¥
      */
 	void onSocketNewConnection();
     /**
-     * @brief ÊÕµ½WEBÏûÏ¢
+     * @brief æ”¶åˆ°WEBæ¶ˆæ¯
      */
 	void onSocketTextMessageReceived(QString message);
     /**
-     * @brief WEBÁ¬½Ó¶Ï¿ª
+     * @brief WEBè¿æ¥æ–­å¼€
      */
 	void onSocketDisconnected();
     /**
-     * @brief Ñ¡ÖĞÉè±¸¸Ä±ä
-     * @param [in] currentName  ĞÂÉè±¸Ãû³Æ
-     * @param [in] previousName ¾ÉÉè±¸Ãû³Æ
+     * @brief é€‰ä¸­è®¾å¤‡æ”¹å˜
+     * @param [in] currentName  æ–°è®¾å¤‡åç§°
+     * @param [in] previousName æ—§è®¾å¤‡åç§°
      */
     void onCurrentDeviceNameChanged(QString currentName, QString previousName);
     /**
-     * @brief Éè±¸ÁĞ±íÖĞÉè±¸ĞÂÔö»ò¸üĞÂ
+     * @brief è®¾å¤‡åˆ—è¡¨ä¸­è®¾å¤‡æ–°å¢æˆ–æ›´æ–°
      */
     void onDeviceAdd(QString name, QString ip, float x, float y);
     /**
-     * @brief Éè±¸ÁĞ±íÖĞÉè±¸ÒÆ³ı
+     * @brief è®¾å¤‡åˆ—è¡¨ä¸­è®¾å¤‡ç§»é™¤
      */
     void onDeviceRemove(QString name);
     /**
-     * @brief Éè±¸ÁĞ±íÖĞÉè±¸ÖØÃüÃû
+     * @brief è®¾å¤‡åˆ—è¡¨ä¸­è®¾å¤‡é‡å‘½å
      */
     void onDeviceRename(QString newName, QString oldName);
     /**
-     * @brief Éè±¸IPµØÖ·ÒÑĞŞ¸Ä
-     * @param Éè±¸Ãû
-     * @param IPµØÖ·
+     * @brief è®¾å¤‡IPåœ°å€å·²ä¿®æ”¹
+     * @param è®¾å¤‡å
+     * @param IPåœ°å€
      */
     void onDeviceResetIp(QString name, QString ip);
     /**
-     * @brief ĞŞ¸ÄÉè±¸³õÊ¼Î»ÖÃ
+     * @brief ä¿®æ”¹è®¾å¤‡åˆå§‹ä½ç½®
      */
     void onDeviceResetLocation(QString name, long x, long y);
     /**
-    * @brief Éè±¸Æğ·ÉÖ¸ÁîÏÂ·¢Íê³É
-    * @param Æğ·É|½µÂä
+    * @brief è®¾å¤‡èµ·é£æŒ‡ä»¤ä¸‹å‘å®Œæˆ
+    * @param èµ·é£|é™è½
     */
     void onDeviceTakeoffFinished(bool takeoff);
     /**
-     * @brief ³ÌĞò¼äÍ¨Ñ¶
+     * @brief ç¨‹åºé—´é€šè®¯
      */
     void onAppMessage(const QString& message);
     /**
-     * @brief º½µãÉÏ´«½ø¶È
+     * @brief èˆªç‚¹ä¸Šä¼ è¿›åº¦
      */
     void onWaypointProcess(QString name, unsigned int index, unsigned int count, int res, bool finish, QString text);
     /**
-    * @brief ¸üĞÂ¼ÓÔØÒôÀÖÎÄ¼ş
+    * @brief æ›´æ–°åŠ è½½éŸ³ä¹æ–‡ä»¶
     */
     void onUpdateMusic(QString qstrFilePath);
     /**
-    * @brief µ±Ç°ÒôÀÖ²¥·Å½ø¶È
+    * @brief å½“å‰éŸ³ä¹æ’­æ”¾è¿›åº¦
     */
     void onCurrentMusicTime(int second);
     /**
-    * @brief µ±Ç°ÒôÀÖ²¥·Å×´Ì¬
+    * @brief å½“å‰éŸ³ä¹æ’­æ”¾çŠ¶æ€
     */
     void onCurrentPlayeState(qint8 state);
     /**
-    * @brief ÈıÎ¬´°¿ÚÁ¬½Ó×´Ì¬
+    * @brief ä¸‰ç»´çª—å£è¿æ¥çŠ¶æ€
     */
     void on3DDialogStauts(bool connect);
 private:
     /**
-     * @brief ĞÂ½¨ÏîÄ¿¹¤³ÌÎÄ¼ş
-     * @param [in] qstrFile ÏîÄ¿¾ø¶ÔÂ·¾¶Ãû³Æ
-     * @param [in] X ³¡µØ´óĞ¡
-     * @param [in] Y ³¡µØ´óĞ¡
-     * @return ÎÄ¼şÊÇ·ñ½¨Á¢³É¹¦
+     * @brief æ–°å»ºé¡¹ç›®å·¥ç¨‹æ–‡ä»¶
+     * @param [in] qstrFile é¡¹ç›®ç»å¯¹è·¯å¾„åç§°
+     * @param [in] X åœºåœ°å¤§å°
+     * @param [in] Y åœºåœ°å¤§å°
+     * @return æ–‡ä»¶æ˜¯å¦å»ºç«‹æˆåŠŸ
      */
     bool newProjectFile(QString qstrFile, unsigned int X, unsigned int Y);
-    /**
-     * @brief Éú³ÉÎè²½
-     * @param bUpload ÊÇ·ñÉÏ´«Îè²½µ½Éè±¸
-     */
-    void deviceWaypoint(bool bUpload = false);
 private:
     Ui::UAVManageClass ui;
-    //Éè±¸ÁĞ±í
+    //è®¾å¤‡åˆ—è¡¨
     DeviceManage* m_pDeviceManage;
-    //websocket·şÎñ »ıÄ¾¿é½çÃæ
+    //websocketæœåŠ¡ ç§¯æœ¨å—ç•Œé¢
     QWebSocketServer* m_pSocketServer;
-    //webÁ¬½Ó »ıÄ¾¿é½çÃæ
+    //webè¿æ¥ ç§¯æœ¨å—ç•Œé¢
     QWebSocket* m_pWebSocket;
     QString m_qstrLastWebMessage;
-    //µ±Ç°¹¤³ÌÎÄ¼ş
+    //å½“å‰å·¥ç¨‹æ–‡ä»¶
     QString m_qstrCurrentProjectFile;
-    ThreadPython ptyhon;
+    ThreadPython python;
     SoundGrade* m_pSoundWidget;
     QProcess* m_p3DProcess;
 };

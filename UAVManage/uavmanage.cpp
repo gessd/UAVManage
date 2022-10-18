@@ -109,7 +109,7 @@ UAVManage::UAVManage(QWidget *parent)
 	ui.toolBar->addAction(pActionFly4);
 	ui.toolBar->addAction(pActionFly5);
 	ui.toolBar->addAction(pActionFly6);
-	connect(pActionFly1, &QAction::triggered, [this]() { deviceWaypoint(); });
+	connect(pActionFly1, &QAction::triggered, [this]() { m_pDeviceManage->waypointComposeAndUpload(m_qstrCurrentProjectFile, false); });
 	connect(pActionFly2, &QAction::triggered, [this]() { 
 		//if (m_qstrCurrentProjectFile.isEmpty()) return;
 		m_p3DProcess->start("notepad.exe");
@@ -120,7 +120,7 @@ UAVManage::UAVManage(QWidget *parent)
 		PlaceInfoDialog info(this);
 		info.exec();
 		});
-	connect(pActionFly4, &QAction::triggered, [this]() { deviceWaypoint(true); });
+	connect(pActionFly4, &QAction::triggered, [this]() { m_pDeviceManage->waypointComposeAndUpload(m_qstrCurrentProjectFile, true); });
 	connect(pActionFly5, &QAction::triggered, [this]() {  //暂无功能
 		});
 	connect(pActionFly6, &QAction::triggered, [this]() { 
@@ -729,7 +729,6 @@ void UAVManage::onCurrentPlayeState(qint8 state)
 void UAVManage::on3DDialogStauts(bool connect)
 {
 	if (connect) {
-		deviceWaypoint();
 		QFileInfo infoProject(m_qstrCurrentProjectFile);
 		QTextCodec* code = QTextCodec::codecForName(_XMLNameCoding_);
 		std::string filename = code->fromUnicode(m_qstrCurrentProjectFile).data();
@@ -742,6 +741,8 @@ void UAVManage::on3DDialogStauts(bool connect)
 		if (!place) return;
 		QString qstrMusicPath = infoProject.path() + _ProjectDirName_ + place->Attribute(_ElementMusic_);
 		m_pDeviceManage->setCurrentMusicPath(qstrMusicPath);
+
+		m_pDeviceManage->waypointComposeAndUpload(m_qstrCurrentProjectFile, false);
 	}
 }
 
@@ -773,59 +774,4 @@ bool UAVManage::newProjectFile(QString qstrFile, unsigned int X, unsigned int Y)
 	}
 	return true;
 	
-}
-
-void UAVManage::deviceWaypoint(bool bUpload)
-{
-	if (m_qstrCurrentProjectFile.isEmpty()) return;
-	QStringList list = m_pDeviceManage->getDeviceNameList();
-	QMap<QString, QVector<NavWayPointData>> map;
-	foreach(QString name, list) {
-		if (name.isEmpty()) continue;
-		QFileInfo infoProject(m_qstrCurrentProjectFile);
-		QString qstrDevicePyFile = infoProject.path() + _ProjectDirName_ + name + _PyFileSuffix_;
-		if (false == QFile::exists(qstrDevicePyFile)) continue;
-		QFile file(qstrDevicePyFile);
-		if (!file.open(QIODevice::ReadOnly)) continue;
-		QByteArray arrData = file.readAll();
-		file.close();
-		if (arrData.isEmpty()) {
-			_ShowErrorMessage(name + tr(": 没有编写舞步"));
-			continue;
-		}
-		//生成舞步过程必须一个个生成，python交互函数是静态全局，所以同时只能执行一个设备生成舞步
-		if (!ptyhon.compilePythonCode(arrData)) {
-			//生成舞步失败
-			_ShowErrorMessage(name + tr(": 解析舞步积木块失败"));
-			continue;
-		}
-		//TODO 等待python文件执行完成，此处需要优化，有可能造成死循环
-		while (!ptyhon.isFinished()){
-			QApplication::processEvents();
-		}
-		if (PythonSuccessful != ptyhon.getLastState()) {
-			_ShowErrorMessage(name + tr(": 舞步转换失败"));
-			continue;
-		}
-		QVector<NavWayPointData> data = ptyhon.getWaypointData();
-		if (0 == data.count()) {
-			_ShowWarningMessage(name+tr("没有舞步信息"));
-			continue;
-		}
-		else{
-			if(!bUpload) _ShowInfoMessage(name + tr("生成舞步完成"));
-		}
-		qDebug() << "航点信息" << name << data.count();
-		for (int i = 0; i < data.count(); i++) {
-			NavWayPointData waypoint = data.at(i);
-			qDebug() << QString("第%1条航点信息").arg(i) << waypoint.param1 << waypoint.param2 << waypoint.param3 << waypoint.param4
-				<< waypoint.x << waypoint.y << waypoint.z << waypoint.commandID;
-		}
-
-		//上传舞步到飞控/更新三维舞步
-		QString message = m_pDeviceManage->sendWaypoint(name, data, bUpload);
-		if(!message.isEmpty()) _ShowWarningMessage(name + tr("上传舞步") + message);
-		map.insert(name, data);
-	}
-	m_pDeviceManage->sendWaypointTo3D(map);
 }

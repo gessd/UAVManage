@@ -2,6 +2,8 @@
 
 #include <QWidget>
 #include "ui_devicemanage.h"
+//pythonå®å®šä¹‰ä¸mavlinkä¸­å®å®šä¹‰æœ‰å†²çªï¼Œpythonå¼•ç”¨å¿…é¡»æ”¾åˆ°mavlinkå¼•ç”¨ä¹‹å‰
+#include "threadpython.h"
 #include "adddevicedialog.h"
 #include "devicecontrol.h"
 #include <QMenu>
@@ -26,154 +28,155 @@ class DeviceManage : public QWidget
 	//Q_PROPERTY(QString deviceName READ getCurrentName WRITE setCurrentName)
 public:
 	enum _AllDeviceCommand {
-		_DeviceTakeoffLocal=1, //Æğ·É
-		_DeviceLandLocal,      //½µÂä
-		_DeviceQuickStop,      //¼±Í£
-		_DeviceSetout		   //×¼±¸Æğ·É
+		_DeviceTakeoffLocal=1, //èµ·é£
+		_DeviceLandLocal,      //é™è½
+		_DeviceQuickStop,      //æ€¥åœ
+		_DeviceSetout		   //å‡†å¤‡èµ·é£
 	};
 	enum _CalibrationEnum {
-		_Gyro,				//ÍÓÂİĞ£×¼
-		_Magnetometer,		//´ÅÂŞÅÌĞ£×¼ 
-		_MagEnable,			//´ÅÂŞÅÌÊ¹ÄÜ¿ª¹Ø
-		_Remote,			//ÎŞĞ§Öµ
-		_Accelerometer,		//¼Ó¼ÆĞ£×¼
-		_Compmot,			//ÎŞĞ§Öµ
-		_Baro				//µçµ÷Ğ£×¼
+		_Gyro,				//é™€èºæ ¡å‡†
+		_Magnetometer,		//ç£ç½—ç›˜æ ¡å‡† 
+		_MagEnable,			//ç£ç½—ç›˜ä½¿èƒ½å¼€å…³
+		_Remote,			//æ— æ•ˆå€¼
+		_Accelerometer,		//åŠ è®¡æ ¡å‡†
+		_Compmot,			//æ— æ•ˆå€¼
+		_Baro				//ç”µè°ƒæ ¡å‡†
 	};
 	DeviceManage(QWidget *parent = Q_NULLPTR);
 	~DeviceManage();
 	/**
-	* @brief Ìí¼ÓÉè±¸
-	* @param [in] qstrName Éè±¸Ãû³Æ
-	* @param [in] ip Éè±¸IP
-	* @param [in] x ³õÊ¼Î»ÖÃ
-	* @param [in] y ³õÊ¼Î»ÖÃ
-	* @return ´íÎóĞÅÏ¢,³É¹¦Îª¿Õ
+	* @brief æ·»åŠ è®¾å¤‡
+	* @param [in] qstrName è®¾å¤‡åç§°
+	* @param [in] ip è®¾å¤‡IP
+	* @param [in] x åˆå§‹ä½ç½®
+	* @param [in] y åˆå§‹ä½ç½®
+	* @return é”™è¯¯ä¿¡æ¯,æˆåŠŸä¸ºç©º
 	*/
 	QString addDevice(QString qstrName, QString ip, long x, long y);
 	/**
-	* @brief É¾³ıÉè±¸
+	* @brief åˆ é™¤è®¾å¤‡
 	*/
 	void removeDevice();
 	/**
-	 * @brief Çå¿ÕËùÓĞÉè±¸
+	 * @brief æ¸…ç©ºæ‰€æœ‰è®¾å¤‡
 	 */
 	void clearDevice();
 	/**
-	 * @brief »ñÈ¡µ±Ç°Éè±¸Ãû
+	 * @brief è·å–å½“å‰è®¾å¤‡å
 	 */
 	QString getCurrentDeviceName();
 	/**
-	 * @brief ÉèÖÃµ±Ç°Ñ¡ÖĞÉè±¸
+	 * @brief è®¾ç½®å½“å‰é€‰ä¸­è®¾å¤‡
 	 */
 	bool setCurrentDevice(QString qstrName);
 	/**
-	 * @brief »ñÈ¡Éè±¸Ãû³ÆÁĞ±í,°´ÕÕÁĞ±íË³Ğò
+	 * @brief è·å–è®¾å¤‡åç§°åˆ—è¡¨,æŒ‰ç…§åˆ—è¡¨é¡ºåº
 	 */
 	QStringList getDeviceNameList();
 	/**
-	* @brief »ñÈ¡ĞÂµÄ¿ÉÓÃµÄÉè±¸Ãû³Æ,ÒòÉè±¸Ãû³Æ²»¿ÉÖØ¸´
-	* @return °´Ë³Ğò·µ»ØÉè±¸Ãû³Æ
+	* @brief è·å–æ–°çš„å¯ç”¨çš„è®¾å¤‡åç§°,å› è®¾å¤‡åç§°ä¸å¯é‡å¤
+	* @return æŒ‰é¡ºåºè¿”å›è®¾å¤‡åç§°
 	*/
 	QString getNewDefaultName();
 	/**
-	* @brief ÅĞ¶ÏÊÇ·ñÖØ¸´,Îª¿ÕÔò²»ÅĞ¶Ï
-	* @param [in] qstrName Éè±¸Ãû
-	* @param [in] ip Éè±¸IP
-	* @param [in] ×ø±êX
-	* @param [in] ×ø±êY
-	* @param [in] ÊÇ·ñÅĞ¶Ï×ø±êÖØ¸´
+	* @brief åˆ¤æ–­æ˜¯å¦é‡å¤,ä¸ºç©ºåˆ™ä¸åˆ¤æ–­
+	* @param [in] qstrName è®¾å¤‡å
+	* @param [in] ip è®¾å¤‡IP
+	* @param [in] åæ ‡X
+	* @param [in] åæ ‡Y
+	* @param [in] æ˜¯å¦åˆ¤æ–­åæ ‡é‡å¤
 	*/
 	QString isRepetitionDevice(QString qstrName, QString ip, long x, long y, QString type);
 	/**
-	 * @brief ¿ØÖÆËùÓĞÉè±¸Ö´ĞĞ
+	 * @brief æ§åˆ¶æ‰€æœ‰è®¾å¤‡æ‰§è¡Œ
 	 */
 	void allDeviceControl(_AllDeviceCommand comand);
 	/**
-	* @brief Éè±¸Ğ£×¼
+	* @brief è®¾å¤‡æ ¡å‡†
 	*/
 	void allDeviceCalibration(_CalibrationEnum c);
+
 	/**
-	 * @brief ÉÏ´«Îè²½µ½·É¿Ø
-	 * @param name Éè±¸Ãû³Æ
-	 * @param data º½µãÁĞ±í Ğ­ÒéĞÅÏ¢
-	 * @param upload ÊÇ·ñÉÏ´«Îè²½µ½·É¿Ø
-	 * @return ·µ»Ø´íÎóĞÅÏ¢
+	 * @brief ç”Ÿæˆå¹¶ä¸Šä¼ èˆæ­¥
+	 * @param æ‰“å¼€çš„å·¥ç¨‹æ–‡ä»¶ï¼Œæ ¹æ®å·¥ç¨‹æ–‡ä»¶ç›®å½•æ‰“å¼€æ¯ä¸ªæ— äººæœºçš„pyæ–‡ä»¶
+	 * @param æ˜¯å¦ä¸Šä¼ åˆ°é£æ§
 	 */
-	QString sendWaypoint(QString name, QVector<NavWayPointData> data, bool upload);
+	void waypointComposeAndUpload(QString qstrProjectFile, bool upload);
+
 	/**
-	* @brief ¸ù¾İÒôÀÖ½ø¶È¸üĞÂÎè²½Ê±¼ä
-	* @param ÃëÖµ
+	* @brief æ ¹æ®éŸ³ä¹è¿›åº¦æ›´æ–°èˆæ­¥æ—¶é—´
+	* @param ç§’å€¼
 	*/
 	void setUpdateWaypointTime(int second);
+
 	/**
-	* @brief ÉèÖÃµ±Ç°ÒôÆµ²¥·Å×´Ì¬
+	* @brief è®¾ç½®å½“å‰éŸ³é¢‘æ’­æ”¾çŠ¶æ€
 	*/
 	void setCurrentPlayeState(qint8 state);
 	/**
-	* @brief ÈıÎ¬ÉèÖÃÒôÀÖÎÄ¼şÂ·¾¶
+	* @brief ä¸‰ç»´è®¾ç½®éŸ³ä¹æ–‡ä»¶è·¯å¾„
 	*/
 	void setCurrentMusicPath(QString filePath);
 	/**
-	 * @brief ·¢ËÍº½µãÁĞ±íµ½ÈıÎ¬
-	 * @param ËùÓĞÉè±¸º½µã,¸ù¾İÃû³ÆÇø·Ö
-	 * ÒòÉè±¸º½µãÊÇÃ¿¸öÉè±¸µ¥¶À·¢ËÍ£¬¹Ê·¢µÄÈıÎ¬µÄº½µãÓëÉè±¸·Ö¿ª
+	 * @brief å‘é€èˆªç‚¹åˆ—è¡¨åˆ°ä¸‰ç»´
+	 * @param æ‰€æœ‰è®¾å¤‡èˆªç‚¹,æ ¹æ®åç§°åŒºåˆ†
+	 * å› è®¾å¤‡èˆªç‚¹æ˜¯æ¯ä¸ªè®¾å¤‡å•ç‹¬å‘é€ï¼Œæ•…å‘çš„ä¸‰ç»´çš„èˆªç‚¹ä¸è®¾å¤‡åˆ†å¼€
 	 */
 	void sendWaypointTo3D(QMap<QString, QVector<NavWayPointData>> map);
 signals:
 	/**
-	 * @brief Éè±¸Ìí¼ÓÍê³É
-	 * @param Éè±¸Ãû
+	 * @brief è®¾å¤‡æ·»åŠ å®Œæˆ
+	 * @param è®¾å¤‡å
 	 * @param IP
-	 * @param ³õÊ¼×ø±ê
-	 * @param ³õÊ¼×ø±ê
+	 * @param åˆå§‹åæ ‡
+	 * @param åˆå§‹åæ ‡
 	 */
 	void deviceAddFinished(QString qstrName, QString ip, float x, float y);
 	/**
-	 * @brief Éè±¸É¾³ıÍê³É
-	 * @param Éè±¸Ãû
+	 * @brief è®¾å¤‡åˆ é™¤å®Œæˆ
+	 * @param è®¾å¤‡å
 	 */
 	void deviceRemoveFinished(QString qstrName);
 	/**
-	 * @brief Éè±¸ÖØÃüÃûÍê³É
-	 * @param ĞÂÉè±¸Ãû
-	 * @param ¾ÉÉè±¸Ãû
+	 * @brief è®¾å¤‡é‡å‘½åå®Œæˆ
+	 * @param æ–°è®¾å¤‡å
+	 * @param æ—§è®¾å¤‡å
 	 */
 	void deviceRenameFinished(QString newName, QString oldName);
 	/**
-	 * @brief Éè±¸ĞŞ¸ÄIPµØÖ·
-	 * @param Éè±¸Ãû
-	 * @param IPµØÖ·
+	 * @brief è®¾å¤‡ä¿®æ”¹IPåœ°å€
+	 * @param è®¾å¤‡å
+	 * @param IPåœ°å€
 	 */
 	void deviceResetIp(QString qstrName, QString ip);
 	/**
-	 * @brief Éè±¸³õÊ¼Î»ÖÃ±»ĞŞ¸Ä
-	 * @param Éè±¸Ãû
+	 * @brief è®¾å¤‡åˆå§‹ä½ç½®è¢«ä¿®æ”¹
+	 * @param è®¾å¤‡å
 	 */
 	void deviceResetLocation(QString name, long x, long y);
 	/**
-	 * @brief µ±Ç°Ñ¡ÖĞÉè±¸¸Ä±ä
-	 * @param µ±Ç°Ñ¡ÖĞÉè±¸
-	 * @param ÉÏÒ»´ÎÑ¡ÖĞÉè±¸£¬¿ÉÄÜ´æÔÚ¿Õ
+	 * @brief å½“å‰é€‰ä¸­è®¾å¤‡æ”¹å˜
+	 * @param å½“å‰é€‰ä¸­è®¾å¤‡
+	 * @param ä¸Šä¸€æ¬¡é€‰ä¸­è®¾å¤‡ï¼Œå¯èƒ½å­˜åœ¨ç©º
 	 */
 	void currentDeviceNameChanged(QString currentName, QString previousName);
 	/**
-	 * @brief Îè²½ÉÏ´«½ø¶È
-	 * @param name Éè±¸Ãû³Æ
-	 * @param index Îè²½ĞòºÅ
-	 * @param count Îè²½×ÜÊı
-	 * @param res ÉÏ´«Îè²½ÏìÓ¦½á¹û
-	 * @param finish Õû¸ö¹ı³ÌÊÇ·ñÍê³É
-	 * @param text µ±Ç°½øĞĞµÄ¹ı³Ì
+	 * @brief èˆæ­¥ä¸Šä¼ è¿›åº¦
+	 * @param name è®¾å¤‡åç§°
+	 * @param index èˆæ­¥åºå·
+	 * @param count èˆæ­¥æ€»æ•°
+	 * @param res ä¸Šä¼ èˆæ­¥å“åº”ç»“æœ
+	 * @param finish æ•´ä¸ªè¿‡ç¨‹æ˜¯å¦å®Œæˆ
+	 * @param text å½“å‰è¿›è¡Œçš„è¿‡ç¨‹
 	 */
 	void sigWaypointProcess(QString name, unsigned int index, unsigned int count, int res, bool finish, QString text);
 	/**
-	* @brief Éè±¸Æğ·ÉÖ¸ÁîÏÂ·¢Íê³É
-	* @param Æğ·É|½µÂä
+	* @brief è®¾å¤‡èµ·é£æŒ‡ä»¤ä¸‹å‘å®Œæˆ
+	* @param èµ·é£|é™è½
 	*/
 	void sigTakeoffFinished(bool takeoff);
 	/**
-	* @brief ÈıÎ¬´°¿ÚÁ¬½Ó×´Ì¬
+	* @brief ä¸‰ç»´çª—å£è¿æ¥çŠ¶æ€
 	*/
 	void sig3DDialogStatus(bool connect);
 protected:
@@ -181,49 +184,50 @@ protected:
 private slots:
 	void onDeviceConrolFinished(QString text, int res, QString explain);
 	/**
-	 * @brief ÈıÎ¬´°¿Ú½¨Á¢Á¬½Ó
+	 * @brief ä¸‰ç»´çª—å£å»ºç«‹è¿æ¥
 	 */
 	void on3dNewConnection();
 	/**
-	 * @brief ¶¨Ê±´¦ÀíÈıÎ¬ÏûÏ¢·¢ËÍ¼ÇÂ¼
+	 * @brief å®šæ—¶å¤„ç†ä¸‰ç»´æ¶ˆæ¯å‘é€è®°å½•
 	 */
 	void onTimeout3DMessage();
 	/**
-	 * @brief ¶¨Ê±·¢ËÍÉè±¸×´Ì¬µ½ÈıÎ¬
+	 * @brief å®šæ—¶å‘é€è®¾å¤‡çŠ¶æ€åˆ°ä¸‰ç»´
 	 */
 	void onUpdateStatusTo3D();
 private:
 	/**
-	 * @brief µ±Ç°Ñ¡ÖĞµÄÉè±¸
+	 * @brief å½“å‰é€‰ä¸­çš„è®¾å¤‡
 	 */
 	DeviceControl* getCurrentDevice();
 	/**
-	 * @brief ¸ù¾İÉè±¸Ãû³Æ»ñÈ¡Éè±¸¿ØÖÆ¶ÔÏó
+	 * @brief æ ¹æ®è®¾å¤‡åç§°è·å–è®¾å¤‡æ§åˆ¶å¯¹è±¡
 	 */
 	DeviceControl* getDeviceFromName(QString name);
 	/**
-	 * @brief Í¨¹ıTCPÏòÈıÎ¬·¢ËÍÏûÏ¢
+	 * @brief é€šè¿‡TCPå‘ä¸‰ç»´å‘é€æ¶ˆæ¯
 	 */
 	void sendMessageTo3D(QJsonObject json3d);
 	/**
-	 * @@brief ´¦Àí½ÓÊÕµÄÈıÎ¬ÏûÏ¢
+	 * @@brief å¤„ç†æ¥æ”¶çš„ä¸‰ç»´æ¶ˆæ¯
 	 */
 	void analyzeMessageFrom3D(QByteArray data);
 	/**
-	 * @@brief ¼ÆËãÁ½µãÖ±½Ó¾àÀë
+	 * @@brief è®¡ç®—ä¸¤ç‚¹ç›´æ¥è·ç¦»
 	 */
 	double getDistance(int x1, int y1, int z1, int x2, int y2, int z2);
 private:
 	Ui::DeviceManage ui;
-	//Éè±¸²Ëµ¥
+	//è®¾å¤‡èœå•
 	QMenu* m_pMenu;
-	//ÈıÎ¬Ä£ÄâÍ¨Ñ¶Ê¹ÓÃ
+	//ä¸‰ç»´æ¨¡æ‹Ÿé€šè®¯ä½¿ç”¨
 	QTcpServer* m_p3dTcpServer;
 	QTcpSocket* m_p3dTcpSocket;
-	//ÈıÎ¬ÏûÏ¢¼ÇÂ¼£¬ÓÃÓÚ·¢ËÍÊ§°ÜÖØ·¢
+	//ä¸‰ç»´æ¶ˆæ¯è®°å½•ï¼Œç”¨äºå‘é€å¤±è´¥é‡å‘
 	QMap<int, QJsonObject> m_map3DMsgRecord;
 	QTimer m_timerMessage3D;
-	//¶¨Ê±·¢ËÍÎŞÈË»ú×ËÌ¬Êı¾İµ½ÈıÎ¬
+	//å®šæ—¶å‘é€æ— äººæœºå§¿æ€æ•°æ®åˆ°ä¸‰ç»´
 	QTimer m_timerUpdateStatus;
-	
+	//ç”¨äºæ‰§è¡Œpythonä»£ç 
+	ThreadPython pythonThread;
 };
