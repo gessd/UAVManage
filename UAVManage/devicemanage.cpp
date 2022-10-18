@@ -472,6 +472,23 @@ QString DeviceManage::sendWaypoint(QString name, QVector<NavWayPointData> data, 
 {
 	if (name.isEmpty()) return tr("设备名称错误");
 	if (0 == data.count()) return tr("舞步数据为空");
+
+	//TODO 保存航点数据到本地
+	QFile file(QApplication::applicationDirPath() + "/waypoint/"+ name+".csv");
+	if (file.open(QIODevice::ReadWrite | QIODevice::Truncate)) {
+		QTextStream text_stream(&file);
+		text_stream.setCodec("utf-8");
+		QString title = "参数一,参数二,参数三,参数四,X,Y,Z,ID";
+		text_stream << title << "\r\n";
+		for (int i = 0; i < data.count(); i++) {
+			NavWayPointData wp = data.at(i);
+			QString text = QString("%1,%2,%3,%4,%5,%6,%7,%8")
+				.arg(wp.param1).arg(wp.param2).arg(wp.param3).arg(wp.param4).arg(wp.x).arg(wp.y).arg(wp.z).arg(wp.commandID);
+			text_stream << text << "\r\n";
+		}
+		file.flush();
+		file.close();
+	}
 	
 	for (int i = 0; i < ui.listWidget->count(); i++) {
 		QListWidgetItem* pItem = ui.listWidget->item(i);
@@ -485,9 +502,8 @@ QString DeviceManage::sendWaypoint(QString name, QVector<NavWayPointData> data, 
 		NavWayPointData startLocation;
 		startLocation.x = pDevice->getX();
 		startLocation.y = pDevice->getY();
-		startLocation.commandID = 31004;
+		startLocation.commandID = _WaypointStart;
 		data.prepend(startLocation);
-
 		if (upload) {
 			//上传航点到飞控
 			int status = pDevice->DeviceMavWaypointStart(data);
