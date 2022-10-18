@@ -7,13 +7,13 @@
 #include <QHBoxLayout>
 #include <QDebug>
 
-//消息初始时间
+//娑堟伅鍒濆鏃堕棿
 #define _ItemTime_      Qt::UserRole+20
-//消息显示停留时间
+//娑堟伅鏄剧ず鍋滅暀鏃堕棿
 #define _ItemWaitTime_  Qt::UserRole+21
-//列表ITEM高度
+//鍒楄〃ITEM楂樺害
 #define _ItemHeight_ 60
-//列表间隔
+//鍒楄〃闂撮殧
 #define _ItemSpacing 5
 
 MessageListDialog* g_pMessage = NULL;
@@ -26,48 +26,7 @@ MessageListDialog* MessageListDialog::getInstance()
 
 void MessageListDialog::addMessageTest(QString text, _Messagelevel level)
 {	
-	qDebug() << text;
-	if (parent()) {
-		QWidget* pWidget = dynamic_cast<QWidget*>(parent());
-		if (pWidget) {
-			move((pWidget->width() - width()) / 2, 0);
-		}
-	}
-	
-	QListWidgetItem* pItem = new QListWidgetItem();
-	ui.listWidget->addItem(pItem);
-	pItem->setSizeHint(QSize(0, _ItemHeight_));
-	pItem->setData(_ItemTime_, QDateTime::currentDateTime().toTime_t());
-	QLabel* pLabel = new QLabel(text);
-	pLabel->setWordWrap(true);
-	pLabel->setAlignment(Qt::AlignHCenter|Qt::AlignVCenter);
-	unsigned int nMaxWidth = ui.listWidget->width() - 17;
-	pLabel->setFixedSize(nMaxWidth, _ItemHeight_ - 2);
-	switch (level)
-	{
-	case InfoMessage: 
-		pItem->setData(_ItemWaitTime_, 3);
-		pLabel->setObjectName("LabelInfoMessage");
-		break;
-	case WarningMessage:
-		pItem->setData(_ItemWaitTime_, 6);
-		pLabel->setObjectName("LabelWarningMessage");
-		break;
-	case ErrorMessage:
-		pItem->setData(_ItemWaitTime_, 9);
-		pLabel->setObjectName("LabelErrorMessage");
-		break;
-	default:
-		break;
-	}
-	ui.listWidget->setItemWidget(pItem, pLabel);
-	setFixedHeight(ui.listWidget->count() * (_ItemHeight_+ _ItemSpacing) + _ItemHeight_);
-
-	//setWindowFlag(Qt::FramelessWindowHint, true);
-	//setWindowFlag(Qt::Dialog, true);
-	//setModal(true);
-
-	show();
+	emit sigMessage(text, level);
 }
 
 void MessageListDialog::exitDialog()
@@ -85,6 +44,9 @@ MessageListDialog::MessageListDialog(QWidget *parent)
 	ui.setupUi(this);
 	m_timer.start(1000);
 	ui.listWidget->setSpacing(_ItemSpacing);
+	qRegisterMetaType<_Messagelevel>("_Messagelevel");
+	//閫氳繃娑堟伅鍙戦�佸嚭鍘诲啀鏄剧ず鏄负浜嗛槻姝㈠湪瀛愮嚎绋嬩腑鏄剧ず閿欒淇℃伅鎿嶄綔宕╂簝
+	connect(this, &MessageListDialog::sigMessage, this, &MessageListDialog::onShowMessageText);
 	connect(&m_timer, &QTimer::timeout, [this]() {
 		int count = ui.listWidget->count();
 		for (int i = 0; i < count; i++) {
@@ -107,5 +69,51 @@ MessageListDialog::MessageListDialog(QWidget *parent)
 
 MessageListDialog::~MessageListDialog()
 {
+}
+
+void MessageListDialog::onShowMessageText(QString text, _Messagelevel level)
+{
+	qDebug() << "鎻愮ず娑堟伅" << text;
+	if (parent()) {
+		QWidget* pWidget = dynamic_cast<QWidget*>(parent());
+		if (pWidget) {
+			move((pWidget->width() - width()) / 2, 0);
+		}
+	}
+
+	QListWidgetItem* pItem = new QListWidgetItem();
+	ui.listWidget->addItem(pItem);
+	pItem->setSizeHint(QSize(0, _ItemHeight_));
+	pItem->setData(_ItemTime_, QDateTime::currentDateTime().toTime_t());
+	QLabel* pLabel = new QLabel(text);
+	pLabel->setWordWrap(true);
+	pLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+	unsigned int nMaxWidth = ui.listWidget->width() - 17;
+	pLabel->setFixedSize(nMaxWidth, _ItemHeight_ - 2);
+	switch (level)
+	{
+	case InfoMessage:
+		pItem->setData(_ItemWaitTime_, 3);
+		pLabel->setObjectName("LabelInfoMessage");
+		break;
+	case WarningMessage:
+		pItem->setData(_ItemWaitTime_, 6);
+		pLabel->setObjectName("LabelWarningMessage");
+		break;
+	case ErrorMessage:
+		pItem->setData(_ItemWaitTime_, 9);
+		pLabel->setObjectName("LabelErrorMessage");
+		break;
+	default:
+		break;
+	}
+	ui.listWidget->setItemWidget(pItem, pLabel);
+	setFixedHeight(ui.listWidget->count() * (_ItemHeight_ + _ItemSpacing) + _ItemHeight_);
+
+	//setWindowFlag(Qt::FramelessWindowHint, true);
+	//setWindowFlag(Qt::Dialog, true);
+	//setModal(true);
+
+	show();
 }
 

@@ -6,9 +6,9 @@
 
 enum _Messagelevel
 {
-	InfoMessage,
-	WarningMessage,
-	ErrorMessage
+	InfoMessage = 1,
+	WarningMessage = 2,
+	ErrorMessage =3
 };
 #define _ShowInfoMessage(M) MessageListDialog::getInstance()->addMessageTest(M)
 #define _ShowWarningMessage(M) MessageListDialog::getInstance()->addMessageTest(M,WarningMessage)
@@ -24,6 +24,10 @@ public:
 private:
 	MessageListDialog(QWidget *parent = Q_NULLPTR);
 	~MessageListDialog();
+private slots:
+	void onShowMessageText(QString text, _Messagelevel level);
+signals:
+	void sigMessage(QString text, _Messagelevel level);
 private:
 	Ui::MessageListDialog ui;
 	QTimer m_timer;
