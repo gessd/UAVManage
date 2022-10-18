@@ -205,11 +205,10 @@ void UAVManage::onNewProject()
 	onWebClear();
 	if(m_pDeviceManage) m_pDeviceManage->clearDevice();
 
-	//TODO 弹窗设置场地大小
 	SpaceParam space(this);
 	if (QDialog::Accepted != space.exec())return;
-	int x = space.getSpaceX();
-	int y = space.getSpaceY();
+	unsigned int x = space.getSpaceX();
+	unsigned int y = space.getSpaceY();
 	//选择新建路径
 	QString qstrName = QFileDialog::getSaveFileName(this, tr("项目名"), "", tr("File(*.qz)"));
 	if (qstrName.isEmpty()) return;
@@ -258,8 +257,10 @@ void UAVManage::onOpenProject(QString qstrFile)
 		return;
 	}
 	//读取场地大小
+	//TODO 变量类型应使用int
 	long x = place->Int64Attribute(_AttributeX_);
 	long y = place->Int64Attribute(_AttributeY_);
+	m_pDeviceManage->setSpaceSize(x, y);
 	QFileInfo infoProject(qstrFile);
 	QString qstrMusicFilePath = infoProject.path() + _ProjectDirName_ + place->Attribute(_ElementMusic_);
 	QString qstrCurrnetName = place->Attribute(_AttributeName_);
@@ -420,11 +421,11 @@ void UAVManage::onSocketTextMessageReceived(QString message)
 	xmlData = xmlData.right(xmlData.length() - 1);
 	QString pythonData = strList[1];									//python文本数据
 	pythonData = pythonData.right(pythonData.length() - 1);
-	qDebug() << xmlData;
-	qDebug() << pythonData;
+	//qDebug() << xmlData;
+	//qDebug() << pythonData;
 	QString blocklyFileName = getCurrentBlocklyFile();
 	QString pythonFileName = getCurrentPythonFile();
-	qDebug() << "update file" << blocklyFileName << pythonFileName;
+	qDebug() << "更新文件" << blocklyFileName << pythonFileName;
 	if (blocklyFileName.isEmpty() || pythonFileName.isEmpty()) return;
 	QFile blocklyFile(blocklyFileName);
 	if (blocklyFile.open(QIODevice::WriteOnly | QIODevice::Text)){

@@ -17,12 +17,12 @@ SpaceParam::SpaceParam(QWidget *parent)
 SpaceParam::~SpaceParam()
 {}
 
-int SpaceParam::getSpaceX()
+unsigned int SpaceParam::getSpaceX()
 {
-	return ui.lineEditX->text().trimmed().toInt();
+	return ui.lineEditX->text().trimmed().toUInt();
 }
 
-int SpaceParam::getSpaceY()
+unsigned int SpaceParam::getSpaceY()
 {
-	return ui.lineEditY->text().trimmed().toInt();
+	return ui.lineEditY->text().trimmed().toUInt();
 }

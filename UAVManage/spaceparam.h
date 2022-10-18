@@ -10,8 +10,8 @@ class SpaceParam : public QDialog
 public:
 	SpaceParam(QWidget *parent = nullptr);
 	~SpaceParam();
-	int getSpaceX();
-	int getSpaceY();
+	unsigned int getSpaceX();
+	unsigned int getSpaceY();
 
 private:
 	Ui::SpaceParamClass ui;

@@ -44,6 +44,12 @@ public:
 	};
 	DeviceManage(QWidget *parent = Q_NULLPTR);
 	~DeviceManage();
+
+	/**
+	 * @brief 设定场地大小
+	 */
+	void setSpaceSize(unsigned int x, unsigned int y);
+
 	/**
 	* @brief 添加设备
 	* @param [in] qstrName 设备名称
@@ -230,4 +236,7 @@ private:
 	QTimer m_timerUpdateStatus;
 	//用于执行python代码
 	ThreadPython pythonThread;
+	//场地大小
+	unsigned int m_nSpaceX;
+	unsigned int m_nSpaceY;
 };

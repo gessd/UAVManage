@@ -13,7 +13,7 @@ DeviceManage::DeviceManage(QWidget *parent)
 	: QWidget(parent)
 {
 	ui.setupUi(this);
-	
+	m_nSpaceX = m_nSpaceY = 0;
 	m_p3dTcpSocket = nullptr;
 	m_p3dTcpServer = new QTcpServer(this);
 	m_p3dTcpServer->listen(QHostAddress::Any, _TcpPort_);
@@ -225,6 +225,13 @@ DeviceManage::~DeviceManage()
 		delete m_p3dTcpServer;
 		m_p3dTcpServer = nullptr;
 	}
+}
+
+void DeviceManage::setSpaceSize(unsigned int x, unsigned int y)
+{
+	m_nSpaceX = x;
+	m_nSpaceY = y;
+	qDebug() << "设定场地大小" << x << y;
 }
 
 QString DeviceManage::addDevice(QString qstrName, QString ip, long x, long y)
@@ -490,14 +497,15 @@ void DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upload
 		QByteArray arrData = file.readAll();
 		file.close();
 		if (arrData.isEmpty()) {
-			_ShowErrorMessage(name + tr(": 没有编写舞步"));
+			_ShowErrorMessage(name + tr("没有编写舞步"));
 			continue;
 		}
-		pythonThread.initStartlocation(pDevice->getX(), pDevice->getY());
+		//执行python脚本之前初始参数，用于检查无人机编程参数
+		pythonThread.initParam(m_nSpaceX, m_nSpaceY, pDevice->getName(), pDevice->getX(), pDevice->getY());
 		//生成舞步过程必须一个个生成，python交互函数是静态全局，所以同时只能执行一个设备生成舞步
 		if (!pythonThread.compilePythonCode(arrData)) {
 			//生成舞步失败
-			_ShowErrorMessage(name + tr(": 解析舞步积木块失败"));
+			_ShowErrorMessage(name + tr("解析舞步积木块失败"));
 			continue;
 		}
 		//TODO 等待python文件执行完成，此处需要优化，有可能造成死循环
@@ -505,16 +513,21 @@ void DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upload
 			QApplication::processEvents();
 		}
 		if (PythonSuccessful != pythonThread.getLastState()) {
-			_ShowErrorMessage(name + tr(": 舞步转换失败"));
+			_ShowErrorMessage(name + tr("舞步转换失败"));
 			continue;
 		}
 		QVector<NavWayPointData> data = pythonThread.getWaypointData();
-		if (0 == data.count()) {
+		//最少1条，第一条是设置的起始位置
+		if (1 > data.count()) {
 			_ShowWarningMessage(name + tr("没有舞步信息"));
 			continue;
 		}
 		qDebug() << name << "航点数据" << data.count();
-		map.insert(name, data);
+		//TODO 判断最低起飞高度 暂定为0
+		if (0 >= data.at(1).z) {
+			_ShowErrorMessage(name + tr("起飞高度太低"));
+			continue;
+		}
 		//保存航点数据到本地，便于查看
 		QFile fileSvg(QApplication::applicationDirPath() + "/waypoint/" + name + ".csv");
 		if (fileSvg.open(QIODevice::ReadWrite | QIODevice::Truncate)) {
@@ -540,6 +553,7 @@ void DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upload
 			int status = pDevice->DeviceMavWaypointStart(data);
 			if (_DeviceStatus::DeviceDataSucceed != status) _ShowWarningMessage(Utility::waypointMessgeFromStatus(status));
 		}
+		map.insert(name, data);
 	}
 	//发送航点到三维
 	sendWaypointTo3D(map);

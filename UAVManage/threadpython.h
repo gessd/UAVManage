@@ -8,6 +8,12 @@
 
 #define _WaypintFile_ "/pythonapi/waypoint.csv"
 
+class PyToCplus : public QObject
+{
+	Q_OBJECT
+public:
+};
+
 class QZAPI : public QObject
 {
 	Q_OBJECT
@@ -94,7 +100,14 @@ public:
 	 * @brief 飞行到定位点
 	 * @param string 名字 FlyAddMarkPoint预先设置
 	 */
-	static PyObject* FlyToPoint(PyObject* self, PyObject* args);
+	static PyObject* FlyToMarkPoint(PyObject* self, PyObject* args);
+	
+	static QZAPI* Instance();
+private:
+	static QZAPI m_qzaip;
+	QZAPI() {}
+	~QZAPI() {}
+	void showWaypointError(QString error);
 };
 
 class ThreadPython : public QThread
@@ -106,10 +119,11 @@ public:
 	~ThreadPython();
 	/**
 	 * @brief 设定无人机初始位置
+	 * @param 设备名称
 	 * @param X轴 厘米
 	 * @param Y轴 厘米
 	 */
-	void initStartlocation(int x, int y);
+	void initParam(unsigned int nSpaceX, unsigned int nSapaceY, QString name, unsigned int nStartX, unsigned int nStartY);
 	/**
 	 * @brief 通过Python代码交互得到航点数据
 	 * @param python代码
