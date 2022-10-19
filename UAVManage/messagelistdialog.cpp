@@ -26,7 +26,12 @@ MessageListDialog* MessageListDialog::getInstance()
 
 void MessageListDialog::addMessageTest(QString text, _Messagelevel level)
 {	
-	emit sigMessage(text, level);
+	emit sigMessage(text, level, false);
+}
+
+void MessageListDialog::clearMessageList()
+{
+	emit sigMessage("", InfoMessage, true);
 }
 
 void MessageListDialog::exitDialog()
@@ -47,6 +52,7 @@ MessageListDialog::MessageListDialog(QWidget *parent)
 	qRegisterMetaType<_Messagelevel>("_Messagelevel");
 	//通过消息发送出去再显示是为了防止在子线程中显示错误信息操作崩溃
 	connect(this, &MessageListDialog::sigMessage, this, &MessageListDialog::onShowMessageText);
+	//定时删掉历史提示
 	connect(&m_timer, &QTimer::timeout, [this]() {
 		int count = ui.listWidget->count();
 		for (int i = 0; i < count; i++) {
@@ -65,14 +71,24 @@ MessageListDialog::MessageListDialog(QWidget *parent)
 		ui.listWidget->takeItem(ui.listWidget->currentRow());
 		});
 	connect(ui.btnClose, &QAbstractButton::clicked, [this]() {close();});
+	ui.btnClose->setVisible(false);
 }
 
 MessageListDialog::~MessageListDialog()
 {
 }
 
-void MessageListDialog::onShowMessageText(QString text, _Messagelevel level)
+void MessageListDialog::onShowMessageText(QString text, _Messagelevel level, bool clear)
 {
+	if (true == clear) {
+		int count = ui.listWidget->count();
+		qDebug() << "清空提示消息" << count;
+		ui.listWidget->clear();
+		setFixedHeight(_ItemHeight_);
+		close();
+		return;
+	}
+
 	qDebug() << "提示消息" << text;
 	if (parent()) {
 		QWidget* pWidget = dynamic_cast<QWidget*>(parent());
