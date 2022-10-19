@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="google" value="notranslate">
+  <title>Blockly Demo:</title>
+  <link rel="stylesheet" href="style.css">
+  <!--<script src="storage.js"></script>-->
+  <script src="../../blockly_uncompressed.js"></script>
+  <script src="../../blockly_uievent.js"></script>
+  <script src="../../blocks_compressed.js"></script>
+  <script src="../../javascript_compressed.js"></script>
+  <script src="../../python_compressed.js"></script>
+  <script src="code.js"></script>
+  <script src="ace.js"></script>
+  <script src="ext-language_tools.js"></script>
+  <script src="../../generators/javascript/websocket.js"></script>
+  <script src="../../blocks/myblocks.js"></script> 
+  <script src="../../generators/javascript/mygenerators.js"></script>
+  <style>
+    .right-top {
+      width: 20px;
+      height:74px;
+      background-size: 100% auto;
+      background-repeat: no-repeat;
+      position: fixed;
+      z-index: 999;
+      right:18px;
+      top: 35%;
+      background-image:url("../static/images/sidebar.png");
+    }
+    .right-top:hover{
+      width: 20px;
+      height:74px;
+      background-size: 100% auto;
+      background-repeat: no-repeat;
+      position: fixed;
+      z-index: 999;
+      right:18px;
+      top: 35%;
+      background-image:url("../static/images/sidebar_red.png");
+    }
+    .right-top2 {
+      width: 20px;
+      height:74px;
+      background-size: 100% auto;
+      background-repeat: no-repeat;
+      position: fixed;
+      z-index: 999;
+      right:18px;
+      top: 35%;
+      background-image:url("../static/images/sidebar2.png");
+    }
+    .right-top2:hover{
+      width: 20px;
+      height:74px;
+      background-size: 100% auto;
+      background-repeat: no-repeat;
+      position: fixed;
+      z-index: 999;
+      right:18px;
+      top: 35%;
+      background-image:url("../static/images/sidebar2_red.png");
+    }
+  </style>
+</head>
+
+<body style="padding: 0.625rem; ">
+	<div style="width: 6.375rem; background: none; height: 2rem;  z-index:886 !important; margin-top: 0px; position: absolute; padding-top: 3px;">
+		<li style="list-style: none; font-size: 1.25rem; color:  #3B8CFF;margin-left: 0.375rem; text-indent: 1.65rem; background: url(icons/tetle_ic_piece.svg) no-repeat scroll center 0.3rem;">控件</li>
+	</div>
+	<div style="width: 6.375rem; background: none; height: 2rem;  z-index:886 !important; margin-left: 6.375rem; position: absolute; padding-top: 3px;">
+		<li style="list-style: none; font-size: 1.25rem; color:  #3B8CFF;margin-left: 0.375rem;text-indent: 1.65rem; background: url(icons/tetle_ic_program.svg) no-repeat scroll center 0.3rem;">主程序</li>
+	</div>
+  <div style="z-index: 26 !important; top:2.25rem;  width: 10rem; position:  absolute; text-align: center; margin-left: 41.6% ; margin-right: 58.4% ; padding-top: 18px;" id="showButton">
+    <div
+      style="width: 100%; height: auto; background-color: #F2F2F2; border-radius: 0 0 0.625rem 0.625rem; box-shadow: 0rem 0.375rem 0.375rem  rgba(0,0,0,0.25); border-top: 0.0625rem solid #c7c7c7;">
+      <div class="tabmax">
+        <button id="trashButton" class="notext" title="..." style="display: none">
+          <img src='../../media/1x1.gif' class="trash icon21">
+        </button>
+        <button id="linkButton" class="notext" title="..." style="display: none">
+          <img src='../../media/1x1.gif' class="link icon21">
+        </button>
+        <button id="runButton" class="notext primary" onclick="socektmavlink()" title="..." style="display: none">
+        <!--<button id="runButton" class="notext primary" title="...">-->
+          <img src='../../media/1x1.gif' class="run icon21">
+        </button>
+        <button id="backButton" class="notext" onclick="backButton()">
+          <img src="../static/images/undo2.png">
+        </button>
+        <button id="goButton" class="notext" onclick="goButton()">
+          <img src="../static/images/redo2.png">
+        </button>
+      </div>
+    </div>
+  </div>
+  <table width="100%" height="96%" style="background-color: #f2f2f2; border-radius: 0.625rem !important; box-shadow: 0px 6px 10px rgba(0,0,0,0.25)" id="table_box">
+    <tr style="display: none; visibility: hidden;">
+      <td>
+        <h1><a href="https://developers.google.com/blockly/">Blockly</a>&rlm; &gt;
+          <a href="../index.html">Demos</a>&rlm; &gt;
+          <span id="title">...</span>
+        </h1>
+      </td>
+      <td class="farSide">
+        <select id="languageMenu"></select>
+      </td>
+    </tr>
+    <tr>
+      <td colspan=3>
+        <table id="tabRy" style="width: auto;">
+          <tr id="tabRow">
+            <td id="tab_blocks" class="tabon" onclick="tab_blocks();" title="图形编程区"></td>
+            <td width="6px"></td>
+            <td id="tab_python" class="taboff tab_collapse" onclick="tab_python();" title="python编程区"></td>
+            <td style="display: none; visibility: hidden;" id="tab_javascript" class="taboff tab_collapse"> </td>
+            <td style="display: none;" id="tab_xml" class="taboff tab_collapse"> </td>
+            <td style="" id="tab_code" class="taboff"><select id="code_menu"></select></td>
+            <td>
+              <textarea id="xmldata" style="display: none"></textarea>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+    <tr>
+      <td height="99%" width="70%" id="content_area">
+      </td>
+      <td style="display:none;height:100%;width:0.3%;background: #ddd;cursor: w-resize;" id="partitionFlag"></td>
+      <td width="30%" style="background-color:#eee;display: none;border-radius: 0px 0px 10px 0px;" id="show_content_python">
+        <!--<textarea style="z-index:888;height: 88%;width:19%;position: absolute;display: none;" id="content_python_text"></textarea>-->
+        <div style="width:100%;height:100%;display:none;border-radius: 0px 0px 10px 0px;" id="content_python_text"></div>
+      </td>
+      <div id="sidebar" class="right-top" onclick="sidecodeClick()"></div>
+    </tr>
+  </table>
+  <div id="content_blocks" class="content"></div>
+  <pre style="display: none; visibility: hidden;" id="content_javascript" class="content prettyprint lang-js"></pre>
+  <!--<pre id="content_python" class="content prettyprint lang-py" ></pre>-->
+  <div id="content_python" style="position: absolute;border-radius: 0px 0px 8px 8px;"></div>
+  <textarea style="display: none; visibility: hidden;" id="contenttexl" class="content" wrap="off"></textarea>
+  <xml xmlns="https://developers.google.com/blockly/xml" id="toolbox" style="display: none;">
+
+    
+    <category name="事件" colour="#FF6680">
+      <!--
+      <block type="QzrobotStart"></block>
+      <block type="QzrobotUnLock"></block>
+      <block type="QzrobotLock"></block>
+      -->      
+      <block type="QzrobotTakeOff">
+        <value name="height">
+          <shadow type="math_number">
+            <field name="NUM">100</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="Block_TimeGroup"></block>
+      <block type="QzrobotLand"></block>
+    </category>
+
+    <category name="动作" colour="">
+    <!--
+      <block type="QzrobotTakeOff">
+        <value name="height">
+          <shadow type="math_number">
+            <field name="NUM">100</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="SpecifiedpeedTakeOff">
+        <value name="speed">
+          <shadow type="math_number">
+            <field name="NUM">20</field>
+          </shadow>
+        </value>
+        <value name="height">
+          <shadow type="math_number">
+            <field name="NUM">100</field>
+          </shadow>
+        </value>
+      </block>
+    -->
+    <block type="SetFlyLocation">
+      <value name="coordinateX">
+        <shadow type="math_number">
+          <field name="NUM">0</field>
+        </shadow>
+      </value>
+      <value name="coordinateY">
+        <shadow type="math_number">
+          <field name="NUM">0</field>
+        </shadow>
+      </value>
+      <value name="coordinateZ">
+        <shadow type="math_number">
+          <field name="NUM">0</field>
+        </shadow>
+      </value>
+    </block>
+    <!--
+    <block type="SetFlyLocationAndStay">
+      <value name="coordinateX">
+        <shadow type="math_number">
+          <field name="NUM">0</field>
+        </shadow>
+      </value>
+      <value name="coordinateY">
+        <shadow type="math_number">
+          <field name="NUM">0</field>
+        </shadow>
+      </value>
+      <value name="coordinateZ">
+        <shadow type="math_number">
+          <field name="NUM">0</field>
+        </shadow>
+      </value>
+      <value name="stay">
+        <shadow type="math_number">
+          <field name="NUM">0</field>
+        </shadow>
+      </value>
+    </block>
+    -->
+    <block type="SetFlySpeed">
+      <value name="speed">
+        <shadow type="math_number">
+          <field name="NUM">60</field>
+        </shadow>
+      </value>
+    </block>
+    <!--暂时屏蔽 飞控无法设置临时速度
+    <block type="SetFlyLocationAndSpeed">
+      <value name="coordinateX">
+        <shadow type="math_number">
+          <field name="NUM">0</field>
+        </shadow>
+      </value>
+      <value name="coordinateY">
+        <shadow type="math_number">
+          <field name="NUM">0</field>
+        </shadow>
+      </value>
+      <value name="coordinateZ">
+        <shadow type="math_number">
+          <field name="NUM">0</field>
+        </shadow>
+      </value>
+      <value name="speed">
+        <shadow type="math_number">
+          <field name="NUM">60</field>
+        </shadow>
+      </value>
+    </block>
+  -->
+    <block type="Fly_stay">
+      <value name="stay">
+        <shadow type="math_number">
+          <field name="NUM">0</field>
+        </shadow>
+      </value>
+    </block>
+    <block type="Fly_revolve">
+      <value name="revolve">
+        <shadow type="math_number">
+          <field name="NUM">0</field>
+        </shadow>
+      </value>
+    </block>
+    <block type="Fly_moveto">
+      <value name="distances">
+        <shadow type="math_number">
+          <field name="NUM">0</field>
+        </shadow>
+      </value>
+    </block>
+    <block type="Fly_LedMode">
+    </block>
+    <!--
+      <block type="UAV_Marking_Point">
+        <value name="coordinateX">
+          <shadow type="math_number">
+            <field name="NUM">0</field>
+          </shadow>
+        </value>
+        <value name="coordinateY">
+          <shadow type="math_number">
+            <field name="NUM">0</field>
+          </shadow>
+        </value>
+        <value name="coordinateZ">
+          <shadow type="math_number">
+            <field name="NUM">0</field>
+          </shadow>
+        </value>
+        <value name="Hold">
+          <shadow type="math_number">
+            <field name="NUM">0</field>
+          </shadow>
+        </value>
+        <value name="AcceptRadius">
+          <shadow type="math_number">
+            <field name="NUM">0</field>
+          </shadow>
+        </value>
+        <value name="PassRadius">
+          <shadow type="math_number">
+            <field name="NUM">0</field>
+          </shadow>
+        </value>
+        <value name="Yaw">
+          <shadow type="math_number">
+            <field name="NUM">0</field>
+          </shadow>
+        </value>
+      </block>
+      
+      <block type="UAV_MoveToPoint"></block>
+      <block type="QzrobotHover"></block>
+      <block type="QzrobotSpecifiedSpeed">
+        <value name="speed">
+          <shadow type="math_number">
+            <field name="NUM">20</field>
+          </shadow>
+        </value>
+        <value name="flightdistance">
+          <shadow type="math_number">
+            <field name="NUM">100</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="QzrobotHorizontalSpeed">
+        <value name="speed">
+          <shadow type="math_number">
+            <field name="NUM">20</field>
+          </shadow>
+        </value>
+        <value name="flightdistance">
+          <shadow type="math_number">
+            <field name="NUM">100</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="QzrobotVerticalSpeed">
+        <value name="speed">
+          <shadow type="math_number">
+            <field name="NUM">60</field>
+          </shadow>
+        </value>
+        <value name="flightdistance">
+          <shadow type="math_number">
+            <field name="NUM">200</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="QzrobotAngularVelocity">
+        <value name="velocity">
+          <shadow type="math_number">
+            <field name="NUM">30</field>
+          </shadow>
+        </value>
+        <value name="angle">
+          <shadow type="math_number">
+            <field name="NUM">90</field>
+          </shadow>
+        </value>
+      </block>
+     <block type="QzrobotMove">
+       <value name="directionX">
+         <shadow type="math_number">
+           <field name="NUM">0</field>
+         </shadow>
+       </value>
+       <value name="directionY">
+         <shadow type="math_number">
+           <field name="NUM">0</field>
+         </shadow>
+       </value>
+       <value name="directionZ">
+         <shadow type="math_number">
+           <field name="NUM">0</field>
+         </shadow>
+       </value>
+     </block>
+     <block type="QzrobotHorizontalSpeedcp">
+       <value name="speed">
+         <shadow type="math_number">
+           <field name="NUM">60</field>
+         </shadow>
+       </value>
+       <value name="AH">
+         <shadow type="math_number">
+           <field name="NUM">200</field>
+         </shadow>
+       </value>
+     </block>
+     <block type="QzrobotVerticalSpeedcp">
+       <value name="speed">
+         <shadow type="math_number">
+           <field name="NUM">60</field>
+         </shadow>
+       </value>
+       <value name="AV">
+         <shadow type="math_number">
+           <field name="NUM">200</field>
+         </shadow>
+       </value>
+     </block>
+     <block type="QzrobotDirection"></block>
+     -->
+    </category>
+    <!--
+    <category name="显示" colour="">
+      <block type="QzrobotAtomicLEDOn"></block>
+      <block type="QzrobotLed_Colour">
+        <value name="timelength">
+          <shadow type="math_number">
+            <field name="NUM">1000</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="QzrobotLed_Colour_Right">
+        <value name="timelength">
+          <shadow type="math_number">
+            <field name="NUM">1000</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="QzrobotLEDRgb">
+        <value name="rvalue">
+          <shadow type="math_number">
+            <field name="NUM">0</field>
+          </shadow>
+        </value>
+        <value name="gvalue">
+          <shadow type="math_number">
+            <field name="NUM">0</field>
+          </shadow>
+        </value>
+        <value name="bvalue">
+          <shadow type="math_number">
+            <field name="NUM">0</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="QzrobotLEDSingleBlink">
+        <value name="timelength">
+          <shadow type="math_number">
+            <field name="NUM">500</field>
+          </shadow>
+        </value>
+      </block>
+    </category>
+
+    <category name="检测" colour="">
+      <block type="UAV_DetectedData">
+        <value name="detecteddata">
+          <shadow type="math_number">
+            <field name="NUM">20</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="UAV_Dexecute_Drone">
+        <value name="detecteddata">
+          <shadow type="math_number">
+            <field name="NUM">20</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="UAV_FlightPOSXYZ"></block>
+      <block type="UAV_Drone_Flying_Style"></block>
+      <block type="UAV_Drone_Style">
+        <value name="AH">
+          <shadow type="math_number">
+            <field name="NUM">20</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="UAV_SetUnityPoint"></block>
+    </category>
+
+    <category name="计时器" colour="">
+      <block type="QzrobotTimerCounter_Start"></block>
+      <block type="QzrobotTimerCounter_Get"></block>
+      <block type="QzrobotTimerCounter_Clear"></block>
+      <block type="Block_Delay">
+        <value name="timelength">
+          <shadow type="math_number">
+            <field name="NUM">1000</field>
+          </shadow>
+        </value>
+      </block>
+    </category>
+    -->
+    //逻辑
+    <category name="%{BKY_CATLOGIC}" colour="%{BKY_LOGIC_HUE}">
+      <block type="controls_if"></block>
+      <block type="controls_repeat_ext">
+        <value name="TIMES">
+          <shadow type="math_number">
+            <field name="NUM">10</field>
+          </shadow>
+        </value>
+      </block>
+      <!--<block type="controls_whileUntil"></block>-->
+      <block type="controls_flow_statements"></block>
+      <block type="logic_compare"></block>
+      <block type="logic_operation"></block>
+      <block type="logic_negate"></block>
+      <block type="logic_boolean"></block>
+      <block type="logic_null"></block>
+      <!--<block type="logic_ternary"></block>-->
+    </category>
+<!-- 
+    <center></center>ategory name="%{BKY_CATLOOPS}" colour="%{BKY_LOOPS_HUE}">
+      <block type="movie_circle"></block>
+      <block type="logic_compare"></block>
+    </category> -->
+    //循环
+    <!--<category name="%{BKY_CATLOOPS}" colour="%{BKY_LOOPS_HUE}">-->
+      <!--<block type="controls_repeat_ext">-->
+        <!--<value name="TIMES">-->
+          <!--<shadow type="math_number">-->
+            <!--<field name="NUM">10</field>-->
+          <!--</shadow>-->
+        <!--</value>-->
+      <!--</block>-->
+      <!--<block type="controls_whileUntil"></block>-->
+      <!--<block type="controls_for">-->
+        <!--<value name="FROM">-->
+          <!--<shadow type="math_number">-->
+            <!--<field name="NUM">1</field>-->
+          <!--</shadow>-->
+        <!--</value>-->
+        <!--<value name="TO">-->
+          <!--<shadow type="math_number">-->
+            <!--<field name="NUM">10</field>-->
+          <!--</shadow>-->
+        <!--</value>-->
+        <!--<value name="BY">-->
+          <!--<shadow type="math_number">-->
+            <!--<field name="NUM">1</field>-->
+          <!--</shadow>-->
+        <!--</value>-->
+      <!--</block>-->
+      <!--<block type="controls_forEach"></block>-->
+      <!--<block type="controls_flow_statements"></block>-->
+    <!--</category>-->
+    //运算
+    <category name="运算" colour="%{BKY_MATH_HUE}">
+      <block type="math_number">
+        <field name="NUM">123</field>
+      </block>
+      <block type="math_arithmetic">
+        <value name="A">
+          <shadow type="math_number">
+            <field name="NUM">1</field>
+          </shadow>
+        </value>
+        <value name="B">
+          <shadow type="math_number">
+            <field name="NUM">1</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="math_on_list"></block>
+      <block type="math_random_int">
+        <value name="FROM">
+          <shadow type="math_number">
+            <field name="NUM">1</field>
+          </shadow>
+        </value>
+        <value name="TO">
+          <shadow type="math_number">
+            <field name="NUM">100</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="math_constrain">
+        <value name="VALUE">
+          <shadow type="math_number">
+            <field name="NUM">1000</field>
+          </shadow>
+        </value>
+        <value name="LOW">
+          <shadow type="math_number">
+            <field name="NUM">1</field>
+          </shadow>
+        </value>
+        <value name="HIGH">
+          <shadow type="math_number">
+            <field name="NUM">100</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="math_map">
+        <value name="NUM">
+          <shadow type="math_number">
+            <field name="NUM">50</field>
+          </shadow>
+        </value>
+        <value name="fromLow">
+          <shadow type="math_number">
+            <field name="NUM">1</field>
+          </shadow>
+        </value>
+        <value name="fromHigh">
+          <shadow type="math_number">
+            <field name="NUM">100</field>
+          </shadow>
+        </value>
+        <value name="toLow">
+          <shadow type="math_number">
+            <field name="NUM">1</field>
+          </shadow>
+        </value>
+        <value name="toHigh">
+          <shadow type="math_number">
+            <field name="NUM">1000</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="math_single">
+        <value name="NUM">
+          <shadow type="math_number">
+            <field name="NUM">9</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="math_round">
+        <value name="NUM">
+          <shadow type="math_number">
+            <field name="NUM">3.1</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="math_trig">
+      <value name="NUM">
+        <shadow type="math_number">
+          <field name="NUM">45</field>
+        </shadow>
+      </value>
+      </block>
+      <block type="math_type"></block>
+      <block type="math_typelists"></block>
+      <!--<block type="math_constant"></block>-->
+      <!--<block type="math_number_property">-->
+        <!--<value name="NUMBER_TO_CHECK">-->
+          <!--<shadow type="math_number">-->
+            <!--<field name="NUM">0</field>-->
+          <!--</shadow>-->
+        <!--</value>-->
+      <!--</block>-->
+
+
+      <!--<block type="math_modulo">-->
+        <!--<value name="DIVIDEND">-->
+          <!--<shadow type="math_number">-->
+            <!--<field name="NUM">64</field>-->
+          <!--</shadow>-->
+        <!--</value>-->
+        <!--<value name="DIVISOR">-->
+          <!--<shadow type="math_number">-->
+            <!--<field name="NUM">10</field>-->
+          <!--</shadow>-->
+        <!--</value>-->
+      <!--</block>-->
+      <!--<block type="math_constrain">-->
+        <!--<value name="VALUE">-->
+          <!--<shadow type="math_number">-->
+            <!--<field name="NUM">50</field>-->
+          <!--</shadow>-->
+        <!--</value>-->
+        <!--<value name="LOW">-->
+          <!--<shadow type="math_number">-->
+            <!--<field name="NUM">1</field>-->
+          <!--</shadow>-->
+        <!--</value>-->
+        <!--<value name="HIGH">-->
+          <!--<shadow type="math_number">-->
+            <!--<field name="NUM">100</field>-->
+          <!--</shadow>-->
+        <!--</value>-->
+      <!--</block>-->
+
+      <!--<block type="math_random_float"></block>-->
+      <!--<block type="math_atan2">-->
+        <!--<value name="X">-->
+          <!--<shadow type="math_number">-->
+            <!--<field name="NUM">1</field>-->
+          <!--</shadow>-->
+        <!--</value>-->
+        <!--<value name="Y">-->
+          <!--<shadow type="math_number">-->
+            <!--<field name="NUM">1</field>-->
+          <!--</shadow>-->
+        <!--</value>-->
+      <!--</block>-->
+    </category>
+    <!-- <category name="%{BKY_CATTEXT}" colour="%{BKY_TEXTS_HUE}">
+      <block type="text"></block>
+      <block type="text_join"></block>
+      <block type="text_append">
+        <value name="TEXT">
+          <shadow type="text"></shadow>
+        </value>
+      </block>
+      <block type="text_length">
+        <value name="VALUE">
+          <shadow type="text">
+            <field name="TEXT">abc</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="text_isEmpty">
+        <value name="VALUE">
+          <shadow type="text">
+            <field name="TEXT"></field>
+          </shadow>
+        </value>
+      </block>
+      <block type="text_indexOf">
+        <value name="VALUE">
+          <block type="variables_get">
+            <field name="VAR">{textVariable}</field>
+          </block>
+        </value>
+        <value name="FIND">
+          <shadow type="text">
+            <field name="TEXT">abc</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="text_charAt">
+        <value name="VALUE">
+          <block type="variables_get">
+            <field name="VAR">{textVariable}</field>
+          </block>
+        </value>
+      </block>
+      <block type="text_getSubstring">
+        <value name="STRING">
+          <block type="variables_get">
+            <field name="VAR">{textVariable}</field>
+          </block>
+        </value>
+      </block>
+      <block type="text_changeCase">
+        <value name="TEXT">
+          <shadow type="text">
+            <field name="TEXT">abc</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="text_trim">
+        <value name="TEXT">
+          <shadow type="text">
+            <field name="TEXT">abc</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="text_print">
+        <value name="TEXT">
+          <shadow type="text">
+            <field name="TEXT">abc</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="text_prompt_ext">
+        <value name="TEXT">
+          <shadow type="text">
+            <field name="TEXT">abc</field>
+          </shadow>
+        </value>
+      </block>
+    </category> -->
+    //列表
+    <!--<category name="%{BKY_CATLISTS}" colour="%{BKY_LISTS_HUE}">-->
+      <!--<block type="lists_create_with">-->
+        <!--<mutation items="0"></mutation>-->
+      <!--</block>-->
+      <!--<block type="lists_create_with"></block>-->
+      <!--<block type="lists_repeat">-->
+        <!--<value name="NUM">-->
+          <!--<shadow type="math_number">-->
+            <!--<field name="NUM">5</field>-->
+          <!--</shadow>-->
+        <!--</value>-->
+      <!--</block>-->
+      <!--<block type="lists_length"></block>-->
+      <!--<block type="lists_isEmpty"></block>-->
+      <!--<block type="lists_indexOf">-->
+        <!--<value name="VALUE">-->
+          <!--<block type="variables_get">-->
+            <!--<field name="VAR">{listVariable}</field>-->
+          <!--</block>-->
+        <!--</value>-->
+      <!--</block>-->
+      <!--<block type="lists_getIndex">-->
+        <!--<value name="VALUE">-->
+          <!--<block type="variables_get">-->
+            <!--<field name="VAR">{listVariable}</field>-->
+          <!--</block>-->
+        <!--</value>-->
+      <!--</block>-->
+      <!--<block type="lists_setIndex">-->
+        <!--<value name="LIST">-->
+          <!--<block type="variables_get">-->
+            <!--<field name="VAR">{listVariable}</field>-->
+          <!--</block>-->
+        <!--</value>-->
+      <!--</block>-->
+      <!--<block type="lists_getSublist">-->
+        <!--<value name="LIST">-->
+          <!--<block type="variables_get">-->
+            <!--<field name="VAR">{listVariable}</field>-->
+          <!--</block>-->
+        <!--</value>-->
+      <!--</block>-->
+      <!--<block type="lists_split">-->
+        <!--<value name="DELIM">-->
+          <!--<shadow type="text">-->
+            <!--<field name="TEXT">,</field>-->
+          <!--</shadow>-->
+        <!--</value>-->
+      <!--</block>-->
+      <!--<block type="lists_sort"></block>-->
+    <!--</category>-->
+    //变量
+    <category name="%{BKY_CATVARIABLES}" colour="%{BKY_VARIABLES_HUE}" custom="VARIABLE"></category>
+  </xml>
+  <script type="text/javascript">
+    var sidecodeDisplay = true;
+    /**
+     * 点击侧边显示代码按钮
+     */
+    function sidecodeClick() {
+      if (sidecodeDisplay) {
+        document.getElementById('show_content_python').style.display = '';
+        document.getElementById('content_python_text').style.display = '';
+        document.getElementById('partitionFlag').style.display = '';
+        document.getElementById('sidebar').className = 'right-top2';
+        sidecodeDisplay = false;
+      } else {
+        document.getElementById('show_content_python').style.display = 'none';
+        document.getElementById('content_python_text').style.display = 'none';
+        document.getElementById('partitionFlag').style.display = 'none';
+        document.getElementById('sidebar').className = 'right-top';
+        sidecodeDisplay = true;
+      }
+      Blockly.fireUiEvent(window, 'resize');
+    }
+    function tab_blocks() {
+      document.getElementById("tab_blocks").style.backgroundImage = "url(icons/workspace_button_block_cli&hov.svg)";
+      document.getElementById("tab_python").style.backgroundImage = "url(icons/workspace_button_python_nor.svg)";
+      document.getElementById("sidebar").style.display = "";
+      document.getElementById("showButton").style.display = "";
+      if(!sidecodeDisplay){
+        document.getElementById("show_content_python").style.display = "";
+        document.getElementById("content_python_text").style.display = "";
+        document.getElementById("partitionFlag").style.display = '';
+      }else{
+        document.getElementById("show_content_python").style.display = "none";
+        document.getElementById("content_python_text").style.display = "none";
+        document.getElementById("partitionFlag").style.display = 'none';
+      }
+      Blockly.fireUiEvent(window, 'resize');
+    }
+
+    function tab_python() {
+      document.getElementById("tab_python").style.backgroundImage = "url(icons/workspace_button_python_cli&hov.svg)";
+      document.getElementById("tab_blocks").style.backgroundImage = "url(icons/workspace_button_block_nor.svg)";
+      document.getElementById("sidebar").style.display = "none";
+      document.getElementById("show_content_python").style.display = "none";
+      document.getElementById("content_python_text").style.display = "none";
+      document.getElementById("partitionFlag").style.display = "none";
+      document.getElementById("showButton").style.display = "none";
+      Blockly.fireUiEvent(window, 'resize');
+    }
+
+    //前进按钮
+    function goButton(){
+      Code.workspace.undo(true)
+    }
+
+    //后退按钮
+    function backButton(){
+      Code.workspace.undo(false)
+    }
+
+    window.addEventListener('load', function load(event) {
+
+      var oBox = document.getElementById("table_box");
+      var oTop = document.getElementById("content_blocks");
+      var oTop1 = document.getElementById("content_area");
+      var oBottom = document.getElementById("show_content_python");
+      var oLine = document.getElementById("partitionFlag");
+
+      oLine.onmousedown = function(e) {
+        var disX = (e || event).clientX;
+        oLine.left = oLine.offsetLeft;
+
+        document.onmousemove = function(e) {
+          //console.log(oBox.clientWidth + " " + oLine.style.left + " " + disX + " " + (e || event).clientX);
+          var iT = oLine.left + ((e || event).clientX - disX);
+          var e=e||window.event,tarnameb=e.target||e.srcElement;
+          var maxT = oBox.clientWidth;
+          var minT = Code.workspace.getToolbox().width;
+          oLine.style.margin = 0;
+          iT < minT && (iT = minT);
+          iT > maxT && (iT = maxT);
+          //console.log(oBox.clientWidth+" "+iT+" "+oTop1.style.width+" "+oTop.style.width);
+          var percent=iT*100/oBox.clientWidth;
+          oTop1.style.width = percent + '%';
+          oTop.style.width = percent  + '%';  // no need this line
+          oLine.style.left = percent  + '%';
+          Blockly.fireUiEvent(window, 'resize');
+          oBottom.style.width = ( 100 - percent ) + '%';
+          return false;
+        };
+        document.onmouseup = function() {
+          document.onmousemove = null;
+          document.onmouseup = null;
+          Blockly.fireUiEvent(window, 'resize');
+          oLine.releaseCapture && oLine.releaseCapture();
+        };
+        oLine.setCapture && oLine.setCapture();
+        return false;
+      };
+
+    });
+  </script>
+</body>
+
+</html>
