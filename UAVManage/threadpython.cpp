@@ -94,8 +94,8 @@ PyObject* QZAPI::Fly_Waypoint(PyObject* self, PyObject* args)
 	}
 	if (a < 0.2) a = 0.2;
 	NavWayPointData data;
-	data.x = x * 1000;
-	data.y = y * 1000;
+	data.x = x;
+	data.y = y;
 	data.z = z;
 	data.param1 = h;
 	data.param2 = a;
@@ -112,8 +112,8 @@ PyObject* QZAPI::Fly_Location(PyObject* self, PyObject* args)
 		return Py_BuildValue("i", 0);
 	}
 	NavWayPointData data;
-	data.x = x * 1000;
-	data.y = y * 1000;
+	data.x = x;
+	data.y = y;
 	data.z = z;
 	g_waypointData.append(data);
 	return Py_BuildValue("i", 0);
@@ -162,8 +162,8 @@ PyObject* QZAPI::Fly_speedWaypoint(PyObject* self, PyObject* args)
 		return Py_BuildValue("i", 0);
 	}
 	NavWayPointData data;
-	data.x = x * 1000;
-	data.y = y * 1000;
+	data.x = x;
+	data.y = y;
 	data.z = z;
 	data.param1 = s;
 	data.commandID = 31000;
@@ -210,8 +210,8 @@ PyObject* QZAPI::Fly_Moveto(PyObject* self, PyObject* args)
 	NavWayPointData data = g_waypointData.back();
 	switch (d)
 	{
-	case 1: data.x = s * 1000; break;
-	case 2: data.y = s * 1000; break;
+	case 1: data.x = s; break;
+	case 2: data.y = s; break;
 	case 3: data.z = s; break;
 	}
 	data.param1 = 0; 
@@ -232,10 +232,10 @@ PyObject* QZAPI::Fly_MoveAddTo(PyObject* self, PyObject* args)
 	//需要判断是否有效航点,commandID=16;
 	switch (d)
 	{
-	case 1: data.x += s * 1000; break;
-	case 2: data.x -= s * 1000; break;
-	case 3: data.y += s * 1000; break;
-	case 4: data.y -= s * 1000; break;
+	case 1: data.x += s; break;
+	case 2: data.x -= s; break;
+	case 3: data.y += s; break;
+	case 4: data.y -= s; break;
 	case 5: data.z += s; break;
 	case 6: data.z -= s; break;
 	}
@@ -319,18 +319,19 @@ PyObject* QZAPI::FlyHover(PyObject* self, PyObject* args)
 		QZAPI::Instance()->showWaypointError(tr("悬停参数值错误"));
 		return nullptr;
 	}
-	qDebug() << "悬停时间" << n;
+	qDebug() << "悬停时间" << n << "毫秒";
 	NavWayPointData last = g_waypointData.back();
 	if (last.z <= 0.0) {
 		//判断是否已经飞离地面
 		QZAPI::Instance()->showWaypointError(tr("没有起飞无法悬停"));
 		return nullptr;
 	}
+	//悬停时间精确到毫秒
 	NavWayPointData data;
 	data.x = last.x;
 	data.y = last.y;
 	data.z = last.z;
-	data.param1 = n;
+	data.param1 = n / 1000.0;
 	data.commandID = _WaypointHover;
 	g_waypointData.append(data);
 	return Py_BuildValue("i", 0);
@@ -449,10 +450,10 @@ PyObject* QZAPI::FlyMove(PyObject* self, PyObject* args)
 	//["下", "6"],
 	switch (direction)
 	{
-	case 1: data.x += n * 1000; break;
-	case 2: data.x -= n * 1000; break;
-	case 3: data.y += n * 1000; break;
-	case 4: data.y -= n * 1000; break;
+	case 1: data.x += n; break;
+	case 2: data.x -= n; break;
+	case 3: data.y += n; break;
+	case 4: data.y -= n; break;
 	case 5: data.z += n; break;
 	case 6: data.z -= n; break;
 	}

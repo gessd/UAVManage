@@ -164,7 +164,10 @@ Blockly.Blocks['FlyHover'] = {
             .setCheck("Number")
             .appendField("悬停");
         this.appendDummyInput()
-		     .appendField("秒");
+			.appendField(new Blockly.FieldDropdown([
+				["毫秒", "1"],
+				["秒", "2"]
+             ]), "unit");
         this.setPreviousStatement(true,["action", "notReachAction", "ReachAction"]);
         this.setNextStatement(true,["action", "notReachAction", "ReachAction"]);
         this.setColour('#3B8CFF');
@@ -177,6 +180,10 @@ Blockly.Blocks['FlyHover'] = {
 Blockly.Python['FlyHover'] = function(block) {
     initHead("FlyHover");
     var t = Blockly.Python.valueToCode(this,'hover',Blockly.Python.ORDER_ATOMIC);
+    var u = block.getFieldValue('unit');
+    if(2 == u){
+        t = t*1000;
+    }
     var code = 'FlyHover('+t+')' + '\n';
     return code; 
 };
