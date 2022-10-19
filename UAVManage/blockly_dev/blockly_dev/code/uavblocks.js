@@ -64,7 +64,7 @@ Blockly.Blocks['FlyTimeGroup'] = {
         this.appendDummyInput().appendField("分钟");
         this.appendValueInput('second').setCheck('Number');
         this.appendDummyInput().appendField("秒");
-        //this.appendStatementInput("interiorfunction").setCheck(null);
+        this.appendStatementInput("interiorfunction").setCheck(null);
         this.setPreviousStatement(true, "time");
         this.setNextStatement(true, "time");
         this.setColour('#FF6680');
@@ -75,8 +75,12 @@ Blockly.Python['FlyTimeGroup'] = function(block) {
     initHead("FlyTimeGroup");
     var m = Blockly.Python.valueToCode(block, 'minute', Blockly.Python.ORDER_NONE);
     var s = Blockly.Python.valueToCode(block, 'second', Blockly.Python.ORDER_NONE);
-    //var ff = Blockly.Python.statementToCode(block, 'interiorfunction');
-    return "FlyTimeGroup("+m+","+s+")\n";//+ff;
+    var ff = Blockly.Python.statementToCode(block, 'interiorfunction');
+    var code = "FlyTimeGroup("+m+","+s+")\n";
+    if(false == isEmpty(ff)) {
+        code = code + "if True:\n"+ff;
+    }
+    return code;
 };
 
 Blockly.Blocks['FlyLand'] = {
