@@ -14,8 +14,8 @@ AddDeviceDialog::AddDeviceDialog(QString qstrName, QWidget *parent)
 		"{3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\b");
 	//ÏÞÖÆÊäÈë
 	ui.lineEditIP->setValidator(new QRegExpValidator(regExp1, this));
-	ui.lineEditX->setValidator(new QIntValidator(0, 10000, this));
-	ui.lineEditY->setValidator(new QIntValidator(0, 10000, this));
+	ui.lineEditX->setValidator(new QIntValidator(10, 10000, this));
+	ui.lineEditY->setValidator(new QIntValidator(10, 10000, this));
 	ui.lineEditX->setMaxLength(5);
 	ui.lineEditY->setMaxLength(5);
 	connect(ui.btnOK, &QAbstractButton::clicked, [this]() { 
