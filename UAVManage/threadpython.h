@@ -6,14 +6,6 @@
 #include "definesetting.h"
 #include "globalfunction.h"
 
-#define _WaypintFile_ "/pythonapi/waypoint.csv"
-
-class PyToCplus : public QObject
-{
-	Q_OBJECT
-public:
-};
-
 class QZAPI : public QObject
 {
 	Q_OBJECT

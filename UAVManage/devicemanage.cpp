@@ -477,6 +477,7 @@ void DeviceManage::allDeviceCalibration(_CalibrationEnum c)
 
 void DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upload)
 {
+	_MessageListClear
 	//MAP用于统一发送航点信息到三维
 	QMap<QString, QVector<NavWayPointData>> map;
 	qDebug() << "准备生成舞步信息";
