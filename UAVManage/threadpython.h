@@ -99,6 +99,7 @@ private:
 	static QZAPI m_qzaip;
 	QZAPI() {}
 	~QZAPI() {}
+	PyObject* examineWaypoint();
 	void showWaypointError(QString error);
 };
 

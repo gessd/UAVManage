@@ -647,7 +647,7 @@ void DeviceManage::sendWaypointTo3D(QMap<QString, QVector<NavWayPointData>> map)
 				y = pDevcie->getY();
 			}
 			//计算空间点距离
-			double d = getDistance(lastX, lastY, lastZ, x, y, z);
+			int d = getDistance(lastX, lastY, lastZ, x, y, z);
 			//计算飞行时间 时间使用毫秒单位
 			int time = d / speed * 1000;
 			if (waypoint.param1 > 0) {
@@ -845,9 +845,9 @@ void DeviceManage::analyzeMessageFrom3D(QByteArray data)
 	}
 }
 
-double DeviceManage::getDistance(int x1, int y1, int z1, int x2, int y2, int z2)
+int DeviceManage::getDistance(int x1, int y1, int z1, int x2, int y2, int z2)
 {
-	double d = qSqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2) + (z1 - z2) * (z1 - z2));
+	int d = qSqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2) + (z1 - z2) * (z1 - z2));
 	return d;
 }
 

@@ -31,6 +31,70 @@ QVector<NavWayPointData> g_waypointData;
 //标定点名称，空间坐标
 QMap<QString, _MarkPoint> g_mapMarkPoint;
 
+PyObject* QZAPI::examineWaypoint()
+{
+	//倒序检查
+	for (int i = g_waypointData.count(); i >= 0; i--) {
+		NavWayPointData data = g_waypointData.at(i);
+		switch (data.commandID)
+		{
+		case _WaypointFly: 
+			//判断是否飞出场地范围
+			if (data.x < 0 || data.y < 0 || data.x > g_nSpaceX || data.y > g_nSpaceY) {
+				showWaypointError(tr("飞出场地范围"));
+				return nullptr;
+			}
+			break;
+		case _WaypointSpeed: 
+			//飞行速度范围
+			if (data.param1 > 100 || data.param1 < 10) {
+				showWaypointError(tr("飞行速度设定超出范围"));
+				return nullptr;
+			}
+			break;
+		case _WaypointRevolve: 
+			//旋转角度
+			if (data.param1 >= 360 || data.param1 <= 0) {
+				showWaypointError(tr("旋转角度设定超出范围"));
+				return nullptr;
+			}
+			break;
+		case _WaypointHover: 
+			//悬停时间
+			if (data.param1 >= 100 || data.param1 <= 0) {
+				showWaypointError(tr("悬停时间设定超出范围"));
+				return nullptr;
+			}
+			break;
+		case _WaypointLed: 
+			//LED灯模式
+			if (data.param1 > 7 || data.param1 <= 0) {
+				showWaypointError(tr("LED模式选择超出范围"));
+				return nullptr;
+			}
+			break;
+		case _WaypointStart: 
+			//只有第一步才能是起飞位置
+			if (0 != i) {
+				showWaypointError(tr("起飞位置设定错误"));
+				return nullptr;
+			}
+			break;
+		case _WaypointTime: 
+			//时间范围
+			if (data.param2 >= 60 || data.param2 < 0) {
+				showWaypointError(tr("时间范围设定错误"));
+				return nullptr;
+			}
+			break;
+		default:
+			return nullptr;
+			break;
+		}
+	}
+	return Py_BuildValue("i", 0);
+}
+
 void QZAPI::showWaypointError(QString error)
 {
 	QString text = QString("%1 第%2步 %3").arg(g_deviceName).arg(g_waypointData.count()).arg(error);
@@ -290,7 +354,7 @@ PyObject* QZAPI::FlySetSpeed(PyObject* self, PyObject* args)
 	data.param1 = n;
 	data.commandID = _WaypointSpeed;
 	g_waypointData.append(data);
-	return Py_BuildValue("i", 0);
+	return QZAPI::Instance()->examineWaypoint();
 }
 
 PyObject* QZAPI::FlySetLed(PyObject* self, PyObject* args)
@@ -309,7 +373,7 @@ PyObject* QZAPI::FlySetLed(PyObject* self, PyObject* args)
 	data.param1 = n;
 	data.commandID = _WaypointLed;
 	g_waypointData.append(data);
-	return Py_BuildValue("i", 0);
+	return QZAPI::Instance()->examineWaypoint();
 }
 
 PyObject* QZAPI::FlyHover(PyObject* self, PyObject* args)
@@ -334,7 +398,7 @@ PyObject* QZAPI::FlyHover(PyObject* self, PyObject* args)
 	data.param1 = n / 1000.0;
 	data.commandID = _WaypointHover;
 	g_waypointData.append(data);
-	return Py_BuildValue("i", 0);
+	return QZAPI::Instance()->examineWaypoint();
 }
 
 PyObject* QZAPI::FlyTakeoff(PyObject* self, PyObject* args)
@@ -355,23 +419,19 @@ PyObject* QZAPI::FlyTakeoff(PyObject* self, PyObject* args)
 	data.y = lastWaypoint.y;
 	data.z = lastWaypoint.z + n;
 	g_waypointData.append(data);
-	return Py_BuildValue("i", 0);
+	return QZAPI::Instance()->examineWaypoint();
 }
 
 PyObject* QZAPI::FlyLand(PyObject* self, PyObject* args)
 {
 	qDebug() << "降落";
 	NavWayPointData lastWaypoint = g_waypointData.back();
-	if (0 >= lastWaypoint.z) {
-		QZAPI::Instance()->showWaypointError(tr("高度已降为0"));
-		return nullptr;
-	}
 	NavWayPointData data;
 	data.x = lastWaypoint.x;
 	data.y = lastWaypoint.y;
 	data.z = 0;
 	g_waypointData.append(data);
-	return Py_BuildValue("i", 0);
+	return QZAPI::Instance()->examineWaypoint();
 }
 
 PyObject* QZAPI::FlyTimeGroup(PyObject* self, PyObject* args)
@@ -384,7 +444,16 @@ PyObject* QZAPI::FlyTimeGroup(PyObject* self, PyObject* args)
 		return nullptr;
 	}
 	qDebug() << "时间组范围" << m << s;
-	return Py_BuildValue("i", 0);
+	NavWayPointData last = g_waypointData.back();
+	NavWayPointData data;
+	data.x = last.x;
+	data.y = last.y;
+	data.z = last.z;
+	data.param1 = m;
+	data.param2 = s;
+	data.commandID = _WaypointTime;
+	g_waypointData.append(data);
+	return QZAPI::Instance()->examineWaypoint();
 }
 
 PyObject* QZAPI::FlyRevolve(PyObject* self, PyObject* args)
@@ -403,7 +472,7 @@ PyObject* QZAPI::FlyRevolve(PyObject* self, PyObject* args)
 	data.param1 = angle;
 	data.commandID = _WaypointRevolve;
 	g_waypointData.append(data);
-	return Py_BuildValue("i", 0);
+	return QZAPI::Instance()->examineWaypoint();
 }
 
 PyObject* QZAPI::FlyTo(PyObject* self, PyObject* args)
@@ -419,13 +488,8 @@ PyObject* QZAPI::FlyTo(PyObject* self, PyObject* args)
 	data.x = x;
 	data.y = y;
 	data.z = z;
-	//判断是否飞出场地范围
-	if (data.x <= 0 || data.y <= 0 || data.x >= g_nSpaceX || data.y >= g_nSpaceY) {
-		QZAPI::Instance()->showWaypointError(tr("飞出场地范围"));
-		return nullptr;
-	}
 	g_waypointData.append(data);
-	return Py_BuildValue("i", 0);
+	return QZAPI::Instance()->examineWaypoint();
 }
 
 PyObject* QZAPI::FlyMove(PyObject* self, PyObject* args)
@@ -442,12 +506,7 @@ PyObject* QZAPI::FlyMove(PyObject* self, PyObject* args)
 	data.x = lastWaypoint.x;
 	data.y = lastWaypoint.y;
 	data.z = lastWaypoint.z;
-	//["前", "1"] ,
-	//["后", "2"],
-	//["右", "3"],
-	//["左", "4"],
-	//["上", "5"],
-	//["下", "6"],
+	//["前", "1"],["后", "2"],["右", "3"],["左", "4"],["上", "5"],["下", "6"],
 	switch (direction)
 	{
 	case 1: data.x += n; break;
@@ -457,13 +516,8 @@ PyObject* QZAPI::FlyMove(PyObject* self, PyObject* args)
 	case 5: data.z += n; break;
 	case 6: data.z -= n; break;
 	}
-	//判断是否飞出场地范围
-	if (data.x <= 0 || data.y <= 0 || data.x >= g_nSpaceX || data.y >= g_nSpaceY) {
-		QZAPI::Instance()->showWaypointError(tr("飞出场地范围"));
-		return nullptr;
-	}
 	g_waypointData.append(data);
-	return Py_BuildValue("i", 0);
+	return QZAPI::Instance()->examineWaypoint();
 }
 
 PyObject* QZAPI::FlyToMarkPoint(PyObject* self, PyObject* args)
@@ -479,7 +533,7 @@ PyObject* QZAPI::FlyToMarkPoint(PyObject* self, PyObject* args)
 	}
 	QString qstrName(name);
 	if (false == g_mapMarkPoint.contains(qstrName)) {
-		QZAPI::Instance()->showWaypointError(tr("飞到标定点名称不存在"));
+		QZAPI::Instance()->showWaypointError(tr("飞到标定点中的名称不存在"));
 		return nullptr;
 	}
 	_MarkPoint point = g_mapMarkPoint[qstrName];
@@ -490,7 +544,7 @@ PyObject* QZAPI::FlyToMarkPoint(PyObject* self, PyObject* args)
 	data.z = point.z;
 	data.commandID = _WaypointFly;
 	g_waypointData.append(data);
-	return Py_BuildValue("i", 0);
+	return QZAPI::Instance()->examineWaypoint();
 }
 
 QZAPI* QZAPI::Instance()

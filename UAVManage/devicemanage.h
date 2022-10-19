@@ -221,7 +221,7 @@ private:
 	/**
 	 * @@brief 计算两点直接距离
 	 */
-	double getDistance(int x1, int y1, int z1, int x2, int y2, int z2);
+	int getDistance(int x1, int y1, int z1, int x2, int y2, int z2);
 private:
 	Ui::DeviceManage ui;
 	//设备菜单
