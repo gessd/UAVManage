@@ -500,11 +500,6 @@ Code.init = function() {
   editor_content_python_text.setReadOnly(true);
   editor_content_python_text.setScrollSpeed(0.05);
   editor_content_python_text.setHighlightActiveLine(true);//行高亮
-  //editor_content_python_text.setOptions({
-  //  enableBasicAutocompletion: true,
-  //  enableSnippets: true,
-  //  enableLiveAutocompletion: true
-  //});
 
   Code.addEventListeners();
 
@@ -527,7 +522,6 @@ Code.init = function() {
     jsonObj.xml = document.getElementById("xmldata").value;
     jsonObj.python = python;
     var jsonStr = JSON.stringify(jsonObj);
-    console.log(python);
     if(1 == socket.readyState){
       socket.send(jsonStr);
     }
@@ -642,7 +636,7 @@ Code.getRootBlock = function(workspace) {
     var code = Blockly.Python.workspaceToCode(workspace);
     var xmlcode = Blockly.Xml.domToPrettyText(Blockly.Xml.workspaceToDom(workspace))
     document.getElementById("content_python_text").value = code;
-    //editor_content_python_text.setValue(code,-1)
+    editor_content_python_text.setValue(code,-1)
     document.getElementById("xmldata").value = xmlcode;
   }
 
