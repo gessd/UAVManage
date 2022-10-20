@@ -2,9 +2,7 @@
 #include <QDebug>
 #include <QTime>
 #include <QDateTime>
-#include "globalfunction.h"
 #include "messagelistdialog.h"
-
 
 #define _CurrentTime_  QTime::currentTime().toString("hh:mm:ss.zzz")
 

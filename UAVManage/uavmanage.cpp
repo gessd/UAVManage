@@ -25,7 +25,7 @@ UAVManage::UAVManage(QWidget *parent)
 {
     ui.setupUi(this);
 	m_pSocketServer = nullptr;
-	m_pWebSocket = nullptr;
+	m_pWebBockly = nullptr;
 	m_pDeviceManage = nullptr;
 	m_p3DProcess = nullptr;
 	
@@ -257,17 +257,27 @@ void UAVManage::onOpenProject(QString qstrFile)
 		return;
 	}
 	//读取场地大小
-	//TODO 变量类型应使用int
 	long x = place->Int64Attribute(_AttributeX_);
 	long y = place->Int64Attribute(_AttributeY_);
 	m_pDeviceManage->setSpaceSize(x, y);
+	if (m_pWebBockly) {
+		qDebug() << "发送场地范围到编程区";
+		QSize space = m_pDeviceManage->getSpaceSize();
+		QJsonObject jsonObj;
+		jsonObj.insert(_WMID, _WIDSet);
+		jsonObj.insert("x", space.width());
+		jsonObj.insert("y", space.height());
+		jsonObj.insert("z", 10000);
+		QJsonDocument jsonDoc(jsonObj);
+		m_pWebBockly->sendTextMessage(jsonDoc.toJson());
+	}
 	QFileInfo infoProject(qstrFile);
 	QString qstrMusicFilePath = infoProject.path() + _ProjectDirName_ + place->Attribute(_ElementMusic_);
 	QString qstrCurrnetName = place->Attribute(_AttributeName_);
 	tinyxml2::XMLElement* device = root->FirstChildElement(_ElementDevice_);
 	if (!device) {
 		_ShowErrorMessage(tr("工程中没有添加设备"));
-		return;
+		//return;
 	}
 	m_qstrCurrentProjectFile = qstrFile;
 	while (device){
@@ -285,7 +295,6 @@ void UAVManage::onOpenProject(QString qstrFile)
 		}
 	}
 	_ShowInfoMessage(tr("打开工程完成"));
-	qDebug() << "工程打开完成";
 	QFileInfo info(m_qstrCurrentProjectFile);
 	QString name = info.baseName();
 	this->setWindowTitle(name);
@@ -362,13 +371,16 @@ void UAVManage::onSaveasProject()
 
 void UAVManage::onWebClear()
 {
-	if (!m_pWebSocket) return;
-	m_pWebSocket->sendTextMessage("");
+	if (!m_pWebBockly) return;
+	QJsonObject jsonObj;
+	jsonObj.insert("id", 2);
+	QJsonDocument doc(jsonObj);
+	m_pWebBockly->sendTextMessage(doc.toJson());
 }
 
 void UAVManage::showEvent(QShowEvent* event)
 {
-	if(!m_pWebSocket) loadWeb();
+	if(!m_pWebBockly) loadWeb();
 }
 
 void UAVManage::closeEvent(QCloseEvent* event)
@@ -402,10 +414,11 @@ void UAVManage::onSocketNewConnection()
 {
 	//不能同时打开两个软件，否则端口占用无法使用
 	//只记录一个web连接，防止通过浏览器访问blockly
-	if (m_pWebSocket) return;
-	m_pWebSocket = m_pSocketServer->nextPendingConnection();
-	connect(m_pWebSocket, SIGNAL(textMessageReceived(QString)), this, SLOT(onSocketTextMessageReceived(QString)));
-	connect(m_pWebSocket, SIGNAL(disconnected()), this, SLOT(onSocketDisconnected()));
+	if (m_pWebBockly) return;
+	qDebug() << "建立编程区域连接";
+	m_pWebBockly = m_pSocketServer->nextPendingConnection();
+	connect(m_pWebBockly, SIGNAL(textMessageReceived(QString)), this, SLOT(onSocketTextMessageReceived(QString)));
+	connect(m_pWebBockly, SIGNAL(disconnected()), this, SLOT(onSocketDisconnected()));
 }
 
 void UAVManage::onSocketTextMessageReceived(QString message)
@@ -413,35 +426,39 @@ void UAVManage::onSocketTextMessageReceived(QString message)
 	//防止数据大量重复处理
 	if (m_qstrLastWebMessage == message) return;
 	m_qstrLastWebMessage = message;
-	//更新blockly及python文件
-	message = message.right(message.size() - 7);						//减去 JsonData 字符串
-	QStringList strList = message.split("pythonData");
-	if (strList.size() < 2) return;
-	QString xmlData = strList[0];										//XML文本数据
-	xmlData = xmlData.right(xmlData.length() - 1);
-	QString pythonData = strList[1];									//python文本数据
-	pythonData = pythonData.right(pythonData.length() - 1);
-	//qDebug() << xmlData;
-	//qDebug() << pythonData;
+	qDebug() << "积木块变动,自动保存编程文件";
+	QJsonParseError jsonError;
+	QJsonDocument jsonDoc = QJsonDocument::fromJson(message.toUtf8(), &jsonError);
+	if (QJsonParseError::NoError != jsonError.error || jsonDoc.isEmpty() || !jsonDoc.isObject()) {
+		return;
+	}
+	//使用python方式传送blockly中的数据
+	QJsonObject jsonObj = jsonDoc.object();
+	int id = jsonObj.value(_WMID).toInt();
+	if (_WIDUpdate != id) return;
+	QString xml = jsonObj.value(_name2str(xml)).toString();
+	QString python = jsonObj.value(_name2str(python)).toString();
+
 	QString blocklyFileName = getCurrentBlocklyFile();
 	QString pythonFileName = getCurrentPythonFile();
 	qDebug() << "更新文件" << blocklyFileName << pythonFileName;
 	if (blocklyFileName.isEmpty() || pythonFileName.isEmpty()) return;
 	QFile blocklyFile(blocklyFileName);
-	if (blocklyFile.open(QIODevice::WriteOnly | QIODevice::Text)){
-		blocklyFile.write(xmlData.toUtf8());
+	if (blocklyFile.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)){
+		blocklyFile.write(xml.toUtf8());
 		blocklyFile.close();
 	}
 	QFile pythonFile(pythonFileName);
-	if (pythonFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
-		pythonFile.write(pythonData.toUtf8());
+	if (pythonFile.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
+		pythonFile.write(python.toUtf8());
 		pythonFile.close();
 	}
 }
 
 void UAVManage::onSocketDisconnected()
 {
-	m_pWebSocket = nullptr;
+	qDebug() << "编程区域连接断开";
+	m_pWebBockly = nullptr;
 }
 
 void UAVManage::onCurrentDeviceNameChanged(QString currentName, QString previousName)
@@ -455,8 +472,13 @@ void UAVManage::onCurrentDeviceNameChanged(QString currentName, QString previous
 		arrBlockly = file.readAll();
 		file.close();
 	}
-	qDebug() << "更新WEB界面" << blocklyFilePath << arrBlockly;
-	if(m_pWebSocket) m_pWebSocket->sendTextMessage(arrBlockly);
+	qDebug() << "更新编程区域";
+	QJsonObject jsonObj;
+	jsonObj.insert(_WMID, _WIDUpdate);
+	jsonObj.insert("xml", arrBlockly.data());
+	QJsonDocument jsonDoc(jsonObj);
+	QByteArray data = jsonDoc.toJson();
+	if(m_pWebBockly) m_pWebBockly->sendTextMessage(data);
 	
 	//更新项目工程中选中设备
 	QTextCodec* code = QTextCodec::codecForName(_XMLNameCoding_);
@@ -497,7 +519,7 @@ void UAVManage::onDeviceAdd(QString name, QString ip, float x, float y)
 		temp = temp->NextSiblingElement(_ElementDevice_);
 	}
 	tinyxml2::XMLElement* device = temp;
-	if (!bExist) {
+	if (false == bExist) {
 		device = doc.NewElement(_ElementDevice_);
 		root->InsertEndChild(device);
 		//新建设备文件
@@ -506,7 +528,7 @@ void UAVManage::onDeviceAdd(QString name, QString ip, float x, float y)
 		QString qstrBlocklyFile = QString("%1%2%3.blockly").arg(qstrPath).arg(_ProjectDirName_).arg(name);
 		QString qstrPythonFile = QString("%1%2%3.py").arg(qstrPath).arg(_ProjectDirName_).arg(name);
 		QFile file(qstrBlocklyFile);
-		if (file.open(QIODevice::ReadWrite)) {
+		if (file.open(QIODevice::ReadWrite | QIODevice::Truncate)) {
 			//当设备不存在写入默认blockly控件
 			QString qstrBlock = "<xml xmlns=\"https://developers.google.com/blockly/xml\">\
 								  <block type=\"QzrobotTakeOff\" id=\"hZkt:t([/FZPOZEgkDdx\" x=\"213\" y=\"113\">\
@@ -525,12 +547,12 @@ void UAVManage::onDeviceAdd(QString name, QString ip, float x, float y)
 								    </next>\
 								  </block>\
 								</xml>";
-			file.write(qstrBlock.toUtf8());
+			//file.write(qstrBlock.toUtf8());
 			file.waitForBytesWritten(1000);
 			file.close();
 		}
 		file.setFileName(qstrPythonFile);
-		if (file.open(QIODevice::ReadWrite)) file.close();
+		if (file.open(QIODevice::ReadWrite | QIODevice::Truncate)) file.close();
 	}
 	device->SetAttribute(_AttributeName_, name.toUtf8().data());
 	device->SetAttribute(_AttributeIP_, ip.toUtf8().data());

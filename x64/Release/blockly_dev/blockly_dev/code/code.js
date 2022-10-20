@@ -197,6 +197,7 @@ Code.bindClick = function(el, func) {
  * Load the Prettify CSS and JavaScript.
  */
 Code.importPrettify = function() {
+  return;
   var script = document.createElement('script');
   script.setAttribute('src', 'https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js');
   document.head.appendChild(script);
@@ -520,16 +521,16 @@ Code.init = function() {
   //QZSY 注册监听事件,拖动积木块实时响应
   function myUpdateFunction(event) {
     if (event.type == Blockly.Events.UI || event.type == Blockly.Events.CREATE) return
-    var code = Blockly.Python.workspaceToCode(Code.workspace);
-    
-    var xmldata = "xmlData";
-    var xmlcode = document.getElementById("xmldata").value;
-    var pythondata = "pythonData";
-    var pythoncode = document.getElementById("content_python_text").value;
-    console.log("---code:"+pythoncode);
-
-    socket.send(xmldata +'\n'+xmlcode+'\n'+pythondata +'\n'+pythoncode);
-    //content.recvUpdateCode(code);
+    var python = Blockly.Python.workspaceToCode(Code.workspace);
+    var jsonObj = {};
+    jsonObj.msgID = 1;
+    jsonObj.xml = document.getElementById("xmldata").value;
+    jsonObj.python = python;
+    var jsonStr = JSON.stringify(jsonObj);
+    console.log(python);
+    if(1 == socket.readyState){
+      socket.send(jsonStr);
+    }
   }
   Code.workspace.addChangeListener(myUpdateFunction);
 };

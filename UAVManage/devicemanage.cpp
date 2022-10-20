@@ -234,6 +234,11 @@ void DeviceManage::setSpaceSize(unsigned int x, unsigned int y)
 	qDebug() << "设定场地大小" << x << y;
 }
 
+QSize DeviceManage::getSpaceSize()
+{
+	return QSize(m_nSpaceY, m_nSpaceX);
+}
+
 QString DeviceManage::addDevice(QString qstrName, QString ip, long x, long y)
 {
 	if (qstrName.isEmpty()) return tr("设备名称不能为空");
@@ -534,12 +539,13 @@ void DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upload
 		if (fileSvg.open(QIODevice::ReadWrite | QIODevice::Truncate)) {
 			QTextStream text_stream(&fileSvg);
 			text_stream.setCodec("utf-8");
-			QString title = "参数一,参数二,参数三,参数四,X,Y,Z,ID";
+			QString title = "参数一,参数二,参数三,参数四,X,Y,Z,ID,说明";
 			text_stream << title << "\r\n";
 			for (int i = 0; i < data.count(); i++) {
 				NavWayPointData wp = data.at(i);
-				QString text = QString("%1,%2,%3,%4,%5,%6,%7,%8")
-					.arg(wp.param1).arg(wp.param2).arg(wp.param3).arg(wp.param4).arg(wp.x).arg(wp.y).arg(wp.z).arg(wp.commandID);
+				QString text = QString("%1,%2,%3,%4,%5,%6,%7,%8,%9")
+					.arg(wp.param1).arg(wp.param2).arg(wp.param3).arg(wp.param4).arg(wp.x).arg(wp.y).arg(wp.z).arg(wp.commandID)
+					.arg(Utility::getWaypointDescribeFromID(wp.commandID));
 				text_stream << text << "\r\n";
 				qDebug() << name << QString("第%1条航点").arg(i) << text;
 			}

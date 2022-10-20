@@ -21,6 +21,7 @@ MessageListDialog* MessageListDialog::getInstance()
 {
 	if (g_pMessage) return g_pMessage;
 	g_pMessage = new MessageListDialog;
+	g_pMessage->close();
 	return g_pMessage;
 }
 
@@ -89,7 +90,7 @@ void MessageListDialog::onShowMessageText(QString text, _Messagelevel level, boo
 		return;
 	}
 
-	qDebug() << "提示消息" << text;
+	qDebug() << "提示消息" << level <<text;
 	if (parent()) {
 		QWidget* pWidget = dynamic_cast<QWidget*>(parent());
 		if (pWidget) {

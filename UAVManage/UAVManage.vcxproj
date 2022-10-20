@@ -106,7 +106,7 @@
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
@@ -133,7 +133,6 @@
     </ClCompile>
     <ClCompile Include="devicedebugl.cpp" />
     <ClCompile Include="devicemanage.cpp" />
-    <ClCompile Include="globalfunction.cpp" />
     <ClCompile Include="messagelistdialog.cpp" />
     <ClCompile Include="paramreadwrite.cpp" />
     <ClCompile Include="placeinfodialog.cpp" />
@@ -166,7 +165,6 @@
     <ClInclude Include="define3d.h" />
     <ClInclude Include="definesetting.h" />
     <QtMoc Include="devicedebug.h" />
-    <ClInclude Include="globalfunction.h" />
     <ClInclude Include="libhvsetting.h" />
     <ClInclude Include="mavlinksetting.h" />
     <QtMoc Include="threadpython.h" />

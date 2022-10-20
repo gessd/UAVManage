@@ -141,7 +141,7 @@ private:
     //websocket服务 积木块界面
     QWebSocketServer* m_pSocketServer;
     //web连接 积木块界面
-    QWebSocket* m_pWebSocket;
+    QWebSocket* m_pWebBockly;
     QString m_qstrLastWebMessage;
     //当前工程文件
     QString m_qstrCurrentProjectFile;

@@ -34,7 +34,7 @@ QMap<QString, _MarkPoint> g_mapMarkPoint;
 PyObject* QZAPI::examineWaypoint()
 {
 	//倒序检查
-	for (int i = g_waypointData.count(); i >= 0; i--) {
+	for (int i = g_waypointData.count()-1; i >= 0; i--) {
 		NavWayPointData data = g_waypointData.at(i);
 		switch (data.commandID)
 		{
@@ -88,6 +88,7 @@ PyObject* QZAPI::examineWaypoint()
 			}
 			break;
 		default:
+			showWaypointError(tr("舞步编程中有无法解析内容"));
 			return nullptr;
 			break;
 		}
@@ -97,7 +98,7 @@ PyObject* QZAPI::examineWaypoint()
 
 void QZAPI::showWaypointError(QString error)
 {
-	QString text = QString("%1 第%2步 %3").arg(g_deviceName).arg(g_waypointData.count()).arg(error);
+	QString text = QString("%1 %2").arg(g_deviceName).arg(error);
 	_ShowErrorMessage(text);
 }
 
@@ -331,7 +332,7 @@ PyObject* QZAPI::FlyAddMarkPoint(PyObject* self, PyObject* args)
 	QString qstrName(name);
 	qDebug() << "添加标定点" << qstrName << x << y << z;
 	if (g_mapMarkPoint.contains(qstrName)) {
-		QZAPI::Instance()->showWaypointError(tr("存在相同名称标定点")+qstrName);
+		QZAPI::Instance()->showWaypointError(tr("存在相同名称标定点 ")+qstrName);
 		return nullptr;
 	}
 	g_mapMarkPoint.insert(qstrName, _MarkPoint(x,y,z));

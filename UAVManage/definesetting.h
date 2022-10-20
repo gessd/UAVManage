@@ -47,6 +47,73 @@ enum _WaypointType {
 	_WaypointTime		= 31005		//时间信息
 };
 
+enum _DeviceStatus
+{
+	DeviceMessageToimeout = -404,
+	DeviceMessageSending = -4,
+	DeviceDataError = -3,
+	DeviceUnConnect = -2,
+	DeviceWaiting = -1,
+	DeviceDataSucceed = 0
+};
+
+enum PythonRunState
+{
+	PythonRunNone = 0,
+	PythonSuccessful,
+	PythonError,
+	PythonFileError,
+	PythonTimeout,
+	PythonCodeError,
+	PythonWaypointError,
+	PythonWaypointNull
+};
+
+class Utility :public QObject
+{
+public:
+	static QString waypointMessgeFromStatus(int status)
+	{
+		QString qstrMessage;
+		switch (status)
+		{
+		case DeviceMessageToimeout:
+			qstrMessage = QObject::tr("没有回应");
+			break;
+		case DeviceMessageSending:
+			qstrMessage = QObject::tr("进行中");
+			break;
+		case DeviceDataError:
+			qstrMessage = QObject::tr("数据错误");
+			break;
+		case DeviceUnConnect:
+			qstrMessage = QObject::tr("网络未连接");
+			break;
+		case DeviceWaiting:
+			qstrMessage = QObject::tr("错误");
+			break;
+		case DeviceDataSucceed:
+			qstrMessage = QObject::tr("成功");
+			break;
+		}
+		return qstrMessage;
+	}
+	static QString getWaypointDescribeFromID(int type)
+	{
+		QString qstrText = "未定义类型";
+		switch (type) {
+		case _WaypointFly: qstrText = QObject::tr("飞行"); break;
+		case _WaypointSpeed: qstrText = QObject::tr("设置速度"); break;
+		case _WaypointRevolve: qstrText = QObject::tr("旋转"); break;
+		case _WaypointHover: qstrText = QObject::tr("悬停"); break;
+		case _WaypointLed: qstrText = QObject::tr("LED灯"); break;
+		case _WaypointStart: qstrText = QObject::tr("初始位置"); break;
+		case _WaypointTime: qstrText = QObject::tr("时间信息"); break;
+		}
+		return qstrText;
+	}
+};
+
 //航点属性
 typedef struct __NavWayPointData
 {
@@ -68,4 +135,30 @@ typedef struct __NavWayPointData
 	}
 }NavWayPointData;
 
-
+#define _name2str(name) (#name)
+//结构体属性转换成字符串, 必须以.分割,否则因列表越界造成崩溃
+#define _attribute2str(name) (QString(#name).split(".").at(1))
+//2022-10-20后改为使用json格式传送数据
+// c++ 为 websocketserver
+// blocily 为 websocketclient
+//Blockly通讯消息格式
+/**
+ * c++ to blockly
+ * 1.更加编程区域
+ * {"msgID":1,"xml":"data"}
+ * 2.清空编程区域
+ * {"msgID":2}
+ * 3.设置空间范围
+ * {"msgID":3, "x":1000, "y":10000, "z":10000}
+ */
+/**
+ * blockly to c++
+ * 1.更加编程区域
+ * {"msgID":1,"xml":"data", "python":"data"}
+ */
+#define _WMID "msgID"
+enum _TypeWMID {
+	_WIDUpdate = 1,
+	_WIDClear = 2,
+	_WIDSet = 3
+};

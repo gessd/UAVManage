@@ -51,6 +51,11 @@ public:
 	void setSpaceSize(unsigned int x, unsigned int y);
 
 	/**
+	 * @brief 获取场地大小
+	 */
+	QSize getSpaceSize();
+
+	/**
 	* @brief 添加设备
 	* @param [in] qstrName 设备名称
 	* @param [in] ip 设备IP

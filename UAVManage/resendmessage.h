@@ -3,7 +3,7 @@
 #include <QObject>
 #include <QThread>
 #include <QMutex>
-#include "globalfunction.h"
+#include "definesetting.h"
 
 class ResendMessage : public QThread
 {

@@ -4,7 +4,6 @@
 #include <Python.h>
 #include "mypythondefine.h"
 #include "definesetting.h"
-#include "globalfunction.h"
 
 class QZAPI : public QObject
 {
