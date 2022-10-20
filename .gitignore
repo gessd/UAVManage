@@ -50,6 +50,7 @@ ui_*
 build*
 *.db
 *.opendb
+/x64
 /UAVManage/x64
 /.vs
 *.aps
