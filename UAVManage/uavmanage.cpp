@@ -414,7 +414,7 @@ void UAVManage::onSocketNewConnection()
 {
 	//不能同时打开两个软件，否则端口占用无法使用
 	//只记录一个web连接，防止通过浏览器访问blockly
-	if (m_pWebBockly) return;
+	//if (m_pWebBockly) return;
 	qDebug() << "建立编程区域连接";
 	m_pWebBockly = m_pSocketServer->nextPendingConnection();
 	connect(m_pWebBockly, SIGNAL(textMessageReceived(QString)), this, SLOT(onSocketTextMessageReceived(QString)));
