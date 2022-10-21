@@ -33,6 +33,9 @@ socket.onmessage = function(event) {
             document.getElementById("tab_blocks").click();
             var xml = Blockly.Xml.textToDom(jsonObject.xml);
             Blockly.Xml.domToWorkspace(xml, Code.workspace);
+            var name = jsonObject.name;
+            console.log("设备名称:"+name);
+            document.getElementById("deviceName").textContent = name;
         } else if(2 == msgID){
             console.log("清空编程区域");
             document.getElementById("tab_blocks").click();

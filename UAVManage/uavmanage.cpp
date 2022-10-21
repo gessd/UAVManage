@@ -476,6 +476,7 @@ void UAVManage::onCurrentDeviceNameChanged(QString currentName, QString previous
 	QJsonObject jsonObj;
 	jsonObj.insert(_WMID, _WIDUpdate);
 	jsonObj.insert("xml", arrBlockly.data());
+	jsonObj.insert("name", currentName);
 	QJsonDocument jsonDoc(jsonObj);
 	QByteArray data = jsonDoc.toJson();
 	if(m_pWebBockly) m_pWebBockly->sendTextMessage(data);
