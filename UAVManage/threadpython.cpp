@@ -33,9 +33,7 @@ QMap<QString, _MarkPoint> g_mapMarkPoint;
 
 PyObject* QZAPI::examineWaypoint()
 {
-	//倒序检查
-	for (int i = g_waypointData.count()-1; i >= 0; i--) {
-		NavWayPointData data = g_waypointData.at(i);
+		NavWayPointData data = g_waypointData.back();
 		switch (data.commandID)
 		{
 		case _WaypointFly: 
@@ -75,8 +73,9 @@ PyObject* QZAPI::examineWaypoint()
 			break;
 		case _WaypointStart: 
 			//只有第一步才能是起飞位置
-			if (0 != i) {
-				showWaypointError(tr("起飞位置设定错误"));
+			if (g_waypointData.count() != 2) {
+				//第一条为初始位置，第二条为起飞
+				showWaypointError(tr("起飞设定错误"));
 				return nullptr;
 			}
 			break;
@@ -86,14 +85,23 @@ PyObject* QZAPI::examineWaypoint()
 				showWaypointError(tr("时间范围设定错误"));
 				return nullptr;
 			}
+			//需要检查是否为递进关系
+			for (int i = g_waypointData.count() - 2; i >= 0; i--) {
+				NavWayPointData last = g_waypointData.at(i);
+				if(_WaypointTime != last.commandID) continue;
+				if (last.param1 >= data.param1 && last.param2 >= data.param2) {
+					//航点中存在比当前时间小的记录
+					showWaypointError(tr("时间范围设定顺序错误"));
+					return nullptr;
+				}
+			}
 			break;
 		default:
 			showWaypointError(tr("舞步编程中有无法解析内容"));
 			return nullptr;
 			break;
 		}
-	}
-	return Py_BuildValue("i", 0);
+		return Py_BuildValue("i", 0);
 }
 
 void QZAPI::showWaypointError(QString error)
