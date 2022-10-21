@@ -197,7 +197,6 @@ Code.bindClick = function(el, func) {
  * Load the Prettify CSS and JavaScript.
  */
 Code.importPrettify = function() {
-  return;
   var script = document.createElement('script');
   script.setAttribute('src', 'https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js');
   document.head.appendChild(script);
@@ -428,24 +427,34 @@ Code.init = function() {
     }
   }
 
-  // Construct the toolbox XML, replacing translated variable names.
+  // Construct the toolbox XML.
   var toolboxText = document.getElementById('toolbox').outerHTML;
-  toolboxText = toolboxText.replace(/(^|[^%]){(\w+)}/g,
-      function(m, p1, p2) {return p1 + MSG[p2];});
   var toolboxXml = Blockly.Xml.textToDom(toolboxText);
 
-  Code.workspace = Blockly.inject('content_blocks',
-      {grid:
-          {spacing: 25,
+  Code.workspace = Blockly.inject('content_blocks', {
+        grid:{
+          spacing: 25,
            length: 3,
            colour: '#ccc',
-           snap: true},
-       media: '../../media/',
-       rtl: rtl,
-       toolbox: toolboxXml,
-       zoom:
-           {controls: true,
-            wheel: true}
+           snap: true
+          },
+        move:{
+          scrollbars: true,
+          drag: true,
+          wheel: true
+        },
+        media: '../../media/',
+        rtl: rtl,
+        toolbox: toolboxXml,
+        scrollbars:true,
+        zoom:{
+            controls: true,
+            wheel: true,
+            startScale: 1.0,
+            maxScale: 1.5,
+            minScale: 0.8,
+            scaleSpeed: 1.2
+          }
       });
 
   // Add to reserved word list: Local variables in execution environment (runJS)
@@ -485,15 +494,6 @@ Code.init = function() {
   editor_content_python_text.setScrollSpeed(0.05);
   editor_content_python_text.setHighlightActiveLine(true);//行高亮
 
-  Code.addEventListeners();
-
-  /**
-   * 模拟操作---------------------
-   */
-
-  //Code.addExporterEventListeners();
-  //Code.addImporterEventListeners();
-
   // Lazy-load the syntax-highlighting.
   window.setTimeout(Code.importPrettify, 1);
 
@@ -501,12 +501,14 @@ Code.init = function() {
   function myUpdateFunction(event) {
     if (event.type == Blockly.Events.UI || event.type == Blockly.Events.CREATE) return
     var python = Blockly.Python.workspaceToCode(Code.workspace);
+    editor_content_python_text.setValue(python,-1)
     var jsonObj = {};
     jsonObj.msgID = 1;
-    jsonObj.xml = document.getElementById("xmldata").value;
+    jsonObj.xml = Blockly.Xml.domToPrettyText(Blockly.Xml.workspaceToDom(Code.workspace));
     jsonObj.python = python;
     var jsonStr = JSON.stringify(jsonObj);
     if(1 == socket.readyState){
+      //连接中则发送数据
       socket.send(jsonStr);
     }
   }
@@ -591,81 +593,6 @@ Code.discard = function() {
     }
   }
 };
-
-//拖动块生成python代码
-Code.addEventListeners = function(){
-  this.workspace.addChangeListener(Code.updateLanguage);
-};
-
-Code.updateLanguage = function(){
-  var blocktype = Code.getRootBlock(Code.workspace);
-  if (!blocktype) {
-    return;
-  }
-};
-
-Code.getRootBlock = function(workspace) {
-  var blocks = workspace.getTopBlocks(false);
-  var count =Code.workspace.getAllBlocks().length;
-  if (Code.checkAllGeneratorFunctionsDefined(Blockly.Python)) {
-    var code = Blockly.Python.workspaceToCode(workspace);
-    var xmlcode = Blockly.Xml.domToPrettyText(Blockly.Xml.workspaceToDom(workspace))
-    document.getElementById("content_python_text").value = code;
-    editor_content_python_text.setValue(code,-1)
-    document.getElementById("xmldata").value = xmlcode;
-  }
-
-  if(count < 1){
-    document.getElementById("content_python_text").value = "";
-    document.getElementById("xmldata").value = "";
-  }
-  return null;
-};
-
-/**
- * 模拟操作-------------------
- */
-
-//下载xml文件
-//Code.addExporterEventListeners = function(){
-//  document.getElementById("runButton").addEventListener('click',function(){
-//    // var blockDefs = Blockly.Xml.domToPrettyText(Blockly.Xml.workspaceToDom(Code.workspace));
-//    // var blockDef_filename = "testxml";
-//    // Code.createAndDownloadFile(blockDefs, blockDef_filename, 'xml');
-//  });
-//};
-
-//上传xml文件并显示块
-//Code.addImporterEventListeners = function(){
-//  document.getElementById("files").addEventListener('change',function(){
-//    var files = document.getElementById('files')
-//    var file = files.files[0];
-//    var fileReader = new FileReader();
-//    fileReader.addEventListener('load', function(event) {
-//      Code.workspace.clear();
-//      var fileContents = event.target.result;
-//      var xmldata = document.getElementById('xmldata').value = fileContents;
-//      var xml = Blockly.Xml.textToDom(xmldata);
-//      Blockly.Xml.domToWorkspace(xml, Code.workspace);
-//    });
-//    fileReader.readAsText(file);
-//  })
-//};
-
-//Code.createAndDownloadFile = function(contents, filename, fileType) {
-//  var data = new Blob([contents], {type: 'text/' + fileType});
-//  var clickEvent = new MouseEvent("click", {
-//    "view": window,
-//    "bubbles": true,
-//    "cancelable": false
-//  });
-//
-//  var a = document.createElement('a');
-//  a.href = window.URL.createObjectURL(data);
-//  a.download = filename;
-//  a.textContent = 'Download file!';
-//  a.dispatchEvent(clickEvent);
-//};
 
 // Load the Code demo's language strings.
 document.write('<script src="msg/' + Code.LANG + '.js"></script>\n');
