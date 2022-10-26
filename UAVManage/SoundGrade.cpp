@@ -29,14 +29,19 @@ SoundGrade::SoundGrade(QWidget *parent) :QWidget(parent)
 
 void SoundGrade::signalConnectSlot()
 {//绑定信号槽
-	connect(player, SIGNAL(stateChanged(QMediaPlayer::State)),   //播放状态改变
-		this, SLOT(onStateChanged(QMediaPlayer::State)));
+	//播放状态改变
+	connect(player, SIGNAL(stateChanged(QMediaPlayer::State)),this, SLOT(onStateChanged(QMediaPlayer::State)));
 
-	connect(player, SIGNAL(positionChanged(qint64)),             //播放位置改变
-		this, SLOT(onPositionChanged(qint64)));
+	//播放位置改变
+	connect(player, SIGNAL(positionChanged(qint64)),this, SLOT(onPositionChanged(qint64)));
 
-	connect(player, SIGNAL(durationChanged(qint64)),             //持续时间改变
-		this, SLOT(onDurationChanged(qint64)));
+	////持续时间改变
+	// //不准确，会出现值为0的情况
+	//connect(player, SIGNAL(durationChanged(qint64)),this, SLOT(onDurationChanged(qint64)));
+	//connect(player, &QMediaPlayer::currentMediaChanged, [this](const QMediaContent& media) {
+	//	qint64 time = player->metaData("Duration").toInt();
+	//	if (time != 0) onDurationChanged(time);
+	//	});
 }
 
 SoundGrade::~SoundGrade()
@@ -49,7 +54,7 @@ void SoundGrade::updateLoadMusic(QString filePath)
 	if (!QFile::exists(filePath)) return;
 	playlist->removeMedia(0, playlist->mediaCount() - 1);
 	playlist->addMedia(QUrl::fromLocalFile(filePath));
-	playlist->setCurrentIndex(m_ui.m_pPlayList->count() - 1);
+	playlist->setCurrentIndex(0);
 	m_decoder = new AudioDecoder(this);
 	connect(m_decoder, SIGNAL(finished()), this, SLOT(onDecoderFinished()));
 	m_decoder->analysisAudioFile(filePath);
@@ -171,13 +176,14 @@ void SoundGrade::onDecoderFinished()
 		frameCount += buffer.frameCount();
 		duration += buffer.duration();
 		AudioByte.append(QByteArray(buffer.data<char>(), buffer.byteCount()));
+		
 	}
 	qint64 interval = frameCount / 5000;                    //计算显示的帧数间隔
 	tmpNorm.frameCount = frameCount;                        //总帧数
 	tmpNorm.showFrameCount = 5000;                          //展示帧数
 	tmpNorm.drawInterval = interval;                        //计算显示的帧数间隔
 	tmpNorm.duration = duration;                            //播放时间
-	//m_ui.m_pCuverPlot->clearSeriesPoint();
+	onDurationChanged(duration / 1000);
 	m_ui.m_pCuverPlot->resetAxisAndSeries(tmpNorm);
 	if (tmpNorm.ChannelCount == 1)
 		m_ui.m_pCuverPlot->addSeriesPoint<qint8>((qint8*)AudioByte.data(), tmpNorm.frameCount);
@@ -215,6 +221,7 @@ void SoundGrade::onStateChanged(QMediaPlayer::State state)
 
 void SoundGrade::onDurationChanged(qint64 duration)
 {//文件时长变化，更新进度显示
+	if (0 == duration) return;
 	m_ui.m_pHslider->setMaximum(duration);
 	QString strSec, strMin; //豪秒，秒，分钟字符串
 	int   secs = duration / 1000;	//秒
