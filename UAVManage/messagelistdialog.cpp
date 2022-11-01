@@ -6,6 +6,7 @@
 #include <QLayout>
 #include <QHBoxLayout>
 #include <QDebug>
+#include <QGraphicsDropShadowEffect>
 
 //消息初始时间
 #define _ItemTime_      Qt::UserRole+20
@@ -103,9 +104,14 @@ void MessageListDialog::onShowMessageText(QString text, _Messagelevel level, boo
 	pItem->setSizeHint(QSize(0, _ItemHeight_));
 	pItem->setData(_ItemTime_, QDateTime::currentDateTime().toTime_t());
 	QLabel* pLabel = new QLabel(text);
+	QGraphicsDropShadowEffect* shadow = new QGraphicsDropShadowEffect(this);
+	shadow->setOffset(0, 0);
+	shadow->setColor(QColor("#444444"));
+	shadow->setBlurRadius(10);
+	pLabel->setGraphicsEffect(shadow);
 	pLabel->setWordWrap(true);
 	pLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-	unsigned int nMaxWidth = ui.listWidget->width() - 17;
+	unsigned int nMaxWidth = ui.listWidget->width() - 12;
 	pLabel->setFixedSize(nMaxWidth, _ItemHeight_ - 2);
 	switch (level)
 	{

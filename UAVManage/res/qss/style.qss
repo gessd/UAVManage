@@ -10,13 +10,13 @@ QWidget:disabled{
 /*通用按钮样式*/
 QPushButton,QToolButton{
 	color:#FFFFFF;
-    background:#388CFF;
+    background:#3B8CFF;
 	border-radius:10px;
 }
 QPushButton:hover,QToolButton:hover{
     background:#FFFFFF;
-	color:#388CFF;
-	border:1px solid #388CFF;
+	color:#3B8CFF;
+	border:1px solid #3B8CFF;
 }
 QPushButton:pressed,QToolButton:pressed{
     background:#DDDDDD;
@@ -58,11 +58,11 @@ QLineEdit{
 	padding:4px;
 	padding-left:10px;
 	border-radius:3px;
-	color:#388CFF;
+	color:#3B8CFF;
 	background:transparent;
 }
-QLineEdit:focus{
-	border:2px solid #388CFF;
+QLineEdit:focus, QLineEdit:hover{
+	border:1px solid #3B8CFF;
 }
 QLineEdit:disabled{
 	background:rgb(238,238,238);
@@ -160,6 +160,7 @@ QMenu{
 }
 QMenu::item{
 	background:transparent;
+	
 }
 /* 选中条目时 */
 QMenu::item:selected {
@@ -181,6 +182,19 @@ QMenuBar::item {
 }
 */
 
-AddDeviceDialog,PlaceInfoDialog{
-	background:rgb(204,204,204);
+AddDeviceDialog .QFrame, SpaceParam .QFrame{
+	border:2px solid rgb(125, 125, 125);
+    border-bottom-left-radius:10px; 
+	border-bottom-right-radius:10px; 
+	background:rgb(242,242,242);
+	border-top:0px;
+}
+
+#dialogWidgetTitle{
+	border-top-left-radius:10px; 
+	border-top-right-radius:10px; 
+	background:#3B8CFF;
+}
+#dialogLabelTitle{
+	color:#FFFFFF;
 }
