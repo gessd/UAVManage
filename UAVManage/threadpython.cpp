@@ -80,16 +80,11 @@ PyObject* QZAPI::examineWaypoint()
 			}
 			break;
 		case _WaypointTime: 
-			//时间范围
-			if (data.param2 >= 60 || data.param2 < 0) {
-				showWaypointError(tr("时间范围设定错误"));
-				return nullptr;
-			}
-			//需要检查是否为递进关系
+			//时间范围,需要检查是否为递进关系
 			for (int i = g_waypointData.count() - 2; i >= 0; i--) {
 				NavWayPointData last = g_waypointData.at(i);
 				if(_WaypointTime != last.commandID) continue;
-				if (last.param1 >= data.param1 && last.param2 >= data.param2) {
+				if (last.param1 >= data.param1) {
 					//航点中存在比当前时间小的记录
 					showWaypointError(tr("时间范围设定顺序错误"));
 					return nullptr;
@@ -453,13 +448,16 @@ PyObject* QZAPI::FlyTimeGroup(PyObject* self, PyObject* args)
 		return nullptr;
 	}
 	qDebug() << "时间组范围" << m << s;
+	if (s >= 60 || m < 0) {
+		QZAPI::Instance()->showWaypointError(tr("时间范围设定错误"));
+		return nullptr;
+	}
 	NavWayPointData last = g_waypointData.back();
 	NavWayPointData data;
 	data.x = last.x;
 	data.y = last.y;
 	data.z = last.z;
-	data.param1 = m;
-	data.param2 = s;
+	data.param1 = m * 60 + s;
 	data.commandID = _WaypointTime;
 	g_waypointData.append(data);
 	return QZAPI::Instance()->examineWaypoint();

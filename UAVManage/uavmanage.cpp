@@ -57,6 +57,8 @@ UAVManage::UAVManage(QWidget *parent)
 	//添加菜单
 	QStyle* style = QApplication::style();
 	QMenu* pTestMenu = new QMenu(tr("测试"));
+	pTestMenu->setWindowFlags(pTestMenu->windowFlags() | Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint);
+	pTestMenu->setAttribute(Qt::WA_TranslucentBackground);
 	ui.menuBar->addMenu(pTestMenu);
 	QAction* pQssAction = new QAction(style->standardIcon(QStyle::SP_ComputerIcon), tr("更新样式"));
 	QAction* pMessage = new QAction("消息窗口");
@@ -70,6 +72,8 @@ UAVManage::UAVManage(QWidget *parent)
 		});
 	//项目管理菜单
 	QMenu* pProjectMenu = new QMenu(tr("项目"));
+	pProjectMenu->setWindowFlags(pProjectMenu->windowFlags() | Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint);
+	pProjectMenu->setAttribute(Qt::WA_TranslucentBackground);
 	ui.menuBar->addMenu(pProjectMenu);
 	QAction* pActionNew = new QAction(style->standardIcon(QStyle::SP_FileDialogNewFolder), tr("新建"));
 	QAction* pActionOpen = new QAction(style->standardIcon(QStyle::SP_DialogOpenButton), tr("打开"));
@@ -89,6 +93,8 @@ UAVManage::UAVManage(QWidget *parent)
 	m_p3DProcess = new QProcess(this);
 	//起飞准备菜单
 	QMenu* pMenuFlyPrepare = new QMenu(tr("起飞准备"));
+	pMenuFlyPrepare->setWindowFlags(pMenuFlyPrepare->windowFlags() | Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint);
+	pMenuFlyPrepare->setAttribute(Qt::WA_TranslucentBackground);
 	ui.menuBar->addMenu(pMenuFlyPrepare);
 	QAction* pActionFly1 = new QAction(QIcon(":/res/images/inspect.png"), tr("1.检查舞步"));
 	QAction* pActionFly2 = new QAction(QIcon(":/res/images/stereoscopic.png"), tr("2.三维仿真"));
@@ -112,7 +118,7 @@ UAVManage::UAVManage(QWidget *parent)
 	connect(pActionFly1, &QAction::triggered, [this]() { m_pDeviceManage->waypointComposeAndUpload(m_qstrCurrentProjectFile, false); });
 	connect(pActionFly2, &QAction::triggered, [this]() { 
 		//if (m_qstrCurrentProjectFile.isEmpty()) return;
-		m_p3DProcess->start("notepad.exe");
+		m_p3DProcess->start("E:/UAVProgram/UAV_Program_UE4.exe");
 		//m_p3DProcess->waitForFinished();
 		});
 	connect(pActionFly3, &QAction::triggered, [this]() { 

@@ -1,23 +1,25 @@
 QWidget{
-	color:rgb(255,255,255);
-	background:rgb(58,58,58);
+	color:#000000;
+	background:#C2DDF0;
+	font-size:16px;
+	font-family:"微软雅黑"
 }
 QWidget:disabled{
 	color:#666666;
-	border-color:#666666;
 }
 /*通用按钮样式*/
 QPushButton,QToolButton{
-    background:rgb(80, 80, 80);
-	border:0px solid rgba(248,248,255,200);
+	color:#FFFFFF;
+    background:#388CFF;
 	border-radius:10px;
 }
 QPushButton:hover,QToolButton:hover{
-    background:rgb(180,180,180);
-	color:rgb(50,50,50);
+    background:#FFFFFF;
+	color:#388CFF;
+	border:1px solid #388CFF;
 }
 QPushButton:pressed,QToolButton:pressed{
-    background:rgb(140,140,140);
+    background:#DDDDDD;
 }
 QDialogButtonBox QPushButton{
 	min-height:30px;
@@ -50,75 +52,56 @@ QToolBar QPushButton{
 #m_pBtnLoad,#m_pBtnPlay,#m_pbtnStop{
 	padding-left:8px;
 }
-/*弹窗框及添加设备弹窗框*/
-AddDeviceDialog QPushButton, QInputDialog QPushButton, SpaceParam QPushButton{
-	background:rgb(26,179,148); 
-	color:rgb(255,255,255); 
-	border-radius:3px; 
-	min-height:30px; 
-	min-width:60px; 
-	font-size:20px;
-}
-AddDeviceDialog QPushButton:hover, QInputDialog QPushButton:hover, SpaceParam QPushButton:hover{
-background:rgb(24,166,137);
-}
-AddDeviceDialog QPushButton:pressed, QInputDialog QPushButton:pressed, SpaceParam QPushButton:pressed{
-	background:rgb(32,178,170);
-}
-AddDeviceDialog QLabel, QInputDialog QLabel, SpaceParam QLabel{
-	color:rgb(255,255,255); 
-	font-size:18px;
-}
 
 QLineEdit{
-	border:2px solid rgb(229,230,231);
+	border:1px solid #000000;
 	padding:4px;
 	padding-left:10px;
 	border-radius:3px;
-	color:rgb(255,255,255);
-	font-size:18px;
+	color:#388CFF;
+	background:transparent;
 }
 QLineEdit:focus{
-	border:2px solid rgb(26,179,148);
+	border:2px solid #388CFF;
 }
 QLineEdit:disabled{
-	background-color:rgb(238,238,238);
+	background:rgb(238,238,238);
 }
-
+QTableWidget{
+	background:rgb(204,204,204);
+}
 QTableWidget::item:selected{
-    background-color:rgb(75,85,97);
+    background:rgb(75,85,97);
 	color:rgb(255,255,255);
 }
 QHeaderView::section{
 	text-align:center;
-	background:rgb(58,58,58);
+	background:rgb(204,204,204);
 	margin:0px;
 	color:rgb(255,255,255);
 }
 /*QTableView 左上角样式*/
 QTableWidget QTableCornerButton::section {
-    background:rgb(58,58,58);
+    background:transparent;
 }
-
-/*
-QLineEdit, QListWidget, QGroupBox, QTextBrowser{
-	border:1px dashed rgb(255,255,255);
+QLabel{
+    background:transparent;
 }
-*/
 DeviceDebug QLineEdit{
 	border-width:1px;
 }
-
-QListWidget QLabel{
-    background:transparent;
+QListWidget{
+	outline:0px;
+	border:1px solid #FFFFFF;
 }
 QListWidget::item:hover{
-	background-color:rgb(100,100,100);
+	background-color:rgb(220,220,220);
 }
 QListWidget::item:selected{
-	background-color:rgb(120,120,120);
-	border-width:0;
+	background-color:#C8C8C8;
+	border-width:0px;
 }
+
 QProgressBar{
 	background:transparent;
 	color:white;
@@ -135,6 +118,7 @@ MessageListDialog, MessageListDialog QListWidget, MessageListDialog QListWidget:
 	background:transparent;
 	border-radius:10px;
 	outline:0px;
+	border:0px solid red;
 }
 
 MessageListDialog QListWidget::item:hover{
@@ -154,34 +138,36 @@ MessageListDialog #LabelErrorMessage{
 /*垂直滑条*/
 QScrollBar::vertical {
 	background:transparent;
-	width:8px;
+	width:10px;
 }
 /*垂直滑条上的滑块*/
 QScrollBar::handle:vertical{
-	background:rgba(100,100,100,80%);
+	background:rgb(204,204,204);
 	border-radius:5px;
 }
 QScrollBar::handle:vertical:hover{
-	background:rgba(100,100,100,60%);
+	background:rgb(187,187,187);
 }
 /*滑条上下箭头*/
 QScrollBar::sub-line:vertical, QScrollBar::add-line:vertical{
 	border: none; 
     background: none; 
 }
-
-QMenu::item {
+QMenu{
+	border:1px solid rgb(125, 125, 125);
+    border-radius:10px; 
+	background:rgb(242,242,242);
+}
+QMenu::item{
 	background:transparent;
 }
-
 /* 选中条目时 */
 QMenu::item:selected {
-	background:rgb(80,80,80);
+	background:#CCCCCC;
 }
-QMenu::item:hover {
-	background:rgb(100,100,100);
+QMenu::item:hover{
+	background:#C8C8C8;
 }
-
 /* 条目被选中时*/
 QMenu::icon::checked {
 	background:red;
@@ -194,3 +180,7 @@ QMenuBar::item {
 	spacing:20px;
 }
 */
+
+AddDeviceDialog,PlaceInfoDialog{
+	background:rgb(204,204,204);
+}

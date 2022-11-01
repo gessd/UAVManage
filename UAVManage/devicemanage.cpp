@@ -37,6 +37,8 @@ DeviceManage::DeviceManage(QWidget *parent)
 
 	//添加右键菜单
 	m_pMenu = new QMenu(this);
+	m_pMenu->setWindowFlags(m_pMenu->windowFlags() | Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint);
+	m_pMenu->setAttribute(Qt::WA_TranslucentBackground);
 	QAction* pActionParam = new QAction(tr("修改"), this);
 	QAction* pActionResetName = new QAction(tr("重命名"), this);
 	QAction* pActionResetIP = new QAction(tr("修改IP"), this);
