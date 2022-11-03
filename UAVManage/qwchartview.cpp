@@ -2,15 +2,21 @@
 
 QWChartView::QWChartView(QWidget *parent):QChartView(parent)
 {
-    setDragMode(QGraphicsView::RubberBandDrag);//拖动鼠标可以设置矩形
+    //setDragMode(QGraphicsView::RubberBandDrag);//拖动鼠标可以设置矩形
     //    this->setRubberBand(QChartView::RectangleRubberBand);//设置为矩形选择方式
     //    this->setRubberBand(QChartView::VerticalRubberBand);
     //    this->setRubberBand(QChartView::HorizontalRubberBand);
     
     setMouseTracking(true);           //必须开启此功能，启用鼠标跟踪
     m_chart = new QChart();
-	m_chart->setMargins(QMargins(0, 0, 20, 0));
+	m_chart->layout()->setContentsMargins(0, 0, 0, 0);//设置外边界全部为0
+	m_chart->setMargins(QMargins(0, 0, 0, 0));//设置内边界全部为0
+	m_chart->setBackgroundRoundness(0);//设置背景区域无圆角
 	m_chart->legend()->setVisible(false);
+    m_chart->setBackgroundBrush(QBrush(QColor(194, 221, 240, 255)));
+    //内外边距全都设置为0
+	this->setViewportMargins(0, 0, 0, 0);
+	this->setContentsMargins(0, 0, 0, 0);
     setChart(m_chart);
     setRenderHint(QPainter::Antialiasing);  //消除边缘锯齿
     setCursor(Qt::CrossCursor);             //设置鼠标指针为十字星
@@ -45,9 +51,9 @@ void QWChartView::resetAxisAndSeries(const AxisAndSeriesNorm &norm)
     /*calcAxisX();*/
 	m_axisX->setRange(0, 5000);
     if(norm.ChannelCount == 1)
-        m_axisY->setRange(0,126);
+        m_axisY->setRange(0, 126);
     else if(norm.ChannelCount == 2)
-        m_axisY->setRange(0,32768);
+        m_axisY->setRange(0, 20000);
 }
 
 void QWChartView::initSeries()
@@ -64,7 +70,7 @@ void QWChartView::initSeries()
     pen.setColor(Qt::blue);
     m_series2->setPen(pen);
     pen.setColor(Qt::red);
-	pen.setWidth(3);
+	pen.setWidth(2);
     m_series3->setPen(pen);
 
 	m_timeNode = new QScatterSeries();
@@ -84,6 +90,8 @@ void QWChartView::initAxis()
     //m_axisX->setTitleText("time(secs)"); //标题
 	m_axisX->setTitleVisible(false);
     m_axisX->setGridLineVisible(true);
+    //隐藏Y轴刻度尺
+    m_axisX->setVisible(false);
 
     m_axisY = new QCategoryAxis;
     m_axisY->setRange(-100, 100);
@@ -93,6 +101,8 @@ void QWChartView::initAxis()
     m_axisY->setGridLineVisible(true);
     m_axisY->setMinorTickCount(2);//4
 	m_axisY->setTitleVisible(false);
+    //隐藏Y轴刻度尺
+    m_axisY->setVisible(false);
 }
 
 void QWChartView::initMouseLabel()
@@ -226,6 +236,7 @@ void QWChartView::mousePressEvent(QMouseEvent *event)
 
 void QWChartView::enterEvent(QEvent  *event)
 {//鼠标进入事件
+    m_mouseLabel->setMinimumWidth(80);
 	m_mouseLabel->show();
 }
 void QWChartView::leaveEvent(QEvent *event)
@@ -259,64 +270,69 @@ void QWChartView::mouseMoveEvent(QMouseEvent *event)
     QChartView::mouseMoveEvent(event);
 }
 
-void QWChartView::wheelEvent(QWheelEvent*event)
+void QWChartView::wheelEvent(QWheelEvent* event)
 {//滚动事件
+    /*
 	if (event->delta() > 0) {//如果滚轮往上滚
 		chart()->zoom(1.2);
 	}
 	else {//同样的
 		chart()->zoom(0.8);
-	}
+	}*/
 }
 
 void QWChartView::mouseReleaseEvent(QMouseEvent *event)
 {//单击事件
-    if (event->button()==Qt::LeftButton)
-    { //鼠标左键释放，获取矩形框的endPoint,进行缩放
-        endPoint=event->pos();
-        QRectF  rectF;
-        rectF.setTopLeft(this->beginPoint);
-        rectF.setBottomRight(this->endPoint);
-        this->chart()->zoomIn(rectF);
-    }
-    else if (event->button()==Qt::RightButton)
-        this->chart()->zoomReset(); //鼠标右键释放，resetZoom
+    /*
+	if (event->button() == Qt::LeftButton)
+	{ //鼠标左键释放，获取矩形框的endPoint,进行缩放
+		endPoint = event->pos();
+		QRectF  rectF;
+		rectF.setTopLeft(this->beginPoint);
+		rectF.setBottomRight(this->endPoint);
+		this->chart()->zoomIn(rectF);
+	}
+	else if (event->button() == Qt::RightButton)
+		this->chart()->zoomReset(); //鼠标右键释放，resetZoom
+    */
     QChartView::mouseReleaseEvent(event);
 }
 
 void QWChartView::keyPressEvent(QKeyEvent *event)
 {//按键控制
-    switch (event->key()) {
-    case Qt::Key_Plus:  //+
-        chart()->zoom(1.2);
-        break;
-    case Qt::Key_Minus:
-        chart()->zoom(0.8);
-        break;
-    case Qt::Key_Left:
-        chart()->scroll(10, 0);
-        break;
-    case Qt::Key_Right:
-        chart()->scroll(-10, 0);
-        break;
-    case Qt::Key_Up:
-        chart()->scroll(0, -10);
-        break;
-    case Qt::Key_Down:
-        chart()->scroll(0, 10);
-        break;
-    case Qt::Key_PageUp:
-        chart()->scroll(0, 50);
-        break;
-    case Qt::Key_PageDown:
-        chart()->scroll(0, -50);
-        break;
-    case Qt::Key_Home:
-        chart()->zoomReset();
-        break;
-    default:
-        QGraphicsView::keyPressEvent(event);
-    }
+    /*
+	switch (event->key()) {
+	case Qt::Key_Plus:  //+
+		chart()->zoom(1.2);
+		break;
+	case Qt::Key_Minus:
+		chart()->zoom(0.8);
+		break;
+	case Qt::Key_Left:
+		chart()->scroll(10, 0);
+		break;
+	case Qt::Key_Right:
+		chart()->scroll(-10, 0);
+		break;
+	case Qt::Key_Up:
+		chart()->scroll(0, -10);
+		break;
+	case Qt::Key_Down:
+		chart()->scroll(0, 10);
+		break;
+	case Qt::Key_PageUp:
+		chart()->scroll(0, 50);
+		break;
+	case Qt::Key_PageDown:
+		chart()->scroll(0, -50);
+		break;
+	case Qt::Key_Home:
+		chart()->zoomReset();
+		break;
+	default:
+		QGraphicsView::keyPressEvent(event);
+	}
+    */
         QGraphicsView::keyPressEvent(event);
 }
 
