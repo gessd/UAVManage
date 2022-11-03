@@ -49,12 +49,17 @@ enum _WaypointType {
 
 enum _DeviceStatus
 {
+	//程序内部错误
 	DeviceMessageToimeout = -404,
 	DeviceMessageSending = -4,
 	DeviceDataError = -3,
 	DeviceUnConnect = -2,
 	DeviceWaiting = -1,
-	DeviceDataSucceed = 0
+	DeviceDataSucceed = 0,
+	//无人机返回错误
+	FlyNoWaypoint = 1,	//航线错误
+	Flying = 2,			//正在飞行中
+	FlyNoPrepare = 3	//没有准备起飞
 };
 
 enum PythonRunState
@@ -74,7 +79,7 @@ class Utility :public QObject
 public:
 	static QString waypointMessgeFromStatus(int status)
 	{
-		QString qstrMessage;
+		QString qstrMessage = QString::number(status);
 		switch (status)
 		{
 		case DeviceMessageToimeout:
@@ -87,13 +92,22 @@ public:
 			qstrMessage = QObject::tr("数据错误");
 			break;
 		case DeviceUnConnect:
-			qstrMessage = QObject::tr("网络未连接");
+			qstrMessage = QObject::tr("设备未连接");
 			break;
 		case DeviceWaiting:
 			qstrMessage = QObject::tr("错误");
 			break;
 		case DeviceDataSucceed:
 			qstrMessage = QObject::tr("成功");
+			break;
+		case FlyNoWaypoint:
+			qstrMessage = QObject::tr("没有航线或航线错误");
+			break;
+		case Flying:
+			qstrMessage = QObject::tr("正在飞行中");
+			break;
+		case FlyNoPrepare:
+			qstrMessage = QObject::tr("没有准备起飞");
 			break;
 		}
 		return qstrMessage;

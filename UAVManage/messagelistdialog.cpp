@@ -73,7 +73,7 @@ MessageListDialog::MessageListDialog(QWidget *parent)
 		ui.listWidget->takeItem(ui.listWidget->currentRow());
 		});
 	connect(ui.btnClose, &QAbstractButton::clicked, [this]() {close();});
-	ui.btnClose->setVisible(false);
+	ui.widgetMessageTitle->setVisible(false);
 }
 
 MessageListDialog::~MessageListDialog()

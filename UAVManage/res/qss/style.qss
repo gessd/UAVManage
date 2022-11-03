@@ -2,7 +2,7 @@ QWidget{
 	color:#000000;
 	background:#C2DDF0;
 	font-size:16px;
-	font-family:"微软雅黑"
+	font-family:"微软雅黑";
 }
 QWidget:disabled{
 	color:#666666;
