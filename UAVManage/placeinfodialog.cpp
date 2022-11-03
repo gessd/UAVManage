@@ -39,6 +39,8 @@ void PlaceInfoDialog::showEvent(QShowEvent* event)
 	}
 	ui.comboBoxCom->clear();
 	foreach(QSerialPortInfo info, QSerialPortInfo::availablePorts()) {
+		quint16 pid = info.productIdentifier();
+		if (60000 != pid) continue;
 		ui.comboBoxCom->addItem(info.portName());
 	}
 }
