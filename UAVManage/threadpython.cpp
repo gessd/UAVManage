@@ -137,182 +137,6 @@ PyMODINIT_FUNC PyInit_PythonCallBack(void)
 	module = PyModule_Create(&BicubicModule);
 	return module;
 }
-PyObject* QZAPI::Fly_Time(PyObject* self, PyObject* args)
-{
-	char* t = NULL;
-	if (!PyArg_ParseTuple(args, "s", &t)) {
-		return Py_BuildValue("i", 0);
-	}
-	QString qstrTime(t);
-	QStringList list = qstrTime.split(":");
-	if(2 != list.count()) return Py_BuildValue("i", 0);
-	NavWayPointData data;
-	data.param1 = list[0].toInt();
-	data.param2 = list[1].toInt();
-	data.commandID = 31005;
-	g_waypointData.append(data);
-	return Py_BuildValue("i", 0);
-}
-
-PyObject* QZAPI::Fly_Waypoint(PyObject* self, PyObject* args)
-{
-	float x, y, z, h, a, p, w;
-	if (!PyArg_ParseTuple(args, "f|f|f|f|f|f|f", &x, &y, &z, & h, &a, & p, &w)) {
-		return Py_BuildValue("i", 0);
-	}
-	if (a < 0.2) a = 0.2;
-	NavWayPointData data;
-	data.x = x;
-	data.y = y;
-	data.z = z;
-	data.param1 = h;
-	data.param2 = a;
-	data.param3 = p;
-	data.param4 = w;
-	g_waypointData.append(data);
-	return Py_BuildValue("i", 0);
-}
-
-PyObject* QZAPI::Fly_Location(PyObject* self, PyObject* args)
-{
-	float x, y, z;
-	if (!PyArg_ParseTuple(args, "f|f|f", &x, &y, &z)) {
-		return Py_BuildValue("i", 0);
-	}
-	NavWayPointData data;
-	data.x = x;
-	data.y = y;
-	data.z = z;
-	g_waypointData.append(data);
-	return Py_BuildValue("i", 0);
-}
-
-PyObject* QZAPI::Fly_hover(PyObject* self, PyObject* args)
-{
-	float hold;
-	if (!PyArg_ParseTuple(args, "f", &hold)) {
-		return Py_BuildValue("i", 0);
-	}
-	if (g_waypointData.isEmpty()) {
-		//TODO 没有航点信息无法设置停留时间,需要提示,此处为子线程无法使用弹窗
-		//return Py_BuildValue("i", 0);
-	}
-	NavWayPointData data = g_waypointData.back();
-	data.param1 = hold;
-	data.param4 = 0;
-	g_waypointData.append(data);
-	return Py_BuildValue("i", 0);
-}
-
-PyObject* QZAPI::Fly_revolve(PyObject* self, PyObject* args)
-{
-	float yaw;
-	if (!PyArg_ParseTuple(args, "f", &yaw)) {
-		return Py_BuildValue("i", 0);
-	}
-	if (g_waypointData.isEmpty()) {
-		//TODO
-		//没有航点信息无法设置偏转角度,需要提示,此处为子线程无法使用弹窗
-		//return Py_BuildValue("i", 0);
-	}
-	NavWayPointData data = g_waypointData.back();
-	data.param1 = 0;
-	data.param4 = yaw;
-	g_waypointData.append(data);
-	return Py_BuildValue("i", 0);
-}
-
-PyObject* QZAPI::Fly_speedWaypoint(PyObject* self, PyObject* args)
-{
-	//带速度航点
-	float x, y, z, s;
-	if (!PyArg_ParseTuple(args, "f|f|f|f", &x, &y, &z, &s)) {
-		return Py_BuildValue("i", 0);
-	}
-	NavWayPointData data;
-	data.x = x;
-	data.y = y;
-	data.z = z;
-	data.param1 = s;
-	data.commandID = 31000;
-	g_waypointData.append(data);
-	return Py_BuildValue("i", 0);
-}
-
-PyObject* QZAPI::Fly_setSpeed(PyObject* self, PyObject* args)
-{
-	float s;
-	if (!PyArg_ParseTuple(args, "f", &s)) {
-		return Py_BuildValue("i", 0);
-	}
-	//设置航点速度
-	//TODO 航点位置使用上一次位置
-	NavWayPointData data = g_waypointData.back();
-	data.param1 = s;
-	data.param3 = 0;
-	data.param4 = 0;
-	data.commandID = 31000;
-	g_waypointData.append(data);
-	return Py_BuildValue("i", 0);
-}
-
-PyObject* QZAPI::Fly_LedMode(PyObject* self, PyObject* args)
-{
-	int m;
-	if (!PyArg_ParseTuple(args, "n", &m)) {
-		return Py_BuildValue("i", 0);
-	}
-	NavWayPointData data;
-	data.param1 = m;
-	data.commandID = 31003;
-	g_waypointData.append(data);
-	return Py_BuildValue("i", 0);
-}
-PyObject* QZAPI::Fly_Moveto(PyObject* self, PyObject* args)
-{
-	float s;
-	int d;
-	if (!PyArg_ParseTuple(args, "n|f", &d, &s)) {
-		return Py_BuildValue("i", 0);
-	}
-	NavWayPointData data = g_waypointData.back();
-	switch (d)
-	{
-	case 1: data.x = s; break;
-	case 2: data.y = s; break;
-	case 3: data.z = s; break;
-	}
-	data.param1 = 0; 
-	data.param4 = 0;
-	g_waypointData.append(data);
-	return Py_BuildValue("i", 0);
-}
-
-PyObject* QZAPI::Fly_MoveAddTo(PyObject* self, PyObject* args)
-{
-	float s;
-	int d;
-	if (!PyArg_ParseTuple(args, "n|f", &d, &s)) {
-		return Py_BuildValue("i", 0);
-	}
-	NavWayPointData data = g_waypointData.back();
-	//TODO
-	//需要判断是否有效航点,commandID=16;
-	switch (d)
-	{
-	case 1: data.x += s; break;
-	case 2: data.x -= s; break;
-	case 3: data.y += s; break;
-	case 4: data.y -= s; break;
-	case 5: data.z += s; break;
-	case 6: data.z -= s; break;
-	}
-	data.param1 = 0;
-	data.param4 = 0;
-	data.commandID = 16;
-	g_waypointData.append(data);
-	return Py_BuildValue("i", 0);
-}
 
 PyObject* QZAPI::FlyAddMarkPoint(PyObject* self, PyObject* args)
 {
@@ -413,15 +237,22 @@ PyObject* QZAPI::FlyTakeoff(PyObject* self, PyObject* args)
 		return nullptr;
 	}
 	qDebug() << "起飞高度" << n;
-	NavWayPointData lastWaypoint = g_waypointData.back();
-	if (_WaypointStart != lastWaypoint.commandID) {
-		QZAPI::Instance()->showWaypointError(tr("起飞必须是第一步"));
-		return nullptr;
-	}
+	//TODO 暂时去掉起飞检查，飞控没有处理
+	//NavWayPointData lastWaypoint = g_waypointData.back();
+	//if (_WaypointStart != lastWaypoint.commandID) {
+	//	QZAPI::Instance()->showWaypointError(tr("起飞必须是第一步"));
+	//	return nullptr;
+	//}
+	//NavWayPointData data;
+	//data.x = lastWaypoint.x;
+	//data.y = lastWaypoint.y;
+	//data.z = lastWaypoint.z + n;
+	//g_waypointData.append(data);
+
 	NavWayPointData data;
-	data.x = lastWaypoint.x;
-	data.y = lastWaypoint.y;
-	data.z = lastWaypoint.z + n;
+	data.x = 0;
+	data.y = 0;
+	data.z = n;
 	g_waypointData.append(data);
 	return QZAPI::Instance()->examineWaypoint();
 }
@@ -585,11 +416,12 @@ void ThreadPython::initParam(unsigned int nSpaceX, unsigned int nSapaceY, QStrin
 	g_nSpaceY = nSapaceY;
 	g_deviceName = name;
 	//舞步前添加起始位置
-	NavWayPointData startLocation;
-	startLocation.x = nStartX;
-	startLocation.y = nStartY;
-	startLocation.commandID = _WaypointStart;
-	g_waypointData.append(startLocation);
+	// //TODO 测试时暂时屏蔽，飞控没有处理
+	//NavWayPointData startLocation;
+	//startLocation.x = nStartX;
+	//startLocation.y = nStartY;
+	//startLocation.commandID = _WaypointStart;
+	//g_waypointData.append(startLocation);
 }
 
 bool ThreadPython::compilePythonCode(QByteArray arrCode)

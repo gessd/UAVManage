@@ -9,27 +9,6 @@ class QZAPI : public QObject
 {
 	Q_OBJECT
 public:
-	//时间
-	static PyObject* Fly_Time(PyObject* self, PyObject* args);
-	//完整航点信息
-	static PyObject* Fly_Waypoint(PyObject* self, PyObject* args);
-	//航点中的坐标信息
-	static PyObject* Fly_Location(PyObject* self, PyObject* args);
-	//航点中的停留时间
-	static PyObject* Fly_hover(PyObject* self, PyObject* args);
-	//航点中的旋转角度
-	static PyObject* Fly_revolve(PyObject* self, PyObject* args);
-	//带速度航点
-	static PyObject* Fly_speedWaypoint(PyObject* self, PyObject* args);
-	//设置速度
-	static PyObject* Fly_setSpeed(PyObject* self, PyObject* args);
-	//设置LED模式
-	static PyObject* Fly_LedMode(PyObject* self, PyObject* args);
-	//单方向增量飞行
-	static PyObject* Fly_Moveto(PyObject* self, PyObject* args);
-	//单方向飞行
-	static PyObject* Fly_MoveAddTo(PyObject* self, PyObject* args);
-
 	/**
 	 *  @brief 预设飞行点
 	 * 	@param string 预设点名称，不能重复
