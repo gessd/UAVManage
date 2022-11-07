@@ -7,14 +7,11 @@
     <x>0</x>
     <y>0</y>
     <width>666</width>
-    <height>140</height>
+    <height>172</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
-  </property>
-  <property name="styleSheet">
-   <string notr="true"/>
   </property>
   <layout class="QGridLayout" name="gridLayout" columnstretch="5,0">
    <property name="leftMargin">
@@ -25,6 +22,9 @@
    </property>
    <property name="rightMargin">
     <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>2</number>
    </property>
    <property name="verticalSpacing">
     <number>0</number>
@@ -292,6 +292,16 @@
      </property>
     </widget>
    </item>
+   <item row="2" column="0" colspan="2">
+    <widget class="MusicScale" name="widgetScale" native="true">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>30</height>
+      </size>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <customwidgets>
@@ -299,6 +309,12 @@
    <class>QWChartView</class>
    <extends>QWidget</extends>
    <header location="global">qwchartview.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>MusicScale</class>
+   <extends>QWidget</extends>
+   <header>musicscale.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

@@ -97,6 +97,9 @@
     <ClCompile Include="spaceparam.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="musicscale.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="devicemanage.h">
@@ -145,6 +148,9 @@
       <Filter>Header Files</Filter>
     </QtMoc>
     <QtMoc Include="spaceparam.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="musicscale.h">
       <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>

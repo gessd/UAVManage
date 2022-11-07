@@ -56,6 +56,5 @@ private slots:
 	void on_m_pHslider_sliderReleased();							//拖动滑块后进行音频播放进度调控
 	void on_m_pPlayList_currentRowChanged(int currentRow);			//单击播放列表
 	void on_m_pPlayList_doubleClicked(const QModelIndex &index);	//双击播放列表
-	
 };
 #endif 

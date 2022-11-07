@@ -25,6 +25,10 @@ SoundGrade::SoundGrade(QWidget *parent) :QWidget(parent)
 	m_ui.m_pBtnPlay->setEnabled(false);
 	m_ui.m_pbtnStop->setEnabled(false);
 	connect(m_ui.m_pbtnStop, &QAbstractButton::clicked, [this]() {stopPlayMusic(); });
+	connect(m_ui.widgetScale, &MusicScale::updateMaxWidget, [this](int max) {
+		m_ui.m_pHslider->setMaximumWidth(max);
+		m_ui.m_pCuverPlot->setMaximumWidth(max);
+		});
 }
 
 void SoundGrade::signalConnectSlot()
@@ -231,6 +235,7 @@ void SoundGrade::onDurationChanged(qint64 duration)
 	strSec = secs < 10 ? QString::asprintf("0%1").arg(QString::number(secs)) : QString::number(secs);
 	durationTime = QString::asprintf("%1:%2").arg(strMin).arg(strSec);
 	m_ui.m_pLblTotal->setText(durationTime);
+	m_ui.widgetScale->updateScale(duration);
 }
 
 void SoundGrade::onPositionChanged(qint64 position)
