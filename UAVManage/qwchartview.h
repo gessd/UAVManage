@@ -61,5 +61,6 @@ private:
     void calcAxisX();       //根据音频文件排布X轴
 signals:
     void mouseMovePoint(QPoint point); //鼠标移动信号，在mouseMoveEvent()事件中触发
+    void updateMusicWaveFinished();
 };
 #endif // QWCHARTVIEW_H

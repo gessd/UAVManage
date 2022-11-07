@@ -69,7 +69,7 @@ void QWChartView::initSeries()
     m_series1->setPen(pen);
     pen.setColor(Qt::blue);
     m_series2->setPen(pen);
-    pen.setColor(Qt::red);
+    pen.setColor(Qt::green);
 	pen.setWidth(2);
     m_series3->setPen(pen);
 
@@ -224,7 +224,6 @@ void QWChartView::axisXPlaying(qint64 duration)
     points3.append(QPointF(duration * m_norm.timeScale, m_axisY->min()));
     points3.append(QPointF(duration * m_norm.timeScale, m_axisY->max()));
     m_series3->replace(points3);
-
 }
 
 void QWChartView::mousePressEvent(QMouseEvent *event)
@@ -394,6 +393,7 @@ void QWChartView::addSeriesPoint(const Customtype * data,qint64 maxSize)
 		timeNode.push_back(8000000);
 		addTimeNode(timeNode);
     }
+    emit updateMusicWaveFinished();
 }
 
 void QWChartView::addTimeNode(const QVector<quint64>& timeNode)

@@ -125,6 +125,10 @@ private slots:
     * @brief 三维窗口连接状态
     */
     void on3DDialogStauts(bool connect);
+    /**
+     * @brief 音乐波形绘制完成
+     */
+    void onMusicWaveFinished();
 private:
     /**
      * @brief 新建项目工程文件

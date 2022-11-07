@@ -140,6 +140,7 @@ UAVManage::UAVManage(QWidget *parent)
 	connect(m_pSoundWidget, &SoundGrade::sigUpdateMusic, this, &UAVManage::onUpdateMusic);
 	connect(m_pSoundWidget, &SoundGrade::sigMsuicTime, this, &UAVManage::onCurrentMusicTime);
 	connect(m_pSoundWidget, &SoundGrade::playeState, this, &UAVManage::onCurrentPlayeState);
+	connect(m_pSoundWidget, &SoundGrade::updateMusicWaveFinished, this, &UAVManage::onMusicWaveFinished);
 }
 
 UAVManage::~UAVManage()
@@ -209,6 +210,8 @@ void UAVManage::onNewProject()
 	}
 	m_qstrCurrentProjectFile.clear();
 	onWebClear();
+	m_pSoundWidget->stopPlayMusic();
+	
 	if(m_pDeviceManage) m_pDeviceManage->clearDevice();
 
 	SpaceParam space(this);
@@ -306,7 +309,7 @@ void UAVManage::onOpenProject(QString qstrFile)
 	this->setWindowTitle(name);
 	m_pDeviceManage->setCurrentDevice(qstrCurrnetName);
 	m_pSoundWidget->updateLoadMusic(qstrMusicFilePath);
-	m_pDeviceManage->setCurrentMusicPath(qstrMusicFilePath);
+	//m_pDeviceManage->setCurrentMusicPath(qstrMusicFilePath);
 	m_pDeviceManage->setEnabled(true);
 	m_pSoundWidget->setEnabled(true);
 	ui.toolBar->setEnabled(true);
@@ -739,7 +742,7 @@ void UAVManage::onUpdateMusic(QString qstrFilePath)
 		QMessageBox::warning(this, tr("提示"), tr("音乐选择失败"));
 		return;
 	}
-	m_pDeviceManage->setCurrentMusicPath(qstrNewFile);
+	//m_pDeviceManage->setCurrentMusicPath(qstrNewFile);
 
 	place->SetAttribute(_ElementMusic_, fileName.toUtf8().data());
 	error = doc.SaveFile(filename.c_str());
@@ -759,21 +762,14 @@ void UAVManage::onCurrentPlayeState(qint8 state)
 void UAVManage::on3DDialogStauts(bool connect)
 {
 	if (connect) {
-		QFileInfo infoProject(m_qstrCurrentProjectFile);
-		QTextCodec* code = QTextCodec::codecForName(_XMLNameCoding_);
-		std::string filename = code->fromUnicode(m_qstrCurrentProjectFile).data();
-		tinyxml2::XMLDocument doc;
-		tinyxml2::XMLError error = doc.LoadFile(filename.c_str());
-		if (error != tinyxml2::XMLError::XML_SUCCESS) return;
-		tinyxml2::XMLElement* root = doc.RootElement();
-		if (!root) return;
-		tinyxml2::XMLElement* place = root->FirstChildElement(_ElementPlace_);
-		if (!place) return;
-		QString qstrMusicPath = infoProject.path() + _ProjectDirName_ + place->Attribute(_ElementMusic_);
-		m_pDeviceManage->setCurrentMusicPath(qstrMusicPath);
-
+		onMusicWaveFinished();
 		m_pDeviceManage->waypointComposeAndUpload(m_qstrCurrentProjectFile, false);
 	}
+}
+
+void UAVManage::onMusicWaveFinished()
+{
+	m_pDeviceManage->setCurrentMusicPath(m_pSoundWidget->getCurrentMusic(), m_pSoundWidget->getMusicPixmap());
 }
 
 bool UAVManage::newProjectFile(QString qstrFile, unsigned int X, unsigned int Y)

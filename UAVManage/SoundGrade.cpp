@@ -25,6 +25,7 @@ SoundGrade::SoundGrade(QWidget *parent) :QWidget(parent)
 	m_ui.m_pBtnPlay->setEnabled(false);
 	m_ui.m_pbtnStop->setEnabled(false);
 	connect(m_ui.m_pbtnStop, &QAbstractButton::clicked, [this]() {stopPlayMusic(); });
+	connect(m_ui.m_pCuverPlot, SIGNAL(updateMusicWaveFinished()), this, SIGNAL(updateMusicWaveFinished()));
 	connect(m_ui.widgetScale, &MusicScale::updateMaxWidget, [this](int max) {
 		m_ui.m_pHslider->setMaximumWidth(max);
 		m_ui.m_pCuverPlot->setMaximumWidth(max);
@@ -56,6 +57,7 @@ SoundGrade::~SoundGrade()
 void SoundGrade::updateLoadMusic(QString filePath)
 {
 	if (!QFile::exists(filePath)) return;
+	m_strCurFile = filePath;
 	playlist->removeMedia(0, playlist->mediaCount() - 1);
 	playlist->addMedia(QUrl::fromLocalFile(filePath));
 	playlist->setCurrentIndex(0);
@@ -67,6 +69,16 @@ void SoundGrade::updateLoadMusic(QString filePath)
 	m_ui.labelMusicName->setText(name);
 	m_ui.m_pBtnPlay->setEnabled(true);
 	m_ui.m_pbtnStop->setEnabled(true);
+}
+
+QPixmap SoundGrade::getMusicPixmap()
+{
+	return m_ui.m_pCuverPlot->grab();
+}
+
+QString SoundGrade::getCurrentMusic()
+{
+	return m_strCurFile;
 }
 
 void SoundGrade::startPlayMusic()

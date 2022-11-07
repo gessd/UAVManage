@@ -15,6 +15,8 @@ public:
 	SoundGrade(QWidget *parent = 0);
     ~SoundGrade();
 	void updateLoadMusic(QString filePath);
+	QPixmap getMusicPixmap();
+	QString getCurrentMusic();
 public slots:
 	void startPlayMusic();
     void stopPlayMusic();
@@ -39,6 +41,7 @@ signals:
 	void playeState(qint8);			//播放状态信号 1:开始 2:暂停 3:结束	
 	void sigUpdateMusic(QString path);
 	void sigMsuicTime(int second);
+	void updateMusicWaveFinished();
 private:
 	void signalConnectSlot();
 private slots:

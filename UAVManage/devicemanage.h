@@ -127,7 +127,7 @@ public:
 	/**
 	* @brief 三维设置音乐文件路径
 	*/
-	void setCurrentMusicPath(QString filePath);
+	void setCurrentMusicPath(QString filePath, QPixmap pixmap);
 	/**
 	 * @brief 发送航点列表到三维
 	 * @param 所有设备航点,根据名称区分

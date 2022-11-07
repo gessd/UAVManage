@@ -571,6 +571,7 @@ void DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upload
 
 void DeviceManage::setUpdateWaypointTime(int second)
 {
+	return;
 	QJsonObject obj3dmsg;
 	obj3dmsg.insert(_Ver_, _VerNum_);
 	obj3dmsg.insert(_Tag_, _TabName_);
@@ -582,6 +583,7 @@ void DeviceManage::setUpdateWaypointTime(int second)
 
 void DeviceManage::setCurrentPlayeState(qint8 state)
 {
+	return;
 	QJsonObject obj3dmsg;
 	obj3dmsg.insert(_Ver_, _VerNum_);
 	obj3dmsg.insert(_Tag_, _TabName_);
@@ -591,15 +593,25 @@ void DeviceManage::setCurrentPlayeState(qint8 state)
 	sendMessageTo3D(obj3dmsg);
 }
 
-void DeviceManage::setCurrentMusicPath(QString filePath)
+void DeviceManage::setCurrentMusicPath(QString filePath, QPixmap pixmap)
 {
 	if (!QFile::exists(filePath)) return;
+	QFileInfo info(filePath);
+	QString qstrPixmapPath = info.path() + "/music.png";
+	if (false == pixmap.save(qstrPixmapPath)) {
+		qDebug() << "保持音乐波形图片失败";
+		return;
+	}
 	QJsonObject obj3dmsg;
 	obj3dmsg.insert(_Ver_, _VerNum_);
 	obj3dmsg.insert(_Tag_, _TabName_);
 	obj3dmsg.insert(_ID_, _3dDeviceMusicPath);
 	obj3dmsg.insert(_Time_, QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"));
-	obj3dmsg.insert(_Data_, filePath);
+	//obj3dmsg.insert(_Data_, filePath);
+	QJsonObject data;
+	data.insert("file", filePath);
+	data.insert("image", qstrPixmapPath);
+	obj3dmsg.insert(_Data_, data);
 	sendMessageTo3D(obj3dmsg);
 }
 

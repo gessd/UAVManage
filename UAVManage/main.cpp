@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
 {
 	QtSingleApplication a("myapp_id", argc, argv);
 	//注册MessageHandler
-	qInstallMessageHandler(outputMessage);
+	//qInstallMessageHandler(outputMessage);
 	if (a.isRunning())  //判断实例是否已经运行
 	{
 		qDebug() << "程序已运行";
