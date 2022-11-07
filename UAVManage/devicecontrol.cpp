@@ -191,6 +191,9 @@ int DeviceControl::Fun_MAV_CMD_DO_SET_MODE(float Mode, bool wait, bool again)
 
 int DeviceControl::DeviceMavWaypointStart(QVector<NavWayPointData> data)
 {
+	//TODO 飞控没有处理起飞位置，暂时去掉
+	data.removeFirst();
+
 	qDebug() << "准备发送航点" << ui.labelDeviceName->text() << _CurrentTime_;
 	if (!isConnectDevice()) return DeviceUnConnect;
 	int count = data.count();

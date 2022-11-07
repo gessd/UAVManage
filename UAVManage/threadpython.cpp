@@ -237,22 +237,15 @@ PyObject* QZAPI::FlyTakeoff(PyObject* self, PyObject* args)
 		return nullptr;
 	}
 	qDebug() << "起飞高度" << n;
-	//TODO 暂时去掉起飞检查，飞控没有处理
-	//NavWayPointData lastWaypoint = g_waypointData.back();
-	//if (_WaypointStart != lastWaypoint.commandID) {
-	//	QZAPI::Instance()->showWaypointError(tr("起飞必须是第一步"));
-	//	return nullptr;
-	//}
-	//NavWayPointData data;
-	//data.x = lastWaypoint.x;
-	//data.y = lastWaypoint.y;
-	//data.z = lastWaypoint.z + n;
-	//g_waypointData.append(data);
-
+	NavWayPointData lastWaypoint = g_waypointData.back();
+	if (_WaypointStart != lastWaypoint.commandID) {
+		QZAPI::Instance()->showWaypointError(tr("起飞必须是第一步"));
+		return nullptr;
+	}
 	NavWayPointData data;
-	data.x = 0;
-	data.y = 0;
-	data.z = n;
+	data.x = lastWaypoint.x;
+	data.y = lastWaypoint.y;
+	data.z = lastWaypoint.z + n;
 	g_waypointData.append(data);
 	return QZAPI::Instance()->examineWaypoint();
 }
@@ -416,12 +409,11 @@ void ThreadPython::initParam(unsigned int nSpaceX, unsigned int nSapaceY, QStrin
 	g_nSpaceY = nSapaceY;
 	g_deviceName = name;
 	//舞步前添加起始位置
-	// //TODO 测试时暂时屏蔽，飞控没有处理
-	//NavWayPointData startLocation;
-	//startLocation.x = nStartX;
-	//startLocation.y = nStartY;
-	//startLocation.commandID = _WaypointStart;
-	//g_waypointData.append(startLocation);
+	NavWayPointData startLocation;
+	startLocation.x = nStartX;
+	startLocation.y = nStartY;
+	startLocation.commandID = _WaypointStart;
+	g_waypointData.append(startLocation);
 }
 
 bool ThreadPython::compilePythonCode(QByteArray arrCode)
@@ -476,7 +468,6 @@ bool ThreadPython::compilePythonFile(QString qstrFile)
 	}
 	//设置python运行环境目录
 	QString qstrPythonRunPath = QApplication::applicationDirPath() + _PyDllPath_;
-	//TODO检查python必要文件是否存在，防止执行python接口引起程序崩溃
 	QDir dirPython(qstrPythonRunPath);
 	if (false == dirPython.exists()) {
 		qDebug() << "python文件夹不存在";
@@ -493,12 +484,6 @@ bool ThreadPython::compilePythonFile(QString qstrFile)
 	if (!Py_IsInitialized()) return false;
 	start();
 	return true;
-}
-
-QString ThreadPython::checkWaypoint()
-{
-	//1开始必须是起始位置，有且只有一条
-	return "";
 }
 
 void ThreadPython::run()

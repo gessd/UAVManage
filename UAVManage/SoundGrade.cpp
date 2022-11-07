@@ -197,22 +197,22 @@ void SoundGrade::onStateChanged(QMediaPlayer::State state)
 
 	if (state == QMediaPlayer::PlayingState)
 	{
-		m_ui.m_pBtnPlay->setText(QStringLiteral("暂停"));
-		m_ui.m_pBtnPlay->setIcon(QIcon(":/res/images/pausemusic.png"));
+		m_ui.m_pBtnPlay->setText("暂停");
+		//m_ui.m_pBtnPlay->setIcon(QIcon(":/res/images/pausemusic.png"));
 		emit isPlaying(true);
 		emit playeState(1);
 	}
 	else if (state == QMediaPlayer::PausedState)
 	{
-		m_ui.m_pBtnPlay->setText(QStringLiteral("播放"));
-		m_ui.m_pBtnPlay->setIcon(QIcon(":/res/images/playmusic.png"));
+		m_ui.m_pBtnPlay->setText("播放");
+		//m_ui.m_pBtnPlay->setIcon(QIcon(":/res/images/playmusic.png"));
 		emit isPlaying(false);
 		emit playeState(2);
 	}
 	else
 	{
-		m_ui.m_pBtnPlay->setText(QStringLiteral("播放"));
-		m_ui.m_pBtnPlay->setIcon(QIcon(":/res/images/playmusic.png"));
+		m_ui.m_pBtnPlay->setText("播放");
+		//m_ui.m_pBtnPlay->setIcon(QIcon(":/res/images/playmusic.png"));
 		emit isPlaying(false);
 		emit playeState(3);
 	}

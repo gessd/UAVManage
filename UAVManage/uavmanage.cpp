@@ -118,7 +118,7 @@ UAVManage::UAVManage(QWidget *parent)
 	connect(pActionFly1, &QAction::triggered, [this]() { m_pDeviceManage->waypointComposeAndUpload(m_qstrCurrentProjectFile, false); });
 	connect(pActionFly2, &QAction::triggered, [this]() { 
 		//if (m_qstrCurrentProjectFile.isEmpty()) return;
-		m_p3DProcess->start("E:/UAVProgram/UAV_Program_UE4.exe");
+		m_p3DProcess->start("E:/3D/WindowsNoEditor/UAV_Program_UE4.exe");
 		//m_p3DProcess->waitForFinished();
 		});
 	connect(pActionFly3, &QAction::triggered, [this]() { 

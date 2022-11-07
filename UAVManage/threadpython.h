@@ -113,7 +113,6 @@ public:
 	QVector<NavWayPointData> getWaypointData();
 private:
 	bool compilePythonFile(QString qstrFile);
-	QString checkWaypoint();
 private:
 	void run();
 private:
