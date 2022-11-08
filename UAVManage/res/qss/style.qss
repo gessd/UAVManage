@@ -26,13 +26,6 @@ QDialogButtonBox QPushButton{
 	min-width:100px;
 }
 
-QToolBar{
-	border:0px;
-	border-radius:0px;
-}
-QToolBar QPushButton{
-	border-radius:0px;
-}
 #btnFlyStop{
 	padding-left:40px;
 	background:rgb(199,21,133);
@@ -153,10 +146,21 @@ QScrollBar::sub-line:vertical, QScrollBar::add-line:vertical{
 	border: none; 
     background: none; 
 }
+QToolBar{
+	border:0px;
+	border-radius:0px;
+	background:rgb(59,140,255);
+}
+QToolBar QPushButton{
+	border-radius:0px;
+}
 QMenu{
 	border:1px solid rgb(125, 125, 125);
     border-radius:10px; 
 	background:rgb(242,242,242);
+}
+QMenu:hover{
+	background:#11FFF;
 }
 QMenu::item{
 	background:transparent;

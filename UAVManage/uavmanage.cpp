@@ -54,16 +54,17 @@ UAVManage::UAVManage(QWidget *parent)
 	connect(m_pDeviceManage, &DeviceManage::sigTakeoffFinished, this, &UAVManage::onDeviceTakeoffFinished);
 	connect(m_pDeviceManage, &DeviceManage::sig3DDialogStatus, this, &UAVManage::on3DDialogStauts);
 
+	ui.menuBar->setVisible(false);
 	//添加菜单
 	QStyle* style = QApplication::style();
-	QMenu* pTestMenu = new QMenu(tr("测试"));
-	pTestMenu->setWindowFlags(pTestMenu->windowFlags() | Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint);
-	pTestMenu->setAttribute(Qt::WA_TranslucentBackground);
-	ui.menuBar->addMenu(pTestMenu);
-	QAction* pQssAction = new QAction(style->standardIcon(QStyle::SP_ComputerIcon), tr("更新样式"));
+	QMenu* pIconMenu = new QMenu(tr("奇正数元"));
+	pIconMenu->setIcon(QIcon(":/res/logo/qz_logo.ico"));
+	pIconMenu->setWindowFlags(pIconMenu->windowFlags() | Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint);
+	pIconMenu->setAttribute(Qt::WA_TranslucentBackground);
+	QAction* pQssAction = new QAction("更新样式");
 	QAction* pMessage = new QAction("消息窗口");
-	pTestMenu->addAction(pQssAction);
-	pTestMenu->addAction(pMessage);
+	pIconMenu->addAction(pQssAction);
+	pIconMenu->addAction(pMessage);
 	connect(pQssAction, &QAction::triggered, [this]() { updateStyle(); });
 	connect(pMessage, &QAction::triggered, [this]() { 
 		_ShowErrorMessage(tr("这是错误消息这是错误消息这是错误消息这是错误消息这是错误消息这是错误消息这是错误消息"));
@@ -74,10 +75,9 @@ UAVManage::UAVManage(QWidget *parent)
 	QMenu* pProjectMenu = new QMenu(tr("项目"));
 	pProjectMenu->setWindowFlags(pProjectMenu->windowFlags() | Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint);
 	pProjectMenu->setAttribute(Qt::WA_TranslucentBackground);
-	ui.menuBar->addMenu(pProjectMenu);
-	QAction* pActionNew = new QAction(style->standardIcon(QStyle::SP_FileDialogNewFolder), tr("新建"));
-	QAction* pActionOpen = new QAction(style->standardIcon(QStyle::SP_DialogOpenButton), tr("打开"));
-	QAction* pActionSaveas = new QAction(style->standardIcon(QStyle::SP_DirIcon), tr("另存为"));
+	QAction* pActionNew = new QAction(QIcon(":/res/menu/P01_file_new_btn_nor.png"), tr("新建"));
+	QAction* pActionOpen = new QAction(QIcon(":/res/menu/P01_file_open_btn_nor.png"), tr("打开"));
+	QAction* pActionSaveas = new QAction(QIcon(":/res/menu/P01_file_saveus_btn_nor.png"), tr("另存为"));
 	pProjectMenu->addAction(pActionNew);
 	pProjectMenu->addAction(pActionOpen);
 	pProjectMenu->addAction(pActionSaveas);
@@ -95,7 +95,6 @@ UAVManage::UAVManage(QWidget *parent)
 	QMenu* pMenuFlyPrepare = new QMenu(tr("起飞准备"));
 	pMenuFlyPrepare->setWindowFlags(pMenuFlyPrepare->windowFlags() | Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint);
 	pMenuFlyPrepare->setAttribute(Qt::WA_TranslucentBackground);
-	ui.menuBar->addMenu(pMenuFlyPrepare);
 	QAction* pActionFly1 = new QAction(QIcon(":/res/images/inspect.png"), tr("1.检查舞步"));
 	QAction* pActionFly2 = new QAction(QIcon(":/res/images/stereoscopic.png"), tr("2.三维仿真"));
 	QAction* pActionFly3 = new QAction(QIcon(":/res/images/basestation.png"), tr("3.基站标定"));
@@ -109,12 +108,12 @@ UAVManage::UAVManage(QWidget *parent)
 	pMenuFlyPrepare->addAction(pActionFly5);
 	pMenuFlyPrepare->addAction(pActionFly6);
 	ui.toolBar->layout()->setSpacing(10);
-	ui.toolBar->addAction(pActionFly1);
-	ui.toolBar->addAction(pActionFly2);
-	ui.toolBar->addAction(pActionFly3);
-	ui.toolBar->addAction(pActionFly4);
-	ui.toolBar->addAction(pActionFly5);
-	ui.toolBar->addAction(pActionFly6);
+
+	ui.toolBar->addWidget(initMenuButton(tr(""), ":/res/logo/qz_logo.ico", ":/res/logo/qz_logo.ico", pIconMenu));
+	ui.toolBar->addWidget(initMenuButton(tr("项目"), ":/res/menu/P01_file_open_btn_cli.png", ":/res/menu/P01_file_open_btn_nor.png", pProjectMenu));
+	ui.toolBar->addWidget(initMenuButton(tr("起飞准备"), ":/res/menu/P02_help_about_page_update_drone_ic.png", ":/res/menu/P04_dronre_ic.png", pMenuFlyPrepare));
+	ui.toolBar->addWidget(initMenuButton(tr("帮助"), ":/res/menu/P02_help_about_page_ic.png", ":/res/menu/P02_help_about_btn_new_ic.png", nullptr));
+	
 	connect(pActionFly1, &QAction::triggered, [this]() { m_pDeviceManage->waypointComposeAndUpload(m_qstrCurrentProjectFile, false); });
 	connect(pActionFly2, &QAction::triggered, [this]() { 
 		//if (m_qstrCurrentProjectFile.isEmpty()) return;
@@ -800,4 +799,21 @@ bool UAVManage::newProjectFile(QString qstrFile, unsigned int X, unsigned int Y)
 	}
 	return true;
 	
+}
+
+QToolButton* UAVManage::initMenuButton(QString text, QString noramlicon, QString activeicon, QMenu* menu)
+{
+	QToolButton* pButton = new QToolButton(this);
+	pButton->setText(text);
+	QIcon icon;
+	icon.addFile(noramlicon, QSize(32, 32), QIcon::Normal, QIcon::Off);
+	icon.addFile(activeicon, QSize(32, 32), QIcon::Active, QIcon::Off);
+	pButton->setIcon(icon);
+	pButton->setMenu(menu);
+	pButton->setMinimumHeight(40);
+	pButton->setPopupMode(QToolButton::InstantPopup);
+	pButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+	pButton->setStyleSheet("QToolButton::menu-indicator{image:none;} \
+							QToolButton:pressed{background:transparent;}");
+	return pButton;
 }

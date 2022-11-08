@@ -138,6 +138,10 @@ private:
      * @return 文件是否建立成功
      */
     bool newProjectFile(QString qstrFile, unsigned int X, unsigned int Y);
+    /**
+     * @brief 建立工具栏按钮菜单
+     */
+    QToolButton* initMenuButton(QString text, QString noramlicon, QString activeicon, QMenu* menu);
 private:
     Ui::UAVManageClass ui;
     //设备列表
