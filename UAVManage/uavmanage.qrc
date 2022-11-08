@@ -31,5 +31,6 @@
         <file>res/menu/P02_help_about_btn_new_ic.png</file>
         <file>res/menu/P02_help_about_btn_nor_ic.png</file>
         <file>res/menu/P02_help_about_page_ic.png</file>
+        <file>res/device/P04_dronre_ic.png</file>
     </qresource>
 </RCC>

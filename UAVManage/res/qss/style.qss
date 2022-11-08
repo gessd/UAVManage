@@ -84,8 +84,9 @@ DeviceDebug QLineEdit{
 	border-width:1px;
 }
 QListWidget{
+	background:transparent;
 	outline:0px;
-	border:1px solid #FFFFFF;
+	border:0px solid #FFFFFF;
 }
 QListWidget::item:hover{
 	background-color:rgb(220,220,220);
@@ -201,4 +202,12 @@ AddDeviceDialog .QFrame, SpaceParam .QFrame{
 }
 #dialogLabelTitle{
 	color:#FFFFFF;
+}
+/*设备控制区域*/
+#widgetCommand{
+	background:transparent;
+}
+#widgetBackgroundMain{
+	background:#F0F0F0;
+	border-radius:10px;
 }
