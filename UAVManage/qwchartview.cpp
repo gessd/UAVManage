@@ -13,7 +13,7 @@ QWChartView::QWChartView(QWidget *parent):QChartView(parent)
 	m_chart->setMargins(QMargins(0, 0, 0, 0));//设置内边界全部为0
 	m_chart->setBackgroundRoundness(0);//设置背景区域无圆角
 	m_chart->legend()->setVisible(false);
-    m_chart->setBackgroundBrush(QBrush(QColor(194, 221, 240, 255)));
+    m_chart->setBackgroundBrush(QBrush(QColor("#F0F0F0")));
     //内外边距全都设置为0
 	this->setViewportMargins(0, 0, 0, 0);
 	this->setContentsMargins(0, 0, 0, 0);
@@ -69,7 +69,7 @@ void QWChartView::initSeries()
     m_series1->setPen(pen);
     pen.setColor(Qt::blue);
     m_series2->setPen(pen);
-    pen.setColor(Qt::green);
+    pen.setColor(Qt::red);
 	pen.setWidth(2);
     m_series3->setPen(pen);
 
