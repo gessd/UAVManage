@@ -115,14 +115,8 @@
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
-          <property name="minimumSize">
-           <size>
-            <width>50</width>
-            <height>25</height>
-           </size>
-          </property>
           <property name="styleSheet">
-           <string notr="true"/>
+           <string notr="true">background:transparent;</string>
           </property>
           <property name="text">
            <string>打开</string>
@@ -133,12 +127,12 @@
           </property>
           <property name="iconSize">
            <size>
-            <width>16</width>
-            <height>16</height>
+            <width>32</width>
+            <height>32</height>
            </size>
           </property>
           <property name="toolButtonStyle">
-           <enum>Qt::ToolButtonTextBesideIcon</enum>
+           <enum>Qt::ToolButtonIconOnly</enum>
           </property>
          </widget>
         </item>
@@ -168,15 +162,18 @@
           </property>
           <property name="minimumSize">
            <size>
-            <width>0</width>
-            <height>25</height>
+            <width>41</width>
+            <height>41</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>16777215</width>
-            <height>25</height>
+            <width>41</width>
+            <height>41</height>
            </size>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">background:transparent;</string>
           </property>
           <property name="text">
            <string>播放</string>
@@ -186,11 +183,17 @@
             <normaloff>:/res/images/playmusic.png</normaloff>
             <activeon>:/res/images/pausemusic.png</activeon>:/res/images/playmusic.png</iconset>
           </property>
+          <property name="iconSize">
+           <size>
+            <width>32</width>
+            <height>32</height>
+           </size>
+          </property>
           <property name="checkable">
            <bool>true</bool>
           </property>
           <property name="toolButtonStyle">
-           <enum>Qt::ToolButtonTextBesideIcon</enum>
+           <enum>Qt::ToolButtonIconOnly</enum>
           </property>
          </widget>
         </item>
@@ -202,6 +205,9 @@
             <height>25</height>
            </size>
           </property>
+          <property name="styleSheet">
+           <string notr="true">background:transparent;</string>
+          </property>
           <property name="text">
            <string>停止</string>
           </property>
@@ -209,8 +215,14 @@
            <iconset resource="uavmanage.qrc">
             <normaloff>:/res/images/stopmusic.png</normaloff>:/res/images/stopmusic.png</iconset>
           </property>
+          <property name="iconSize">
+           <size>
+            <width>32</width>
+            <height>32</height>
+           </size>
+          </property>
           <property name="toolButtonStyle">
-           <enum>Qt::ToolButtonTextBesideIcon</enum>
+           <enum>Qt::ToolButtonIconOnly</enum>
           </property>
          </widget>
         </item>
