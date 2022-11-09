@@ -207,6 +207,8 @@ DeviceManage::DeviceManage(QWidget *parent)
 	connect(ui.btnFlyTakeoff, &QAbstractButton::clicked, [this]() { allDeviceControl(_DeviceTakeoffLocal); });
 	connect(ui.btnFlyLand, &QAbstractButton::clicked, [this]() { allDeviceControl(_DeviceLandLocal); });
 	connect(ui.btnFlyStop, &QAbstractButton::clicked, [this]() { allDeviceControl(_DeviceQuickStop); });
+	connect(ui.btnQueue, &QAbstractButton::clicked, [this]() { allDeviceControl(_DeviceQueue); });
+	connect(ui.btnRegain, &QAbstractButton::clicked, [this]() { allDeviceControl(_DeviceRegain); });
 
 	ui.checkBoxAutoLand->setVisible(false);
 	ui.checkBoxMagnetismStatus->setVisible(false);
@@ -467,6 +469,14 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 			res = pDevice->Fun_MAV_CMD_DO_SET_MODE(3, false);
 			qstrText = tr("准备起飞");
 			break;
+		case DeviceManage::_DeviceQueue:
+			res = pDevice->Fun_MAV_Defined_Queue();
+			qstrText = tr("列队");
+			break;
+		case DeviceManage::_DeviceRegain:
+			res = pDevice->Fun_MAV_Defined_Regain();
+			qstrText = tr("回收");
+			break;;
 		default:
 			break;
 		}

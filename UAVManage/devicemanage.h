@@ -31,7 +31,9 @@ public:
 		_DeviceTakeoffLocal=1, //起飞
 		_DeviceLandLocal,      //降落
 		_DeviceQuickStop,      //急停
-		_DeviceSetout		   //准备起飞
+		_DeviceSetout,		   //准备起飞
+		_DeviceQueue,			//列队
+		_DeviceRegain			//回收
 	};
 	enum _CalibrationEnum {
 		_Gyro,				//陀螺校准

@@ -203,7 +203,7 @@ AddDeviceDialog .QFrame, SpaceParam .QFrame{
 #widgetCommand{
 	background:transparent;
 }
-#widgetBackgroundMain{
+#widgetBackgroundMain, QGroupBox{
 	background:#F0F0F0;
 	border-radius:10px;
 }
