@@ -156,5 +156,5 @@ private:
     ThreadPython python;
     SoundGrade* m_pSoundWidget;
     QProcess* m_p3DProcess;
-    QToolButton* m_pButtonProject;
+    QToolButton* m_pButtonFlyPrepare;
 };

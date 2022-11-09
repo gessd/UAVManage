@@ -14,7 +14,7 @@
    <enum>Qt::NoContextMenu</enum>
   </property>
   <property name="windowTitle">
-   <string>UAVManage</string>
+   <string>无人机编程软件</string>
   </property>
   <property name="styleSheet">
    <string notr="true"/>

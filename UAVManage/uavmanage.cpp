@@ -108,17 +108,19 @@ UAVManage::UAVManage(QWidget *parent)
 	pMenuFlyPrepare->addAction(pActionFly6);
 	ui.toolBar->layout()->setSpacing(10);
 
-	m_pButtonProject = initMenuButton(tr("项目"), ":/res/menu/P01_file_open_btn_cli.png", ":/res/menu/P01_file_open_btn_nor.png", pProjectMenu);
-	m_pButtonProject->setEnabled(false);
+	m_pButtonFlyPrepare = initMenuButton(tr("起飞准备"), ":/res/menu/P02_help_about_page_update_drone_ic.png", ":/res/menu/P04_dronre_ic.png", pMenuFlyPrepare);
+	m_pButtonFlyPrepare->setEnabled(false);
 	ui.toolBar->addWidget(initMenuButton(tr(""), ":/res/logo/qz_logo.ico", ":/res/logo/qz_logo.ico", pIconMenu));
-	ui.toolBar->addWidget(m_pButtonProject);
-	ui.toolBar->addWidget(initMenuButton(tr("起飞准备"), ":/res/menu/P02_help_about_page_update_drone_ic.png", ":/res/menu/P04_dronre_ic.png", pMenuFlyPrepare));
+	ui.toolBar->addWidget(initMenuButton(tr("项目"), ":/res/menu/P01_file_open_btn_cli.png", ":/res/menu/P01_file_open_btn_nor.png", pProjectMenu));
+	ui.toolBar->addWidget(m_pButtonFlyPrepare);
 	ui.toolBar->addWidget(initMenuButton(tr("帮助"), ":/res/menu/P02_help_about_page_ic.png", ":/res/menu/P02_help_about_btn_new_ic.png", nullptr));
 	
 	connect(pActionFly1, &QAction::triggered, [this]() { m_pDeviceManage->waypointComposeAndUpload(m_qstrCurrentProjectFile, false); });
 	connect(pActionFly2, &QAction::triggered, [this]() { 
 		//if (m_qstrCurrentProjectFile.isEmpty()) return;
-		m_p3DProcess->start("E:/3D/WindowsNoEditor/UAV_Program_UE4.exe");
+		QDir::setCurrent(QApplication::applicationDirPath() + "/3D");
+		m_p3DProcess->start("UAV_Program_UE4.exe");
+		QDir::setCurrent(QApplication::applicationDirPath());
 		//m_p3DProcess->waitForFinished();
 		});
 	connect(pActionFly3, &QAction::triggered, [this]() { 
@@ -202,7 +204,7 @@ void UAVManage::onNewProject()
 {
 	m_pDeviceManage->setEnabled(false);
 	m_pSoundWidget->setEnabled(false);
-	m_pButtonProject->setEnabled(false);
+	m_pButtonFlyPrepare->setEnabled(false);
 	//先清空数据
 	if (false == m_qstrCurrentProjectFile.isEmpty()) {
 		QFileInfo info(m_qstrCurrentProjectFile);
@@ -312,7 +314,7 @@ void UAVManage::onOpenProject(QString qstrFile)
 	//m_pDeviceManage->setCurrentMusicPath(qstrMusicFilePath);
 	m_pDeviceManage->setEnabled(true);
 	m_pSoundWidget->setEnabled(true);
-	m_pButtonProject->setEnabled(true);
+	m_pButtonFlyPrepare->setEnabled(true);
 	ParamReadWrite::writeParam(_Path_, m_qstrCurrentProjectFile);
 }
 

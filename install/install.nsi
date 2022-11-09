@@ -88,6 +88,7 @@ Section "MainSection" SEC01
 	; 安全认证
 	SetOutPath "$INSTDIR"
 	SetOverwrite on
+	File /r "${appDir}\3D"
 	File /r "${appDir}\blockly_dev"
 	File /r "${appDir}\imageformats"
 	File /r "${appDir}\mediaservice"
