@@ -441,6 +441,8 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 			QApplication::processEvents();
 		}
 	}
+	int x = 0;
+	int y = 0;
 	for (int i = 0; i < ui.listWidget->count(); i++) {
 		QListWidgetItem* pItem = ui.listWidget->item(i);
 		if (!pItem) continue;
@@ -470,13 +472,24 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 			qstrText = tr("准备起飞");
 			break;
 		case DeviceManage::_DeviceQueue:
-			res = pDevice->Fun_MAV_Defined_Queue();
+			//降落到初始位置
+			pDevice->Fun_MAV_CMD_NAV_LAND_LOCAL(0, 0, 0, 0, pDevice->getX(), pDevice->getY(), 0, false);
 			qstrText = tr("列队");
 			break;
 		case DeviceManage::_DeviceRegain:
-			res = pDevice->Fun_MAV_Defined_Regain();
+		{
+			//按顺序排列
+			int nInterval = 50;			//无人机间隔
+			int c = getSpaceSize().width() / nInterval;
+			if (i > 0) {
+				int r = i % c;
+				x = r * nInterval;
+				if (0 == r) y += nInterval;
+			}
+			pDevice->Fun_MAV_CMD_NAV_LAND_LOCAL(0, 0, 0, 0, x, y, 0, false);
 			qstrText = tr("回收");
-			break;;
+			break;
+		}
 		default:
 			break;
 		}

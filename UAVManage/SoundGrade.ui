@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>666</width>
-    <height>235</height>
+    <width>679</width>
+    <height>223</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -31,7 +31,7 @@
    </property>
    <item row="0" column="0" colspan="2">
     <widget class="QWidget" name="widgetBackgroundMain" native="true">
-     <layout class="QGridLayout" name="gridLayout_2">
+     <layout class="QGridLayout" name="gridLayout_2" rowstretch="4,2,2,2">
       <property name="leftMargin">
        <number>0</number>
       </property>
@@ -44,6 +44,9 @@
       <property name="bottomMargin">
        <number>0</number>
       </property>
+      <property name="spacing">
+       <number>0</number>
+      </property>
       <item row="0" column="1">
        <widget class="QListWidget" name="m_pPlayList"/>
       </item>
@@ -52,7 +55,7 @@
         <property name="minimumSize">
          <size>
           <width>200</width>
-          <height>0</height>
+          <height>100</height>
          </size>
         </property>
         <property name="styleSheet">
