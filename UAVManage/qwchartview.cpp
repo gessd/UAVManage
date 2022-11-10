@@ -67,9 +67,9 @@ void QWChartView::initSeries()
     pen.setColor(Qt::green);
     pen.setWidth(1);
     m_series1->setPen(pen);
-    pen.setColor(Qt::blue);
+    pen.setColor("#7DFF7B");
     m_series2->setPen(pen);
-    pen.setColor(Qt::red);
+    pen.setColor(Qt::blue);
 	pen.setWidth(2);
     m_series3->setPen(pen);
 

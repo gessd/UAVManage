@@ -38,22 +38,26 @@ void MusicScale::paintEvent(QPaintEvent* event)
 			int h = nHeight;
 			int pw = 1;
 			if(0 == i){
-				pw = 3;
+				//起始位置
+				pw = 1;
 			}
 			else if (0 == i % 60) {
+				//分钟刻度
 				pw = 3;
 			}
 			else if (0 == i % 10) {
+				//10秒刻度
 				pw = 2;
 				h = nHeight / 2;
 			}
 			else {
+				//秒
 				pw = 1;
-				h = nHeight / 3;
+				h = nHeight / 4;
 			}
 			pen.setWidth(pw);
 			painter.setPen(pen);
-			painter.drawLine(i * clearance, 0, i * clearance, h);
+			painter.drawLine(i * clearance, nHeight, i * clearance, nHeight-h);
 		}
 		
 	}
