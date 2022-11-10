@@ -212,33 +212,34 @@ AddDeviceDialog .QFrame, SpaceParam .QFrame{
 
 /*horizontal ：水平QSlider*/
 QSlider::groove:horizontal {
-    border: 0px solid #3B8CFF;
+    border: 1px solid #3B8CFF;
+	border-radius:6px;
 }
 
 /*1.滑动过的槽设计参数*/
 QSlider::sub-page:horizontal {
      /*槽颜色*/
     background: #3B8CFF;
-	border: 1px solid #000000;
+	/*border: 1px solid #000000;*/
      /*外环区域倒圆角度*/
     border-radius: 3px;
      /*上遮住区域高度*/
-    margin-top:8px;
+    margin-top:2px;
      /*下遮住区域高度*/
-    margin-bottom:8px;
+    margin-bottom:2px;
 }
 
 /*2.未滑动过的槽设计参数*/
 QSlider::add-page:horizontal {
     /*槽颜色*/
-    background:#FFFFFF;
-    border: 1px solid #3B8CFF;
+    background:transparent;
+    /*border: 1px solid #3B8CFF;*/
     /*外环区域倒圆角度*/
     border-radius: 3px;
      /*上遮住区域高度*/
-    margin-top:8px;
+    margin-top:0px;
      /*下遮住区域高度*/
-    margin-bottom:8px;
+    margin-bottom:0px;
 }
 
 /*3.平时滑动的滑块设计参数*/
@@ -246,15 +247,15 @@ QSlider::handle:horizontal {
     /*滑块颜色*/
     background:#FFFFFF;
     /*滑块的宽度*/
-    width:4px;
+    width:8px;
     /*滑块外环为1px，再加颜色*/
     border: 1px solid #3B8CFF;
      /*滑块外环倒圆角度*/
-    border-radius:2px;
+    border-radius:4px;
      /*上遮住区域高度*/
-    margin-top:6px;
+    margin-top:0px;
      /*下遮住区域高度*/
-    margin-bottom:6px;
+    margin-bottom:0px;
 }
 
 /*4.手动拉动时显示的滑块设计参数*/
@@ -262,13 +263,14 @@ QSlider::handle:horizontal:hover {
     /*滑块颜色*/
     background:#FFFFFF;
     /*滑块的宽度*/
-    width:6px;
+    width:10px;
+	height:10px;
     border: 1px solid #3B8CFF;
      /*滑块外环倒圆角度*/
-    border-radius:3px;
+    border-radius:5px;
      /*上遮住区域高度*/
-    margin-top:4px;
+    margin-top:0px;
      /*下遮住区域高度*/
-    margin-bottom:4px;
+    margin-bottom:0px;
 }
 
