@@ -473,7 +473,7 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 			break;
 		case DeviceManage::_DeviceQueue:
 			//降落到初始位置
-			pDevice->Fun_MAV_CMD_NAV_LAND_LOCAL(0, 0, 0, 0, pDevice->getX(), pDevice->getY(), 0, false);
+			pDevice->Fun_MAV_Defined_Queue(pDevice->getX(), pDevice->getY());
 			qstrText = tr("列队");
 			break;
 		case DeviceManage::_DeviceRegain:
@@ -791,8 +791,9 @@ void DeviceManage::onTimeout3DMessage()
 
 void DeviceManage::onUpdateStatusTo3D()
 {
-	//TODO 暂时屏蔽向三维发送实时位置信息
-	return;
+	//定时向三维发送无人机状态信息
+	////TODO 暂时屏蔽向三维发送实时位置信息
+	//return;
 	QJsonObject obj3dmsg;
 	obj3dmsg.insert(_Ver_, _VerNum_);
 	obj3dmsg.insert(_Tag_, _TabName_);
@@ -813,19 +814,19 @@ void DeviceManage::onUpdateStatusTo3D()
 		device.insert("y", status.y);
 		device.insert("z", status.z);
 		device.insert("pitch", status.pitch);
-		device.insert("pitch", status.pitch);
+		device.insert("yaw", status.yaw);
 		device.insert("roll", status.roll);
 		device.insert("led", status.led);
 		device.insert("battery", status.battery);
-		//TODO 三维测试用，便于更新无人机位置
-		if (0 == i) {
-			int z = QDateTime::currentDateTime().toString("ss").toInt();
-			int x = z / 10;
-			int y = z;
-			device.insert("x", x);
-			device.insert("y", y);
-			device.insert("z", z);
-		}
+		////TODO 三维测试用，便于更新无人机位置
+		//if (0 == i) {
+		//	int z = QDateTime::currentDateTime().toString("ss").toInt();
+		//	int x = z / 10;
+		//	int y = z;
+		//	device.insert("x", x);
+		//	device.insert("y", y);
+		//	device.insert("z", z);
+		//}
 		jsonArr.append(device);
 	}
 	obj3dmsg.insert(_Data_, jsonArr);

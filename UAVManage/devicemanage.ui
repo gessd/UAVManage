@@ -79,7 +79,7 @@
            </property>
            <property name="icon">
             <iconset resource="uavmanage.qrc">
-             <normaloff>:/res/images/stopmusic.png</normaloff>:/res/images/stopmusic.png</iconset>
+             <normaloff>:/res/images/flystop.png</normaloff>:/res/images/flystop.png</iconset>
            </property>
            <property name="iconSize">
             <size>
@@ -114,6 +114,13 @@
            </property>
            <property name="text">
             <string>回收</string>
+           </property>
+           <property name="icon">
+            <iconset resource="uavmanage.qrc">
+             <normaloff>:/res/images/flyRegain.png</normaloff>:/res/images/flyRegain.png</iconset>
+           </property>
+           <property name="toolButtonStyle">
+            <enum>Qt::ToolButtonTextBesideIcon</enum>
            </property>
           </widget>
          </item>
@@ -214,6 +221,13 @@
            </property>
            <property name="text">
             <string>列队</string>
+           </property>
+           <property name="icon">
+            <iconset resource="uavmanage.qrc">
+             <normaloff>:/res/images/flyQueue.png</normaloff>:/res/images/flyQueue.png</iconset>
+           </property>
+           <property name="toolButtonStyle">
+            <enum>Qt::ToolButtonTextBesideIcon</enum>
            </property>
           </widget>
          </item>

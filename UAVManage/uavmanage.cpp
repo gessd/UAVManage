@@ -108,12 +108,12 @@ UAVManage::UAVManage(QWidget *parent)
 	pMenuFlyPrepare->addAction(pActionFly6);
 	ui.toolBar->layout()->setSpacing(10);
 
-	m_pButtonFlyPrepare = initMenuButton(tr("起飞准备"), ":/res/menu/P02_help_about_page_update_drone_ic.png", ":/res/menu/P04_dronre_ic.png", pMenuFlyPrepare);
+	m_pButtonFlyPrepare = initMenuButton(tr("起飞准备"), ":/res/menu/P02_help_about_page_update_drone_ic.png", ":/res/menu/P02_help_about_page_update_drone_ic.png", pMenuFlyPrepare);
 	m_pButtonFlyPrepare->setEnabled(false);
 	ui.toolBar->addWidget(initMenuButton(tr(""), ":/res/logo/qz_logo.ico", ":/res/logo/qz_logo.ico", pIconMenu));
-	ui.toolBar->addWidget(initMenuButton(tr("项目"), ":/res/menu/P01_file_open_btn_cli.png", ":/res/menu/P01_file_open_btn_nor.png", pProjectMenu));
+	ui.toolBar->addWidget(initMenuButton(tr("项目"), ":/res/menu/P01_file_open_btn_cli.png", ":/res/menu/P01_file_open_btn_cli.png", pProjectMenu));
 	ui.toolBar->addWidget(m_pButtonFlyPrepare);
-	ui.toolBar->addWidget(initMenuButton(tr("帮助"), ":/res/menu/P02_help_about_page_ic.png", ":/res/menu/P02_help_about_btn_new_ic.png", nullptr));
+	ui.toolBar->addWidget(initMenuButton(tr("帮助"), ":/res/menu/P02_help_about_page_ic.png", ":/res/menu/P02_help_about_page_ic.png", nullptr));
 	
 	connect(pActionFly1, &QAction::triggered, [this]() { m_pDeviceManage->waypointComposeAndUpload(m_qstrCurrentProjectFile, false); });
 	connect(pActionFly2, &QAction::triggered, [this]() { 

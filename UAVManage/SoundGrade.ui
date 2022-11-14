@@ -116,7 +116,7 @@ color:#0000FF;</string>
           </property>
           <property name="icon">
            <iconset resource="uavmanage.qrc">
-            <normaloff>:/res/images/add.png</normaloff>:/res/images/add.png</iconset>
+            <normaloff>:/res/images/musicload.png</normaloff>:/res/images/musicload.png</iconset>
           </property>
           <property name="iconSize">
            <size>

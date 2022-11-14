@@ -9,17 +9,23 @@ QWidget:disabled{
 }
 /*通用按钮样式*/
 QPushButton,QToolButton{
-	color:#FFFFFF;
-    background:#3B8CFF;
+	color:#3B8CFF;
+    background:#FFFFFF;
 	border-radius:10px;
+	border:1px solid #3B8CFF;
 }
 QPushButton:hover,QToolButton:hover{
-    background:#FFFFFF;
-	color:#3B8CFF;
-	border:1px solid #3B8CFF;
+	border-width:2px;
 }
 QPushButton:pressed,QToolButton:pressed{
     background:#DDDDDD;
+}
+QToolBar QToolButton{
+	background:transparent;
+	color:#FFFFFF;
+}
+QToolBar QToolButton:hover{
+	border:1px solid #FFFFFF;
 }
 QDialogButtonBox QPushButton{
 	min-height:30px;
@@ -28,20 +34,13 @@ QDialogButtonBox QPushButton{
 
 #btnFlyStop{
 	padding-left:40px;
-	background:rgb(255,20,147);
+	border:1px solid #FF0000;
+	color:#FF0000;
 }
 #btnFlyStop:hover{
-	color:#000000;
-	background:rgb(210,74,73);
+	border-width:2px;
 }
-#btnFlyStop:pressed{
-	color:#000000;
-	background:rgb(255,105,255);
-}
-#btnFlyStop:disabled{
-	background:rgb(216,191,216);
-}
-#btnFlyTakeoff,#btnFlyLand,#btnAddDevice,#btnRemoveDevice{
+#btnFlyTakeoff,#btnFlyLand,#btnAddDevice,#btnRemoveDevice,#btnQueue,#btnRegain{
 	padding-left:15px;
 }
 QLineEdit{
@@ -156,9 +155,6 @@ QToolBar{
 	border:0px;
 	border-radius:0px;
 	background:rgb(59,140,255);
-}
-QToolBar QPushButton{
-	border-radius:0px;
 }
 QMenu{
 	border:1px solid rgb(125, 125, 125);

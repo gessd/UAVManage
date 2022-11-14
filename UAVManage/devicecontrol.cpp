@@ -263,17 +263,17 @@ int DeviceControl::Fun_MAV_CALIBRATION(float p1, float p2, float p3, float p4, f
 }
 
 //无人机列队
-int DeviceControl::Fun_MAV_Defined_Queue()
+int DeviceControl::Fun_MAV_Defined_Queue(int x, int y)
 {
-	QByteArray arrData = mavCommandLongToBuffer(0, 0, 0, 0, 0, 0, 0, MAV_CMD_USER_1);
-	return MavSendCommandLongMessage(tr("列队"), MAV_CMD_USER_1, arrData, arrData, false);
+	QByteArray arrData = mavCommandLongToBuffer(0, 0, 0, 0, 0, x, y, MAV_CMD_USER_2);
+	return MavSendCommandLongMessage(tr("列队"), MAV_CMD_USER_2, arrData, arrData, false);
 }
 
 //无人机回收
 int DeviceControl::Fun_MAV_Defined_Regain()
 {
-	QByteArray arrData = mavCommandLongToBuffer(0, 0, 0, 0, 0, 0, 0, MAV_CMD_USER_2);
-	return MavSendCommandLongMessage(tr("回收"), MAV_CMD_USER_2, arrData, arrData, false);
+	QByteArray arrData = mavCommandLongToBuffer(0, 0, 0, 0, 0, 0, 0, MAV_CMD_USER_1);
+	return MavSendCommandLongMessage(tr("回收"), MAV_CMD_USER_1, arrData, arrData, false);
 }
 
 //无人机灯光

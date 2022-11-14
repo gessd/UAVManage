@@ -146,7 +146,7 @@ public:
 	/**
 	 * @brief  无人机列队
 	 */
-	int Fun_MAV_Defined_Queue();
+	int Fun_MAV_Defined_Queue(int x, int y);
 	
 	/**
 	 * @brief 无人机回收
