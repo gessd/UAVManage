@@ -44,6 +44,7 @@ class PlaceInfoDialog : public QDialog
 public:
 	PlaceInfoDialog(QWidget *parent = Q_NULLPTR);
 	~PlaceInfoDialog();
+	QMap<QString, QPoint> getStationAddress();
 protected:
 	virtual void showEvent(QShowEvent* event);
 	virtual void closeEvent(QCloseEvent* event);
@@ -60,5 +61,7 @@ private:
 	QSerialPort m_serialPort;
 	bool m_bSetNLINK;
 	bool m_bOnekeySetNLINK;
-	unsigned int m_nOnekeySetIndex;
+	int m_nOnekeySetIndex;
+	//基站标定状态 [0未标定|1标定成功|-1标定失败]
+	int m_stationStatus;
 };

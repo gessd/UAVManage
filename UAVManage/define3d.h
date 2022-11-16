@@ -10,7 +10,7 @@
 #define _Data_   "data"
 
 enum _MsgID {
-	_3dDeviceList = 101,
+	_3dDeviceInit = 101,
 	_3dDeviceAdd = 102,
 	_3dDeviceRemove = 103,
 	_3dDeviceRename = 104,

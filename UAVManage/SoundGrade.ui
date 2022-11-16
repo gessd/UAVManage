@@ -301,6 +301,9 @@ color:#0000FF;</string>
       </item>
       <item row="2" column="0" colspan="2">
        <widget class="QSlider" name="m_pHslider">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="minimumSize">
          <size>
           <width>0</width>

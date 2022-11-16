@@ -273,6 +273,7 @@ void SoundGrade::onPositionChanged(qint64 position)
 
 void SoundGrade::on_m_pHslider_sliderPressed()
 {//开始拖动滑块时暂停音频播放
+	return;//使用中音乐条不能随意拖动
 	m_sliderPlaying = m_bPlaying;
 	if (player->state() == QMediaPlayer::PlayingState)
 		player->pause();
@@ -280,6 +281,7 @@ void SoundGrade::on_m_pHslider_sliderPressed()
 
 void SoundGrade::on_m_pHslider_sliderReleased()
 {//拖动滑块后进行音频播放进度调控
+	return;//使用中音乐条不能随意拖动
 	qint64 position = m_ui.m_pHslider->value();
 	player->setPosition(position);
 	if (m_sliderPlaying)

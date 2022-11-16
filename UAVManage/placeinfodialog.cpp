@@ -9,18 +9,37 @@ PlaceInfoDialog::PlaceInfoDialog(QWidget *parent)
 {
 	ui.setupUi(this);
 	m_bSetNLINK = false;
+	m_stationStatus = 0;
 	connect(ui.btnComOpen, SIGNAL(clicked()), this, SLOT(onBtnOpenClicked()));
 	connect(ui.btnRead, SIGNAL(clicked()), this, SLOT(onBtnReadClicked()));
 	connect(ui.btnWrite, SIGNAL(clicked()), this, SLOT(onBtnWriteClicked()));
 	connect(ui.btnOnekey, SIGNAL(clicked()), this, SLOT(onBtnOnekeyClicked()));
 
 	connect(&m_serialPort, SIGNAL(readyRead()), this, SLOT(onSerialReadyRead()));
-	m_nOnekeySetIndex = 0;
+	m_nOnekeySetIndex = -1;
 }
 
 PlaceInfoDialog::~PlaceInfoDialog()
 {
 }
+
+QMap<QString, QPoint> PlaceInfoDialog::getStationAddress()
+{
+	QMap<QString, QPoint> stations;
+	//TODO 需要确保基站标定位置可用
+	//if (1 != m_stationStatus) {
+	//	//未标定或标定失败
+	//	return stations;
+	//}
+	stations.insert("A0", QPoint(ui.tableWidget->item(0, 0)->text().toInt() * 100, ui.tableWidget->item(0, 1)->text().toInt() * 100));
+	stations.insert("A1", QPoint(ui.tableWidget->item(1, 0)->text().toInt() * 100, ui.tableWidget->item(1, 1)->text().toInt() * 100));
+	stations.insert("A2", QPoint(ui.tableWidget->item(2, 0)->text().toInt() * 100, ui.tableWidget->item(2, 1)->text().toInt() * 100));
+	stations.insert("A3", QPoint(ui.tableWidget->item(3, 0)->text().toInt() * 100, ui.tableWidget->item(3, 1)->text().toInt() * 100));
+	stations.insert("A4", QPoint(ui.tableWidget->item(4, 0)->text().toInt() * 100, ui.tableWidget->item(4, 1)->text().toInt() * 100));
+	stations.insert("A5", QPoint(ui.tableWidget->item(5, 0)->text().toInt() * 100, ui.tableWidget->item(5, 1)->text().toInt() * 100));
+	return stations;
+}
+
 void PlaceInfoDialog::showEvent(QShowEvent* event) 
 {
 	ui.btnComOpen->setText(tr("连接"));
@@ -222,7 +241,10 @@ void PlaceInfoDialog::parseSettingFrame(QByteArray arrNLINKData)
 		QThread::msleep(100);
 		m_nOnekeySetIndex++;
 		if (m_nOnekeySetIndex > 300) {
+			//一键标定完成
 			m_nOnekeySetIndex = 0;
+			m_stationStatus = 1;
+			//TODO 检查标定基站位置
 			return;
 		}
 	}

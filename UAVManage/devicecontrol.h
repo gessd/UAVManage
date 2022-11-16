@@ -151,7 +151,7 @@ public:
 	/**
 	 * @brief 无人机回收
 	 */
-	int Fun_MAV_Defined_Regain();
+	int Fun_MAV_Defined_Regain(int x, int y);
 
 	/**
 	 * @brief 无人机灯光

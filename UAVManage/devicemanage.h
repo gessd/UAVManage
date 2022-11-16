@@ -55,7 +55,12 @@ public:
 	/**
 	 * @brief 获取场地大小
 	 */
-	QSize getSpaceSize();
+	QPoint getSpaceSize();
+
+	/**
+	 * @brief 设置基站位置
+	 */
+	void setStationAddress(QMap<QString, QPoint> station);
 
 	/**
 	* @brief 添加设备
@@ -244,6 +249,7 @@ private:
 	//用于执行python代码
 	ThreadPython pythonThread;
 	//场地大小
-	unsigned int m_nSpaceX;
-	unsigned int m_nSpaceY;
+	QPoint m_pointSpace;
+	//基站定位位置 基站名称及基站位置
+	QMap<QString, QPoint> m_stationMap;
 };

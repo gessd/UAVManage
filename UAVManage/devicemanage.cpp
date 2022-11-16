@@ -13,7 +13,8 @@ DeviceManage::DeviceManage(QWidget *parent)
 	: QWidget(parent)
 {
 	ui.setupUi(this);
-	m_nSpaceX = m_nSpaceY = 0;
+	m_pointSpace.setX(0);
+	m_pointSpace.setY(0);
 	m_p3dTcpSocket = nullptr;
 	m_p3dTcpServer = new QTcpServer(this);
 	m_p3dTcpServer->listen(QHostAddress::Any, _TcpPort_);
@@ -233,14 +234,19 @@ DeviceManage::~DeviceManage()
 
 void DeviceManage::setSpaceSize(unsigned int x, unsigned int y)
 {
-	m_nSpaceX = x;
-	m_nSpaceY = y;
+	m_pointSpace.setX(x);
+	m_pointSpace.setY(y);
 	qDebug() << "设定场地大小" << x << y;
 }
 
-QSize DeviceManage::getSpaceSize()
+QPoint DeviceManage::getSpaceSize()
 {
-	return QSize(m_nSpaceY, m_nSpaceX);
+	return m_pointSpace;
+}
+
+void DeviceManage::setStationAddress(QMap<QString, QPoint> station)
+{
+	m_stationMap = station;
 }
 
 QString DeviceManage::addDevice(QString qstrName, QString ip, long x, long y)
@@ -480,13 +486,13 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 		{
 			//按顺序排列
 			int nInterval = 50;			//无人机间隔
-			int c = getSpaceSize().width() / nInterval;
+			int c = getSpaceSize().x() / nInterval;
 			if (i > 0) {
 				int r = i % c;
 				x = r * nInterval;
 				if (0 == r) y += nInterval;
 			}
-			pDevice->Fun_MAV_CMD_NAV_LAND_LOCAL(0, 0, 0, 0, x, y, 0, false);
+			pDevice->Fun_MAV_Defined_Regain(x, y);
 			qstrText = tr("回收");
 			break;
 		}
@@ -533,7 +539,7 @@ void DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upload
 			continue;
 		}
 		//执行python脚本之前初始参数，用于检查无人机编程参数
-		pythonThread.initParam(m_nSpaceX, m_nSpaceY, pDevice->getName(), pDevice->getX(), pDevice->getY());
+		pythonThread.initParam(m_pointSpace.x(), m_pointSpace.y(), pDevice->getName(), pDevice->getX(), pDevice->getY());
 		//生成舞步过程必须一个个生成，python交互函数是静态全局，所以同时只能执行一个设备生成舞步
 		if (!pythonThread.compilePythonCode(arrData)) {
 			//生成舞步失败
@@ -751,14 +757,16 @@ void DeviceManage::on3dNewConnection()
 		if (m_timerUpdateStatus.isActive()) m_timerUpdateStatus.stop();
 		if (m_timerMessage3D.isActive()) m_timerMessage3D.stop();
 		});
-	if (!m_timerUpdateStatus.isActive()) m_timerUpdateStatus.start(1000);
 	if (!m_timerMessage3D.isActive()) m_timerMessage3D.start(10 * 1000);
 	//发送无人机设备列表
 	QJsonObject obj3dmsg;
 	obj3dmsg.insert(_Ver_, _VerNum_);
 	obj3dmsg.insert(_Tag_, _TabName_);
-	obj3dmsg.insert(_ID_, _3dDeviceList);
+	obj3dmsg.insert(_ID_, _3dDeviceInit);
 	obj3dmsg.insert(_Time_, QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"));
+	obj3dmsg.insert("x", getSpaceSize().x());
+	obj3dmsg.insert("y", getSpaceSize().y());
+	//无人机初始位置
 	QJsonArray jsonArr;
 	for (int i = 0; i < ui.listWidget->count(); i++) {
 		QListWidgetItem* pItem = ui.listWidget->item(i);
@@ -774,8 +782,21 @@ void DeviceManage::on3dNewConnection()
 		jsonArr.append(device);
 	}
 	obj3dmsg.insert(_Data_, jsonArr);
+	//基站坐标
+	QJsonArray arrStation;
+	QStringList keys = m_stationMap.keys();
+	foreach(QString name, keys) {
+		QJsonObject obj;
+		obj.insert("name", name);
+		obj.insert("x", m_stationMap.value(name).x());
+		obj.insert("y", m_stationMap.value(name).y());
+		arrStation.append(obj);
+	}
+	obj3dmsg.insert("station", arrStation);
 	sendMessageTo3D(obj3dmsg);
 	emit sig3DDialogStatus(true);
+	//实时状态定时放到最后，必须在发送设备列表之后才能发送实时位置数据
+	if (!m_timerUpdateStatus.isActive()) m_timerUpdateStatus.start(1000);
 }
 
 void DeviceManage::onTimeout3DMessage()
@@ -792,8 +813,6 @@ void DeviceManage::onTimeout3DMessage()
 void DeviceManage::onUpdateStatusTo3D()
 {
 	//定时向三维发送无人机状态信息
-	////TODO 暂时屏蔽向三维发送实时位置信息
-	//return;
 	QJsonObject obj3dmsg;
 	obj3dmsg.insert(_Ver_, _VerNum_);
 	obj3dmsg.insert(_Tag_, _TabName_);
@@ -807,6 +826,8 @@ void DeviceManage::onUpdateStatusTo3D()
 		if (!pWidget) continue;
 		DeviceControl* pDevice = dynamic_cast<DeviceControl*>(pWidget);
 		if (!pDevice) continue;
+		//设备连接后才更新实时位置
+		if(!pDevice->isConnectDevice()) continue;
 		_stDeviceCurrentStatus status = pDevice->getCurrentStatus();
 		QJsonObject device;
 		device.insert("name", pDevice->getName());
@@ -829,6 +850,7 @@ void DeviceManage::onUpdateStatusTo3D()
 		//}
 		jsonArr.append(device);
 	}
+	if (0 == jsonArr.count()) return;
 	obj3dmsg.insert(_Data_, jsonArr);
 	sendMessageTo3D(obj3dmsg);
 }
@@ -870,7 +892,7 @@ void DeviceManage::sendMessageTo3D(QJsonObject json3d)
 	QJsonDocument document(json3d);
 	QByteArray msg3d = document.toJson(QJsonDocument::Compact);
 	qDebug() << "3dmessage" << json3d;
-	//消息头部增加标识#，尾部增加标识*
+	//消息头部增加标识，尾部增加标识
 	msg3d.prepend(_MsgHead);
 	msg3d.append(_MsgTail);
 	m_p3dTcpSocket->write(msg3d);

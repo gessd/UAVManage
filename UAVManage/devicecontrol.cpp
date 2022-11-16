@@ -270,9 +270,9 @@ int DeviceControl::Fun_MAV_Defined_Queue(int x, int y)
 }
 
 //无人机回收
-int DeviceControl::Fun_MAV_Defined_Regain()
+int DeviceControl::Fun_MAV_Defined_Regain(int x, int y)
 {
-	QByteArray arrData = mavCommandLongToBuffer(0, 0, 0, 0, 0, 0, 0, MAV_CMD_USER_1);
+	QByteArray arrData = mavCommandLongToBuffer(0, 0, 0, 0, 0, x, y, MAV_CMD_USER_1);
 	return MavSendCommandLongMessage(tr("回收"), MAV_CMD_USER_1, arrData, arrData, false);
 }
 

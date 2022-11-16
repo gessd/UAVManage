@@ -49,9 +49,6 @@
     <ClCompile Include="devicemanage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="setdevicedialog.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="resendmessage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -111,9 +108,6 @@
     <QtMoc Include="adddevicedialog.h">
       <Filter>Header Files</Filter>
     </QtMoc>
-    <QtMoc Include="setdevicedialog.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
     <QtMoc Include="resendmessage.h">
       <Filter>Header Files</Filter>
     </QtMoc>
@@ -162,9 +156,6 @@
       <Filter>Form Files</Filter>
     </QtUic>
     <QtUic Include="adddevicedialog.ui">
-      <Filter>Form Files</Filter>
-    </QtUic>
-    <QtUic Include="setdevicedialog.ui">
       <Filter>Form Files</Filter>
     </QtUic>
     <QtUic Include="messagelistdialog.ui">

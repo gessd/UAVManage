@@ -118,7 +118,6 @@
     <QtUic Include="devicemanage.ui" />
     <QtUic Include="messagelistdialog.ui" />
     <QtUic Include="placeinfodialog.ui" />
-    <QtUic Include="setdevicedialog.ui" />
     <QtUic Include="SoundGrade.ui" />
     <QtUic Include="spaceparam.ui" />
     <QtUic Include="uavmanage.ui" />
@@ -141,7 +140,6 @@
     <ClCompile Include="qtsingleapplication\qtsingleapplication.cpp" />
     <ClCompile Include="qwchartview.cpp" />
     <ClCompile Include="resendmessage.cpp" />
-    <ClCompile Include="setdevicedialog.cpp" />
     <ClCompile Include="SoundGrade.cpp" />
     <ClCompile Include="spaceparam.cpp" />
     <ClCompile Include="threadpython.cpp" />
@@ -157,9 +155,6 @@
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="adddevicedialog.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <QtMoc Include="setdevicedialog.h" />
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="AudioDecoder.h" />

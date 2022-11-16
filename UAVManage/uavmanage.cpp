@@ -108,11 +108,12 @@ UAVManage::UAVManage(QWidget *parent)
 	pMenuFlyPrepare->addAction(pActionFly6);
 	ui.toolBar->layout()->setSpacing(10);
 
-	m_pButtonFlyPrepare = initMenuButton(tr("起飞准备"), ":/res/menu/P02_help_about_page_update_drone_ic.png", ":/res/menu/P02_help_about_page_update_drone_ic.png", pMenuFlyPrepare);
-	m_pButtonFlyPrepare->setEnabled(false);
 	ui.toolBar->addWidget(initMenuButton(tr(""), ":/res/logo/qz_logo.ico", ":/res/logo/qz_logo.ico", pIconMenu));
 	ui.toolBar->addWidget(initMenuButton(tr("项目"), ":/res/menu/P01_file_open_btn_cli.png", ":/res/menu/P01_file_open_btn_cli.png", pProjectMenu));
+	m_pButtonFlyPrepare = initMenuButton(tr("起飞准备"), ":/res/menu/P02_help_about_page_update_drone_ic.png", ":/res/menu/P02_help_about_page_update_drone_ic.png", pMenuFlyPrepare);
+	m_pButtonFlyPrepare->setEnabled(false);
 	ui.toolBar->addWidget(m_pButtonFlyPrepare);
+	ui.toolBar->addWidget(initMenuButton(tr("校准"), ":/res/logo/qz_logo.ico", ":/res/logo/qz_logo.ico", nullptr));
 	ui.toolBar->addWidget(initMenuButton(tr("帮助"), ":/res/menu/P02_help_about_page_ic.png", ":/res/menu/P02_help_about_page_ic.png", nullptr));
 	
 	connect(pActionFly1, &QAction::triggered, [this]() { m_pDeviceManage->waypointComposeAndUpload(m_qstrCurrentProjectFile, false); });
@@ -127,6 +128,7 @@ UAVManage::UAVManage(QWidget *parent)
 		if (m_qstrCurrentProjectFile.isEmpty()) return;
 		PlaceInfoDialog info(this);
 		info.exec();
+		m_pDeviceManage->setStationAddress(info.getStationAddress());
 		});
 	connect(pActionFly4, &QAction::triggered, [this]() { m_pDeviceManage->waypointComposeAndUpload(m_qstrCurrentProjectFile, true); });
 	connect(pActionFly5, &QAction::triggered, [this]() {  //暂无功能
@@ -268,16 +270,16 @@ void UAVManage::onOpenProject(QString qstrFile)
 		return;
 	}
 	//读取场地大小
-	long x = place->Int64Attribute(_AttributeX_);
-	long y = place->Int64Attribute(_AttributeY_);
+	unsigned int x = place->IntAttribute(_AttributeX_);
+	unsigned int y = place->IntAttribute(_AttributeY_);
 	m_pDeviceManage->setSpaceSize(x, y);
 	if (m_pWebBockly) {
 		qDebug() << "发送场地范围到编程区";
-		QSize space = m_pDeviceManage->getSpaceSize();
+		QPoint space = m_pDeviceManage->getSpaceSize();
 		QJsonObject jsonObj;
 		jsonObj.insert(_WMID, _WIDSet);
-		jsonObj.insert("x", space.width());
-		jsonObj.insert("y", space.height());
+		jsonObj.insert("x", space.x());
+		jsonObj.insert("y", space.y());
 		jsonObj.insert("z", 10000);
 		QJsonDocument jsonDoc(jsonObj);
 		m_pWebBockly->sendTextMessage(jsonDoc.toJson());
@@ -295,8 +297,8 @@ void UAVManage::onOpenProject(QString qstrFile)
 		//遍历无人机属性
 		QString devicename = device->Attribute(_AttributeName_);
 		QString ip = device->Attribute(_AttributeIP_);
-		long x = device->Int64Attribute(_AttributeX_);
-		long y = device->Int64Attribute(_AttributeY_);
+		int x = device->IntAttribute(_AttributeX_);
+		int y = device->IntAttribute(_AttributeY_);
 		device = device->NextSiblingElement(_ElementDevice_);
 		if (m_pDeviceManage) {
 			QString error = m_pDeviceManage->addDevice(devicename, ip, x, y);
