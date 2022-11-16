@@ -41,7 +41,7 @@ QDialogButtonBox QPushButton{
 	border-width:2px;
 }
 #btnFlyTakeoff,#btnFlyLand,#btnAddDevice,#btnRemoveDevice,#btnQueue,#btnRegain{
-	padding-left:15px;
+	padding-left:10px;
 }
 QLineEdit{
 	border:1px solid #000000;

@@ -119,6 +119,12 @@
             <iconset resource="uavmanage.qrc">
              <normaloff>:/res/images/flyRegain.png</normaloff>:/res/images/flyRegain.png</iconset>
            </property>
+           <property name="iconSize">
+            <size>
+             <width>22</width>
+             <height>22</height>
+            </size>
+           </property>
            <property name="toolButtonStyle">
             <enum>Qt::ToolButtonTextBesideIcon</enum>
            </property>
@@ -144,6 +150,12 @@
            <property name="icon">
             <iconset resource="uavmanage.qrc">
              <normaloff>:/res/images/flyland.png</normaloff>:/res/images/flyland.png</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>22</width>
+             <height>22</height>
+            </size>
            </property>
            <property name="toolButtonStyle">
             <enum>Qt::ToolButtonTextBesideIcon</enum>
@@ -173,6 +185,12 @@
            <property name="icon">
             <iconset resource="uavmanage.qrc">
              <normaloff>:/res/images/flytakeoff.png</normaloff>:/res/images/flytakeoff.png</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>22</width>
+             <height>22</height>
+            </size>
            </property>
            <property name="toolButtonStyle">
             <enum>Qt::ToolButtonTextBesideIcon</enum>
@@ -225,6 +243,12 @@
            <property name="icon">
             <iconset resource="uavmanage.qrc">
              <normaloff>:/res/images/flyQueue.png</normaloff>:/res/images/flyQueue.png</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>22</width>
+             <height>22</height>
+            </size>
            </property>
            <property name="toolButtonStyle">
             <enum>Qt::ToolButtonTextBesideIcon</enum>
@@ -284,6 +308,12 @@
            <iconset resource="uavmanage.qrc">
             <normaloff>:/res/images/add.png</normaloff>:/res/images/add.png</iconset>
           </property>
+          <property name="iconSize">
+           <size>
+            <width>22</width>
+            <height>22</height>
+           </size>
+          </property>
           <property name="toolButtonStyle">
            <enum>Qt::ToolButtonTextBesideIcon</enum>
           </property>
@@ -303,6 +333,12 @@
           <property name="icon">
            <iconset resource="uavmanage.qrc">
             <normaloff>:/res/images/delete.png</normaloff>:/res/images/delete.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>22</width>
+            <height>22</height>
+           </size>
           </property>
           <property name="toolButtonStyle">
            <enum>Qt::ToolButtonTextBesideIcon</enum>
@@ -360,7 +396,7 @@
             <string/>
            </property>
            <property name="pixmap">
-            <pixmap resource="uavmanage.qrc">:/res/device/P04_dronre_ic.png</pixmap>
+            <pixmap resource="uavmanage.qrc">:/res/images/device.png</pixmap>
            </property>
            <property name="scaledContents">
             <bool>true</bool>

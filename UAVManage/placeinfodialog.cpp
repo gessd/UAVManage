@@ -27,10 +27,10 @@ QMap<QString, QPoint> PlaceInfoDialog::getStationAddress()
 {
 	QMap<QString, QPoint> stations;
 	//TODO 需要确保基站标定位置可用
-	//if (1 != m_stationStatus) {
-	//	//未标定或标定失败
-	//	return stations;
-	//}
+	if (1 != m_stationStatus) {
+		//未标定或标定失败
+		return stations;
+	}
 	stations.insert("A0", QPoint(ui.tableWidget->item(0, 0)->text().toInt() * 100, ui.tableWidget->item(0, 1)->text().toInt() * 100));
 	stations.insert("A1", QPoint(ui.tableWidget->item(1, 0)->text().toInt() * 100, ui.tableWidget->item(1, 1)->text().toInt() * 100));
 	stations.insert("A2", QPoint(ui.tableWidget->item(2, 0)->text().toInt() * 100, ui.tableWidget->item(2, 1)->text().toInt() * 100));
@@ -244,7 +244,7 @@ void PlaceInfoDialog::parseSettingFrame(QByteArray arrNLINKData)
 			//一键标定完成
 			m_nOnekeySetIndex = 0;
 			m_stationStatus = 1;
-			//TODO 检查标定基站位置
+			//TODO 检查标定基站位置 -8388为无效值
 			return;
 		}
 	}

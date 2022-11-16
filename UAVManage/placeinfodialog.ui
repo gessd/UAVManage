@@ -121,9 +121,15 @@
     <rect>
      <x>190</x>
      <y>10</y>
-     <width>421</width>
-     <height>421</height>
+     <width>331</width>
+     <height>331</height>
     </rect>
+   </property>
+   <property name="verticalScrollBarPolicy">
+    <enum>Qt::ScrollBarAlwaysOff</enum>
+   </property>
+   <property name="horizontalScrollBarPolicy">
+    <enum>Qt::ScrollBarAlwaysOff</enum>
    </property>
    <row>
     <property name="text">
