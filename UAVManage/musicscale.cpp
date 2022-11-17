@@ -20,7 +20,6 @@ void MusicScale::updateScale(qint64 duration)
 void MusicScale::paintEvent(QPaintEvent* event)
 {
 	if(m_nduration > 0){
-		qDebug() << "更新刻度";
 		QPainter painter(this);
 		QPen pen;
 		pen.setStyle(Qt::SolidLine);

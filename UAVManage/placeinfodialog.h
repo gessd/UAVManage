@@ -7,6 +7,7 @@
 #include <QShowEvent>
 #include <QHideEvent>
 #include <QCloseEvent>
+#include <QThread>
 
 //NLINK设置协议格式
 enum _NLINK_Setting_Frame0_
@@ -37,6 +38,21 @@ enum _NLINK_Setting_Frame0_
 #define _OneKey_Set_Start_   QByteArray::fromHex("54000200000000000000000000FF00FF0008FFFF00FFFF0000000000000000FFFFFFFFFF0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000053")
 #define _OneKey_Set_Next_    QByteArray::fromHex("54002000000000000000000000FF00FF0000FFFF00FFFF0000000000000000FFFFFFFFFF0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000069")
 
+class SerialWorker : public QObject
+{
+	Q_OBJECT
+public:
+	explicit SerialWorker(QSerialPort* ser, QObject* parent = nullptr);
+signals:
+	void sendResultToGui(QByteArray result);
+public slots:
+	void onDataSendWork(const QByteArray data);
+	void onDataReciveWork();
+private:
+	QSerialPort* m_pSerial;
+	QByteArray m_SerialData;
+};
+
 class PlaceInfoDialog : public QDialog
 {
 	Q_OBJECT
@@ -54,8 +70,9 @@ private slots:
 	void onBtnWriteClicked();
 	void onBtnOnekeyClicked();
 	void onSerialReadyRead();
-private:
-	void parseSettingFrame(QByteArray arrNLINKData);
+	void onParseSettingFrame(QByteArray arrNLINKData);
+signals:
+	void serialDataSend(const QByteArray data);
 private:
 	Ui::PlaceInfoDialog ui;
 	QSerialPort m_serialPort;
@@ -64,4 +81,5 @@ private:
 	int m_nOnekeySetIndex;
 	//基站标定状态 [0未标定|1标定成功|-1标定失败]
 	int m_stationStatus;
+	QThread m_threadSerial;
 };

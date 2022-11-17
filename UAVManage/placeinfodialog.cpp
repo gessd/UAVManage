@@ -10,17 +10,30 @@ PlaceInfoDialog::PlaceInfoDialog(QWidget *parent)
 	ui.setupUi(this);
 	m_bSetNLINK = false;
 	m_stationStatus = 0;
+	m_nOnekeySetIndex = -1;
 	connect(ui.btnComOpen, SIGNAL(clicked()), this, SLOT(onBtnOpenClicked()));
 	connect(ui.btnRead, SIGNAL(clicked()), this, SLOT(onBtnReadClicked()));
 	connect(ui.btnWrite, SIGNAL(clicked()), this, SLOT(onBtnWriteClicked()));
 	connect(ui.btnOnekey, SIGNAL(clicked()), this, SLOT(onBtnOnekeyClicked()));
+	//connect(&m_serialPort, SIGNAL(readyRead()), this, SLOT(onSerialReadyRead()), Qt::QueuedConnection);
 
-	connect(&m_serialPort, SIGNAL(readyRead()), this, SLOT(onSerialReadyRead()));
-	m_nOnekeySetIndex = -1;
+	SerialWorker* pSerialWorker = new SerialWorker(&m_serialPort);
+	(&m_serialPort)->moveToThread(&m_threadSerial);
+	pSerialWorker->moveToThread(&m_threadSerial);
+
+	connect(&m_threadSerial, &QThread::finished, pSerialWorker, &QObject::deleteLater);           // 线程结束，自动删除对象
+	connect(this, &PlaceInfoDialog::serialDataSend, pSerialWorker, &SerialWorker::onDataSendWork);   // 主线程串口数据发送的信号
+	connect(&m_serialPort, &QSerialPort::readyRead, pSerialWorker, &SerialWorker::onDataReciveWork); // 主线程通知子线程接收数据的信号
+	connect(pSerialWorker, &SerialWorker::sendResultToGui,this, &PlaceInfoDialog::onParseSettingFrame);              // 主线程收到数据结果的信号
+	m_threadSerial.start();                   // 线程开始运行
 }
 
 PlaceInfoDialog::~PlaceInfoDialog()
 {
+	if (m_threadSerial.isRunning()) {
+		m_threadSerial.exit();
+		m_threadSerial.wait();
+	}
 }
 
 QMap<QString, QPoint> PlaceInfoDialog::getStationAddress()
@@ -96,11 +109,12 @@ void PlaceInfoDialog::onBtnReadClicked()
 {
 	if (!m_serialPort.isOpen()) return;
 	m_nOnekeySetIndex = 0;
-	int len = m_serialPort.write(_Get_Setting_Frame0_);
-	m_serialPort.waitForBytesWritten(500);
-	if (len != _ByteCount) {
-		QMessageBox::warning(this, tr("提示"), tr("写入数据失败"));
-	}
+	//int len = m_serialPort.write(_Get_Setting_Frame0_);
+	//m_serialPort.waitForBytesWritten(500);
+	//if (len != _ByteCount) {
+	//	QMessageBox::warning(this, tr("提示"), tr("写入数据失败"));
+	//}
+	emit serialDataSend(_Get_Setting_Frame0_);
 }
 
 void PlaceInfoDialog::onBtnWriteClicked() 
@@ -108,11 +122,12 @@ void PlaceInfoDialog::onBtnWriteClicked()
 	if (!m_serialPort.isOpen()) return;
 	m_nOnekeySetIndex = 0;
 	m_bSetNLINK = true;
-	int len = m_serialPort.write(_Get_Setting_Frame0_);
-	m_serialPort.waitForBytesWritten(500);
-	if (len != _ByteCount) {
-		QMessageBox::warning(this, tr("提示"), tr("写入数据失败"));
-	}
+	//int len = m_serialPort.write(_Get_Setting_Frame0_);
+	//m_serialPort.waitForBytesWritten(500);
+	//if (len != _ByteCount) {
+	//	QMessageBox::warning(this, tr("提示"), tr("写入数据失败"));
+	//}
+	emit serialDataSend(_Get_Setting_Frame0_);
 }
 
 void PlaceInfoDialog::onBtnOnekeyClicked() 
@@ -121,8 +136,10 @@ void PlaceInfoDialog::onBtnOnekeyClicked()
 	if (!m_serialPort.isOpen()) return;
 	m_bOnekeySetNLINK = true;
 	m_nOnekeySetIndex = 1;
-	m_serialPort.write(_OneKey_Set_Start_);
-	m_serialPort.waitForBytesWritten(500);
+	qDebug() << "开始一键标定";
+	//m_serialPort.write(_OneKey_Set_Start_);
+	//m_serialPort.waitForBytesWritten(500);
+	emit serialDataSend(_OneKey_Set_Start_);
 }
 //NLINK数据转数值,根据协议转换
 float NLINK_ParseInt24(uint8_t byte[3])
@@ -171,12 +188,12 @@ void PlaceInfoDialog::onSerialReadyRead()
 	if (arrCompleteData.length() >= _ByteCount) {
 		bComplete = true;
 		arrCompleteData = arrCompleteData.left(_ByteCount);
-		parseSettingFrame(arrCompleteData);
+		onParseSettingFrame(arrCompleteData);
 		arrCompleteData.clear();
 	}
 }
 
-void PlaceInfoDialog::parseSettingFrame(QByteArray arrNLINKData)
+void PlaceInfoDialog::onParseSettingFrame(QByteArray arrNLINKData)
 {
 	qDebug() << "----nlinkmsg:" << arrNLINKData.length()<<arrNLINKData.toHex().toUpper();
 	QByteArray arrData = arrNLINKData;
@@ -211,8 +228,9 @@ void PlaceInfoDialog::parseSettingFrame(QByteArray arrNLINKData)
 		QByteArray arrNew = arrData.left(arrData.length() - 1);
 		arrNew.append(getCheckSum(arrNew));
 		//写入新设置
-		m_serialPort.write(arrNew);
-		m_serialPort.waitForBytesWritten(500);
+		//m_serialPort.write(arrNew);
+		//m_serialPort.waitForBytesWritten(500);
+		emit serialDataSend(arrNew);
 		QMessageBox::information(this, tr("提示"), tr("数据写入完成"));
 	}
 	else {
@@ -236,16 +254,48 @@ void PlaceInfoDialog::parseSettingFrame(QByteArray arrNLINKData)
 	}
 
 	if (m_nOnekeySetIndex > 0) {
-		m_serialPort.write(_OneKey_Set_Next_);
-		m_serialPort.waitForBytesWritten(500);
-		QThread::msleep(100);
+		//m_serialPort.write(_OneKey_Set_Next_);
+		//m_serialPort.waitForBytesWritten(500);
+		emit serialDataSend(_OneKey_Set_Next_);
 		m_nOnekeySetIndex++;
+		ui.progressBar->setValue(m_nOnekeySetIndex);
 		if (m_nOnekeySetIndex > 300) {
 			//一键标定完成
+			qDebug() << "标定完成";
 			m_nOnekeySetIndex = 0;
 			m_stationStatus = 1;
 			//TODO 检查标定基站位置 -8388为无效值
 			return;
 		}
+	}
+}
+
+SerialWorker::SerialWorker(QSerialPort* ser, QObject* parent /*= nullptr*/)
+{
+	m_pSerial = ser;
+}
+
+void SerialWorker::onDataSendWork(const QByteArray data)
+{
+	// 发送数据
+	m_pSerial->write(data);
+	m_pSerial->waitForBytesWritten(3000);
+}
+
+void SerialWorker::onDataReciveWork()
+{
+	QByteArray arrData = m_pSerial->readAll();
+	//只处理设置消息
+	if (!m_SerialData.isEmpty()) {
+		m_SerialData.append(arrData);
+	}
+	if (0x54 == arrData.at(0) && 0x00 == arrData.at(1)) {
+		//if (arrData.length() < _ByteCount) bComplete = false;
+		m_SerialData.append(arrData);
+	}
+	if (m_SerialData.length() >= _ByteCount) {
+		m_SerialData = m_SerialData.left(_ByteCount);
+		emit sendResultToGui(m_SerialData);
+		m_SerialData.clear();
 	}
 }

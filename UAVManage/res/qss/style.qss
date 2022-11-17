@@ -69,14 +69,23 @@ QLineEdit:focus, QLineEdit:hover{
 QLineEdit:disabled{
 	background:rgb(238,238,238);
 }
+QTableWidget QLineEdit{
+	border-width:0px;
+	padding:0px;
+	padding-left:0px;
+	border-radius:0px;
+	color:#000000;
+	background:#C2DDF0;
+}
 QTableWidget{
 	background:transparent;
 }
 QTableWidget::item:selected{
-    background:rgb(75,85,97);
-	color:rgb(255,255,255);
+    background:#F0F0F0;
+	color:#000000;
 }
 QHeaderView::section{
+	background:#C2DDF0;
 	text-align:center;
 	margin:0px;
 }
@@ -107,14 +116,16 @@ QListWidget::item:selected{
 }
 QProgressBar{
 	background:transparent;
-	color:white;
+	color:#000000;
+	border-width:0px;
 }
 QProgressBar:disabled{
-	color:white;
+	color:000000;
 	border-bottom:1px solid white;
 }
 QProgressBar::chunk{
 	background:qlineargradient(spread:pad,x1:0,y1:0,x2:1,y2:0,stop:0 white,stop:1 blue);
+	border-radius:2px;
 }
 MessageListDialog, MessageListDialog QListWidget, MessageListDialog QListWidget::item:selected{
 	color:blue;
