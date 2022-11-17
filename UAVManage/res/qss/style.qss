@@ -103,7 +103,7 @@ QListWidget::item:hover{
 	border:2px solid #3B8CFF;
 }
 QListWidget::item:selected{
-	border:2px solid rgb(18,179,254);
+	border:2px solid rgba(59,140,255,190);
 }
 QProgressBar{
 	background:transparent;
@@ -194,7 +194,6 @@ QMenuBar::item {
 */
 
 AddDeviceDialog .QFrame, SpaceParam .QFrame{
-	border:2px solid rgb(125, 125, 125);
     border-bottom-left-radius:10px; 
 	border-bottom-right-radius:10px; 
 	background:rgb(242,242,242);

@@ -8,7 +8,7 @@
 #include "devicedebug.h"
 #include "define3d.h"
 
-#define _ItemHeight_ 80
+#define _ItemHeight_ 86
 DeviceManage::DeviceManage(QWidget *parent)
 	: QWidget(parent)
 {
