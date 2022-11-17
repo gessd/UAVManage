@@ -14,7 +14,7 @@ DeviceControl::DeviceControl(QString name, float x, float y, QString ip, QWidget
 	m_bHeartbeatEnable = true;
 	m_bWaypointSending = false;
 	ui.progressBar->setVisible(false);
-	ui.btnSet->setVisible(false);
+	ui.labelLocation->setVisible(false);
 	QPixmap pixmap(":/res/images/uavred.png");
 	ui.labelStatus->setPixmap(pixmap.scaled(ui.labelStatus->size()));
 	//发送消息为了转移到主线程中处理，需要对界面进行处理
@@ -22,6 +22,7 @@ DeviceControl::DeviceControl(QString name, float x, float y, QString ip, QWidget
 	connect(this, &DeviceControl::sigBatteryStatus, this, &DeviceControl::onUpdateBatteryStatus);
 	connect(this, &DeviceControl::sigConnectStatus, this, &DeviceControl::onUpdateConnectStatus);
 	connect(this, &DeviceControl::sigUpdateHeartbeat, this, &DeviceControl::onUpdateHeartBeat);
+	connect(this, &DeviceControl::sigLocalPosition, this, &DeviceControl::onUpdateLocation);
 	
 	qRegisterMetaType<QList<float>>("QList<float>");
 	m_pDebugDialog = new DeviceDebug(ip, name, this);
@@ -287,6 +288,13 @@ void DeviceControl::onUpdateBatteryStatus(float voltages, float battery, unsigne
 {
 	ui.labelBattery->setText(QString(tr("电量：%1 %")).arg(electric));
 	m_pDebugDialog->onSetBatteryStatus(voltages, battery, electric);
+}
+
+void DeviceControl::onUpdateLocation(float x, float y, float z)
+{
+	ui.labelLocation->setVisible(true);
+	QString text = QString("X:%1 Y:%2 Z:%2").arg(x).arg(y).arg(z);
+	ui.labelLocation->setText(text);
 }
 
 //网络连接状态

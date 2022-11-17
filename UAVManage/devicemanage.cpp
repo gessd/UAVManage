@@ -8,7 +8,7 @@
 #include "devicedebug.h"
 #include "define3d.h"
 
-#define _ItemHeight_ 60
+#define _ItemHeight_ 80
 DeviceManage::DeviceManage(QWidget *parent)
 	: QWidget(parent)
 {
@@ -22,6 +22,7 @@ DeviceManage::DeviceManage(QWidget *parent)
 
 	//设置设备列表
 	ui.listWidget->installEventFilter(this);
+	ui.listWidget->setSpacing(4);
 	connect(ui.listWidget, &QListWidget::currentItemChanged, [this](QListWidgetItem* current, QListWidgetItem* previous) {
 		QString name;
 		QString previousname;
@@ -94,6 +95,7 @@ DeviceManage::DeviceManage(QWidget *parent)
 		}
 		if (qstrNewIP != pControl->getIP()) {
 			//修改设备IP
+			QString text = isRepetitionDevice("", qstrNewIP, 0, 0, "010");
 			if (!isRepetitionDevice("", qstrNewIP, 0, 0, "010").isEmpty()) {
 				QMessageBox::warning(this, tr("提示"), tr("设备地址重复"));
 				return;
@@ -407,13 +409,13 @@ QString DeviceManage::isRepetitionDevice(QString qstrName, QString ip, long x, l
 		while (qstrRep.length() < 3) {
 			qstrRep.prepend("0");
 		}
-		if (!qstrName.isEmpty() && 0 != qstrRep.at(0)) {
+		if (!qstrName.isEmpty() && '0' != qstrRep.at(0)) {
 			if (qstrName == pDevice->getName()) return tr("设备名称重复");
 		}
-		if (!ip.isEmpty() && 0 != qstrRep.at(1)) {
+		if (!ip.isEmpty() && '0' != qstrRep.at(1)) {
 			if (ip == pDevice->getIP()) return tr("设备IP重复");
 		}
-		if (0 != qstrRep.at(2)) {
+		if ('0' != qstrRep.at(2)) {
 			if (x == pDevice->getX() && y == pDevice->getY()) return tr("设备初始位置重复");
 		}
 	}
