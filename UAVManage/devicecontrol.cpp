@@ -14,7 +14,6 @@ DeviceControl::DeviceControl(QString name, float x, float y, QString ip, QWidget
 	m_bHeartbeatEnable = true;
 	m_bWaypointSending = false;
 	ui.progressBar->setVisible(false);
-	ui.labelLocation->setVisible(false);
 	QPixmap pixmap(":/res/images/uavred.png");
 	ui.labelStatus->setPixmap(pixmap.scaled(ui.labelStatus->size()));
 	//发送消息为了转移到主线程中处理，需要对界面进行处理
@@ -40,10 +39,14 @@ DeviceControl::DeviceControl(QString name, float x, float y, QString ip, QWidget
 			//connectDevice();
 		}
 		});
+	connect(ui.btnRemove, &QToolButton::clicked, [this]() {
+		emit sigRemoveDevice(ui.labelDeviceName->text()); 
+		});
 	setName(name);
 	setIp(ip);
 	setX(x);
 	setY(y);
+	onUpdateLocation(x / 100.0, y / 100.0, 0);
 }
 
 DeviceControl::~DeviceControl()
@@ -292,7 +295,6 @@ void DeviceControl::onUpdateBatteryStatus(float voltages, float battery, unsigne
 
 void DeviceControl::onUpdateLocation(float x, float y, float z)
 {
-	ui.labelLocation->setVisible(true);
 	QString text = QString("X:%1 Y:%2 Z:%2").arg(x).arg(y).arg(z);
 	ui.labelLocation->setText(text);
 }
@@ -406,9 +408,10 @@ void DeviceControl::hvcbReceiveMessage(const hv::SocketChannelPtr& channel, hv::
 		{
 			mavlink_local_position_ned_t t;
 			mavlink_msg_local_position_ned_decode(&msg, &t);
-			m_deviceStatus.x = QString::number(t.x, 'f', 3).toFloat() * 10;
-			m_deviceStatus.y = QString::number(t.y, 'f', 3).toFloat() * 10;
-			m_deviceStatus.z = QString::number(t.z, 'f', 3).toFloat() * 10;
+			//单位转换成cm
+			m_deviceStatus.x = QString::number(t.x * 100, 'f', 3).toInt();
+			m_deviceStatus.y = QString::number(t.y * 100, 'f', 3).toInt();
+			m_deviceStatus.z = QString::number(t.z * 100, 'f', 3).toInt();
 			emit sigLocalPosition(t.time_boot_ms, QString::number(t.x, 'f', 3).toFloat(), QString::number(t.y, 'f', 3).toFloat(), QString::number(t.z, 'f', 3).toFloat());
 			break;
 		}
@@ -672,5 +675,3 @@ void DeviceControl::onMessageThreadFinished()
 	emit sigConrolFinished(pMessage->getCommandName(), pMessage->getResult(), "");
 	delete pMessage;
 }
-
-

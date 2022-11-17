@@ -26,7 +26,6 @@
         <file>res/menu/P01_file_open_btn_nor.png</file>
         <file>res/menu/P01_file_new_btn_nor.png</file>
         <file>res/menu/P01_file_saveus_btn_nor.png</file>
-        <file>res/menu/P02_help_about_page_update_drone_ic.png</file>
         <file>res/menu/P02_help_about_btn_new_ic.png</file>
         <file>res/menu/P02_help_about_btn_nor_ic.png</file>
         <file>res/menu/P02_help_about_page_ic.png</file>
@@ -34,5 +33,7 @@
         <file>res/images/flyRegain.png</file>
         <file>res/images/musicload.png</file>
         <file>res/images/device.png</file>
+        <file>res/menu/preparation.png</file>
+        <file>res/images/newproject.png</file>
     </qresource>
 </RCC>

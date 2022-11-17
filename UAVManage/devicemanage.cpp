@@ -195,8 +195,6 @@ DeviceManage::DeviceManage(QWidget *parent)
 		pDebug->setIp(pControl->getIP());
 		pDebug->show();
 		});
-	//addDevice("测试名称1", "", 0,0);
-	//addDevice("测试名称2", "", 0, 0);
 	connect(ui.btnAddDevice, &QAbstractButton::clicked, [this]() {
 		AddDeviceDialog dialog(getNewDefaultName(), this);
 		if (QDialog::Accepted != dialog.exec())return;
@@ -205,8 +203,6 @@ DeviceManage::DeviceManage(QWidget *parent)
 			QMessageBox::warning(this, tr("错误"), qstrError);
 		}
 		});
-	connect(ui.btnRemoveDevice, &QAbstractButton::clicked, [this]() { removeDevice(); });
-
 	connect(ui.btnFlyTakeoff, &QAbstractButton::clicked, [this]() { allDeviceControl(_DeviceTakeoffLocal); });
 	connect(ui.btnFlyLand, &QAbstractButton::clicked, [this]() { allDeviceControl(_DeviceLandLocal); });
 	connect(ui.btnFlyStop, &QAbstractButton::clicked, [this]() { allDeviceControl(_DeviceQuickStop); });
@@ -265,6 +261,7 @@ QString DeviceManage::addDevice(QString qstrName, QString ip, long x, long y)
 	DeviceControl* pControl = new DeviceControl(qstrName, x, y, ip);
 	connect(pControl, &DeviceControl::sigWaypointProcess, this, &DeviceManage::sigWaypointProcess);
 	connect(pControl, &DeviceControl::sigConrolFinished, this, &DeviceManage::onDeviceConrolFinished);
+	connect(pControl, &DeviceControl::sigRemoveDevice, this, &DeviceManage::onRemoveDevice);
 	//需要先发送添加设备信息，用于创建默认blockly布局，当ui.listWidget->setCurrentItem触发设备切换时可以显示有布局的WEB界面
 	emit deviceAddFinished(qstrName, ip, x, y);
 	ui.listWidget->setItemWidget(item, pControl);
@@ -283,32 +280,6 @@ QString DeviceManage::addDevice(QString qstrName, QString ip, long x, long y)
 		sendMessageTo3D(obj3dmsg);
 	}
 	return "";
-}
-
-void DeviceManage::removeDevice()
-{
-	//删除选中项目，如果没有选中则删除最后一个
-	int count = ui.listWidget->count();
-	if (0 >= count) return;
-	QListWidgetItem* item = ui.listWidget->currentItem();
-	if (!item) item = ui.listWidget->item(count - 1);
-	DeviceControl* m_pControl = dynamic_cast<DeviceControl*>(ui.listWidget->itemWidget(item));
-	if (!m_pControl) return;
-	QString name = m_pControl->getName();
-	ui.listWidget->takeItem(ui.listWidget->currentRow());
-	emit deviceRemoveFinished(name);
-
-	if (m_p3dTcpSocket) {
-		QJsonObject obj3dmsg;
-		obj3dmsg.insert(_Ver_, _VerNum_);
-		obj3dmsg.insert(_Tag_, _TabName_);
-		obj3dmsg.insert(_ID_, _3dDeviceRemove);
-		obj3dmsg.insert(_Time_, QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"));
-		QJsonObject data;
-		data.insert("name", name);
-		obj3dmsg.insert(_Data_, data);
-		sendMessageTo3D(obj3dmsg);
-	}
 }
 
 void DeviceManage::clearDevice()
@@ -855,6 +826,35 @@ void DeviceManage::onUpdateStatusTo3D()
 	if (0 == jsonArr.count()) return;
 	obj3dmsg.insert(_Data_, jsonArr);
 	sendMessageTo3D(obj3dmsg);
+}
+
+void DeviceManage::onRemoveDevice(QString name)
+{
+	for (int i = 0; i < ui.listWidget->count(); i++) {
+		QListWidgetItem* pItem = ui.listWidget->item(i);
+		if (!pItem) continue;
+		QWidget* pWidget = ui.listWidget->itemWidget(pItem);
+		if (!pWidget) continue;
+		DeviceControl* pDevice = dynamic_cast<DeviceControl*>(pWidget);
+		if (!pDevice) continue;
+		QString temp = pDevice->getName();
+		if(temp != name) continue;
+		ui.listWidget->takeItem(i);
+		emit deviceRemoveFinished(name);
+		if (m_p3dTcpSocket) {
+			QJsonObject obj3dmsg;
+			obj3dmsg.insert(_Ver_, _VerNum_);
+			obj3dmsg.insert(_Tag_, _TabName_);
+			obj3dmsg.insert(_ID_, _3dDeviceRemove);
+			obj3dmsg.insert(_Time_, QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"));
+			QJsonObject data;
+			data.insert("name", name);
+			obj3dmsg.insert(_Data_, data);
+			sendMessageTo3D(obj3dmsg);
+		}
+		return;
+	}
+	
 }
 
 DeviceControl* DeviceManage::getCurrentDevice()

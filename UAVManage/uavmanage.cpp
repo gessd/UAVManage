@@ -110,7 +110,7 @@ UAVManage::UAVManage(QWidget *parent)
 
 	ui.toolBar->addWidget(initMenuButton(tr(""), ":/res/logo/qz_logo.ico", ":/res/logo/qz_logo.ico", pIconMenu));
 	ui.toolBar->addWidget(initMenuButton(tr("项目"), ":/res/menu/P01_file_open_btn_cli.png", ":/res/menu/P01_file_open_btn_cli.png", pProjectMenu));
-	m_pButtonFlyPrepare = initMenuButton(tr("起飞准备"), ":/res/menu/P02_help_about_page_update_drone_ic.png", ":/res/menu/P02_help_about_page_update_drone_ic.png", pMenuFlyPrepare);
+	m_pButtonFlyPrepare = initMenuButton(tr("起飞准备"), ":/res/menu/preparation.png", ":/res/menu/preparation.png", pMenuFlyPrepare);
 	m_pButtonFlyPrepare->setEnabled(false);
 	ui.toolBar->addWidget(m_pButtonFlyPrepare);
 	ui.toolBar->addWidget(initMenuButton(tr("校准"), ":/res/logo/qz_logo.ico", ":/res/logo/qz_logo.ico", nullptr));

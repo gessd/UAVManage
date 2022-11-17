@@ -289,6 +289,11 @@ signals:
 	void sigHighresImu(unsigned long long, QList<float>);
 	//姿态角
 	void sigAttitude(unsigned int time, float roll, float pitch, float yaw);
+	/*
+	* @brief 设备设备
+	* @param 设备名称
+	*/
+	void sigRemoveDevice(QString name);
 private slots:
 	void onWaypointProcess(QString name, unsigned int index, unsigned int count, int res, bool finish, QString text);
 	void onWaypointNext();

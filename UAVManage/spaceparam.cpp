@@ -1,5 +1,6 @@
 #include "spaceparam.h"
 #include <QIntValidator>
+#include <QMessageBox>
 #include <QGraphicsDropShadowEffect>
 
 SpaceParam::SpaceParam(QWidget *parent)
@@ -13,11 +14,24 @@ SpaceParam::SpaceParam(QWidget *parent)
 	shadow->setColor(QColor("#444444"));
 	shadow->setBlurRadius(10);
 	this->setGraphicsEffect(shadow);
-	ui.lineEditX->setValidator(new QIntValidator(100, 10000, this));
-	ui.lineEditY->setValidator(new QIntValidator(100, 10000, this));
-	ui.lineEditX->setMaxLength(5);
-	ui.lineEditY->setMaxLength(5);
-	connect(ui.btnOK, &QAbstractButton::clicked, [this]() {accept();});
+	ui.lineEditX->setValidator(new QIntValidator(5, 100, this));
+	ui.lineEditY->setValidator(new QIntValidator(5, 100, this));
+	ui.lineEditX->setMaxLength(2);
+	ui.lineEditY->setMaxLength(2);
+	connect(ui.btnOK, &QAbstractButton::clicked, [this]() {
+		//检查输入值
+		int x = ui.lineEditX->text().toInt();
+		int y = ui.lineEditY->text().toInt();
+		if (x < 5 || y < 5) {
+			QMessageBox::warning(this, tr("提示"), tr("场地范围太小"));
+			return;
+		}
+		if (x > 100 || y > 100) {
+			QMessageBox::warning(this, tr("提示"), tr("场地范围太大"));
+			return;
+		}
+		accept();
+		});
 	connect(ui.btnCancel, &QAbstractButton::clicked, [this]() {  reject(); });
 }
 
@@ -26,10 +40,10 @@ SpaceParam::~SpaceParam()
 
 unsigned int SpaceParam::getSpaceX()
 {
-	return ui.lineEditX->text().trimmed().toUInt();
+	return ui.lineEditX->text().trimmed().toUInt() * 100;
 }
 
 unsigned int SpaceParam::getSpaceY()
 {
-	return ui.lineEditY->text().trimmed().toUInt();
+	return ui.lineEditY->text().trimmed().toUInt() * 100;
 }

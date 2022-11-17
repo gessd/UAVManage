@@ -72,10 +72,6 @@ public:
 	*/
 	QString addDevice(QString qstrName, QString ip, long x, long y);
 	/**
-	* @brief 删除设备
-	*/
-	void removeDevice();
-	/**
 	 * @brief 清空所有设备
 	 */
 	void clearDevice();
@@ -213,6 +209,10 @@ private slots:
 	 * @brief 定时发送设备状态到三维
 	 */
 	void onUpdateStatusTo3D();
+	/**
+	* @brief 删除设备
+	*/
+	void onRemoveDevice(QString name);
 private:
 	/**
 	 * @brief 当前选中的设备

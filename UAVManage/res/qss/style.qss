@@ -52,6 +52,9 @@ DeviceControl QLabel{
 #btnFlyTakeoff,#btnFlyLand,#btnAddDevice,#btnRemoveDevice,#btnQueue,#btnRegain{
 	padding-left:10px;
 }
+#m_pBtnPlay,#m_pbtnStop{
+	border-width:0px;
+}
 QLineEdit{
 	border:1px solid #000000;
 	padding:4px;
