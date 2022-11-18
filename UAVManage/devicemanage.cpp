@@ -601,7 +601,7 @@ void DeviceManage::setCurrentMusicPath(QString filePath, QPixmap pixmap)
 	QFileInfo info(filePath);
 	QString qstrPixmapPath = info.path() + "/music.png";
 	if (false == pixmap.save(qstrPixmapPath)) {
-		qDebug() << "保持音乐波形图片失败";
+		qDebug() << "保存音乐波形图片失败";
 		return;
 	}
 	QJsonObject obj3dmsg;

@@ -128,7 +128,31 @@ UAVManage::UAVManage(QWidget *parent)
 		if (m_qstrCurrentProjectFile.isEmpty()) return;
 		PlaceInfoDialog info(this);
 		info.exec();
-		m_pDeviceManage->setStationAddress(info.getStationAddress());
+		if (false == info.isValidStation()) return;
+		QMap<QString, QPoint> map = info.getStationAddress();
+		m_pDeviceManage->setStationAddress(map);
+		//根据基站判断场地大小，修改场地范围
+		QStringList keys = map.keys();
+		int xmax = 0;
+		int ymax = 0;
+		foreach(QString name, keys) {
+			xmax = qMax(xmax, map.value(name).x());
+			ymax = qMax(ymax, map.value(name).y());
+		}
+		m_pDeviceManage->setSpaceSize(xmax, ymax);
+		if (m_qstrCurrentProjectFile.isEmpty()) return;
+		QTextCodec* code = QTextCodec::codecForName(_XMLNameCoding_);
+		std::string filename = code->fromUnicode(m_qstrCurrentProjectFile).data();
+		tinyxml2::XMLDocument doc;
+		tinyxml2::XMLError error = doc.LoadFile(filename.c_str());
+		if (error != tinyxml2::XMLError::XML_SUCCESS) return;
+		tinyxml2::XMLElement* root = doc.RootElement();
+		if (!root) return;
+		tinyxml2::XMLElement* place = root->FirstChildElement(_ElementPlace_);
+		if (!place) return;
+		place->SetAttribute(_AttributeX_, xmax);
+		place->SetAttribute(_AttributeX_, ymax);
+		error = doc.SaveFile(filename.c_str());
 		});
 	connect(pActionFly4, &QAction::triggered, [this]() { m_pDeviceManage->waypointComposeAndUpload(m_qstrCurrentProjectFile, true); });
 	connect(pActionFly5, &QAction::triggered, [this]() {  //暂无功能

@@ -3,6 +3,7 @@
 #include <QDateTime>
 #include <QDebug>
 #include <QThread>
+#include <QTimer>
 
 PlaceInfoDialog::PlaceInfoDialog(QWidget *parent)
 	: QDialog(parent)
@@ -15,7 +16,6 @@ PlaceInfoDialog::PlaceInfoDialog(QWidget *parent)
 	connect(ui.btnRead, SIGNAL(clicked()), this, SLOT(onBtnReadClicked()));
 	connect(ui.btnWrite, SIGNAL(clicked()), this, SLOT(onBtnWriteClicked()));
 	connect(ui.btnOnekey, SIGNAL(clicked()), this, SLOT(onBtnOnekeyClicked()));
-	//connect(&m_serialPort, SIGNAL(readyRead()), this, SLOT(onSerialReadyRead()), Qt::QueuedConnection);
 
 	SerialWorker* pSerialWorker = new SerialWorker(&m_serialPort);
 	(&m_serialPort)->moveToThread(&m_threadSerial);
@@ -39,11 +39,6 @@ PlaceInfoDialog::~PlaceInfoDialog()
 QMap<QString, QPoint> PlaceInfoDialog::getStationAddress()
 {
 	QMap<QString, QPoint> stations;
-	//TODO 需要确保基站标定位置可用
-	if (1 != m_stationStatus) {
-		//未标定或标定失败
-		return stations;
-	}
 	stations.insert("A0", QPoint(ui.tableWidget->item(0, 0)->text().toInt() * 100, ui.tableWidget->item(0, 1)->text().toInt() * 100));
 	stations.insert("A1", QPoint(ui.tableWidget->item(1, 0)->text().toInt() * 100, ui.tableWidget->item(1, 1)->text().toInt() * 100));
 	stations.insert("A2", QPoint(ui.tableWidget->item(2, 0)->text().toInt() * 100, ui.tableWidget->item(2, 1)->text().toInt() * 100));
@@ -51,6 +46,12 @@ QMap<QString, QPoint> PlaceInfoDialog::getStationAddress()
 	stations.insert("A4", QPoint(ui.tableWidget->item(4, 0)->text().toInt() * 100, ui.tableWidget->item(4, 1)->text().toInt() * 100));
 	stations.insert("A5", QPoint(ui.tableWidget->item(5, 0)->text().toInt() * 100, ui.tableWidget->item(5, 1)->text().toInt() * 100));
 	return stations;
+}
+
+bool PlaceInfoDialog::isValidStation()
+{
+	if (1 == m_stationStatus) return true;
+	return false;
 }
 
 void PlaceInfoDialog::showEvent(QShowEvent* event) 
@@ -65,15 +66,20 @@ void PlaceInfoDialog::showEvent(QShowEvent* event)
 			ui.tableWidget->setItem(i, j, new QTableWidgetItem(""));
 		}
 	}
-
 	if (m_serialPort.isOpen()) {
 		m_serialPort.close();
 	}
 	ui.comboBoxCom->clear();
 	foreach(QSerialPortInfo info, QSerialPortInfo::availablePorts()) {
 		quint16 pid = info.productIdentifier();
+		//基站设备PID值
 		if (60000 != pid) continue;
 		ui.comboBoxCom->addItem(info.portName());
+	}
+	if (1 == ui.comboBoxCom->count()) {
+		QTimer::singleShot(500, [this]() {
+			ui.btnComOpen->click();
+			});
 	}
 }
 
@@ -109,11 +115,6 @@ void PlaceInfoDialog::onBtnReadClicked()
 {
 	if (!m_serialPort.isOpen()) return;
 	m_nOnekeySetIndex = 0;
-	//int len = m_serialPort.write(_Get_Setting_Frame0_);
-	//m_serialPort.waitForBytesWritten(500);
-	//if (len != _ByteCount) {
-	//	QMessageBox::warning(this, tr("提示"), tr("写入数据失败"));
-	//}
 	emit serialDataSend(_Get_Setting_Frame0_);
 }
 
@@ -122,11 +123,6 @@ void PlaceInfoDialog::onBtnWriteClicked()
 	if (!m_serialPort.isOpen()) return;
 	m_nOnekeySetIndex = 0;
 	m_bSetNLINK = true;
-	//int len = m_serialPort.write(_Get_Setting_Frame0_);
-	//m_serialPort.waitForBytesWritten(500);
-	//if (len != _ByteCount) {
-	//	QMessageBox::warning(this, tr("提示"), tr("写入数据失败"));
-	//}
 	emit serialDataSend(_Get_Setting_Frame0_);
 }
 
@@ -136,9 +132,8 @@ void PlaceInfoDialog::onBtnOnekeyClicked()
 	if (!m_serialPort.isOpen()) return;
 	m_bOnekeySetNLINK = true;
 	m_nOnekeySetIndex = 1;
+	ui.labelSpace->clear();
 	qDebug() << "开始一键标定";
-	//m_serialPort.write(_OneKey_Set_Start_);
-	//m_serialPort.waitForBytesWritten(500);
 	emit serialDataSend(_OneKey_Set_Start_);
 }
 //NLINK数据转数值,根据协议转换
@@ -166,31 +161,6 @@ uint8_t getCheckSum(QByteArray arrData)
 		sum += bytec[i];
 	}
 	return sum;
-}
-
-void PlaceInfoDialog::onSerialReadyRead() 
-{
-	static bool bComplete = true;
-	static QByteArray arrCompleteData = "";
-	QByteArray arrData = m_serialPort.readAll();
-	//只处理设置消息
-	if (!arrCompleteData.isEmpty()) {
-		arrCompleteData.append(arrData);
-	}
-	if (0x54 == arrData.at(0) && 0x00 == arrData.at(1)) {
-		//if (arrData.length() < _ByteCount) bComplete = false;
-		arrCompleteData.append(arrData);
-	}
-	//if (!bComplete) {
-	//	//数据不完整则继续接收
-	//	arrCompleteData.append(arrData);
-	//}
-	if (arrCompleteData.length() >= _ByteCount) {
-		bComplete = true;
-		arrCompleteData = arrCompleteData.left(_ByteCount);
-		onParseSettingFrame(arrCompleteData);
-		arrCompleteData.clear();
-	}
 }
 
 void PlaceInfoDialog::onParseSettingFrame(QByteArray arrNLINKData)
@@ -227,9 +197,6 @@ void PlaceInfoDialog::onParseSettingFrame(QByteArray arrNLINKData)
 		//重新计数校验位
 		QByteArray arrNew = arrData.left(arrData.length() - 1);
 		arrNew.append(getCheckSum(arrNew));
-		//写入新设置
-		//m_serialPort.write(arrNew);
-		//m_serialPort.waitForBytesWritten(500);
 		emit serialDataSend(arrNew);
 		QMessageBox::information(this, tr("提示"), tr("数据写入完成"));
 	}
@@ -254,8 +221,6 @@ void PlaceInfoDialog::onParseSettingFrame(QByteArray arrNLINKData)
 	}
 
 	if (m_nOnekeySetIndex > 0) {
-		//m_serialPort.write(_OneKey_Set_Next_);
-		//m_serialPort.waitForBytesWritten(500);
 		emit serialDataSend(_OneKey_Set_Next_);
 		m_nOnekeySetIndex++;
 		ui.progressBar->setValue(m_nOnekeySetIndex);
@@ -263,8 +228,37 @@ void PlaceInfoDialog::onParseSettingFrame(QByteArray arrNLINKData)
 			//一键标定完成
 			qDebug() << "标定完成";
 			m_nOnekeySetIndex = 0;
+			//检查标定基站位置 -8388为无效值
+			int xmax = 0;
+			int ymax = 0;
+			for (int row = 0; row < 6; row++) {
+				//暂时检查前6行数值
+				for (int column = 0; column < 2; column ++) {
+					int value = ui.tableWidget->item(row, column)->text().toInt();
+					if (0 == row && 0 != value) {
+						//第一行必须全为0
+						QMessageBox::warning(this, tr("提示"), tr("A0基站标定失败，请重试"));
+						return;
+					}
+					if (_InvalidValue_ == value) {
+						QMessageBox::warning(this, tr("提示"), QString("A%1基站标定失败，请重试").arg(row));
+						return;
+					}
+					if (0 == column) xmax = qMax(xmax, value);
+					if (1 == column) ymax = qMax(ymax, value);
+				}
+			}
+			//判断场地是否太小或太大
+			if (xmax > 100 || ymax > 100) {
+				QMessageBox::warning(this, tr("提示"), tr("基站范围距离太远"));
+				return;
+			}
+			if (xmax < 2 || ymax < 2) {
+				QMessageBox::warning(this, tr("提示"), tr("基站范围距离太近"));
+				return;
+			}
+			ui.labelSpace->setText(QString("场地大小:%1 X %2").arg(xmax).arg(ymax));
 			m_stationStatus = 1;
-			//TODO 检查标定基站位置 -8388为无效值
 			return;
 		}
 	}
