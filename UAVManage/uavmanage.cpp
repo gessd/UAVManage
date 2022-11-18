@@ -451,7 +451,7 @@ void UAVManage::onSocketNewConnection()
 {
 	//不能同时打开两个软件，否则端口占用无法使用
 	//只记录一个web连接，防止通过浏览器访问blockly
-	//if (m_pWebBockly) return;
+	if (m_pWebBockly) return;
 	qDebug() << "建立编程区域连接";
 	m_pWebBockly = m_pSocketServer->nextPendingConnection();
 	connect(m_pWebBockly, SIGNAL(textMessageReceived(QString)), this, SLOT(onSocketTextMessageReceived(QString)));
@@ -568,24 +568,23 @@ void UAVManage::onDeviceAdd(QString name, QString ip, float x, float y)
 		QFile file(qstrBlocklyFile);
 		if (file.open(QIODevice::ReadWrite | QIODevice::Truncate)) {
 			//当设备不存在写入默认blockly控件
-			QString qstrBlock = "<xml xmlns=\"https://developers.google.com/blockly/xml\">\
-								  <block type=\"QzrobotTakeOff\" id=\"hZkt:t([/FZPOZEgkDdx\" x=\"213\" y=\"113\">\
-								    <value name=\"height\">\
-								      <shadow type=\"math_number\" id=\"@T7]yY$K~9Rq4@W(xIGq\">\
-								        <field name=\"NUM\">100</field>\
-								      </shadow>\
-								    </value>\
-								    <next>\
-								      <block type=\"Block_TimeGroup\" id=\"#ZrOCzud3FeD:s2d!7q:\">\
-								        <field name=\"timeParam\">00:01</field>\
-								        <next>\
-								          <block type=\"QzrobotLand\" id=\"I}~[gy|99HvWaWki2YMm\"></block>\
-								        </next>\
-								      </block>\
-								    </next>\
-								  </block>\
-								</xml>";
-			//file.write(qstrBlock.toUtf8());
+			QString qstrBlock = "\
+<xml xmlns=\"https://developers.google.com/blockly/xml\">\
+  <block type=\"FlyTakeoff\" id=\"RHfWI7IcqrRM~UK}OEnp\" x=\"88\" y=\"38\">\
+    <field name=\"height\">100</field>\
+    <next>\
+      <block type=\"FlyTimeGroup\" id=\"W5WBWFi9LI[Xy{I/4OG3\">\
+        <field name=\"minute\">0</field>\
+        <field name=\"second\">1</field>\
+        <next>\
+          <block type=\"FlyLand\" id=\"4X4;~Xwrm@Qa53W;3T2.\"></block>\
+        </next>\
+      </block>\
+    </next>\
+  </block>\
+</xml>\
+";
+			file.write(qstrBlock.toUtf8());
 			file.waitForBytesWritten(1000);
 			file.close();
 		}
