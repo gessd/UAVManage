@@ -279,8 +279,8 @@ signals:
 	 * @param 剩余电量，百分比
 	 */
 	void sigBatteryStatus(float voltages, float battery, unsigned short electric);
-	//已发送的的指令
-    void sigMessageByte(QByteArray, bool);
+	//通讯数据 [true接收|flase发送]
+    void sigMessageByte(QByteArray, bool, int);
 	//日志消息
 	void sigLogMessage(QByteArray data);
 	//当前位置信息

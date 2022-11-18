@@ -42,34 +42,40 @@ void DeviceDebug::onConnectStatus(QString name, QString ip, bool connect)
 	else ui.textBrowser->append(qstrText + tr("连接断开"));
 }
 
-void DeviceDebug::onDeviceMessage(QByteArray arrData, bool bReceive)
+void DeviceDebug::onDeviceMessage(QByteArray arrData, bool bReceive, int msgID)
 {
-	if (Qt::Checked == ui.checkBoxbOnlylog->checkState()) return;
 	bool bHeartbeat = false;
-	if (arrData.length() >= 5) {
-		if (0 == QString(arrData.at(5))) {
-			bHeartbeat = true;
-		}
+	if (arrData.length() >= 5 && 0 == QString(arrData.at(5))){
+		bHeartbeat = true;
 	}
-	if (!bHeartbeat) {
-		QString qstrText = QDateTime::currentDateTime().toString("[hh:mm:ss.zzz]");
-		QString qstrHex = arrData.toHex().toUpper();
-		QString qstrTemp;
-		if (bReceive) {
-			ui.textBrowser->append(QString("<font color=#FFFFFF>%1</font>").arg(qstrText + tr("接收:")));
-			qstrTemp = QString("<font color=#FF6347>%1</font>").arg(qstrHex);
+	//不显示心跳数据
+	if (bHeartbeat) return;
+	QString qstrText = QDateTime::currentDateTime().toString("[hh:mm:ss.zzz]");
+	QString qstrHex = arrData.toHex().toUpper();
+	QString qstrTemp;
+	if (bReceive) {
+		if (Qt::Checked != ui.checkWaypoint->checkState() && (44 == msgID || 47 == msgID)) {
+			return;
+		} else if (Qt::Checked != ui.checkCommand->checkState() && 77 == msgID) {
+			return;
 		}
 		else {
-			ui.textBrowser->append(QString("<font color=#FFFFFF>%1</font>").arg(qstrText + tr("发送:")));
-			qstrTemp = QString("<font color=#1E90FF>%1</font>").arg(qstrHex);
+			ui.textBrowser->append(QString("<font color=#FFFFFF>%1</font>").arg(qstrText + tr("接收:")));
+			ui.textBrowser->append(QString("<font color=#FF6347>%1</font>").arg(qstrHex));
 		}
-		ui.textBrowser->append(qstrTemp);
+	}
+	else {
+		ui.textBrowser->append(QString("<font color=#FFFFFF>%1</font>").arg(qstrText + tr("发送:")));
+		ui.textBrowser->append(QString("<font color=#1E90FF>%1</font>").arg(qstrHex));
 	}
 }
 
 void DeviceDebug::onMessageData(QByteArray arrData)
 {
-	ui.textBrowser->append(QString::fromLocal8Bit(arrData.data()));
+	if (Qt::Checked != ui.checkLog->checkState()) return;
+	QString qstrText = QDateTime::currentDateTime().toString("[hh:mm:ss.zzz]");
+	ui.textBrowser->append(QString("<font color=#FFFFFF>%1</font>").arg(qstrText + tr("接收:")));
+	ui.textBrowser->append(QString("<font color=#FF6347>%1</font>").arg(arrData.data()));
 }
 
 void DeviceDebug::onSetBatteryStatus(float voltages, float battery, unsigned short electric)

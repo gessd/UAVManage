@@ -365,21 +365,21 @@ void DeviceControl::hvcbReceiveMessage(const hv::SocketChannelPtr& channel, hv::
 		case MAVLINK_MSG_ID_MISSION_COUNT:  //航点起始应答
 			mavlink_mission_count_t missionCount;
 			mavlink_msg_mission_count_decode(&msg, &missionCount);
-			emit sigMessageByte(mavMessageToBuffer(msg), true);
+			emit sigMessageByte(mavMessageToBuffer(msg), true, MAVLINK_MSG_ID_MISSION_COUNT);
 			//0成功,成功后发送航点数据
 			emit sigCommandResult(ui.labelDeviceName->text(), missionCount.count>0?0:-1, MAVLINK_MSG_ID_MISSION_COUNT);
 			break;
 		case MAVLINK_MSG_ID_MISSION_ACK:    //航点应答
 			mavlink_mission_ack_t ack;
 			mavlink_msg_mission_ack_decode(&msg, &ack);
-			emit sigMessageByte(mavMessageToBuffer(msg), true);
+			emit sigMessageByte(mavMessageToBuffer(msg), true, MAVLINK_MSG_ID_MISSION_ACK);
 			emit sigCommandResult(ui.labelDeviceName->text(), ack.type, MAVLINK_MSG_ID_MISSION_ACK);
 			break;
 		case MAVLINK_MSG_ID_COMMAND_ACK:	//命令应答
-		{
+		{	//起飞降落等实时控制指令应答
 			mavlink_command_ack_t ack;
 			mavlink_msg_command_ack_decode(&msg, &ack);
-			emit sigMessageByte(mavMessageToBuffer(msg), true);
+			emit sigMessageByte(mavMessageToBuffer(msg), true, MAVLINK_MSG_ID_COMMAND_ACK);
 			emit sigCommandResult(ui.labelDeviceName->text(), ack.result, ack.command);
 			break;		
 		}
@@ -436,7 +436,7 @@ void DeviceControl::hvcbWriteComplete(const hv::SocketChannelPtr& channel, hv::B
 	if (buf->size() <= 0) return;
 	QByteArray arrBuf((char*)buf->data(), buf->size());
 	if (arrBuf.isEmpty()) return;
-	emit sigMessageByte(arrBuf, false);
+	emit sigMessageByte(arrBuf, false, 0);
 	qDebug() << "已发送消息" << ui.labelDeviceName->text() << channel->peeraddr().c_str() << arrBuf.toHex().toUpper();
 }
 
@@ -579,7 +579,6 @@ void DeviceControl::DeviceMavWaypointSend(QVector<NavWayPointData> data)
 		}
 		emit sigWaypointProcess(ui.labelDeviceName->text(), i + 1, count, res, false, tr(""));
 	}
-
 	//航点下发完成后需要发送结束信息
 	DeviceMavWaypointEnd(count);
 }
@@ -649,6 +648,7 @@ void DeviceControl::onUpdateConnectStatus(QString name, QString ip, bool connect
 
 void DeviceControl::onWaypointProcess(QString name, unsigned int index, unsigned int count, int res, bool finish, QString text)
 {
+	emit sigLogMessage(text.toUtf8());
 	ui.progressBar->setValue(index);
 }
 
