@@ -113,6 +113,7 @@
   <ItemGroup>
     <QtRcc Include="uavmanage.qrc" />
     <QtUic Include="adddevicedialog.ui" />
+    <QtUic Include="calibrationdialog.ui" />
     <QtUic Include="devicecontrol.ui" />
     <QtUic Include="devicedebug.ui" />
     <QtUic Include="devicemanage.ui" />
@@ -124,6 +125,7 @@
     <QtMoc Include="uavmanage.h" />
     <ClCompile Include="adddevicedialog.cpp" />
     <ClCompile Include="AudioDecoder.cpp" />
+    <ClCompile Include="calibrationdialog.cpp" />
     <ClCompile Include="devicecontrol.cpp">
       <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">input</DynamicSource>
       <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename).moc</QtMocFileName>
@@ -158,6 +160,7 @@
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="AudioDecoder.h" />
+    <QtMoc Include="calibrationdialog.h" />
     <ClInclude Include="define3d.h" />
     <ClInclude Include="definesetting.h" />
     <QtMoc Include="devicedebug.h" />

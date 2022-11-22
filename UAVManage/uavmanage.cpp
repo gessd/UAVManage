@@ -20,15 +20,15 @@
 #include "paramreadwrite.h"
 #include "spaceparam.h"
 
-UAVManage::UAVManage(QWidget *parent)
-    : QMainWindow(parent)
+UAVManage::UAVManage(QWidget* parent)
+	: QMainWindow(parent)
 {
-    ui.setupUi(this);
+	ui.setupUi(this);
 	m_pSocketServer = nullptr;
 	m_pWebBockly = nullptr;
 	m_pDeviceManage = nullptr;
 	m_p3DProcess = nullptr;
-	
+
 	MessageListDialog::getInstance()->setParent(this);
 	//程序初始化
 	connect(ui.webEngineView, SIGNAL(loadProgress(int)), this, SLOT(onWebLoadProgress(int)));
@@ -39,10 +39,10 @@ UAVManage::UAVManage(QWidget *parent)
 	connect(m_pSocketServer, SIGNAL(newConnection()), this, SLOT(onSocketNewConnection()));
 
 	//增加设备列表
-    m_pDeviceManage = new DeviceManage(this);
+	m_pDeviceManage = new DeviceManage(this);
 	m_pDeviceManage->setEnabled(false);
 	m_pDeviceManage->setMaximumWidth(200);
-    ui.gridLayoutMain->addWidget(m_pDeviceManage, 0,1);
+	ui.gridLayoutMain->addWidget(m_pDeviceManage, 0, 1);
 	connect(m_pDeviceManage, &DeviceManage::currentDeviceNameChanged, this, &UAVManage::onCurrentDeviceNameChanged);
 	connect(m_pDeviceManage, &DeviceManage::deviceAddFinished, this, &UAVManage::onDeviceAdd);
 	connect(m_pDeviceManage, &DeviceManage::deviceRemoveFinished, this, &UAVManage::onDeviceRemove);
@@ -65,7 +65,7 @@ UAVManage::UAVManage(QWidget *parent)
 	pIconMenu->addAction(pQssAction);
 	pIconMenu->addAction(pMessage);
 	connect(pQssAction, &QAction::triggered, [this]() { updateStyle(); });
-	connect(pMessage, &QAction::triggered, [this]() { 
+	connect(pMessage, &QAction::triggered, [this]() {
 		_ShowErrorMessage(tr("这是错误消息这是错误消息这是错误消息这是错误消息这是错误消息这是错误消息这是错误消息"));
 		_ShowWarningMessage(tr("警告消息警告消息警告消息警告消息警告消息警告消息警告消息警告消息"));
 		_ShowInfoMessage(tr("正常提示消息正常提示消息正常提示消息正常提示消息正常提示消息正常提示消息正常提示消息正常提示消息正常提示消息"));
@@ -113,7 +113,9 @@ UAVManage::UAVManage(QWidget *parent)
 	m_pButtonFlyPrepare = initMenuButton(tr("起飞准备"), ":/res/menu/preparation.png", ":/res/menu/preparation.png", pMenuFlyPrepare);
 	m_pButtonFlyPrepare->setEnabled(false);
 	ui.toolBar->addWidget(m_pButtonFlyPrepare);
-	ui.toolBar->addWidget(initMenuButton(tr("校准"), ":/res/logo/qz_logo.ico", ":/res/logo/qz_logo.ico", nullptr));
+	QToolButton* pButton = initMenuButton(tr("校准"), ":/res/logo/qz_logo.ico", ":/res/logo/qz_logo.ico", nullptr);
+	connect(pButton, &QAbstractButton::clicked, [this]() {m_pDeviceManage->allDeviceCalibration();});
+	ui.toolBar->addWidget(pButton);
 	ui.toolBar->addWidget(initMenuButton(tr("帮助"), ":/res/menu/P02_help_about_page_ic.png", ":/res/menu/P02_help_about_page_ic.png", nullptr));
 	
 	connect(pActionFly1, &QAction::triggered, [this]() { m_pDeviceManage->waypointComposeAndUpload(m_qstrCurrentProjectFile, false); });

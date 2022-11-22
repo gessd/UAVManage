@@ -97,6 +97,9 @@
     <ClCompile Include="musicscale.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="calibrationdialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="devicemanage.h">
@@ -147,6 +150,9 @@
     <QtMoc Include="musicscale.h">
       <Filter>Header Files</Filter>
     </QtMoc>
+    <QtMoc Include="calibrationdialog.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="devicemanage.ui">
@@ -171,6 +177,9 @@
       <Filter>Form Files</Filter>
     </QtUic>
     <QtUic Include="spaceparam.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="calibrationdialog.ui">
       <Filter>Form Files</Filter>
     </QtUic>
   </ItemGroup>

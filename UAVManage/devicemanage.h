@@ -108,7 +108,7 @@ public:
 	/**
 	* @brief 设备校准
 	*/
-	void allDeviceCalibration(_CalibrationEnum c);
+	void allDeviceCalibration();
 
 	/**
 	 * @brief 生成并上传舞步

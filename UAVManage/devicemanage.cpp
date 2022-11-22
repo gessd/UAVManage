@@ -7,6 +7,7 @@
 #include "messagelistdialog.h"
 #include "devicedebug.h"
 #include "define3d.h"
+#include "calibrationdialog.h"
 
 #define _ItemHeight_ 86
 DeviceManage::DeviceManage(QWidget *parent)
@@ -480,9 +481,21 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 	else emit sigTakeoffFinished(false);
 }
 
-void DeviceManage::allDeviceCalibration(_CalibrationEnum c)
+void DeviceManage::allDeviceCalibration()
 {
-
+	QMap<QString, DeviceControl*> map;
+	for (int i = 0; i < ui.listWidget->count(); i++) {
+		QListWidgetItem* pItem = ui.listWidget->item(i);
+		if (!pItem) continue;
+		QWidget* pWidget = ui.listWidget->itemWidget(pItem);
+		if (!pWidget) continue;
+		DeviceControl* pDevice = dynamic_cast<DeviceControl*>(pWidget);
+		if (!pDevice) continue;
+		QString name = pDevice->getName();
+		map.insert(name, pDevice);
+	}
+	CalibrationDialog* pDialog = new CalibrationDialog(map, this);
+	pDialog->exec();
 }
 
 void DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upload)
