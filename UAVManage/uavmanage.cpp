@@ -113,9 +113,9 @@ UAVManage::UAVManage(QWidget* parent)
 	m_pButtonFlyPrepare = initMenuButton(tr("起飞准备"), ":/res/menu/preparation.png", ":/res/menu/preparation.png", pMenuFlyPrepare);
 	m_pButtonFlyPrepare->setEnabled(false);
 	ui.toolBar->addWidget(m_pButtonFlyPrepare);
-	QToolButton* pButton = initMenuButton(tr("校准"), ":/res/logo/qz_logo.ico", ":/res/logo/qz_logo.ico", nullptr);
-	connect(pButton, &QAbstractButton::clicked, [this]() {m_pDeviceManage->allDeviceCalibration();});
-	ui.toolBar->addWidget(pButton);
+	//QToolButton* pButton = initMenuButton(tr("校准"), ":/res/logo/qz_logo.ico", ":/res/logo/qz_logo.ico", nullptr);
+	//connect(pButton, &QAbstractButton::clicked, [this]() {m_pDeviceManage->allDeviceCalibration();});
+	//ui.toolBar->addWidget(pButton);
 	ui.toolBar->addWidget(initMenuButton(tr("帮助"), ":/res/menu/P02_help_about_page_ic.png", ":/res/menu/P02_help_about_page_ic.png", nullptr));
 	
 	connect(pActionFly1, &QAction::triggered, [this]() { m_pDeviceManage->waypointComposeAndUpload(m_qstrCurrentProjectFile, false); });

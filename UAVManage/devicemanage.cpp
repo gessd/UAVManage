@@ -43,23 +43,36 @@ DeviceManage::DeviceManage(QWidget *parent)
 	m_pMenu->setWindowFlags(m_pMenu->windowFlags() | Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint);
 	m_pMenu->setAttribute(Qt::WA_TranslucentBackground);
 	QAction* pActionParam = new QAction(tr("修改"), this);
-	QAction* pActionResetName = new QAction(tr("重命名"), this);
-	QAction* pActionResetIP = new QAction(tr("修改IP"), this);
 	QAction* pActionDicconnect = new QAction(tr("连接/断开"), this);
 	QAction* pFlyTo = new QAction(tr("起飞"), this);
 	QAction* pLand = new QAction(tr("降落"), this);
 	QAction* pStop = new QAction(tr("急停"), this);
+	QAction* pActionGyro = new QAction(tr("陀螺校准"), this);
+	QAction* pActionMagnetism = new QAction(tr("磁罗盘校准"), this);
+	QAction* pActionAccelerometer = new QAction(tr("加计校准"), this);
+	QAction* pActionBaro = new QAction(tr("电调校准"), this);
 	QAction* pDebug = new QAction(tr("调试"), this);
 	m_pMenu->addAction(pActionParam);
-	//m_pMenu->addAction(pActionResetName);
-	//m_pMenu->addAction(pActionResetIP);
 	m_pMenu->addAction(pActionDicconnect);
 	m_pMenu->addSeparator();
 	m_pMenu->addAction(pFlyTo);
 	m_pMenu->addAction(pLand);
 	m_pMenu->addAction(pStop);
 	m_pMenu->addSeparator();
+	m_pMenu->addAction(pActionGyro);
+	m_pMenu->addAction(pActionMagnetism);
+	m_pMenu->addAction(pActionAccelerometer);
+	m_pMenu->addAction(pActionBaro);
+	m_pMenu->addSeparator();
 	m_pMenu->addAction(pDebug);
+	pActionGyro->setProperty("Calibration", _Gyro);
+	pActionMagnetism->setProperty("Calibration", _Magnetometer);
+	pActionAccelerometer->setProperty("Calibration", _Accelerometer);
+	pActionBaro->setProperty("Calibration", _Baro);
+	connect(pActionGyro, &QAction::triggered, this, &DeviceManage::deviceCalibration);
+	connect(pActionMagnetism, &QAction::triggered, this, &DeviceManage::deviceCalibration);
+	connect(pActionAccelerometer, &QAction::triggered, this, &DeviceManage::deviceCalibration);
+	connect(pActionBaro, &QAction::triggered, this, &DeviceManage::deviceCalibration);
 	//菜单响应处理
 	connect(pActionParam, &QAction::triggered, [this](bool checked) {
 		DeviceControl* pControl = getCurrentDevice();
@@ -115,46 +128,6 @@ DeviceManage::DeviceManage(QWidget *parent)
 			pControl->setStartLocation(nNewX, nNewY);
 			emit deviceResetLocation(qstrNewName, nNewX, nNewY);
 		}
-		});
-	connect(pActionResetName, &QAction::triggered, [this](bool checked) {
-		DeviceControl* pControl = getCurrentDevice();
-		if (!pControl) return;
-		QString qstrOldName = pControl->getName();
-		QString qstrNewName = QInputDialog::getText(this, tr("重命名"), tr("请输入新名称"), QLineEdit::Normal, qstrOldName);
-		if (qstrNewName.isEmpty()) return;
-		if (qstrOldName == qstrNewName) return;
-		if (!isRepetitionDevice(qstrNewName, "",0,0, "100").isEmpty()) {
-			QMessageBox::warning(this, tr("提示"), tr("无法修改，名称重复"));
-			return;
-		}
-		pControl->setName(qstrNewName);
-		emit deviceRenameFinished(qstrNewName, qstrOldName);
-
-		if (m_p3dTcpSocket) {
-			QJsonObject obj3dmsg;
-			obj3dmsg.insert(_Ver_, _VerNum_);
-			obj3dmsg.insert(_Tag_, _TabName_);
-			obj3dmsg.insert(_ID_, _3dDeviceRename);
-			obj3dmsg.insert(_Time_, QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"));
-			QJsonObject data;
-			data.insert("oldName", qstrOldName);
-			data.insert("newName", qstrNewName);
-			obj3dmsg.insert(_Data_, data);
-			sendMessageTo3D(obj3dmsg);
-		}
-		});
-	connect(pActionResetIP, &QAction::triggered, [this](bool checked) {
-		DeviceControl* pControl = getCurrentDevice();
-		if (!pControl) return;
-		QString qstrNewIP = QInputDialog::getText(this, tr("IP"), tr("请输入设备IP"), QLineEdit::Normal, pControl->getIP());
-		if (qstrNewIP.isEmpty()) return;
-		if (pControl->getIP() == qstrNewIP) return;
-		if (!isRepetitionDevice("", qstrNewIP, 0, 0, "010").isEmpty()) {
-			QMessageBox::warning(this, tr("提示"), tr("无法修改，设备地址重复"));
-			return;
-		}
-		pControl->setIp(qstrNewIP);
-		emit deviceResetIp(pControl->getName(), qstrNewIP);
 		});
 	connect(pActionDicconnect, &QAction::triggered, [this](bool checked) {
 		DeviceControl* pControl = getCurrentDevice();
@@ -931,6 +904,28 @@ int DeviceManage::getDistance(int x1, int y1, int z1, int x2, int y2, int z2)
 {
 	int d = qSqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2) + (z1 - z2) * (z1 - z2));
 	return d;
+}
+
+void DeviceManage::deviceCalibration()
+{
+	QAction* pAction = dynamic_cast<QAction*>(sender());
+	if (nullptr == pAction) return;
+	int n = pAction->property("Calibration").toInt();
+	DeviceControl* pDevice = getCurrentDevice();
+	if (nullptr == pDevice) return;
+	if (false == pDevice->isConnectDevice()) {
+		QMessageBox::warning(this, tr("提示"), tr("设备未连接，无法校准"));
+		return;
+	}
+	CalibrationDialog* pDialog = new CalibrationDialog(pDevice, this);
+	pDialog->addLogToBrowser(pDevice->getName() + tr("：校准开始"));
+	switch (n) {
+	case _Gyro: pDevice->Fun_MAV_CALIBRATION(1, 0, 0, 0, 0, 0, 0, false); break;
+	case _Magnetometer: pDevice->Fun_MAV_CALIBRATION(1, 0, 0, 0, 0, 0, 0, false); break;
+	case _Accelerometer: pDevice->Fun_MAV_CALIBRATION(1, 0, 0, 0, 0, 0, 0, false); break;
+	case _Baro: pDevice->Fun_MAV_CALIBRATION(1, 0, 0, 0, 0, 0, 0, false); break;
+	}
+	pDialog->exec();
 }
 
 void DeviceManage::onDeviceConrolFinished(QString text, int res, QString explain)

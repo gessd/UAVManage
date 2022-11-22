@@ -36,7 +36,7 @@ public:
 		_DeviceRegain			//回收
 	};
 	enum _CalibrationEnum {
-		_Gyro,				//陀螺校准
+		_Gyro = 1,			//陀螺校准
 		_Magnetometer,		//磁罗盘校准 
 		_MagEnable,			//磁罗盘使能开关
 		_Remote,			//无效值
@@ -227,13 +227,17 @@ private:
 	 */
 	void sendMessageTo3D(QJsonObject json3d);
 	/**
-	 * @@brief 处理接收的三维消息
+	 * @brief 处理接收的三维消息
 	 */
 	void analyzeMessageFrom3D(QByteArray data);
 	/**
-	 * @@brief 计算两点直接距离
+	 * @brief 计算两点直接距离
 	 */
 	int getDistance(int x1, int y1, int z1, int x2, int y2, int z2);
+	/**
+	 * @brief 设备校准
+	 */
+	void deviceCalibration();
 private:
 	Ui::DeviceManage ui;
 	//设备菜单

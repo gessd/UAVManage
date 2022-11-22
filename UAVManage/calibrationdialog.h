@@ -10,7 +10,12 @@ class CalibrationDialog : public QDialog
 
 public:
 	CalibrationDialog(QMap<QString, DeviceControl*> map, QWidget *parent = nullptr);
+	CalibrationDialog(DeviceControl* device, QWidget* parent = nullptr);
 	~CalibrationDialog();
+	void addLogToBrowser(QString text);
+public slots:
+	void onBtnCalibrationClicked();
+	void onDeviceMessage(QByteArray data);
 private:
 	Ui::CalibrationDialogClass ui;
 };
