@@ -434,7 +434,13 @@ bool ThreadPython::compilePythonCode(QByteArray arrCode)
 	//fileHead.close();
 
 	//python代码保存至文件后执行
-	QString qstrRunFile = QApplication::applicationDirPath() + _PyRunFilePath_;
+	QString path = QApplication::applicationDirPath() + _PyRunDir_;
+	//删除python运行目录，防止缓存影响
+	deleteDir(path);
+	QDir dir(path);
+	//新建python运行目录
+	dir.mkdir(path);
+	QString qstrRunFile = path + _PyRunFilePath_;
 	QFile filePython(qstrRunFile);
 	if (!filePython.open(QIODevice::ReadWrite | QIODevice::Truncate)) return false;
 	int len = filePython.write(arrCode);
@@ -486,13 +492,35 @@ bool ThreadPython::compilePythonFile(QString qstrFile)
 	return true;
 }
 
+bool ThreadPython::deleteDir(const QString& path)
+{
+	if (path.isEmpty()) {
+		return false;
+	}
+	QDir dir(path);
+	if (!dir.exists()) {
+		return true;
+	}
+	dir.setFilter(QDir::AllEntries | QDir::NoDotAndDotDot); //设置过滤
+	QFileInfoList fileList = dir.entryInfoList(); // 获取所有的文件信息
+	foreach(QFileInfo file, fileList)
+	{ //遍历文件信息
+		if (file.isFile()) { // 是文件，删除
+			file.dir().remove(file.fileName());
+		}
+		else { // 递归调用函数，删除子文件夹
+			deleteDir(file.absoluteFilePath());
+		}
+	}
+	return dir.rmpath(dir.absolutePath()); // 这时候文件夹已经空了，再删除文件夹本身
+}
+
 void ThreadPython::run()
 {
 	if (!QFile::exists(m_qstrFilePath)) return;
 	qDebug() << "python文件开始执行" << m_qstrFilePath;
 	int n = PyRun_SimpleString("import sys");
-	//QString qstrPythonApiPath = QString("sys.path.append('%1')").arg(QApplication::applicationDirPath() + _PythonApiFilePath_);
-	QString qstrPythonPath = QString("sys.path.append('%1')").arg(QApplication::applicationDirPath());
+	QString qstrPythonPath = QString("sys.path.append('%1')").arg(QApplication::applicationDirPath()+_PyRunDir_);
 	//设置python执行文件路径
 	//PyRun_SimpleString(qstrPythonApiPath.toStdString().c_str());
 	PyRun_SimpleString(qstrPythonPath.toStdString().c_str());

@@ -630,6 +630,11 @@ void DeviceManage::sendWaypointTo3D(QMap<QString, QVector<NavWayPointData>> map)
 		int lastZ = 0;
 
 		for (int i = 0; i < data.count(); i++) {
+			if (0 == i) {
+				lastX = data.at(i).x;
+				lastY = data.at(i).y;
+				lastZ = data.at(i).z;
+			}
 			NavWayPointData waypoint = data.at(i);
 			if (_WaypointSpeed == waypoint.commandID) {
 				//设置飞行速度
