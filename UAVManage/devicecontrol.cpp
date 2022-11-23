@@ -13,6 +13,7 @@ DeviceControl::DeviceControl(QString name, float x, float y, QString ip, QWidget
 	m_pHvTcpClient = new hv::TcpClient;
 	m_bHeartbeatEnable = true;
 	m_bWaypointSending = false;
+	m_nCurrentMusicTime = 0;
 	ui.progressBar->setVisible(false);
 	QPixmap pixmap(":/res/images/uavred.png");
 	ui.labelStatus->setPixmap(pixmap.scaled(ui.labelStatus->size()));
@@ -41,6 +42,9 @@ DeviceControl::DeviceControl(QString name, float x, float y, QString ip, QWidget
 		});
 	connect(ui.btnRemove, &QToolButton::clicked, [this]() {
 		emit sigRemoveDevice(ui.labelDeviceName->text()); 
+		});
+	connect(ui.btnLED, &QAbstractButton::clicked, [this]() {
+		Fun_MAV_LED_MODE();
 		});
 	setName(name);
 	setIp(ip);
@@ -103,6 +107,11 @@ long DeviceControl::getY()
 void DeviceControl::setY(long y)
 {
 	m_nStartY = y;
+}
+
+void DeviceControl::setCurrentTime(unsigned int time)
+{
+	m_nCurrentMusicTime = time;
 }
 
 DeviceDebug* DeviceControl::getDeviceDebug()
@@ -317,10 +326,10 @@ void DeviceControl::hvcbConnectionStatus(const hv::SocketChannelPtr& channel)
 		channel->setHeartbeat(_DeviceHeartbeatInterval_, [&, this]() {
 			//设置心跳
 			if (!m_bHeartbeatEnable) return;
-			QTime time = QTime::currentTime();
+			unsigned int time = m_nCurrentMusicTime;
 			mavlink_message_t message;
 			mavlink_heartbeat_t heard;
-			heard.custom_mode = time.minute() * 100 * 1000 + time.second() * 1000 + time.msec();
+			heard.custom_mode = time;
 			heard.type = 17;
 			heard.autopilot = 84;
 			heard.base_mode = 151;

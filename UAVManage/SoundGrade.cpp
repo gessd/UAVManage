@@ -90,6 +90,7 @@ void SoundGrade::startPlayMusic()
 void SoundGrade::stopPlayMusic()
 {
 	if(player) player->stop();
+	emit sigMsuicTime(0);
 }
 
 void SoundGrade::on_m_pBtnPlay_clicked()
@@ -264,7 +265,7 @@ void SoundGrade::onPositionChanged(qint64 position)
 	strSec = secs < 10 ? QString::asprintf("0%1").arg(QString::number(secs)) : QString::number(secs);
 	positionTime = QString::asprintf("%1:%2").arg(strMin).arg(strSec);
 	m_ui.m_pLblCur->setText(positionTime);
-	static int currentsecs = 0;
+	unsigned int currentsecs = 0;
 	if (currentsecs != mins * 60 + secs) {
 		currentsecs = mins * 60 + secs;
 		emit sigMsuicTime(currentsecs);

@@ -682,6 +682,19 @@ void DeviceManage::sendWaypointTo3D(QMap<QString, QVector<NavWayPointData>> map)
 	sendMessageTo3D(obj3dmsg);
 }
 
+void DeviceManage::updateMusicTime(unsigned int time)
+{
+	for (int i = 0; i < ui.listWidget->count(); i++) {
+		QListWidgetItem* pItem = ui.listWidget->item(i);
+		if (!pItem) continue;
+		QWidget* pWidget = ui.listWidget->itemWidget(pItem);
+		if (!pWidget) continue;
+		DeviceControl* pDevice = dynamic_cast<DeviceControl*>(pWidget);
+		if (!pDevice) continue;
+		pDevice->setCurrentTime(time);
+	}
+}
+
 bool DeviceManage::eventFilter(QObject* watched, QEvent* event)
 {
 	if (!isEnabled()) return false;

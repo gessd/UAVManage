@@ -46,6 +46,7 @@ public:
 	void setX(long x);
 	long getY();
 	void setY(long y);
+	void setCurrentTime(unsigned int time);
 	DeviceDebug* getDeviceDebug();
 	void setStartLocation(long x, long y);
 	QList<long> getStartLocation();
@@ -314,4 +315,6 @@ private:
 	//检测心跳定时器
 	QTimer m_timerHeartbeat;
 	_stDeviceCurrentStatus m_deviceStatus;
+	//当前音乐播放进度
+	unsigned int m_nCurrentMusicTime;
 };

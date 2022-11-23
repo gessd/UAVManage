@@ -137,6 +137,11 @@ public:
 	 * 因设备航点是每个设备单独发送，故发的三维的航点与设备分开
 	 */
 	void sendWaypointTo3D(QMap<QString, QVector<NavWayPointData>> map);
+	/**
+	 * @brief 更新音乐播放时间
+	 * @param 第N秒
+	 */
+	void updateMusicTime(unsigned int time);
 signals:
 	/**
 	 * @brief 设备添加完成

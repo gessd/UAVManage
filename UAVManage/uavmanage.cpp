@@ -777,9 +777,10 @@ void UAVManage::onUpdateMusic(QString qstrFilePath)
 	error = doc.SaveFile(filename.c_str());
 }
 
-void UAVManage::onCurrentMusicTime(int second)
+void UAVManage::onCurrentMusicTime(unsigned int second)
 {
-	m_pDeviceManage->setUpdateWaypointTime(second);
+	qDebug() << "当前音乐时间" << second;
+	m_pDeviceManage->updateMusicTime(second);
 }
 
 void UAVManage::onCurrentPlayeState(qint8 state)
