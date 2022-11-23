@@ -529,7 +529,7 @@ void DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upload
 		QFile fileSvg(QApplication::applicationDirPath() + "/waypoint/" + name + ".csv");
 		if (fileSvg.open(QIODevice::ReadWrite | QIODevice::Truncate)) {
 			QTextStream text_stream(&fileSvg);
-			text_stream.setCodec("utf-8");
+			text_stream.setCodec("gbk");
 			QString title = "参数一,参数二,参数三,参数四,X,Y,Z,ID,说明";
 			text_stream << title << "\r\n";
 			for (int i = 0; i < data.count(); i++) {
