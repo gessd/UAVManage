@@ -9,7 +9,7 @@
 #include "define3d.h"
 #include "calibrationdialog.h"
 
-#define _ItemHeight_ 86
+#define _ItemHeight_ 70
 DeviceManage::DeviceManage(QWidget *parent)
 	: QWidget(parent)
 {
