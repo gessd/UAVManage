@@ -51,6 +51,7 @@ enum _DeviceStatus
 {
 	//程序内部错误
 	DeviceMessageToimeout = -404,
+	DeviceLowBattery = -5,
 	DeviceMessageSending = -4,
 	DeviceDataError = -3,
 	DeviceUnConnect = -2,
@@ -84,6 +85,9 @@ public:
 		{
 		case DeviceMessageToimeout:
 			qstrMessage = QObject::tr("没有回应");
+			break;
+		case DeviceLowBattery:
+			qstrMessage = QObject::tr("电量过低");
 			break;
 		case DeviceMessageSending:
 			qstrMessage = QObject::tr("进行中");

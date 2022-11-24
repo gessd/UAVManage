@@ -243,6 +243,10 @@ int DeviceControl::DeviceMavWaypointStart(QVector<NavWayPointData> data)
 //无人机起飞
 int DeviceControl::Fun_MAV_CMD_NAV_TAKEOFF_LOCAL(float Pitch, float Empty, float AscendRate, float Yaw, float X, float Y, float Z, bool wait, bool again)
 {
+	if (isConnectDevice()) {
+		_stDeviceCurrentStatus status = m_deviceStatus;
+		if (status.battery < 60) return DeviceLowBattery;
+	}
 	//参数1无效
 	//参数2用了标记是否为重发的消息
 	QByteArray arrData = mavCommandLongToBuffer(0, 0, AscendRate, Yaw, X, Y, Z, MAV_CMD_NAV_TAKEOFF_LOCAL);

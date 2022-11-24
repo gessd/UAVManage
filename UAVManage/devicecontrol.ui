@@ -82,10 +82,10 @@
         </sizepolicy>
        </property>
        <property name="styleSheet">
-        <string notr="true">color:#008000;</string>
+        <string notr="true">color:#FF0000;</string>
        </property>
        <property name="text">
-        <string>100 %</string>
+        <string>0 %</string>
        </property>
       </widget>
      </item>
