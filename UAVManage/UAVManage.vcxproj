@@ -112,6 +112,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <QtRcc Include="uavmanage.qrc" />
+    <QtUic Include="aboutdialog.ui" />
     <QtUic Include="adddevicedialog.ui" />
     <QtUic Include="calibrationdialog.ui" />
     <QtUic Include="devicecontrol.ui" />
@@ -123,6 +124,7 @@
     <QtUic Include="spaceparam.ui" />
     <QtUic Include="uavmanage.ui" />
     <QtMoc Include="uavmanage.h" />
+    <ClCompile Include="aboutdialog.cpp" />
     <ClCompile Include="adddevicedialog.cpp" />
     <ClCompile Include="AudioDecoder.cpp" />
     <ClCompile Include="calibrationdialog.cpp" />
@@ -161,6 +163,7 @@
   <ItemGroup>
     <QtMoc Include="AudioDecoder.h" />
     <QtMoc Include="calibrationdialog.h" />
+    <QtMoc Include="aboutdialog.h" />
     <ClInclude Include="define3d.h" />
     <ClInclude Include="definesetting.h" />
     <QtMoc Include="devicedebug.h" />

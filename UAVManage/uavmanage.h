@@ -10,6 +10,7 @@
 #include "threadpython.h"
 #include "devicemanage.h"
 #include "messagelistdialog.h"
+#include "aboutdialog.h"
 
 class SoundGrade;
 class UAVManage : public QMainWindow
@@ -154,12 +155,15 @@ private:
     QWebSocketServer* m_pSocketServer;
     //web连接 积木块界面
     QWebSocket* m_pWebBockly;
-    QString m_qstrLastWebMessage;
     //当前工程文件
     QString m_qstrCurrentProjectFile;
-    ThreadPython python;
+    //底部音乐窗口
     SoundGrade* m_pSoundWidget;
+    //启动外部三维程序使用
     QProcess* m_p3DProcess;
+    //起飞准备按钮，没有打开项目前禁止点击
     QToolButton* m_pButtonFlyPrepare;
+    //属性菜单，没有打开项目前禁止点击
     QAction* m_pActionAttribute;
+    AboutDialog* m_pAbout;
 };

@@ -35,5 +35,7 @@
         <file>res/images/device.png</file>
         <file>res/menu/preparation.png</file>
         <file>res/images/newproject.png</file>
+        <file>res/images/windows_close.png</file>
+        <file>res/images/networkerror.png</file>
     </qresource>
 </RCC>

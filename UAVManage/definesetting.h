@@ -1,5 +1,11 @@
 #pragma once
 
+//项目版本
+#define _MajorNumber_ 2
+#define _MinorNumber_ 2
+#define _BuildNumber_ 1
+
+//blockly交互端口
 #define _WebSocketPort_ 25252
 
 //项目后缀名
@@ -74,6 +80,10 @@ enum PythonRunState
 	PythonWaypointError,
 	PythonWaypointNull
 };
+
+static QString AppVersion() {
+	return QString("%1.%2.%3").arg(_MajorNumber_).arg(_MinorNumber_).arg(_BuildNumber_);
+}
 
 class Utility :public QObject
 {

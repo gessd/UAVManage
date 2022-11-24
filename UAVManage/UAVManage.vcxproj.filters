@@ -100,6 +100,9 @@
     <ClCompile Include="calibrationdialog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="aboutdialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="devicemanage.h">
@@ -153,6 +156,9 @@
     <QtMoc Include="calibrationdialog.h">
       <Filter>Header Files</Filter>
     </QtMoc>
+    <QtMoc Include="aboutdialog.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="devicemanage.ui">
@@ -180,6 +186,9 @@
       <Filter>Form Files</Filter>
     </QtUic>
     <QtUic Include="calibrationdialog.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="aboutdialog.ui">
       <Filter>Form Files</Filter>
     </QtUic>
   </ItemGroup>

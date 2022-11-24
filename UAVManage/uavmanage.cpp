@@ -53,6 +53,7 @@ UAVManage::UAVManage(QWidget* parent)
 	connect(m_pDeviceManage, &DeviceManage::sigTakeoffFinished, this, &UAVManage::onDeviceTakeoffFinished);
 	connect(m_pDeviceManage, &DeviceManage::sig3DDialogStatus, this, &UAVManage::on3DDialogStauts);
 
+	m_pAbout = new AboutDialog(this);
 	ui.menuBar->setVisible(false);
 	//添加菜单
 	QStyle* style = QApplication::style();
@@ -121,7 +122,13 @@ UAVManage::UAVManage(QWidget* parent)
 	//QToolButton* pButton = initMenuButton(tr("校准"), ":/res/logo/qz_logo.ico", ":/res/logo/qz_logo.ico", nullptr);
 	//connect(pButton, &QAbstractButton::clicked, [this]() {m_pDeviceManage->allDeviceCalibration();});
 	//ui.toolBar->addWidget(pButton);
-	ui.toolBar->addWidget(initMenuButton(tr("帮助"), ":/res/menu/P02_help_about_page_ic.png", ":/res/menu/P02_help_about_page_ic.png", nullptr));
+	QMenu* pActionHelp = new QMenu(tr("帮助"));
+	pActionHelp->setWindowFlags(pMenuFlyPrepare->windowFlags() | Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint);
+	pActionHelp->setAttribute(Qt::WA_TranslucentBackground);
+	QAction* pActionAbout = new QAction(QIcon(":/res/menu/P02_help_about_btn_new_ic.png"), tr("关于"));
+	pActionHelp->addAction(pActionAbout);
+	ui.toolBar->addWidget(initMenuButton(tr("帮助"), ":/res/menu/P02_help_about_page_ic.png", ":/res/menu/P02_help_about_page_ic.png", pActionHelp));
+	connect(pActionAbout, &QAction::triggered, [this]() {m_pAbout->exec(); });
 	
 	connect(pActionFly1, &QAction::triggered, [this]() { m_pDeviceManage->waypointComposeAndUpload(m_qstrCurrentProjectFile, false); });
 	connect(pActionFly2, &QAction::triggered, [this]() { 
@@ -472,8 +479,9 @@ void UAVManage::onSocketNewConnection()
 void UAVManage::onSocketTextMessageReceived(QString message)
 {
 	//防止数据大量重复处理
-	if (m_qstrLastWebMessage == message) return;
-	m_qstrLastWebMessage = message;
+	static QString qstrLastWebMessage = "";
+	if (qstrLastWebMessage == message) return;
+	qstrLastWebMessage = message;
 	qDebug() << "积木块变动,自动保存编程文件";
 	QJsonParseError jsonError;
 	QJsonDocument jsonDoc = QJsonDocument::fromJson(message.toUtf8(), &jsonError);
