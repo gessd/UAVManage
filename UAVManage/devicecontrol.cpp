@@ -44,7 +44,11 @@ DeviceControl::DeviceControl(QString name, float x, float y, QString ip, QWidget
 		emit sigRemoveDevice(ui.labelDeviceName->text()); 
 		});
 	connect(ui.btnLED, &QAbstractButton::clicked, [this]() {
-		Fun_MAV_LED_MODE();
+		//手动点亮无人机灯光
+		int res = Fun_MAV_LED_MODE();
+		if (_DeviceStatus::DeviceDataSucceed != res) {
+			_ShowErrorMessage(tr("控制LED出错:") + Utility::waypointMessgeFromStatus(res));
+		}
 		});
 	setName(name);
 	setIp(ip);

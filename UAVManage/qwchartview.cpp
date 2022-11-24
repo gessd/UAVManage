@@ -13,7 +13,7 @@ QWChartView::QWChartView(QWidget *parent):QChartView(parent)
 	m_chart->setMargins(QMargins(0, 0, 0, 0));//设置内边界全部为0
 	m_chart->setBackgroundRoundness(0);//设置背景区域无圆角
 	m_chart->legend()->setVisible(false);
-    m_chart->setBackgroundBrush(QBrush(QColor("#F0F0F0")));
+    m_chart->setBackgroundBrush(QBrush(QColor(0x00, 0x00, 0x00, 0x00)));
     //内外边距全都设置为0
 	this->setViewportMargins(0, 0, 0, 0);
 	this->setContentsMargins(0, 0, 0, 0);
