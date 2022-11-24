@@ -129,6 +129,10 @@ private slots:
      * @brief 音乐波形绘制完成
      */
     void onMusicWaveFinished();
+    /**
+     * @brief 项目属性查看
+     */
+    void onProjectAttribute();
 private:
     /**
      * @brief 新建项目工程文件
@@ -157,4 +161,5 @@ private:
     SoundGrade* m_pSoundWidget;
     QProcess* m_p3DProcess;
     QToolButton* m_pButtonFlyPrepare;
+    QAction* m_pActionAttribute;
 };

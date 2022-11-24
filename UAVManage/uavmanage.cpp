@@ -77,16 +77,21 @@ UAVManage::UAVManage(QWidget* parent)
 	QAction* pActionNew = new QAction(QIcon(":/res/menu/P01_file_new_btn_nor.png"), tr("新建"));
 	QAction* pActionOpen = new QAction(QIcon(":/res/menu/P01_file_open_btn_nor.png"), tr("打开"));
 	QAction* pActionSaveas = new QAction(QIcon(":/res/menu/P01_file_saveus_btn_nor.png"), tr("另存为"));
+	m_pActionAttribute = new QAction(QIcon(":/res/menu/P01_file_saveus_btn_nor.png"), tr("属性"));
 	pProjectMenu->addAction(pActionNew);
 	pProjectMenu->addAction(pActionOpen);
 	pProjectMenu->addAction(pActionSaveas);
+	pProjectMenu->addSeparator();
+	pProjectMenu->addAction(m_pActionAttribute);
+	m_pActionAttribute->setEnabled(false);
 	connect(pActionNew, &QAction::triggered, [this]() { onNewProject(); });
 	connect(pActionOpen, &QAction::triggered, [this]() {
 		QString qstrFile = QFileDialog::getOpenFileName(this, tr("项目名"), "", "File(*.qz)");
 		if (qstrFile.isEmpty()) return;
 		onOpenProject(qstrFile);
 		});
-	connect(pActionSaveas, &QAction::triggered, [this]() {onSaveasProject(); });
+	connect(pActionSaveas, &QAction::triggered, [this]() { onSaveasProject(); });
+	connect(m_pActionAttribute, &QAction::triggered, [this]() { onProjectAttribute(); });
 
 	//三维预览进程
 	m_p3DProcess = new QProcess(this);
@@ -230,31 +235,34 @@ QString UAVManage::getCurrentPythonFile()
 
 void UAVManage::onNewProject()
 {
+	SpaceParam space(true, this);
+	if (QDialog::Accepted != space.exec())return;
+	//场地大小
+	unsigned int x = space.getSpaceX();
+	unsigned int y = space.getSpaceY();
+	//选择新建路径
+	QString qstrName = QFileDialog::getSaveFileName(this, tr("项目名"), "", tr("File(*.qz)"));
+	if (qstrName.isEmpty()) return;
+
+	//清空项目信息
+	m_pActionAttribute->setEnabled(false);
 	m_pDeviceManage->setEnabled(false);
 	m_pSoundWidget->setEnabled(false);
 	m_pButtonFlyPrepare->setEnabled(false);
 	//先清空数据
 	if (false == m_qstrCurrentProjectFile.isEmpty()) {
 		QFileInfo info(m_qstrCurrentProjectFile);
-		_ShowInfoMessage(tr("关闭工程")+ info.baseName());
+		_ShowInfoMessage(tr("关闭工程") + info.baseName());
 	}
 	m_qstrCurrentProjectFile.clear();
 	onWebClear();
 	m_pSoundWidget->stopPlayMusic();
+	if (m_pDeviceManage) m_pDeviceManage->clearDevice();
 	
-	if(m_pDeviceManage) m_pDeviceManage->clearDevice();
-
-	SpaceParam space(this);
-	if (QDialog::Accepted != space.exec())return;
-	unsigned int x = space.getSpaceX();
-	unsigned int y = space.getSpaceY();
-	//选择新建路径
-	QString qstrName = QFileDialog::getSaveFileName(this, tr("项目名"), "", tr("File(*.qz)"));
-	if (qstrName.isEmpty()) return;
+	//新建项目文件夹
 	QFileInfo info(qstrName);
 	QString qstrDir = info.path() + "/" + info.baseName();
 	QString qstrFile = qstrDir + "/" + info.fileName();
-	//新建项目文件夹
 	QDir dir;
 	if (!dir.mkdir(qstrDir)) {
 		_ShowErrorMessage(info.baseName() + tr("项目创建失败"));
@@ -344,6 +352,7 @@ void UAVManage::onOpenProject(QString qstrFile)
 	m_pSoundWidget->setEnabled(true);
 	m_pButtonFlyPrepare->setEnabled(true);
 	ParamReadWrite::writeParam(_Path_, m_qstrCurrentProjectFile);
+	m_pActionAttribute->setEnabled(true);
 }
 
 //拷贝文件夹
@@ -800,6 +809,16 @@ void UAVManage::on3DDialogStauts(bool connect)
 void UAVManage::onMusicWaveFinished()
 {
 	m_pDeviceManage->setCurrentMusicPath(m_pSoundWidget->getCurrentMusic(), m_pSoundWidget->getMusicPixmap());
+}
+
+void UAVManage::onProjectAttribute()
+{
+	SpaceParam space(false, this);
+	QFileInfo info(m_qstrCurrentProjectFile);
+	space.setProjectPath(info.path());
+	QPoint point = m_pDeviceManage->getSpaceSize();
+	space.setSpaceSize(point.x(), point.y());
+	if (QDialog::Accepted != space.exec())return;
 }
 
 bool UAVManage::newProjectFile(QString qstrFile, unsigned int X, unsigned int Y)

@@ -3,7 +3,7 @@
 #include <QMessageBox>
 #include <QGraphicsDropShadowEffect>
 
-SpaceParam::SpaceParam(QWidget *parent)
+SpaceParam::SpaceParam(bool init, QWidget *parent)
 	: QDialog(parent)
 {
 	ui.setupUi(this);
@@ -18,6 +18,15 @@ SpaceParam::SpaceParam(QWidget *parent)
 	ui.lineEditY->setValidator(new QIntValidator(5, 100, this));
 	ui.lineEditX->setMaxLength(2);
 	ui.lineEditY->setMaxLength(2);
+	if (init) {
+		ui.dialogLabelTitle->setText(tr("新建项目"));
+		ui.widgetProject->setVisible(false);
+	}
+	else {
+		ui.dialogLabelTitle->setText(tr("项目属性"));
+		ui.widgetProject->setVisible(true);
+		ui.btnOK->setVisible(false);
+	}
 	connect(ui.btnOK, &QAbstractButton::clicked, [this]() {
 		//检查输入值
 		int x = ui.lineEditX->text().toInt();
@@ -46,4 +55,17 @@ unsigned int SpaceParam::getSpaceX()
 unsigned int SpaceParam::getSpaceY()
 {
 	return ui.lineEditY->text().trimmed().toUInt() * 100;
+}
+
+void SpaceParam::setProjectPath(QString path)
+{
+	ui.labelPath->setText(path);
+}
+
+void SpaceParam::setSpaceSize(unsigned int x, unsigned int y)
+{
+	ui.lineEditX->setText(QString::number(x / 100));
+	ui.lineEditY->setText(QString::number(y / 100));
+	ui.lineEditX->setEnabled(false);
+	ui.lineEditY->setEnabled(false);
 }
