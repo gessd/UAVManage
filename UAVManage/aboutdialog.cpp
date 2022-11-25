@@ -1,6 +1,8 @@
 #include "aboutdialog.h"
 #include <QGraphicsDropShadowEffect>
 #include "definesetting.h"
+#include "paramreadwrite.h"
+#include <QDebug>
 
 AboutDialog::AboutDialog(QWidget *parent)
 	: QDialog(parent)
@@ -15,7 +17,15 @@ AboutDialog::AboutDialog(QWidget *parent)
 	shadow->setBlurRadius(10);
 	this->setGraphicsEffect(shadow);
 	ui.labelVersion->setText("V " + AppVersion());
+	ui.stackedWidget->setCurrentIndex(1);
+	ui.radioButton->setChecked(ParamReadWrite::readParam(_Update_).toBool());
 	connect(ui.btnClose, &QAbstractButton::clicked, [this]() {  accept(); });
+	connect(ui.btnRetry, &QAbstractButton::clicked, [this]() {  onCheckNewVersion(); });
+	connect(ui.btnCheckVersion, &QAbstractButton::clicked, [this]() {  onCheckNewVersion(); });
+	connect(ui.btnUpdate, &QAbstractButton::clicked, [this]() {  onStartUpdate(); });
+	connect(ui.radioButton, &QAbstractButton::clicked, [this]() {
+		ParamReadWrite::writeParam(_Update_, ui.radioButton->isChecked());
+		});
 }
 
 AboutDialog::~AboutDialog()
@@ -24,6 +34,16 @@ AboutDialog::~AboutDialog()
 		delete m_pLabelBackground;
 		m_pLabelBackground = nullptr;
 	}
+}
+
+void AboutDialog::onCheckNewVersion()
+{
+
+}
+
+void AboutDialog::onStartUpdate()
+{
+
 }
 
 void AboutDialog::showEvent(QShowEvent* event)
@@ -36,6 +56,7 @@ void AboutDialog::showEvent(QShowEvent* event)
 	m_pLabelBackground->setStyleSheet(QString("background-color: rgba(0, 0, 0, 50%);"));
 	m_pLabelBackground->setFixedSize(dynamic_cast<QWidget*>(parent())->size());
 	m_pLabelBackground->show();
+	onCheckNewVersion();
 }
 
 void AboutDialog::hideEvent(QHideEvent* event)

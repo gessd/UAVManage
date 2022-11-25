@@ -10,6 +10,9 @@ class AboutDialog : public QDialog
 public:
 	AboutDialog(QWidget *parent = nullptr);
 	~AboutDialog();
+public slots:
+	void onCheckNewVersion();
+	void onStartUpdate();
 protected:
 	void showEvent(QShowEvent* event);
 	void hideEvent(QHideEvent* event);

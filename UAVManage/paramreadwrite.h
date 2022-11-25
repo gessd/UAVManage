@@ -7,6 +7,7 @@
 #define PARAMFILE       "/config.ini"
 #define _Root_          "App"
 #define _Path_          "path"
+#define _Update_            "update"
 
 class ParamReadWrite : public QObject
 {

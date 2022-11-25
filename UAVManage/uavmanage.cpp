@@ -201,6 +201,11 @@ UAVManage::~UAVManage()
 		delete m_pDeviceManage;
 		m_pDeviceManage = nullptr;
 	}
+	if (m_pAbout) {
+		m_pAbout->close();
+		m_pAbout->deleteLater();
+		m_pAbout = nullptr;
+	}
 }
 
 void UAVManage::updateStyle()
