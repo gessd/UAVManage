@@ -4,6 +4,8 @@
 #define _MajorNumber_ 2
 #define _MinorNumber_ 2
 #define _BuildNumber_ 1
+//新程序下载存放文件夹
+#define _NewVersionPath_	"/update"
 
 //blockly交互端口
 #define _WebSocketPort_ 25252

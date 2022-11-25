@@ -19,4 +19,5 @@ protected:
 private:
 	Ui::AboutDialogClass ui;
 	QLabel* m_pLabelBackground;
+	QString m_qstrNewVersionName;
 };

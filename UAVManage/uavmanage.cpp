@@ -125,7 +125,7 @@ UAVManage::UAVManage(QWidget* parent)
 	QMenu* pActionHelp = new QMenu(tr("帮助"));
 	pActionHelp->setWindowFlags(pMenuFlyPrepare->windowFlags() | Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint);
 	pActionHelp->setAttribute(Qt::WA_TranslucentBackground);
-	QAction* pActionAbout = new QAction(QIcon(":/res/menu/P02_help_about_btn_new_ic.png"), tr("关于"));
+	QAction* pActionAbout = new QAction(QIcon(":/res/menu/P02_help_about_btn_new_ic.png"), tr("版本"));
 	pActionHelp->addAction(pActionAbout);
 	ui.toolBar->addWidget(initMenuButton(tr("帮助"), ":/res/menu/P02_help_about_page_ic.png", ":/res/menu/P02_help_about_page_ic.png", pActionHelp));
 	connect(pActionAbout, &QAction::triggered, [this]() {m_pAbout->exec(); });

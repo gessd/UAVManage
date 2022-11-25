@@ -136,6 +136,7 @@
     </ClCompile>
     <ClCompile Include="devicedebugl.cpp" />
     <ClCompile Include="devicemanage.cpp" />
+    <ClCompile Include="downloadtool.cpp" />
     <ClCompile Include="messagelistdialog.cpp" />
     <ClCompile Include="musicscale.cpp" />
     <ClCompile Include="paramreadwrite.cpp" />
@@ -167,6 +168,7 @@
     <ClInclude Include="define3d.h" />
     <ClInclude Include="definesetting.h" />
     <QtMoc Include="devicedebug.h" />
+    <QtMoc Include="downloadtool.h" />
     <ClInclude Include="libhvsetting.h" />
     <ClInclude Include="mavlinksetting.h" />
     <QtMoc Include="threadpython.h" />

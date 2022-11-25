@@ -24,18 +24,24 @@ QLabel{
 QStackedWidget{
 	border:1px solid #000000;
 }
-QPushButton{
+QToolButton{
 	text-decoration:underline;
 	background:transparent;
 	color:#3B8CFF;
 	border-width:0px;
 	border-radius:0px; 
 }
-QPushButton:hover{
+QToolButton:hover{
 	border-bottom:1px solid #3B8CFF;
 }
-QPushButton:pressed,QToolButton:pressed{
+QToolButton:pressed,QToolButton:pressed{
     background:transparent;
+}
+QProgressBar{
+    color:transparent;
+}
+QProgressBar::chunk{
+	border-radius:10px;
 }
 #dialogWidgetTitle{
 	border-top-left-radius:10px; 
@@ -229,7 +235,7 @@ QPushButton:pressed,QToolButton:pressed{
           </widget>
          </item>
          <item>
-          <widget class="QToolButton" name="btnCheckVersion">
+          <widget class="QPushButton" name="btnCheckVersion">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -238,7 +244,7 @@ QPushButton:pressed,QToolButton:pressed{
            </property>
            <property name="minimumSize">
             <size>
-             <width>88</width>
+             <width>90</width>
              <height>38</height>
             </size>
            </property>
@@ -255,72 +261,6 @@ QPushButton:pressed,QToolButton:pressed{
         <property name="currentIndex">
          <number>2</number>
         </property>
-        <widget class="QWidget" name="pageCheck">
-         <layout class="QVBoxLayout" name="verticalLayout_2">
-          <item>
-           <widget class="QLabel" name="labelNewVersion">
-            <property name="text">
-             <string>发现新版本：</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_7">
-            <item>
-             <spacer name="horizontalSpacer_5">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item>
-             <widget class="QToolButton" name="btnUpdate">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="minimumSize">
-               <size>
-                <width>0</width>
-                <height>38</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>16777215</width>
-                <height>38</height>
-               </size>
-              </property>
-              <property name="text">
-               <string>立即更新</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <spacer name="horizontalSpacer_6">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-           </layout>
-          </item>
-         </layout>
-        </widget>
         <widget class="QWidget" name="pageError">
          <layout class="QVBoxLayout" name="verticalLayout" stretch="6,4">
           <property name="leftMargin">
@@ -390,7 +330,7 @@ QPushButton:pressed,QToolButton:pressed{
              </spacer>
             </item>
             <item>
-             <widget class="QToolButton" name="btnRetry">
+             <widget class="QPushButton" name="btnRetry">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                 <horstretch>0</horstretch>
@@ -399,7 +339,7 @@ QPushButton:pressed,QToolButton:pressed{
               </property>
               <property name="minimumSize">
                <size>
-                <width>88</width>
+                <width>90</width>
                 <height>38</height>
                </size>
               </property>
@@ -431,10 +371,176 @@ QPushButton:pressed,QToolButton:pressed{
           </item>
          </layout>
         </widget>
+        <widget class="QWidget" name="pageCheck">
+         <layout class="QGridLayout" name="gridLayout_4">
+          <item row="0" column="0">
+           <layout class="QHBoxLayout" name="horizontalLayout_6">
+            <item>
+             <widget class="QLabel" name="labelNewVersion">
+              <property name="maximumSize">
+               <size>
+                <width>100</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>最新版本：</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="labelNewVersionNumber">
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="1" column="0">
+           <layout class="QHBoxLayout" name="horizontalLayout_7">
+            <item>
+             <spacer name="horizontalSpacer_5">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btnUpdate">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>90</width>
+                <height>38</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>38</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>立即更新</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_6">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
         <widget class="QWidget" name="pageProgress">
-         <layout class="QHBoxLayout" name="horizontalLayout_6">
-          <item>
-           <widget class="QProgressBar" name="progressBar"/>
+         <layout class="QGridLayout" name="gridLayout_3">
+          <property name="topMargin">
+           <number>16</number>
+          </property>
+          <property name="bottomMargin">
+           <number>16</number>
+          </property>
+          <property name="spacing">
+           <number>0</number>
+          </property>
+          <item row="0" column="3">
+           <spacer name="horizontalSpacer_8">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="0" column="2">
+           <widget class="QLabel" name="labelProgress">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>60</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">color:#3B8CFF;</string>
+            </property>
+            <property name="text">
+             <string>0%</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0" colspan="4">
+           <widget class="QProgressBar" name="progressBar">
+            <property name="value">
+             <number>0</number>
+            </property>
+            <property name="textVisible">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <spacer name="horizontalSpacer_7">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLabel" name="label_4">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">color:#3B8CFF;</string>
+            </property>
+            <property name="text">
+             <string>进度</string>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>
@@ -479,7 +585,7 @@ QPushButton:pressed,QToolButton:pressed{
           </spacer>
          </item>
          <item>
-          <widget class="QPushButton" name="btnPermit">
+          <widget class="QToolButton" name="btnPermit">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
              <horstretch>0</horstretch>
@@ -492,7 +598,7 @@ QPushButton:pressed,QToolButton:pressed{
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="btnClause">
+          <widget class="QToolButton" name="btnClause">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
              <horstretch>0</horstretch>
