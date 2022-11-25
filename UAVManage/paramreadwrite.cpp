@@ -7,9 +7,9 @@ ParamReadWrite::ParamReadWrite(QObject *parent) : QObject(parent)
 
 }
 
-QVariant ParamReadWrite::readParam(QString qstrKey, QVariant defaultValue, QString qstrGroup)
+QVariant ParamReadWrite::readParam(QString qstrKey, QVariant defaultValue, QString qstrGroup, QString file)
 {
-    QString qstrPath = QApplication::applicationDirPath() + PARAMFILE;
+    QString qstrPath = file;// QApplication::applicationDirPath() + PARAMFILE;
     QSettings settings(qstrPath, QSettings::IniFormat);
     settings.setIniCodec("UTF8");
     settings.beginGroup(qstrGroup);
@@ -21,9 +21,9 @@ QVariant ParamReadWrite::readParam(QString qstrKey, QVariant defaultValue, QStri
     return value;
 }
 
-void ParamReadWrite::writeParam(QString qstrKey, QVariant value, QString qstrGroup)
+void ParamReadWrite::writeParam(QString qstrKey, QVariant value, QString qstrGroup, QString file)
 {
-    QString qstrPath = QApplication::applicationDirPath() + PARAMFILE;
+    QString qstrPath = file;// QApplication::applicationDirPath() + PARAMFILE;
     QSettings settings(qstrPath, QSettings::IniFormat);
     settings.setIniCodec("UTF8");
     settings.beginGroup(qstrGroup);

@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QSettings>
+#include <QApplication>
 
 #define PARAMFILE       "/config.ini"
 #define _Root_          "App"
@@ -14,8 +15,8 @@ class ParamReadWrite : public QObject
     Q_OBJECT
 public:
     explicit ParamReadWrite(QObject *parent = nullptr);
-    static QVariant readParam(QString qstrKey, QVariant defaultValue="", QString qstrGroup = _Root_);
-    static void writeParam(QString qstrKey, QVariant value, QString qstrGroup = _Root_);
+    static QVariant readParam(QString qstrKey, QVariant defaultValue="", QString qstrGroup = _Root_, QString file = QApplication::applicationDirPath() + PARAMFILE);
+    static void writeParam(QString qstrKey, QVariant value, QString qstrGroup = _Root_, QString file = QApplication::applicationDirPath() + PARAMFILE);
 signals:
 
 public slots:
