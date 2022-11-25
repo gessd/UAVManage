@@ -9,6 +9,7 @@ PlaceInfoDialog::PlaceInfoDialog(QWidget *parent)
 	: QDialog(parent)
 {
 	ui.setupUi(this);
+	m_pLabelBackground = nullptr;
 	m_bSetNLINK = false;
 	m_stationStatus = 0;
 	m_nOnekeySetIndex = -1;
@@ -33,6 +34,10 @@ PlaceInfoDialog::~PlaceInfoDialog()
 	if (m_threadSerial.isRunning()) {
 		m_threadSerial.exit();
 		m_threadSerial.wait();
+	}
+	if (m_pLabelBackground) {
+		delete m_pLabelBackground;
+		m_pLabelBackground = nullptr;
 	}
 }
 
@@ -81,6 +86,15 @@ void PlaceInfoDialog::showEvent(QShowEvent* event)
 			ui.btnComOpen->click();
 			});
 	}
+
+	if (m_pLabelBackground) {
+		delete m_pLabelBackground;
+		m_pLabelBackground = nullptr;
+	}
+	m_pLabelBackground = new QLabel(dynamic_cast<QWidget*>(parent()));
+	m_pLabelBackground->setStyleSheet(QString("background-color: rgba(0, 0, 0, 50%);"));
+	m_pLabelBackground->setFixedSize(dynamic_cast<QWidget*>(parent())->size());
+	m_pLabelBackground->show();
 }
 
 void PlaceInfoDialog::closeEvent(QCloseEvent* event) 
@@ -89,6 +103,11 @@ void PlaceInfoDialog::closeEvent(QCloseEvent* event)
 	if (m_serialPort.isOpen()) {
 		m_serialPort.close();
 	}
+}
+
+void PlaceInfoDialog::hideEvent(QHideEvent* event)
+{
+	if (m_pLabelBackground) m_pLabelBackground->close();
 }
 
 void PlaceInfoDialog::onBtnOpenClicked()

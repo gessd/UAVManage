@@ -7,6 +7,7 @@ AddDeviceDialog::AddDeviceDialog(QString qstrName, QWidget *parent)
 	: QDialog(parent)
 {
 	ui.setupUi(this);
+	m_pLabelBackground = nullptr;
 	setWindowFlags(windowFlags() | Qt::FramelessWindowHint | Qt::Tool);
 	this->setAttribute(Qt::WA_TranslucentBackground);
 	QGraphicsDropShadowEffect* shadow = new QGraphicsDropShadowEffect(this);
@@ -39,4 +40,26 @@ AddDeviceDialog::AddDeviceDialog(QString qstrName, QWidget *parent)
 
 AddDeviceDialog::~AddDeviceDialog()
 {
+	if (m_pLabelBackground) {
+		delete m_pLabelBackground;
+		m_pLabelBackground = nullptr;
+	}
+}
+
+void AddDeviceDialog::showEvent(QShowEvent* event)
+{
+	if (m_pLabelBackground) {
+		delete m_pLabelBackground;
+		m_pLabelBackground = nullptr;
+	}
+	m_pLabelBackground = new QLabel(dynamic_cast<QWidget*>(parent()->parent()));
+	//设置窗体的背景色,这里的百分比就是透明度
+	m_pLabelBackground->setStyleSheet(QString("background-color: rgba(0, 0, 0, 50%);"));
+	m_pLabelBackground->setFixedSize(dynamic_cast<QWidget*>(parent()->parent())->size());
+	m_pLabelBackground->show();
+}
+
+void AddDeviceDialog::hideEvent(QHideEvent* event)
+{
+	if (m_pLabelBackground) m_pLabelBackground->close();
 }

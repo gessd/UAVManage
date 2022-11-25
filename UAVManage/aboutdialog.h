@@ -10,6 +10,10 @@ class AboutDialog : public QDialog
 public:
 	AboutDialog(QWidget *parent = nullptr);
 	~AboutDialog();
+protected:
+	void showEvent(QShowEvent* event);
+	void hideEvent(QHideEvent* event);
 private:
 	Ui::AboutDialogClass ui;
+	QLabel* m_pLabelBackground;
 };

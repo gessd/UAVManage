@@ -935,7 +935,7 @@ void DeviceManage::deviceCalibration()
 		QMessageBox::warning(this, tr("提示"), tr("设备未连接，无法校准"));
 		return;
 	}
-	CalibrationDialog* pDialog = new CalibrationDialog(pDevice, this);
+	CalibrationDialog* pDialog = new CalibrationDialog(pDevice, dynamic_cast<QWidget*>(parent()));
 	pDialog->addLogToBrowser(pDevice->getName() + tr("：校准开始"));
 	switch (n) {
 	case _Gyro: pDevice->Fun_MAV_CALIBRATION(1, 0, 0, 0, 0, 0, 0, false); break;
@@ -944,6 +944,8 @@ void DeviceManage::deviceCalibration()
 	case _Baro: pDevice->Fun_MAV_CALIBRATION(1, 0, 0, 0, 0, 0, 0, false); break;
 	}
 	pDialog->exec();
+	pDialog->deleteLater();
+	pDialog = nullptr;
 }
 
 void DeviceManage::onDeviceConrolFinished(QString text, int res, QString explain)

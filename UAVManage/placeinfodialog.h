@@ -60,13 +60,14 @@ class PlaceInfoDialog : public QDialog
 	Q_OBJECT
 
 public:
-	PlaceInfoDialog(QWidget *parent = Q_NULLPTR);
+	PlaceInfoDialog(QWidget *parent);
 	~PlaceInfoDialog();
 	QMap<QString, QPoint> getStationAddress();
 	bool isValidStation();
 protected:
 	virtual void showEvent(QShowEvent* event);
 	virtual void closeEvent(QCloseEvent* event);
+	virtual void hideEvent(QHideEvent* event);
 private slots:
 	void onBtnOpenClicked();
 	void onBtnReadClicked();
@@ -84,4 +85,5 @@ private:
 	//基站标定状态 [0未标定|1标定成功|-1标定失败]
 	int m_stationStatus;
 	QThread m_threadSerial;
+	QLabel* m_pLabelBackground;
 };

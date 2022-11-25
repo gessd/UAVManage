@@ -8,7 +8,7 @@ class AddDeviceDialog : public QDialog
 	Q_OBJECT
 
 public:
-	AddDeviceDialog(QString qstrName, QWidget *parent = Q_NULLPTR);
+	AddDeviceDialog(QString qstrName, QWidget *parent);
 	~AddDeviceDialog();
 	void setName(QString qstrName) { ui.lineEditName->setText(qstrName); }
 	QString getName() { return ui.lineEditName->text().trimmed(); }
@@ -24,6 +24,10 @@ public:
 		setX(x);
 		setY(y);
 	}
+protected:
+	void showEvent(QShowEvent* event);
+	void hideEvent(QHideEvent* event);
 private:
 	Ui::AddDeviceDialog ui;
+	QLabel* m_pLabelBackground;
 };

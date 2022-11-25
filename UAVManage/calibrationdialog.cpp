@@ -5,6 +5,7 @@ CalibrationDialog::CalibrationDialog(QMap<QString, DeviceControl*> map, QWidget 
 	: QDialog(parent)
 {
 	ui.setupUi(this);
+	m_pLabelBackground = nullptr;
 	connect(ui.btnMagnetism, &QAbstractButton::clicked, this, &CalibrationDialog::onBtnCalibrationClicked);
 	connect(ui.btnGyro, &QAbstractButton::clicked, this, &CalibrationDialog::onBtnCalibrationClicked);
 	connect(ui.btnAccelerometer, &QAbstractButton::clicked, this, &CalibrationDialog::onBtnCalibrationClicked);
@@ -19,15 +20,21 @@ CalibrationDialog::CalibrationDialog(QMap<QString, DeviceControl*> map, QWidget 
 	}
 }
 
-CalibrationDialog::CalibrationDialog(DeviceControl* device, QWidget* parent /*= nullptr*/)
+CalibrationDialog::CalibrationDialog(DeviceControl* device, QWidget* parent)
+	: QDialog(parent)
 {
 	ui.setupUi(this);
+	m_pLabelBackground = nullptr;
 	ui.treeWidget->setVisible(false);
 	ui.widget->setVisible(false);
 }
 
 CalibrationDialog::~CalibrationDialog()
 {
+	if (m_pLabelBackground) {
+		delete m_pLabelBackground;
+		m_pLabelBackground = nullptr;
+	}
 }
 
 void CalibrationDialog::addLogToBrowser(QString text)
@@ -73,4 +80,21 @@ void CalibrationDialog::onDeviceMessage(QByteArray data)
 	if (nullptr == pDevice) return;
 	QString name = pDevice->getName();
 	addLogToBrowser(name + ": "+ data);
+}
+
+void CalibrationDialog::showEvent(QShowEvent* event)
+{
+	if (m_pLabelBackground) {
+		delete m_pLabelBackground;
+		m_pLabelBackground = nullptr;
+	}
+	m_pLabelBackground = new QLabel(dynamic_cast<QWidget*>(parent()));
+	m_pLabelBackground->setStyleSheet(QString("background-color: rgba(0, 0, 0, 50%);"));
+	m_pLabelBackground->setFixedSize(dynamic_cast<QWidget*>(parent())->size());
+	m_pLabelBackground->show();
+}
+
+void CalibrationDialog::hideEvent(QHideEvent* event)
+{
+	if (m_pLabelBackground) m_pLabelBackground->close();
 }

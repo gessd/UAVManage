@@ -7,6 +7,7 @@ SpaceParam::SpaceParam(bool init, QWidget *parent)
 	: QDialog(parent)
 {
 	ui.setupUi(this);
+	m_pLabelBackground = nullptr;
 	setWindowFlags(windowFlags() | Qt::FramelessWindowHint | Qt::Tool);
 	this->setAttribute(Qt::WA_TranslucentBackground);
 	QGraphicsDropShadowEffect* shadow = new QGraphicsDropShadowEffect(this);
@@ -45,7 +46,12 @@ SpaceParam::SpaceParam(bool init, QWidget *parent)
 }
 
 SpaceParam::~SpaceParam()
-{}
+{
+	if (m_pLabelBackground) {
+		delete m_pLabelBackground;
+		m_pLabelBackground = nullptr;
+	}
+}
 
 unsigned int SpaceParam::getSpaceX()
 {
@@ -68,4 +74,21 @@ void SpaceParam::setSpaceSize(unsigned int x, unsigned int y)
 	ui.lineEditY->setText(QString::number(y / 100));
 	ui.lineEditX->setEnabled(false);
 	ui.lineEditY->setEnabled(false);
+}
+
+void SpaceParam::showEvent(QShowEvent* event)
+{
+	if (m_pLabelBackground) {
+		delete m_pLabelBackground;
+		m_pLabelBackground = nullptr;
+	}
+	m_pLabelBackground = new QLabel(dynamic_cast<QWidget*>(parent()));
+	m_pLabelBackground->setStyleSheet(QString("background-color: rgba(0, 0, 0, 50%);"));
+	m_pLabelBackground->setFixedSize(dynamic_cast<QWidget*>(parent())->size());
+	m_pLabelBackground->show();
+}
+
+void SpaceParam::hideEvent(QHideEvent* event)
+{
+	if (m_pLabelBackground) m_pLabelBackground->close();
 }
