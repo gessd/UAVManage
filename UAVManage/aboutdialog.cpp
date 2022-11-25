@@ -13,6 +13,8 @@ AboutDialog::AboutDialog(QWidget *parent)
 {
 	ui.setupUi(this);
 	m_pLabelBackground = nullptr;
+	m_bShowing = false;
+	m_bAutoUpdate = false;
 	setWindowFlags(windowFlags() | Qt::FramelessWindowHint | Qt::Tool);
 	this->setAttribute(Qt::WA_TranslucentBackground);
 	QGraphicsDropShadowEffect* shadow = new QGraphicsDropShadowEffect(this);
@@ -23,14 +25,19 @@ AboutDialog::AboutDialog(QWidget *parent)
 	ui.labelVersion->setText("V " + AppVersion());
 	ui.stackedWidget->setCurrentIndex(1);
 	ui.pageCheck->setVisible(false);
-	ui.radioButton->setChecked(ParamReadWrite::readParam(_Update_).toBool());
+	ui.btnRestart->setVisible(false);
+	m_bAutoUpdate = ParamReadWrite::readParam(_Update_).toBool();
+	ui.radioButton->setChecked(m_bAutoUpdate);
 	connect(ui.btnClose, &QAbstractButton::clicked, [this]() {  accept(); });
 	connect(ui.btnRetry, &QAbstractButton::clicked, [this]() {  onCheckNewVersion(); });
 	connect(ui.btnCheckVersion, &QAbstractButton::clicked, [this]() {  onCheckNewVersion(); });
 	connect(ui.btnUpdate, &QAbstractButton::clicked, [this]() {  onStartUpdate(); });
+	connect(ui.btnRestart, &QAbstractButton::clicked, [this]() {  onRestartApp(); });
 	connect(ui.radioButton, &QAbstractButton::clicked, [this]() {
 		ParamReadWrite::writeParam(_Update_, ui.radioButton->isChecked());
 		});
+	//自动后台更新
+	if (m_bAutoUpdate) onCheckNewVersion();
 }
 
 AboutDialog::~AboutDialog()
@@ -43,11 +50,14 @@ AboutDialog::~AboutDialog()
 
 void AboutDialog::onCheckNewVersion()
 {
+	if (ui.stackedWidget->currentIndex() == 2) {
+		qDebug() << "正在更新中";
+		return;
+	}
 	ui.stackedWidget->setCurrentIndex(1);
-	QString qstrConnfigPath = QApplication::applicationDirPath() + _NewVersionPath_;
-	//QString qstrUrl = "http://dldir1.qq.com/qqfile/qq/PCQQ9.6.9/QQ9.6.9.28878.exe";
+	QString qstrSavePath = QApplication::applicationDirPath() + _NewVersionPath_;
 	QString qstrUrl = QString("%1/%2").arg(_ServerUrl_).arg(_ConFile_);
-	DownloadTool* download = new DownloadTool(qstrUrl, qstrConnfigPath);
+	DownloadTool* download = new DownloadTool(qstrUrl, qstrSavePath);
 	download->startDownload();
 	connect(download, &DownloadTool::sigDownloadFinished, [this](QString error) {
 		if (error.isEmpty()) {
@@ -57,7 +67,7 @@ void AboutDialog::onCheckNewVersion()
 			qDebug() << "新版本号" << qstrNewVersionNumber;
 			QStringList list = qstrNewVersionNumber.split(".");
 			if (list.count() != 3) {
-				QMessageBox::warning(this, tr("错误"), tr("获取新版本号失败"));
+				if(m_bShowing) QMessageBox::warning(this, tr("错误"), tr("获取新版本号失败"));
 				return;
 			}
 			ui.pageCheck->setVisible(true);
@@ -69,8 +79,11 @@ void AboutDialog::onCheckNewVersion()
 			}
 			m_qstrNewVersionName = ParamReadWrite::readParam("file", AppVersion(), _Root_, config).toString();
 			if (m_qstrNewVersionName.isEmpty()) {
-				QMessageBox::warning(this, tr("错误"), tr("更新文件错误"));
+				if (m_bShowing) QMessageBox::warning(this, tr("错误"), tr("更新文件错误"));
 				return;
+			}
+			if (m_bAutoUpdate) {
+				onStartUpdate();
 			}
 		}
 		else {
@@ -81,11 +94,14 @@ void AboutDialog::onCheckNewVersion()
 
 void AboutDialog::onStartUpdate()
 {
+	ui.btnRestart->setVisible(false);
 	ui.stackedWidget->setCurrentIndex(2);
-	QString qstrConnfigPath = QApplication::applicationDirPath() + _NewVersionPath_;
+	QString qstrSavePath = QApplication::applicationDirPath() + _NewVersionPath_;
 	QString qstrUrl = QString("%1/%2").arg(_ServerUrl_).arg(m_qstrNewVersionName);
-	DownloadTool* download = new DownloadTool(qstrUrl, qstrConnfigPath);
+	qstrUrl = "http://downmini.yun.kugou.com/web/kugou_10112.exe";
+	DownloadTool* download = new DownloadTool(qstrUrl, qstrSavePath);
 	download->startDownload();
+	//TODO 需要增加下载超时
 	connect(download, &DownloadTool::sigProgress, [this](qint64 bytesRead, qint64 totalBytes, qreal progress) {
 		//文件下载进度
 		ui.progressBar->setValue(progress * 100);
@@ -93,18 +109,22 @@ void AboutDialog::onStartUpdate()
 		});
 	connect(download, &DownloadTool::sigDownloadFinished, [this](QString error) {
 		if (error.isEmpty()) {
-			QMessageBox::question(this, tr("询问"), tr("新版本下载完成，是否重启更新？"));
+			ui.btnRestart->setVisible(true);
+			if(nullptr == m_pLabelBackground) backgroundShow();
+			QMessageBox::StandardButton button = QMessageBox::question(this, tr("询问"), tr("新版本下载完成，是否重启更新？"));
+			if(false == m_bShowing) m_pLabelBackground->close();
+			if(QMessageBox::Yes == button) onRestartApp();
 			return;
 		}
 		else {
 			ui.stackedWidget->setCurrentIndex(1);
-			QMessageBox::warning(this, tr("错误"), tr("更新文件下载失败，请重试"));
+			if (m_bShowing) QMessageBox::warning(this, tr("错误"), tr("更新文件下载失败，请重试"));
 			return;
 		}
 		});
 }
 
-void AboutDialog::showEvent(QShowEvent* event)
+void AboutDialog::backgroundShow()
 {
 	if (m_pLabelBackground) {
 		delete m_pLabelBackground;
@@ -114,10 +134,23 @@ void AboutDialog::showEvent(QShowEvent* event)
 	m_pLabelBackground->setStyleSheet(QString("background-color: rgba(0, 0, 0, 50%);"));
 	m_pLabelBackground->setFixedSize(dynamic_cast<QWidget*>(parent())->size());
 	m_pLabelBackground->show();
+}
+
+void AboutDialog::onRestartApp()
+{
+	qDebug() << "重启程序";
+}
+
+void AboutDialog::showEvent(QShowEvent* event)
+{
+	m_bShowing = true;
+	m_bAutoUpdate = false;
+	backgroundShow();
 	onCheckNewVersion();
 }
 
 void AboutDialog::hideEvent(QHideEvent* event)
 {
+	m_bShowing = false;
 	if (m_pLabelBackground) m_pLabelBackground->close();
 }

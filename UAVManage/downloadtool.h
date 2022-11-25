@@ -1,49 +1,49 @@
 #pragma once
 
-#include <QObject>        // QObjectÀàÊÇQt¶ÔÏóÄ£ĞÍµÄºËĞÄ
-#include <QUrl>           // QUrlÀàÌá¹©ÁËÊ¹ÓÃURLµÄ±ã½İ½Ó¿Ú
-#include <QFile>          // QFileÀàÓÃÓÚ¶ÔÎÄ¼ş½øĞĞ¶ÁĞ´²Ù×÷
-#include <QDir>           // QDirÀàÓÃÓÚ²Ù×÷Â·¾¶Ãû¼°µ×²ãÎÄ¼şÏµÍ³
-#include <QPointer>       // QPointerÖ¸ÕëÒıÓÃµÄ¶ÔÏó±»Ïú»ÙÊ±ºò,»á×Ô¶¯Ö¸ÏòNULL,½â¾öÖ¸ÕëĞü¹ÒÎÊÌâ
-#include <QApplication>   // ´Ë´¦ÓÃÓÚ»ñÈ¡µ±Ç°³ÌĞò¾ø¶ÔÂ·¾¶
+#include <QObject>        // QObjectç±»æ˜¯Qtå¯¹è±¡æ¨¡å‹çš„æ ¸å¿ƒ
+#include <QUrl>           // QUrlç±»æä¾›äº†ä½¿ç”¨URLçš„ä¾¿æ·æ¥å£
+#include <QFile>          // QFileç±»ç”¨äºå¯¹æ–‡ä»¶è¿›è¡Œè¯»å†™æ“ä½œ
+#include <QDir>           // QDirç±»ç”¨äºæ“ä½œè·¯å¾„ååŠåº•å±‚æ–‡ä»¶ç³»ç»Ÿ
+#include <QPointer>       // QPointeræŒ‡é’ˆå¼•ç”¨çš„å¯¹è±¡è¢«é”€æ¯æ—¶å€™,ä¼šè‡ªåŠ¨æŒ‡å‘NULL,è§£å†³æŒ‡é’ˆæ‚¬æŒ‚é—®é¢˜
+#include <QApplication>   // æ­¤å¤„ç”¨äºè·å–å½“å‰ç¨‹åºç»å¯¹è·¯å¾„
 
-#include <QNetworkReply>  // QNetworkReplyÀà·â×°ÁËÊ¹ÓÃQNetworkAccessManager·¢²¼µÄÇëÇóÏà¹ØµÄ»Ø¸´ĞÅÏ¢¡£
-#include <QNetworkAccessManager>  // QNetworkAccessManagerÀàÎªÓ¦ÓÃÌá¹©·¢ËÍÍøÂçÇëÇóºÍ½ÓÊÕ´ğ¸´µÄAPI½Ó¿Ú
-#include <memory>         // Ê¹ÓÃstd::unique_ptrĞèÒª°üº¬¸ÃÍ·ÎÄ¼ş
+#include <QNetworkReply>  // QNetworkReplyç±»å°è£…äº†ä½¿ç”¨QNetworkAccessManagerå‘å¸ƒçš„è¯·æ±‚ç›¸å…³çš„å›å¤ä¿¡æ¯ã€‚
+#include <QNetworkAccessManager>  // QNetworkAccessManagerç±»ä¸ºåº”ç”¨æä¾›å‘é€ç½‘ç»œè¯·æ±‚å’Œæ¥æ”¶ç­”å¤çš„APIæ¥å£
+#include <memory>         // ä½¿ç”¨std::unique_ptréœ€è¦åŒ…å«è¯¥å¤´æ–‡ä»¶
 
-//#define DOWNLOAD_DEBUG    // ÊÇ·ñ´òÓ¡Êä³ö
+#define DOWNLOAD_DEBUG    // æ˜¯å¦æ‰“å°è¾“å‡º
 
-class DownloadTool : public QObject  // ¼Ì³ĞQObject
+class DownloadTool : public QObject  // ç»§æ‰¿QObject
 {
-	Q_OBJECT              // ¼ÓÈë´Ëºê£¬²ÅÄÜÊ¹ÓÃQTÖĞµÄsignalºÍslot»úÖÆ
+	Q_OBJECT              // åŠ å…¥æ­¤å®ï¼Œæ‰èƒ½ä½¿ç”¨QTä¸­çš„signalå’Œslotæœºåˆ¶
 
 public:
-	// ¹¹Ôìº¯Êı²ÎÊı:  1)httpÎÄ¼şÍêÕûµÄurl  2)±£´æµÄÂ·¾¶
+	// æ„é€ å‡½æ•°å‚æ•°:  1)httpæ–‡ä»¶å®Œæ•´çš„url  2)ä¿å­˜çš„è·¯å¾„
 	explicit DownloadTool(const QString& downloadUrl, const QString& savePath, QObject* parent = nullptr);
 	~DownloadTool();
 
-	void startDownload();  // ¿ªÊ¼ÏÂÔØÎÄ¼ş
-	void cancelDownload(); // È¡ÏûÏÂÔØÎÄ¼ş
+	void startDownload();  // å¼€å§‹ä¸‹è½½æ–‡ä»¶
+	void cancelDownload(); // å–æ¶ˆä¸‹è½½æ–‡ä»¶
 
 Q_SIGNALS:
-	void sigProgress(qint64 bytesRead, qint64 totalBytes, qreal progress);  // ÏÂÔØ½ø¶ÈĞÅºÅ
-	void sigDownloadFinished(QString error);  // ÏÂÔØÍê³ÉĞÅºÅ
+	void sigProgress(qint64 bytesRead, qint64 totalBytes, qreal progress);  // ä¸‹è½½è¿›åº¦ä¿¡å·
+	void sigDownloadFinished(QString error);  // ä¸‹è½½å®Œæˆä¿¡å·
 
 private Q_SLOTS:
-	void httpFinished();    // QNetworkReply::finished¶ÔÓ¦µÄ²Ûº¯Êı
-	void httpReadyRead();   // QIODevice::readyRead¶ÔÓ¦µÄ²Ûº¯Êı
+	void httpFinished();    // QNetworkReply::finishedå¯¹åº”çš„æ§½å‡½æ•°
+	void httpReadyRead();   // QIODevice::readyReadå¯¹åº”çš„æ§½å‡½æ•°
 
-	void networkReplyProgress(qint64 bytesRead, qint64 totalBytes);  // QNetworkReply::downloadProgress¶ÔÓ¦µÄ²Ûº¯Êı
+	void networkReplyProgress(qint64 bytesRead, qint64 totalBytes);  // QNetworkReply::downloadProgresså¯¹åº”çš„æ§½å‡½æ•°
 
 private:
 	void startRequest(const QUrl& requestedUrl);
 	std::unique_ptr<QFile> openFileForWrite(const QString& fileName);
 
 private:
-	QString m_downloadUrl;  // ±£´æ¹¹ÔìÊ±´«ÈëµÄÏÂÔØurl
-	QString m_savePath;     // ±£´æ¹¹ÔìÊ±´«ÈëµÄ±£´æÂ·¾¶
+	QString m_downloadUrl;  // ä¿å­˜æ„é€ æ—¶ä¼ å…¥çš„ä¸‹è½½url
+	QString m_savePath;     // ä¿å­˜æ„é€ æ—¶ä¼ å…¥çš„ä¿å­˜è·¯å¾„
 
-	const QString defaultFileName = "tmp";  // Ä¬ÈÏÏÂÔØµ½tmpÎÄ¼ş¼Ğ
+	const QString defaultFileName = "tmp";  // é»˜è®¤ä¸‹è½½åˆ°tmpæ–‡ä»¶å¤¹
 
 	QUrl url;
 	QNetworkAccessManager qnam;

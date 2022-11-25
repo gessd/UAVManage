@@ -13,6 +13,8 @@ public:
 public slots:
 	void onCheckNewVersion();
 	void onStartUpdate();
+	void backgroundShow();
+	void onRestartApp();
 protected:
 	void showEvent(QShowEvent* event);
 	void hideEvent(QHideEvent* event);
@@ -20,4 +22,6 @@ private:
 	Ui::AboutDialogClass ui;
 	QLabel* m_pLabelBackground;
 	QString m_qstrNewVersionName;
+	bool m_bShowing;
+	bool m_bAutoUpdate;
 };
