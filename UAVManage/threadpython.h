@@ -113,10 +113,6 @@ public:
 	QVector<NavWayPointData> getWaypointData();
 private:
 	bool compilePythonFile(QString qstrFile);
-	/**
-	 * 删除文件夹
-	 */
-	bool deleteDir(const QString& path);
 private:
 	void run();
 private:

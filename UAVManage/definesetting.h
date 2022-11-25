@@ -1,11 +1,14 @@
 #pragma once
-
-//项目版本
+#include <QDir>
+//程序版本号
 #define _MajorNumber_ 2
 #define _MinorNumber_ 2
 #define _BuildNumber_ 1
 //新程序下载存放文件夹
 #define _NewVersionPath_	"/update"
+#define _VersionFile_		"version.ini"
+//服务器地址
+#define _ServerUrl_ "E:/fly/UAVManage/x64/Release/"
 
 //blockly交互端口
 #define _WebSocketPort_ 25252
@@ -87,6 +90,28 @@ static QString AppVersion() {
 	return QString("%1.%2.%3").arg(_MajorNumber_).arg(_MinorNumber_).arg(_BuildNumber_);
 }
 
+static bool deleteDir(const QString& path)
+{
+	if (path.isEmpty()) {
+		return false;
+	}
+	QDir dir(path);
+	if (!dir.exists()) {
+		return true;
+	}
+	dir.setFilter(QDir::AllEntries | QDir::NoDotAndDotDot); //设置过滤
+	QFileInfoList fileList = dir.entryInfoList(); // 获取所有的文件信息
+	foreach(QFileInfo file, fileList)
+	{ //遍历文件信息
+		if (file.isFile()) { // 是文件，删除
+			file.dir().remove(file.fileName());
+		}
+		else { // 递归调用函数，删除子文件夹
+			deleteDir(file.absoluteFilePath());
+		}
+	}
+	return dir.rmpath(dir.absolutePath()); // 这时候文件夹已经空了，再删除文件夹本身
+}
 class Utility :public QObject
 {
 public:

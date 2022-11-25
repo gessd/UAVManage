@@ -11,7 +11,7 @@
 #include <QNetworkAccessManager>  // QNetworkAccessManager类为应用提供发送网络请求和接收答复的API接口
 #include <memory>         // 使用std::unique_ptr需要包含该头文件
 
-#define DOWNLOAD_DEBUG    // 是否打印输出
+//#define DOWNLOAD_DEBUG    // 是否打印输出
 
 class DownloadTool : public QObject  // 继承QObject
 {

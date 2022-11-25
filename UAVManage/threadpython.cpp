@@ -492,29 +492,6 @@ bool ThreadPython::compilePythonFile(QString qstrFile)
 	return true;
 }
 
-bool ThreadPython::deleteDir(const QString& path)
-{
-	if (path.isEmpty()) {
-		return false;
-	}
-	QDir dir(path);
-	if (!dir.exists()) {
-		return true;
-	}
-	dir.setFilter(QDir::AllEntries | QDir::NoDotAndDotDot); //设置过滤
-	QFileInfoList fileList = dir.entryInfoList(); // 获取所有的文件信息
-	foreach(QFileInfo file, fileList)
-	{ //遍历文件信息
-		if (file.isFile()) { // 是文件，删除
-			file.dir().remove(file.fileName());
-		}
-		else { // 递归调用函数，删除子文件夹
-			deleteDir(file.absoluteFilePath());
-		}
-	}
-	return dir.rmpath(dir.absolutePath()); // 这时候文件夹已经空了，再删除文件夹本身
-}
-
 void ThreadPython::run()
 {
 	if (!QFile::exists(m_qstrFilePath)) return;

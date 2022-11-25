@@ -4,10 +4,9 @@
 #include "paramreadwrite.h"
 #include "downloadtool.h"
 #include <QDebug>
+#include <QProcess>
 #include <QMessageBox>
 
-#define _ServerUrl_ "E:/fly/UAVManage/x64/Release/"
-#define _ConFile_   "version.ini"
 AboutDialog::AboutDialog(QWidget *parent)
 	: QDialog(parent)
 {
@@ -56,13 +55,13 @@ void AboutDialog::onCheckNewVersion()
 	}
 	ui.stackedWidget->setCurrentIndex(1);
 	QString qstrSavePath = QApplication::applicationDirPath() + _NewVersionPath_;
-	QString qstrUrl = QString("%1/%2").arg(_ServerUrl_).arg(_ConFile_);
+	QString qstrUrl = QString("%1/%2").arg(_ServerUrl_).arg(_VersionFile_);
 	DownloadTool* download = new DownloadTool(qstrUrl, qstrSavePath);
 	download->startDownload();
 	connect(download, &DownloadTool::sigDownloadFinished, [this](QString error) {
 		if (error.isEmpty()) {
 			//解析升级配置文件，读取最新版本号
-			QString config = QString("%1%2/%3").arg(QApplication::applicationDirPath()).arg(_NewVersionPath_).arg(_ConFile_);
+			QString config = QString("%1%2/%3").arg(QApplication::applicationDirPath()).arg(_NewVersionPath_).arg(_VersionFile_);
 			QString qstrNewVersionNumber = ParamReadWrite::readParam("version", AppVersion(), _Root_, config).toString();
 			qDebug() << "新版本号" << qstrNewVersionNumber;
 			QStringList list = qstrNewVersionNumber.split(".");
@@ -73,10 +72,21 @@ void AboutDialog::onCheckNewVersion()
 			ui.pageCheck->setVisible(true);
 			ui.btnUpdate->setVisible(false);
 			ui.labelNewVersionNumber->setText("V "+qstrNewVersionNumber);
-			if (list.at(0).toUInt() > _MajorNumber_ || list.at(1).toUInt() > _MinorNumber_ || list.at(2).toUInt() > _BuildNumber_) {
-				//有新版本
-				ui.btnUpdate->setVisible(true);
+			bool bUpdate = false;
+			if (list.at(0).toUInt() > _MajorNumber_) {
+				bUpdate = true;
 			}
+			else if (list.at(0).toUInt() >= _MajorNumber_ && list.at(1).toUInt() > _MinorNumber_) {
+				bUpdate = true;
+			}
+			else if (list.at(0).toUInt() >= _MajorNumber_ && list.at(1).toUInt() >= _MinorNumber_ && list.at(2).toUInt() > _BuildNumber_) {
+				bUpdate = true;
+			}
+			else {
+				return;
+			}
+			if (false == bUpdate) return;
+			ui.btnUpdate->setVisible(true);
 			m_qstrNewVersionName = ParamReadWrite::readParam("file", AppVersion(), _Root_, config).toString();
 			if (m_qstrNewVersionName.isEmpty()) {
 				if (m_bShowing) QMessageBox::warning(this, tr("错误"), tr("更新文件错误"));
@@ -98,7 +108,7 @@ void AboutDialog::onStartUpdate()
 	ui.stackedWidget->setCurrentIndex(2);
 	QString qstrSavePath = QApplication::applicationDirPath() + _NewVersionPath_;
 	QString qstrUrl = QString("%1/%2").arg(_ServerUrl_).arg(m_qstrNewVersionName);
-	qstrUrl = "http://downmini.yun.kugou.com/web/kugou_10112.exe";
+	//qstrUrl = "http://downmini.yun.kugou.com/web/kugou_10112.exe";
 	DownloadTool* download = new DownloadTool(qstrUrl, qstrSavePath);
 	download->startDownload();
 	//TODO 需要增加下载超时
@@ -139,6 +149,8 @@ void AboutDialog::backgroundShow()
 void AboutDialog::onRestartApp()
 {
 	qDebug() << "重启程序";
+	qApp->quit();
+	QProcess::startDetached(qApp->applicationFilePath());
 }
 
 void AboutDialog::showEvent(QShowEvent* event)

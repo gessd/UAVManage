@@ -6,6 +6,7 @@
 #include <QMessageBox>
 #include <QTranslator>
 #include "qtsingleapplication.h"
+#include "paramreadwrite.h"
 
 void outputMessage(QtMsgType type, const QMessageLogContext& context, const QString& msg)
 {
@@ -41,6 +42,41 @@ void outputMessage(QtMsgType type, const QMessageLogContext& context, const QStr
 	mutex.unlock();
 }
 
+bool checkVersion() 
+{
+	QString config = QString("%1%2/%3").arg(QApplication::applicationDirPath()).arg(_NewVersionPath_).arg(_VersionFile_);
+	QString qstrNewVersionNumber = ParamReadWrite::readParam("version", AppVersion(), _Root_, config).toString();
+	qDebug() << "记录的版本号" << qstrNewVersionNumber;
+	QStringList list = qstrNewVersionNumber.split(".");
+	if (list.count() != 3) {
+		return false;
+	}
+	bool bUpdate = false;
+	if (list.at(0).toUInt() > _MajorNumber_) {
+		bUpdate = true;
+	}
+	else if (list.at(0).toUInt() >= _MajorNumber_ && list.at(1).toUInt() > _MinorNumber_) {
+		bUpdate = true;
+	}
+	else if (list.at(0).toUInt() >= _MajorNumber_ && list.at(1).toUInt() >= _MinorNumber_ && list.at(2).toUInt() > _BuildNumber_) {
+		bUpdate = true;
+	}
+	else {
+		return false;
+	}
+	if (bUpdate) {
+		QString qstrFileName = ParamReadWrite::readParam("file", AppVersion(), _Root_, config).toString();
+		QString qstrFilePath = QApplication::applicationDirPath() + _NewVersionPath_ + "/" + qstrFileName;
+		if (false == QFile::exists(qstrFilePath)) return false;
+		QProcess process;
+		qDebug() << "启动新版本安装程序" << qstrNewVersionNumber << qstrFilePath;
+		process.startDetached(qstrFilePath);
+		process.waitForStarted(1000);
+		return true;
+	}
+	return false;
+}
+
 int main(int argc, char *argv[])
 {
 	QtSingleApplication a("myapp_id", argc, argv);
@@ -64,6 +100,11 @@ int main(int argc, char *argv[])
         qApp->setStyleSheet(file.readAll());
         file.close();
     }
+	if (checkVersion()) {
+		qDebug() << "有新版本程序文件，关闭程序";
+		return 0;
+	}
+	deleteDir(QApplication::applicationDirPath()+_NewVersionPath_);
 	//主程序
     UAVManage w;
     w.show();
