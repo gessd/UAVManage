@@ -801,7 +801,6 @@ void UAVManage::onUpdateMusic(QString qstrFilePath)
 
 void UAVManage::onCurrentMusicTime(unsigned int second)
 {
-	qDebug() << "当前音乐时间" << second;
 	m_pDeviceManage->updateMusicTime(second);
 }
 

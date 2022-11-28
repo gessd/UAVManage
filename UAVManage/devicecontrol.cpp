@@ -215,7 +215,7 @@ int DeviceControl::DeviceMavWaypointStart(QVector<NavWayPointData> data)
 	if (!isConnectDevice()) return DeviceUnConnect;
 	int count = data.count();
 	if (count <= 0) return DeviceDataError;
-
+	emit sigWaypointProcess(ui.labelDeviceName->text(), 0, count, 0, true, tr("开始上传舞步"));
 	//标记航点下发是否进行中
 	if (m_bWaypointSending) return DeviceMessageSending;
 	m_bWaypointSending = true;
@@ -359,7 +359,7 @@ void DeviceControl::hvcbReceiveMessage(const hv::SocketChannelPtr& channel, hv::
 	QByteArray arrData((char*)buf->data(), buf->size());
 	if (arrData.isEmpty()) return;
 	QString qstrName = ui.labelDeviceName->text();
-	qDebug() << "收到消息" << qstrName << channel->peeraddr().c_str() << arrData.toHex().toUpper();
+	//qDebug() << "收到消息" << qstrName << channel->peeraddr().c_str() << arrData.toHex().toUpper();
 	QByteArray arrTemp = QString(_DeviceLogPrefix_).toLocal8Bit();
 	if (arrData.contains(arrTemp)) {
 		//日志数据
@@ -380,7 +380,7 @@ void DeviceControl::hvcbReceiveMessage(const hv::SocketChannelPtr& channel, hv::
 	for (int i = 0; i < arrData.length(); i++) {
 		uint8_t par = mavlink_parse_char(0, arrData[i], &msg, &status);
 		if (!par) continue;
-		qDebug() << "消息类型" << qstrName << msg.msgid;
+		//qDebug() << "消息类型" << qstrName << msg.msgid;
 		switch (msg.msgid)
 		{
 		case MAVLINK_MSG_ID_HEARTBEAT://心跳
@@ -462,8 +462,7 @@ void DeviceControl::hvcbWriteComplete(const hv::SocketChannelPtr& channel, hv::B
 	if (buf->size() <= 0) return;
 	QByteArray arrBuf((char*)buf->data(), buf->size());
 	if (arrBuf.isEmpty()) return;
-	emit sigMessageByte(arrBuf, false, 0);
-	qDebug() << "已发送消息" << ui.labelDeviceName->text() << channel->peeraddr().c_str() << arrBuf.toHex().toUpper();
+	//qDebug() << "已发送消息" << ui.labelDeviceName->text() << channel->peeraddr().c_str() << arrBuf.toHex().toUpper();
 }
 
 QByteArray DeviceControl::mavMessageToBuffer(mavlink_message_t mesage)
@@ -473,6 +472,7 @@ QByteArray DeviceControl::mavMessageToBuffer(mavlink_message_t mesage)
 	uint8_t buffer[MAVLINK_MAX_PACKET_LEN] = { 0 };
 	int len = mavlink_msg_to_send_buffer(buffer, &mesage);
 	QByteArray arrData = QByteArray((char*)buffer, len);
+	emit sigMessageByte(arrData, false, mesage.msgid);
 	return arrData;
 }
 
@@ -583,6 +583,15 @@ void DeviceControl::DeviceMavWaypointSend(QVector<NavWayPointData> data)
 	for (int i = 0; i < count; i++) {
 		qDebug() << "舞步序号" << ui.labelDeviceName->text() << i + 1<< _CurrentTime_;
 		NavWayPointData temp = data.at(i);
+		//TODO 飞行测试使用，起飞XY位置为0，其他非飞行数据XY位置为0
+		if (i == 0) {
+			temp.x = 0;
+			temp.y = 0;
+		}
+		if (temp.commandID != 16) {
+			temp.x = 0;
+			temp.y = 0;
+		}
 		//与设备通讯协议中规定X与Y值需要*1000
 		QByteArray arrData = getWaypointData(temp.param1, temp.param2, temp.param3, temp.param4, temp.x * 1000, temp.y * 1000, temp.z, i + 1, 0);
 		QByteArray arrAgainData = getWaypointData(temp.param1, temp.param2, temp.param3, temp.param4, temp.x * 1000, temp.y * 1000, temp.z, i + 1, 1);
@@ -659,16 +668,19 @@ void DeviceControl::onUpdateHeartBeat()
 void DeviceControl::onUpdateConnectStatus(QString name, QString ip, bool connect)
 {
 	if (connect) {
+		qInfo() << name << "无人机连接成功";
 		m_timerHeartbeat.setProperty("time", QDateTime::currentDateTime().toTime_t());
 		m_timerHeartbeat.start(_DeviceHeartbeatInterval_);
 		QPixmap pixmap(":/res/images/uavgreen.png");
 		ui.labelStatus->setPixmap(pixmap.scaled(ui.labelStatus->size()));
 	}
 	else {
+		qInfo() << name << "无人机连接断开";
 		m_timerHeartbeat.stop();
 		QPixmap pixmap(":/res/images/uavred.png");
 		ui.labelStatus->setPixmap(pixmap.scaled(ui.labelStatus->size()));
-		
+		onUpdateLocation(0, 0, 0, 0);
+		onUpdateBatteryStatus(0, 0, 0);
 	}
 }
 

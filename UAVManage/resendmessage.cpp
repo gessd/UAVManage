@@ -17,9 +17,9 @@ ResendMessage::ResendMessage(QString comName, QString qstrName, unsigned int aga
 	m_nMessageID = messageid;
 	m_qstrComName = comName;
 	setAutoDelete(bauto);
-	qDebug() << "----新建线程" << qstrName << this;
+	//qDebug() << "----新建线程" << qstrName << this;
 	connect(this, &QThread::finished, [this]() {
-		qDebug() << "----线程执行完成" << this;
+		//qDebug() << "----线程执行完成" << this;
 		if (false == m_bAutoDelete) return;
 		deleteLater();
 		});
@@ -30,7 +30,7 @@ ResendMessage::~ResendMessage()
 	if (isRunning()) {
 		stopThread();
 	}
-	qDebug() << "----线程释放" << this;
+	//qDebug() << "----线程释放" << this;
 }
 
 QString ResendMessage::getCommandName()
@@ -40,7 +40,7 @@ QString ResendMessage::getCommandName()
 
 void ResendMessage::stopThread()
 {
-	qDebug() << "----停止线程" << m_qstrName << this;
+	//qDebug() << "----停止线程" << m_qstrName << this;
 	m_mutexStop.lock();
 	m_bStop = true;
 	m_mutexStop.unlock();
@@ -62,7 +62,7 @@ void ResendMessage::setAutoDelete(bool bauto)
 void ResendMessage::onResult(QString name, int res, int id)
 {
 	if (m_nMessageID != id) return;
-	qDebug() << "----收到结果" << m_qstrName << res << id << this;
+	//qDebug() << "----收到结果" << m_qstrName << res << id << this;
 	m_mutexResult.lock();
 	m_nResult = res;
 	m_mutexResult.unlock();

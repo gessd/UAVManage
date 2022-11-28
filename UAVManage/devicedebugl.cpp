@@ -44,37 +44,39 @@ void DeviceDebug::onConnectStatus(QString name, QString ip, bool connect)
 
 void DeviceDebug::onDeviceMessage(QByteArray arrData, bool bReceive, int msgID)
 {
+	if (arrData.isEmpty()) return;
 	bool bHeartbeat = false;
 	if (arrData.length() >= 5 && 0 == QString(arrData.at(5))){
 		bHeartbeat = true;
 	}
 	//不显示心跳数据
 	if (bHeartbeat) return;
+	if (44 != msgID && 47 != msgID && 77 != msgID) return;
+	if (Qt::Checked != ui.checkWaypoint->checkState() && (44 == msgID || 47 == msgID)) {
+		return;
+	}
+	else if (Qt::Checked != ui.checkCommand->checkState() && 77 == msgID) {
+		return;
+	}
 	QString qstrText = QDateTime::currentDateTime().toString("[hh:mm:ss.zzz]");
 	QString qstrHex = arrData.toHex().toUpper();
 	QString qstrTemp;
 	if (bReceive) {
-		if (Qt::Checked != ui.checkWaypoint->checkState() && (44 == msgID || 47 == msgID)) {
-			return;
-		} else if (Qt::Checked != ui.checkCommand->checkState() && 77 == msgID) {
-			return;
-		}
-		else {
-			ui.textBrowser->append(QString("<font color=#FFFFFF>%1</font>").arg(qstrText + tr("接收:")));
-			ui.textBrowser->append(QString("<font color=#FF6347>%1</font>").arg(qstrHex));
-		}
+		ui.textBrowser->append(QString("<font color=#000000>%1</font>").arg(qstrText + tr("接收:")));
+		ui.textBrowser->append(QString("<font color=#FF6347>%1</font>").arg(qstrHex));
 	}
 	else {
-		ui.textBrowser->append(QString("<font color=#FFFFFF>%1</font>").arg(qstrText + tr("发送:")));
+		ui.textBrowser->append(QString("<font color=#000000>%1</font>").arg(qstrText + tr("发送:")));
 		ui.textBrowser->append(QString("<font color=#1E90FF>%1</font>").arg(qstrHex));
 	}
 }
 
 void DeviceDebug::onMessageData(QByteArray arrData)
 {
+	if (arrData.isEmpty()) return;
 	if (Qt::Checked != ui.checkLog->checkState()) return;
 	QString qstrText = QDateTime::currentDateTime().toString("[hh:mm:ss.zzz]");
-	ui.textBrowser->append(QString("<font color=#FFFFFF>%1</font>").arg(qstrText + tr("接收:")));
+	ui.textBrowser->append(QString("<font color=#000000>%1</font>").arg(qstrText));
 	ui.textBrowser->append(QString("<font color=#FF6347>%1</font>").arg(arrData.data()));
 }
 

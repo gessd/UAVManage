@@ -180,7 +180,7 @@ QMenu{
 	background:rgb(242,242,242);
 }
 QMenu:hover{
-	background:#11FFF;
+	background:#11FFFF;
 }
 QMenu::item{
 	background:transparent;
