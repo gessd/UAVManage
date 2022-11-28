@@ -14,7 +14,7 @@ DeviceControl::DeviceControl(QString name, float x, float y, QString ip, QWidget
 	m_bHeartbeatEnable = true;
 	m_bWaypointSending = false;
 	m_nCurrentMusicTime = 0;
-	ui.progressBar->setVisible(false);
+	ui.stackedWidgetStatus->setCurrentIndex(0);
 	QPixmap pixmap(":/res/images/uavred.png");
 	ui.labelStatus->setPixmap(pixmap.scaled(ui.labelStatus->size()));
 	//发送消息为了转移到主线程中处理，需要对界面进行处理
@@ -230,7 +230,7 @@ int DeviceControl::DeviceMavWaypointStart(QVector<NavWayPointData> data)
 	QByteArray arrData = mavMessageToBuffer(msg);
 	ui.progressBar->setMaximum(count);
 	ui.progressBar->setValue(0);
-	ui.progressBar->setVisible(true);
+	ui.stackedWidgetStatus->setCurrentIndex(1);
 	m_currentWaypointData = data;
 	ResendMessage* pMessageThread = new ResendMessage(tr("准备上传舞步"), ui.labelDeviceName->text(), _MavWaypointRetryNum_, _MavWaypointTimeout_, arrData, arrData, MAVLINK_MSG_ID_MISSION_COUNT);
 	connect(this, SIGNAL(sigCommandResult(QString, int, int)), pMessageThread, SLOT(onResult(QString, int, int)));
@@ -550,7 +550,7 @@ void DeviceControl::DeviceMavWaypointSend(QVector<NavWayPointData> data)
 	int count = data.count();
 	if (false == m_bWaypointSending || count <= 0) {
 		m_bWaypointSending = false;
-		ui.progressBar->setVisible(false);
+		ui.stackedWidgetStatus->setCurrentIndex(0);
 		emit sigWaypointProcess(ui.labelDeviceName->text(), 0, count, DeviceMessageSending, true, tr("上传舞步中"));
 		return;
 	}
@@ -573,7 +573,7 @@ void DeviceControl::DeviceMavWaypointSend(QVector<NavWayPointData> data)
 	if (DeviceDataSucceed != res) {
 		//上传航点失败或超时，整个过程结束
 		m_bWaypointSending = false;
-		ui.progressBar->setVisible(false);
+		ui.stackedWidgetStatus->setCurrentIndex(0);
 		emit sigWaypointProcess(ui.labelDeviceName->text(), 0, count, res, true, tr("0号舞步"));
 		return;
 	}
@@ -608,7 +608,7 @@ void DeviceControl::DeviceMavWaypointSend(QVector<NavWayPointData> data)
 		if (DeviceDataSucceed != res) {
 			//上传航点失败或超时，整个过程结束
 			m_bWaypointSending = false;
-			ui.progressBar->setVisible(false);
+			ui.stackedWidgetStatus->setCurrentIndex(0);
 			emit sigWaypointProcess(ui.labelDeviceName->text(), i + 1, count, res, true, tr("上传第")+QString::number(i+1)+tr("条舞步"));
 			return;
 		}
@@ -644,7 +644,7 @@ void DeviceControl::DeviceMavWaypointEnd(unsigned int count)
 	//整个上传航点过程结束
 	m_bWaypointSending = false;
 	emit sigWaypointProcess(ui.labelDeviceName->text(), count, count, res, true, tr("结束上传舞步"));
-	ui.progressBar->setVisible(false);
+	ui.stackedWidgetStatus->setCurrentIndex(0);
 }
 
 void DeviceControl::onUpdateHeartBeat()
@@ -697,7 +697,7 @@ void DeviceControl::onWaypointNext()
 	int res = pMessage->getResult();
 	if (DeviceDataSucceed != res) {
 		m_bWaypointSending = false;
-		ui.progressBar->setVisible(false);
+		ui.stackedWidgetStatus->setCurrentIndex(0);
 		emit sigWaypointProcess(ui.labelDeviceName->text(), 0, m_currentWaypointData.count(), res, true, tr("请求上传舞步"));
 		return;
 	}
