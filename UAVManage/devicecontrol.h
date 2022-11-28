@@ -175,11 +175,12 @@ private slots:
 
 	/**
 	 * @brief 更新界面定位
+	 * @param 时间
 	 * @param X 米
 	 * @param Y 米
 	 * @param Z 米
 	 */
-	void onUpdateLocation(float x, float y, float z);
+	void onUpdateLocation(unsigned int time, float x, float y, float z);
 private:
 	/**
 	* @brief TCP连接状态，子线程回调函数

@@ -54,7 +54,7 @@ DeviceControl::DeviceControl(QString name, float x, float y, QString ip, QWidget
 	setIp(ip);
 	setX(x);
 	setY(y);
-	onUpdateLocation(x / 100.0, y / 100.0, 0);
+	onUpdateLocation(0, x / 100.0, y / 100.0, 0);
 }
 
 DeviceControl::~DeviceControl()
@@ -319,9 +319,9 @@ void DeviceControl::onUpdateBatteryStatus(float voltages, float battery, unsigne
 	m_pDebugDialog->onSetBatteryStatus(voltages, battery, electric);
 }
 
-void DeviceControl::onUpdateLocation(float x, float y, float z)
+void DeviceControl::onUpdateLocation(unsigned int time, float x, float y, float z)
 {
-	QString text = QString("X:%1 Y:%2 Z:%2").arg(x).arg(y).arg(z);
+	QString text = QString("X:%1 Y:%2 Z:%3").arg(QString::number(x, 'f', 1)).arg(QString::number(y, 'f', 1)).arg(QString::number(z, 'f', 1));
 	ui.labelLocation->setText(text);
 }
 

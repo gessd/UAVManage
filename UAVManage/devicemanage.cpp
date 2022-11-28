@@ -514,14 +514,14 @@ void DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upload
 			continue;
 		}
 		QVector<NavWayPointData> data = pythonThread.getWaypointData();
-		//最少1条，第一条是设置的起始位置
-		if (1 > data.count()) {
+		//最少2条，第一条是设置的起始位置
+		if (data.count() <= 1) {
 			_ShowWarningMessage(name + tr("没有舞步信息"));
 			continue;
 		}
 		qDebug() << name << "航点数据" << data.count();
 		//TODO 判断最低起飞高度 暂定为0
-		if (0 >= data.at(1).z) {
+		if (0 > data.at(1).z) {
 			_ShowErrorMessage(name + tr("起飞高度太低"));
 			continue;
 		}

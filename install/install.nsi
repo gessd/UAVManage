@@ -32,7 +32,7 @@ ShowUnInstDetails hide
 
 ; 安装程序初始定义常量
 !define PRODUCT_NAME "无人机炫舞编程"											
-!define PRODUCT_VERSION "2.1.1"
+!define PRODUCT_VERSION "2.2.1"
 !define PRODUCT_PUBLISHER "无人机炫舞编程"
 !define PRODUCT_WEB_SITE ""
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
@@ -59,7 +59,7 @@ SetCompressor lzma
 ; 安装完成页面
 ;!define MUI_FINISHPAGE_SHOWREADME
 ;!define MUI_FINISHPAGE_SHOWREADME_Function AutoBoot
-!define MUI_FINISHPAGE_SHOWREADME_TEXT "开机自动启动"
+;!define MUI_FINISHPAGE_SHOWREADME_TEXT "开机自动启动"
 !define MUI_FINISHPAGE_RUN "$INSTDIR\UAVManage.exe"
 !insertmacro MUI_PAGE_FINISH
 
@@ -76,7 +76,7 @@ SetCompressor lzma
 ; ------ MUI 现代界面定义结束 ------
 
 Name "${PRODUCT_NAME}"
-OutFile "无人机炫舞编程_${PRODUCT_VERSION}.exe"
+OutFile "无人机炫舞编程.exe"
 InstallDir "$PROGRAMFILES\UAVManage"
 InstallDirRegKey HKLM "${PRODUCT_UNINST_KEY}" "UninstallString"
 ShowInstDetails show
