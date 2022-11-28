@@ -44,12 +44,12 @@ PlaceInfoDialog::~PlaceInfoDialog()
 QMap<QString, QPoint> PlaceInfoDialog::getStationAddress()
 {
 	QMap<QString, QPoint> stations;
-	stations.insert("A0", QPoint(ui.tableWidget->item(0, 0)->text().toInt() * 100, ui.tableWidget->item(0, 1)->text().toInt() * 100));
-	stations.insert("A1", QPoint(ui.tableWidget->item(1, 0)->text().toInt() * 100, ui.tableWidget->item(1, 1)->text().toInt() * 100));
-	stations.insert("A2", QPoint(ui.tableWidget->item(2, 0)->text().toInt() * 100, ui.tableWidget->item(2, 1)->text().toInt() * 100));
-	stations.insert("A3", QPoint(ui.tableWidget->item(3, 0)->text().toInt() * 100, ui.tableWidget->item(3, 1)->text().toInt() * 100));
-	stations.insert("A4", QPoint(ui.tableWidget->item(4, 0)->text().toInt() * 100, ui.tableWidget->item(4, 1)->text().toInt() * 100));
-	stations.insert("A5", QPoint(ui.tableWidget->item(5, 0)->text().toInt() * 100, ui.tableWidget->item(5, 1)->text().toInt() * 100));
+	stations.insert("A0", QPoint(ui.tableWidget->item(0, 1)->text().toDouble() * 100, ui.tableWidget->item(0, 0)->text().toDouble() * 100));
+	stations.insert("A1", QPoint(ui.tableWidget->item(1, 1)->text().toDouble() * 100, ui.tableWidget->item(1, 0)->text().toDouble() * 100));
+	stations.insert("A2", QPoint(ui.tableWidget->item(2, 1)->text().toDouble() * 100, ui.tableWidget->item(2, 0)->text().toDouble() * 100));
+	stations.insert("A3", QPoint(ui.tableWidget->item(3, 1)->text().toDouble() * 100, ui.tableWidget->item(3, 0)->text().toDouble() * 100));
+	stations.insert("A4", QPoint(ui.tableWidget->item(4, 1)->text().toDouble() * 100, ui.tableWidget->item(4, 0)->text().toDouble() * 100));
+	stations.insert("A5", QPoint(ui.tableWidget->item(5, 1)->text().toDouble() * 100, ui.tableWidget->item(5, 0)->text().toDouble() * 100));
 	return stations;
 }
 
@@ -248,12 +248,12 @@ void PlaceInfoDialog::onParseSettingFrame(QByteArray arrNLINKData)
 			qDebug() << "标定完成";
 			m_nOnekeySetIndex = 0;
 			//检查标定基站位置 -8388为无效值
-			int xmax = 0;
-			int ymax = 0;
+			double xmax = 0;
+			double ymax = 0;
 			for (int row = 0; row < 6; row++) {
 				//暂时检查前6行数值
 				for (int column = 0; column < 2; column ++) {
-					int value = ui.tableWidget->item(row, column)->text().toInt();
+					double value = ui.tableWidget->item(row, column)->text().toDouble();
 					if (0 == row && 0 != value) {
 						//第一行必须全为0
 						QMessageBox::warning(this, tr("提示"), tr("A0基站标定失败，请重试"));
@@ -263,8 +263,8 @@ void PlaceInfoDialog::onParseSettingFrame(QByteArray arrNLINKData)
 						QMessageBox::warning(this, tr("提示"), QString("A%1基站标定失败，请重试").arg(row));
 						return;
 					}
-					if (0 == column) xmax = qMax(xmax, value);
-					if (1 == column) ymax = qMax(ymax, value);
+					if (1 == column) xmax = qMax(xmax, value);
+					if (0 == column) ymax = qMax(ymax, value);
 				}
 			}
 			//判断场地是否太小或太大

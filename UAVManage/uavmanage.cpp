@@ -165,7 +165,7 @@ UAVManage::UAVManage(QWidget* parent)
 		tinyxml2::XMLElement* place = root->FirstChildElement(_ElementPlace_);
 		if (!place) return;
 		place->SetAttribute(_AttributeX_, xmax);
-		place->SetAttribute(_AttributeX_, ymax);
+		place->SetAttribute(_AttributeY_, ymax);
 		error = doc.SaveFile(filename.c_str());
 		});
 	connect(pActionFly4, &QAction::triggered, [this]() { m_pDeviceManage->waypointComposeAndUpload(m_qstrCurrentProjectFile, true); });

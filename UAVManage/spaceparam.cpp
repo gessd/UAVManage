@@ -15,10 +15,10 @@ SpaceParam::SpaceParam(bool init, QWidget *parent)
 	shadow->setColor(QColor("#444444"));
 	shadow->setBlurRadius(10);
 	this->setGraphicsEffect(shadow);
-	ui.lineEditX->setValidator(new QIntValidator(5, 100, this));
-	ui.lineEditY->setValidator(new QIntValidator(5, 100, this));
-	ui.lineEditX->setMaxLength(2);
-	ui.lineEditY->setMaxLength(2);
+	ui.lineEditX->setValidator(new QDoubleValidator(2.0, 100.0, 2, this));
+	ui.lineEditY->setValidator(new QDoubleValidator(2.0, 100.0, 2, this));
+	ui.lineEditX->setMaxLength(5);
+	ui.lineEditY->setMaxLength(5);
 	if (init) {
 		ui.dialogLabelTitle->setText(tr("新建项目"));
 		ui.widgetProject->setVisible(false);
@@ -70,8 +70,8 @@ void SpaceParam::setProjectPath(QString path)
 
 void SpaceParam::setSpaceSize(unsigned int x, unsigned int y)
 {
-	ui.lineEditX->setText(QString::number(x / 100));
-	ui.lineEditY->setText(QString::number(y / 100));
+	ui.lineEditX->setText(QString::number(x / 100.0, 'f', 2));
+	ui.lineEditY->setText(QString::number(y / 100.0, 'f', 2));
 	ui.lineEditX->setEnabled(false);
 	ui.lineEditY->setEnabled(false);
 }
