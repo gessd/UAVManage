@@ -741,9 +741,8 @@ void DeviceManage::on3dNewConnection()
 	obj3dmsg.insert(_Tag_, _TabName_);
 	obj3dmsg.insert(_ID_, _3dDeviceInit);
 	obj3dmsg.insert(_Time_, QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"));
-	//TODO 场地大小暂时改为米
-	obj3dmsg.insert("x", getSpaceSize().x() / 100);
-	obj3dmsg.insert("y", getSpaceSize().y() / 100);
+	obj3dmsg.insert("x", getSpaceSize().x());
+	obj3dmsg.insert("y", getSpaceSize().y());
 	//无人机初始位置
 	QJsonArray jsonArr;
 	for (int i = 0; i < ui.listWidget->count(); i++) {

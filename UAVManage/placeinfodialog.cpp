@@ -5,7 +5,7 @@
 #include <QThread>
 #include <QTimer>
 
-PlaceInfoDialog::PlaceInfoDialog(QWidget *parent)
+PlaceInfoDialog::PlaceInfoDialog(QPoint place, QWidget *parent)
 	: QDialog(parent)
 {
 	ui.setupUi(this);
@@ -13,6 +13,7 @@ PlaceInfoDialog::PlaceInfoDialog(QWidget *parent)
 	m_bSetNLINK = false;
 	m_stationStatus = 0;
 	m_nOnekeySetIndex = -1;
+	m_pointPlace = place;
 	connect(ui.btnComOpen, SIGNAL(clicked()), this, SLOT(onBtnOpenClicked()));
 	connect(ui.btnRead, SIGNAL(clicked()), this, SLOT(onBtnReadClicked()));
 	connect(ui.btnWrite, SIGNAL(clicked()), this, SLOT(onBtnWriteClicked()));
@@ -27,6 +28,7 @@ PlaceInfoDialog::PlaceInfoDialog(QWidget *parent)
 	connect(&m_serialPort, &QSerialPort::readyRead, pSerialWorker, &SerialWorker::onDataReciveWork); // 主线程通知子线程接收数据的信号
 	connect(pSerialWorker, &SerialWorker::sendResultToGui,this, &PlaceInfoDialog::onParseSettingFrame);              // 主线程收到数据结果的信号
 	m_threadSerial.start();                   // 线程开始运行
+	ui.labelSpace->setText(QString("场地大小:%1 X %2米").arg(place.x() / 100).arg(place.y() / 100));
 }
 
 PlaceInfoDialog::~PlaceInfoDialog()
@@ -82,9 +84,9 @@ void PlaceInfoDialog::showEvent(QShowEvent* event)
 		ui.comboBoxCom->addItem(info.portName());
 	}
 	if (1 == ui.comboBoxCom->count()) {
-		QTimer::singleShot(500, [this]() {
-			ui.btnComOpen->click();
-			});
+		//如果当前有可用串口则自动连接
+		//延时是为了让窗口显示完成后再连接，防止阻塞
+		QTimer::singleShot(500, [this]() { ui.btnComOpen->click();});
 	}
 
 	if (m_pLabelBackground) {
@@ -151,12 +153,12 @@ void PlaceInfoDialog::onBtnOnekeyClicked()
 	if (!m_serialPort.isOpen()) return;
 	m_bOnekeySetNLINK = true;
 	m_nOnekeySetIndex = 1;
-	ui.labelSpace->clear();
+	ui.labelStationSpace->clear();
 	qDebug() << "开始一键标定";
 	emit serialDataSend(_OneKey_Set_Start_);
 }
 //NLINK数据转数值,根据协议转换
-float NLINK_ParseInt24(uint8_t byte[3])
+double NLINK_ParseInt24(uint8_t byte[3])
 {
 	int n = (int32_t)(byte[0] << 8 | byte[1] << 16 | byte[2] << 24) / 256;
 	return n / 1000.0f;
@@ -184,7 +186,7 @@ uint8_t getCheckSum(QByteArray arrData)
 
 void PlaceInfoDialog::onParseSettingFrame(QByteArray arrNLINKData)
 {
-	qDebug() << "----nlinkmsg:" << arrNLINKData.length()<<arrNLINKData.toHex().toUpper();
+	//qDebug() << "----nlinkmsg:" << arrNLINKData.length()<<arrNLINKData.toHex().toUpper();
 	QByteArray arrData = arrNLINKData;
 	if (m_bSetNLINK) {
 		m_bSetNLINK = false;
@@ -212,7 +214,7 @@ void PlaceInfoDialog::onParseSettingFrame(QByteArray arrNLINKData)
 		m_bOnekeySetNLINK = false;
 		arrData[_mix] = 0x00;
 		arrData[_group] = 0x00;
-		qDebug() << "----write:" << arrData.toHex().toUpper();
+		//qDebug() << "----write:" << arrData.toHex().toUpper();
 		//重新计数校验位
 		QByteArray arrNew = arrData.left(arrData.length() - 1);
 		arrNew.append(getCheckSum(arrNew));
@@ -228,21 +230,36 @@ void PlaceInfoDialog::onParseSettingFrame(QByteArray arrNLINKData)
 		int led = QByteArray(1, arrData[14]).toHex().toInt(0, 16);
 		ui.comboBox_role->setCurrentIndex(role - 1);
 		ui.lineEdit_ID->setText(QString::number(id));
-		//ui.lineEdit_frequency->setText(QString::number(fre));
+		double xmax = 0;
+		double ymax = 0;
+		bool bUsable = true;
 		for (int row = 0; row < 10; row++) {
 			for (int column = 0; column < 9; column += 3) {
 				int index = (row * 9) + _xyz0 + column;
 				unsigned char temp[3] = { arrData[index], arrData[index + 1], arrData[index + 2] };
-				float number = NLINK_ParseInt24(temp);
-				ui.tableWidget->setItem(row, column / 3, new QTableWidgetItem(QString::number(number)));
+				double number = NLINK_ParseInt24(temp);
+				int n = column / 3;
+				ui.tableWidget->setItem(row, n, new QTableWidgetItem(QString::number(number)));
+				if (1 == n) xmax = qMax(xmax, number);
+				if (0 == n) ymax = qMax(ymax, number);
+				if (0 == row && 0 != number) {
+					bUsable = false;
+				}
+				if (_InvalidValue_ == number && row <6) {
+					bUsable = false;
+				}
 			}
+		}
+		if (bUsable) {
+			ui.labelStationSpace->setText(QString("基站范围:%1 X %2米").arg(xmax).arg(ymax));
+			if (0 == m_nOnekeySetIndex) onComparePlace(QPoint(xmax * 100, ymax * 100));
+		}
+		else {
+			ui.labelStationSpace->setText(QString("基站范围:基站位置或数量错误"));
 		}
 	}
 
 	if (m_nOnekeySetIndex > 0) {
-		emit serialDataSend(_OneKey_Set_Next_);
-		m_nOnekeySetIndex++;
-		ui.progressBar->setValue(m_nOnekeySetIndex);
 		if (m_nOnekeySetIndex > 300) {
 			//一键标定完成
 			qDebug() << "标定完成";
@@ -276,11 +293,27 @@ void PlaceInfoDialog::onParseSettingFrame(QByteArray arrNLINKData)
 				QMessageBox::warning(this, tr("提示"), tr("基站范围距离太近"));
 				return;
 			}
-			ui.labelSpace->setText(QString("场地大小:%1 X %2").arg(xmax).arg(ymax));
+			ui.labelStationSpace->setText(QString("基站范围:%1 X %2米").arg(xmax).arg(ymax));
+			onComparePlace(QPoint(xmax * 100, ymax * 100));
 			m_stationStatus = 1;
 			return;
 		}
+		emit serialDataSend(_OneKey_Set_Next_);
+		m_nOnekeySetIndex++;
+		ui.progressBar->setValue(m_nOnekeySetIndex);
 	}
+}
+
+void PlaceInfoDialog::onComparePlace(QPoint point)
+{
+	if (0 == point.x() || 0 == point.y()) return;
+	if (m_pointPlace == point) return;
+	QMessageBox::StandardButton button = QMessageBox::question(this, tr("询问"), tr("基站范围与项目配置场地大小不一致，是否更新项目配置场地大小？"));
+	if (button != QMessageBox::StandardButton::Yes) {
+		m_stationStatus = 0;
+		return;
+	}
+	m_stationStatus = 1;
 }
 
 SerialWorker::SerialWorker(QSerialPort* ser, QObject* parent /*= nullptr*/)

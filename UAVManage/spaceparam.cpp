@@ -27,6 +27,8 @@ SpaceParam::SpaceParam(bool init, QWidget *parent)
 		ui.dialogLabelTitle->setText(tr("项目属性"));
 		ui.widgetProject->setVisible(true);
 		ui.btnOK->setVisible(false);
+		ui.lineEditX->setEnabled(false);
+		ui.lineEditY->setEnabled(false);
 	}
 	connect(ui.btnOK, &QAbstractButton::clicked, [this]() {
 		//检查输入值
@@ -72,8 +74,6 @@ void SpaceParam::setSpaceSize(unsigned int x, unsigned int y)
 {
 	ui.lineEditX->setText(QString::number(x / 100.0, 'f', 2));
 	ui.lineEditY->setText(QString::number(y / 100.0, 'f', 2));
-	ui.lineEditX->setEnabled(false);
-	ui.lineEditY->setEnabled(false);
 }
 
 void SpaceParam::showEvent(QShowEvent* event)

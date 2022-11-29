@@ -60,20 +60,21 @@ class PlaceInfoDialog : public QDialog
 	Q_OBJECT
 
 public:
-	PlaceInfoDialog(QWidget *parent);
+	PlaceInfoDialog(QPoint place, QWidget *parent);
 	~PlaceInfoDialog();
 	QMap<QString, QPoint> getStationAddress();
 	bool isValidStation();
 protected:
-	virtual void showEvent(QShowEvent* event);
-	virtual void closeEvent(QCloseEvent* event);
-	virtual void hideEvent(QHideEvent* event);
+	void showEvent(QShowEvent* event);
+	void closeEvent(QCloseEvent* event);
+	void hideEvent(QHideEvent* event);
 private slots:
 	void onBtnOpenClicked();
 	void onBtnReadClicked();
 	void onBtnWriteClicked();
 	void onBtnOnekeyClicked();
 	void onParseSettingFrame(QByteArray arrNLINKData);
+	void onComparePlace(QPoint point);
 signals:
 	void serialDataSend(const QByteArray data);
 private:
@@ -86,4 +87,5 @@ private:
 	int m_stationStatus;
 	QThread m_threadSerial;
 	QLabel* m_pLabelBackground;
+	QPoint m_pointPlace;
 };

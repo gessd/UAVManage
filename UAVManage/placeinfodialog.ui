@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>614</width>
-    <height>437</height>
+    <width>534</width>
+    <height>428</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -250,8 +250,21 @@
     <rect>
      <x>20</x>
      <y>390</y>
-     <width>331</width>
-     <height>21</height>
+     <width>251</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QLabel" name="labelStationSpace">
+   <property name="geometry">
+    <rect>
+     <x>280</x>
+     <y>390</y>
+     <width>241</width>
+     <height>31</height>
     </rect>
    </property>
    <property name="text">

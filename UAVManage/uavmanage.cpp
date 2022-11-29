@@ -140,7 +140,7 @@ UAVManage::UAVManage(QWidget* parent)
 		});
 	connect(pActionFly3, &QAction::triggered, [this]() { 
 		if (m_qstrCurrentProjectFile.isEmpty()) return;
-		PlaceInfoDialog info(this);
+		PlaceInfoDialog info(m_pDeviceManage->getSpaceSize(), this);
 		info.exec();
 		if (false == info.isValidStation()) return;
 		QMap<QString, QPoint> map = info.getStationAddress();
