@@ -25,7 +25,7 @@ AboutDialog::AboutDialog(QWidget *parent)
 	ui.stackedWidget->setCurrentIndex(1);
 	ui.pageCheck->setVisible(false);
 	ui.btnRestart->setVisible(false);
-	m_bAutoUpdate = ParamReadWrite::readParam(_Update_).toBool();
+	m_bAutoUpdate = ParamReadWrite::readParam(_Update_, true).toBool();
 	ui.radioButton->setChecked(m_bAutoUpdate);
 	connect(ui.btnClose, &QAbstractButton::clicked, [this]() {  accept(); });
 	connect(ui.btnRetry, &QAbstractButton::clicked, [this]() {  onCheckNewVersion(); });

@@ -33,7 +33,7 @@ ShowUnInstDetails hide
 ; 安装程序初始定义常量
 !define PRODUCT_NAME "无人机炫舞编程"											
 !define PRODUCT_VERSION "2.2.1"
-!define PRODUCT_PUBLISHER "无人机炫舞编程"
+!define PRODUCT_PUBLISHER "奇正数元"
 !define PRODUCT_WEB_SITE ""
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
 !define PRODUCT_UNINST_ROOT_KEY "HKLM"
@@ -54,6 +54,8 @@ SetCompressor lzma
 !insertmacro MUI_PAGE_WELCOME
 ; 许可协议页面!insertmacro MUI_PAGE_LICENSE "c:\path\to\licence\YourSoftwareLicence.txt"
 ; 组件选择页面!insertmacro MUI_PAGE_COMPONENTS
+; 安装目录选择页面
+!insertmacro MUI_PAGE_DIRECTORY
 ; 安装过程页面
 !insertmacro MUI_PAGE_INSTFILES
 ; 安装完成页面
@@ -93,10 +95,11 @@ Section "MainSection" SEC01
 	File /r "${appDir}\imageformats"
 	File /r "${appDir}\mediaservice"
 	File /r "${appDir}\platforms"
-	File /r "${appDir}\python395"
+	File /r "..\UAVManage\python395"
 	File /r "${appDir}\resources"
 	File /r "${appDir}\styles"
 	File /r "${appDir}\translations"
+	File /r "${appDir}\tools"
 	File    "${appDir}\python3.dll"
 	File    "${appDir}\python39.dll"
 	File    "${appDir}\Qt5Charts.dll"
@@ -127,14 +130,15 @@ Section "MainSection" SEC01
 	SetShellVarContext all
 	CreateShortCut "$DESKTOP\无人机炫舞编程.lnk" "$INSTDIR\UAVManage.exe"
 	CreateDirectory "$INSTDIR\Log"
+	CreateDirectory "$INSTDIR\waypoint"
 SectionEnd
 
 
 Section -AdditionalIcons
-  WriteIniStr "$INSTDIR\${PRODUCT_NAME}.url" "InternetShortcut" "URL" "${PRODUCT_WEB_SITE}"
+  ;WriteIniStr "$INSTDIR\${PRODUCT_NAME}.url" "InternetShortcut" "URL" "${PRODUCT_WEB_SITE}"
   CreateDirectory "$SMPROGRAMS\UAVManage"
   CreateShortCut "$SMPROGRAMS\UAVManage\无人机炫舞编程.lnk" "$INSTDIR\UAVManage.exe"
-  CreateShortCut "$SMPROGRAMS\UAVManage\Website.lnk" "$INSTDIR\${PRODUCT_NAME}.url"
+  ;CreateShortCut "$SMPROGRAMS\UAVManage\Website.lnk" "$INSTDIR\${PRODUCT_NAME}.url"
   CreateShortCut "$SMPROGRAMS\UAVManage\Uninstall.lnk" "$INSTDIR\uninst.exe"
 SectionEnd
 
@@ -168,12 +172,12 @@ RequestExecutionLevel admin
 Section Uninstall
 	${DisableX64FSRedirection}
 	SetRegView 64
-	Delete "$INSTDIR\${PRODUCT_NAME}.url"
+	;Delete "$INSTDIR\${PRODUCT_NAME}.url"
 	
 	RMDir /r "$INSTDIR"
 	SetShellVarContext all 
 	Delete "$SMPROGRAMS\UAVManage\Uninstall.lnk"
-	Delete "$SMPROGRAMS\UAVManage\Website.lnk"
+	;Delete "$SMPROGRAMS\UAVManage\Website.lnk"
     Delete "$DESKTOP\无人机炫舞编程.lnk"
 	Delete "C:\Users\Public\Desktop\无人机炫舞编程.lnk"
 	RMDir /r "$SMPROGRAMS\UAVManage"
