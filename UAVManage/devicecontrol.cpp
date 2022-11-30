@@ -679,7 +679,7 @@ void DeviceControl::onUpdateConnectStatus(QString name, QString ip, bool connect
 		m_timerHeartbeat.stop();
 		QPixmap pixmap(":/res/images/uavred.png");
 		ui.labelStatus->setPixmap(pixmap.scaled(ui.labelStatus->size()));
-		onUpdateLocation(0, 0, 0, 0);
+		//onUpdateLocation(0, 0, 0, 0);
 		onUpdateBatteryStatus(0, 0, 0);
 	}
 }

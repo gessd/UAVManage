@@ -26,6 +26,10 @@ void outputMessage(QtMsgType type, const QMessageLogContext& context, const QStr
 		break;
 	case QtFatalMsg:
 		text = QString("Fatal:");
+		break;
+	case QtInfoMsg:
+		text = QString("Info:");
+		break;
 	}
 	QString context_info = QString("File:(%1) Line:(%2)").arg(QString(context.file)).arg(context.line);
 	QString current_date = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss.zzz");
@@ -46,7 +50,7 @@ bool checkVersion()
 {
 	QString config = QString("%1%2/%3").arg(QApplication::applicationDirPath()).arg(_NewVersionPath_).arg(_VersionFile_);
 	QString qstrNewVersionNumber = ParamReadWrite::readParam("version", AppVersion(), _Root_, config).toString();
-	qDebug() << "记录的版本号" << qstrNewVersionNumber;
+	qInfo() << "记录的版本号" << qstrNewVersionNumber;
 	QStringList list = qstrNewVersionNumber.split(".");
 	if (list.count() != 3) {
 		return false;
@@ -69,7 +73,7 @@ bool checkVersion()
 		QString qstrFilePath = QApplication::applicationDirPath() + _NewVersionPath_ + "/" + qstrFileName;
 		if (false == QFile::exists(qstrFilePath)) return false;
 		QProcess process;
-		qDebug() << "启动新版本安装程序" << qstrNewVersionNumber << qstrFilePath;
+		qInfo() << "启动新版本安装程序" << qstrNewVersionNumber << qstrFilePath;
 		process.startDetached(qstrFilePath);
 		process.waitForStarted(1000);
 		return true;
@@ -84,11 +88,11 @@ int main(int argc, char *argv[])
 	qInstallMessageHandler(outputMessage);
 	if (a.isRunning())  //判断实例是否已经运行
 	{
-		qDebug() << "程序已运行";
+		qInfo() << "程序已运行";
 		a.sendMessage("raise_window_noop", 1000);
 		return EXIT_SUCCESS;
 	}
-	qDebug() << "程序启动";
+	qInfo() << "程序启动";
 	//添加翻译文件，用于界面控件中的英文翻译
 	QTranslator translator;
 	if (translator.load(":/res/translations/qt_zh_CN.qm")) {
@@ -101,7 +105,7 @@ int main(int argc, char *argv[])
         file.close();
     }
 	if (checkVersion()) {
-		qDebug() << "有新版本程序文件，关闭程序";
+		qInfo() << "有新版本程序文件，关闭程序";
 		return 0;
 	}
 	deleteDir(QApplication::applicationDirPath()+_NewVersionPath_);
@@ -111,6 +115,6 @@ int main(int argc, char *argv[])
 	a.setActivationWindow(&w);
 	QObject::connect(&a, SIGNAL(messageReceived(const QString&)), &w, SLOT(onAppMessage(const QString&)));
  	int n = a.exec();
-	qDebug() << "程序退出";
+	qInfo() << "程序退出";
     return n;
 }
