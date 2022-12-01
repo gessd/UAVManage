@@ -4,6 +4,7 @@
 #include "paramreadwrite.h"
 #include "downloadtool.h"
 #include <QDebug>
+#include <QTimer>
 #include <QProcess>
 #include <QMessageBox>
 
@@ -36,7 +37,10 @@ AboutDialog::AboutDialog(QWidget *parent)
 		ParamReadWrite::writeParam(_Update_, ui.radioButton->isChecked());
 		});
 	//自动后台更新
-	if (m_bAutoUpdate) onCheckNewVersion();
+	if (m_bAutoUpdate) {
+		//延时检查更新，防止阻塞程序
+		QTimer::singleShot(3000, this, SLOT(onCheckNewVersion()));
+	}
 }
 
 AboutDialog::~AboutDialog()
@@ -106,7 +110,8 @@ void AboutDialog::onStartUpdate()
 {
 	ui.btnRestart->setVisible(false);
 	ui.stackedWidget->setCurrentIndex(2);
-	QString qstrSavePath = QApplication::applicationDirPath() + _NewVersionPath_;
+	//安装文件下载到临时目录，防止出现下载文件不完整
+	QString qstrSavePath = QApplication::applicationDirPath() + "/temp";
 	QString qstrUrl = QString("%1/%2").arg(_ServerUrl_).arg(m_qstrNewVersionName);
 	//qstrUrl = "http://downmini.yun.kugou.com/web/kugou_10112.exe";
 	DownloadTool* download = new DownloadTool(qstrUrl, qstrSavePath);
@@ -119,6 +124,15 @@ void AboutDialog::onStartUpdate()
 		});
 	connect(download, &DownloadTool::sigDownloadFinished, [this](QString error) {
 		if (error.isEmpty()) {
+			qInfo() << "更新文件下载完成" << m_qstrNewVersionName;
+			QString qstrNewFile = QString("%1%2/%3").arg(QApplication::applicationDirPath()).arg(_NewVersionPath_).arg(m_qstrNewVersionName);
+			bool bCopy = QFile::rename(QApplication::applicationDirPath() + "/temp/" + m_qstrNewVersionName, qstrNewFile);
+			if (false == bCopy) {
+				qWarning() << "更新文件移动失败" << m_qstrNewVersionName;
+				ui.stackedWidget->setCurrentIndex(1);
+				if (m_bShowing) QMessageBox::warning(this, tr("错误"), tr("更新文件下载失败，请重试"));
+				return;
+			}
 			ui.btnRestart->setVisible(true);
 			if(nullptr == m_pLabelBackground) backgroundShow();
 			QMessageBox::StandardButton button = QMessageBox::question(this, tr("询问"), tr("新版本下载完成，是否重启更新？"));
@@ -128,7 +142,10 @@ void AboutDialog::onStartUpdate()
 		}
 		else {
 			ui.stackedWidget->setCurrentIndex(1);
-			if (m_bShowing) QMessageBox::warning(this, tr("错误"), tr("更新文件下载失败，请重试"));
+			if (m_bShowing) {
+				qWarning() << "更新文件下载失败" << m_qstrNewVersionName;
+				QMessageBox::warning(this, tr("错误"), tr("更新文件下载失败，请重试"));
+			}
 			return;
 		}
 		});
@@ -148,7 +165,7 @@ void AboutDialog::backgroundShow()
 
 void AboutDialog::onRestartApp()
 {
-	qDebug() << "重启程序";
+	qInfo() << "重启程序";
 	qApp->quit();
 	QProcess::startDetached(qApp->applicationFilePath());
 }

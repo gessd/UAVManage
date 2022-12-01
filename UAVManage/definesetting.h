@@ -3,12 +3,12 @@
 //程序版本号
 #define _MajorNumber_ 2
 #define _MinorNumber_ 2
-#define _BuildNumber_ 1
+#define _BuildNumber_ 2
 //新程序下载存放文件夹
 #define _NewVersionPath_	"/update"
 #define _VersionFile_		"version.ini"
 //服务器地址
-#define _ServerUrl_ "E:/fly/UAVManage/x64/Release/"
+#define _ServerUrl_ "http://39.96.33.244/image/"
 
 //blockly交互端口
 #define _WebSocketPort_ 25252
@@ -17,8 +17,6 @@
 #define _ProjectSuffix       ".qz"
 #define _PyFileSuffix_       ".py"
 #define _BlcoklyFileSuffix_  ".blockly"
-//默认项目名称
-#define _ProjectName    "temp"
 #define _ProjectDirName_ "/code/"
 
 //设备名称前缀
@@ -200,7 +198,7 @@ typedef struct __NavWayPointData
 /**
  * c++ to blockly
  * 1.更加编程区域
- * {"msgID":1,"xml":"data"}
+ * {"msgID":1,"xml":"data", "name":"无人机名称"}
  * 2.清空编程区域
  * {"msgID":2}
  * 3.设置空间范围

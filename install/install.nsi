@@ -182,11 +182,9 @@ Section Uninstall
 	Delete "C:\Users\Public\Desktop\无人机炫舞编程.lnk"
 	RMDir /r "$SMPROGRAMS\UAVManage"
 
-
-
-  DeleteRegKey ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}"
-  DeleteRegKey HKLM "${PRODUCT_DIR_REGKEY}"
   DeleteRegValue HKLM "Software\Microsoft\Windows\CurrentVersion\Run" "SysSafeAddKey"
+  DeleteRegKey HKLM "${PRODUCT_DIR_REGKEY}"
+  DeleteRegKey HKLM "${PRODUCT_UNINST_KEY}"
   SetAutoClose true
   ;删除凭证
 
@@ -216,5 +214,5 @@ FunctionEnd
 
 Function un.onUninstSuccess
   HideWindow
-  MessageBox MB_ICONINFORMATION|MB_OK "$(^Name) 已成功地从您的计算机移除。"
+  ;MessageBox MB_ICONINFORMATION|MB_OK "$(^Name) 已成功地从您的计算机移除。"
 FunctionEnd
