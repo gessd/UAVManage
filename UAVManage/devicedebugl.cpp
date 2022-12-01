@@ -71,13 +71,13 @@ void DeviceDebug::onDeviceMessage(QByteArray arrData, bool bReceive, int msgID)
 	}
 }
 
-void DeviceDebug::onMessageData(QByteArray arrData)
+void DeviceDebug::onMessageData(QString qstrData)
 {
-	if (arrData.isEmpty()) return;
+	if (qstrData.isEmpty()) return;
 	if (Qt::Checked != ui.checkLog->checkState()) return;
 	QString qstrText = QDateTime::currentDateTime().toString("[hh:mm:ss.zzz]");
 	ui.textBrowser->append(QString("<font color=#000000>%1</font>").arg(qstrText));
-	ui.textBrowser->append(QString("<font color=#FF6347>%1</font>").arg(arrData.data()));
+	ui.textBrowser->append(QString("<font color=#FF6347>%1</font>").arg(qstrData));
 }
 
 void DeviceDebug::onSetBatteryStatus(float voltages, float battery, unsigned short electric)

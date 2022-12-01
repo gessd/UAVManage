@@ -284,7 +284,7 @@ signals:
 	//通讯数据 [true接收|flase发送]
     void sigMessageByte(QByteArray, bool, int);
 	//日志消息
-	void sigLogMessage(QByteArray data);
+	void sigLogMessage(QString data);
 	//当前位置信息
 	void sigLocalPosition(unsigned int time_boot_ms, float x, float y, float z);
 	//IMU数据

@@ -939,9 +939,9 @@ void DeviceManage::deviceCalibration()
 	pDialog->addLogToBrowser(pDevice->getName() + tr("：校准开始"));
 	switch (n) {
 	case _Gyro: pDevice->Fun_MAV_CALIBRATION(1, 0, 0, 0, 0, 0, 0, false); break;
-	case _Magnetometer: pDevice->Fun_MAV_CALIBRATION(1, 0, 0, 0, 0, 0, 0, false); break;
-	case _Accelerometer: pDevice->Fun_MAV_CALIBRATION(1, 0, 0, 0, 0, 0, 0, false); break;
-	case _Baro: pDevice->Fun_MAV_CALIBRATION(1, 0, 0, 0, 0, 0, 0, false); break;
+	case _Magnetometer: pDevice->Fun_MAV_CALIBRATION(1, 1, 0, 0, 0, 0, 0, false); break;
+	case _Accelerometer: pDevice->Fun_MAV_CALIBRATION(0, 0, 0, 0, 1, 0, 0, false); break;
+	case _Baro: pDevice->Fun_MAV_CALIBRATION(0, 0, 0, 0, 0, 0, 1, false); break;
 	}
 	pDialog->exec();
 	pDialog->deleteLater();

@@ -1,5 +1,6 @@
 #include "calibrationdialog.h"
 #include <QDateTime>
+#include <QDebug>
 
 CalibrationDialog::CalibrationDialog(QMap<QString, DeviceControl*> map, QWidget *parent)
 	: QDialog(parent)
@@ -27,6 +28,7 @@ CalibrationDialog::CalibrationDialog(DeviceControl* device, QWidget* parent)
 	m_pLabelBackground = nullptr;
 	ui.treeWidget->setVisible(false);
 	ui.widget->setVisible(false);
+	connect(device, &DeviceControl::sigLogMessage, this, &CalibrationDialog::onDeviceMessage);
 }
 
 CalibrationDialog::~CalibrationDialog()
@@ -39,6 +41,7 @@ CalibrationDialog::~CalibrationDialog()
 
 void CalibrationDialog::addLogToBrowser(QString text)
 {
+	qDebug() << text;
 	ui.textBrowser->append(QDateTime::currentDateTime().toString("[hh:mm:ss.zzz]:"));
 	ui.textBrowser->append(text);
 }
@@ -74,12 +77,9 @@ void CalibrationDialog::onBtnCalibrationClicked()
 	}
 }
 
-void CalibrationDialog::onDeviceMessage(QByteArray data)
+void CalibrationDialog::onDeviceMessage(QString data)
 {
-	DeviceControl* pDevice = dynamic_cast<DeviceControl*>(sender());
-	if (nullptr == pDevice) return;
-	QString name = pDevice->getName();
-	addLogToBrowser(name + ": "+ data);
+	addLogToBrowser(data);
 }
 
 void CalibrationDialog::showEvent(QShowEvent* event)

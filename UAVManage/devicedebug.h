@@ -19,7 +19,7 @@ protected:
 public slots:
 	void onConnectStatus(QString name, QString ip, bool connect);
 	void onDeviceMessage(QByteArray arrData, bool bReceive, int msgID);
-	void onMessageData(QByteArray arrData);
+	void onMessageData(QString qstrData);
 	void onSetBatteryStatus(float voltages, float battery, unsigned short electric);
 	void onUpdateHighresImu(unsigned long long time, QList<float> list);
 	void onUpdateAttitude(unsigned int time, float roll, float pitch, float yaw);

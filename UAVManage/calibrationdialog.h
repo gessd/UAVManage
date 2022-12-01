@@ -15,7 +15,7 @@ public:
 	void addLogToBrowser(QString text);
 public slots:
 	void onBtnCalibrationClicked();
-	void onDeviceMessage(QByteArray data);
+	void onDeviceMessage(QString data);
 protected:
 	void showEvent(QShowEvent* event);
 	void hideEvent(QHideEvent* event);

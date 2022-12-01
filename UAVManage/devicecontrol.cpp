@@ -36,7 +36,8 @@ DeviceControl::DeviceControl(QString name, float x, float y, QString ip, QWidget
 	connect(&m_timerHeartbeat, &QTimer::timeout, [this]() {
 		unsigned int nLastTime = m_timerHeartbeat.property("time").toUInt();
 		if ((QDateTime::currentDateTime().toTime_t() - nLastTime) > 10) {
-			//TODO 超过N次没有收到心跳数据断开重新连接
+			//TODO 校准时没有数据信息
+			//qInfo()<< getName() << "设备心跳超时无响应重新连接";
 			//connectDevice();
 		}
 		});
@@ -155,12 +156,13 @@ bool DeviceControl::connectDevice()
 	m_pHvTcpClient->onConnection = std::bind(&DeviceControl::hvcbConnectionStatus, this, std::placeholders::_1);
 	m_pHvTcpClient->onMessage = std::bind(&DeviceControl::hvcbReceiveMessage, this, std::placeholders::_1, std::placeholders::_2);
 	m_pHvTcpClient->onWriteComplete = std::bind(&DeviceControl::hvcbWriteComplete, this, std::placeholders::_1, std::placeholders::_2);
+	m_pHvTcpClient->setConnectTimeout(2 * 1000);
 
 	//配置自动重连模式
 	hv::ReconnectInfo reconn;
-	reconn.min_delay = 1000;
-	reconn.max_delay = 10000;
-	reconn.delay_policy = 2;
+	reconn.min_delay = 2 * 1000;
+	reconn.max_delay = 10 * 1000;
+	reconn.delay_policy = 1;
 	m_pHvTcpClient->setReconnect(&reconn);
 	m_pHvTcpClient->start();
 	return true;
@@ -360,16 +362,18 @@ void DeviceControl::hvcbReceiveMessage(const hv::SocketChannelPtr& channel, hv::
 	if (arrData.isEmpty()) return;
 	QString qstrName = ui.labelDeviceName->text();
 	//qDebug() << "收到消息" << qstrName << channel->peeraddr().c_str() << arrData.toHex().toUpper();
-	QByteArray arrTemp = QString(_DeviceLogPrefix_).toLocal8Bit();
-	if (arrData.contains(arrTemp)) {
+	QByteArray arrStart = QString(_DeviceLogPrefix_).toLocal8Bit();
+	QByteArray arrEnd = QString(_DeviceLogEnd_).toLocal8Bit();
+	if (arrData.contains(arrStart) && arrData.contains(arrEnd)) {
 		//日志数据
 		QByteArray arrLog = arrData;
-		while (arrLog.contains(arrTemp)) {
-			int indexStart = arrLog.indexOf(arrTemp);
-			int indexEnd = arrLog.indexOf(_DeviceLogEnd_) + 1;
+		while (arrLog.contains(arrStart)) {
+			int indexStart = arrLog.indexOf(arrStart);
+			int indexEnd = arrLog.indexOf(arrEnd) + arrEnd.length();
 			if (0 == indexEnd) indexEnd = arrLog.length();
-			QByteArray temp = arrLog.mid(indexStart, indexEnd);
-			emit sigLogMessage(temp);
+			QByteArray temp = arrLog.mid(indexStart + arrStart.length(), indexEnd - arrEnd.length());
+			QString log = getName() + ":" + QString::fromLocal8Bit(temp.data());
+			emit sigLogMessage(log);
 			arrLog = arrLog.right(arrLog.length() - indexEnd);
 		}
 	}
@@ -418,6 +422,7 @@ void DeviceControl::hvcbReceiveMessage(const hv::SocketChannelPtr& channel, hv::
 			int16_t b = battery.current_battery;
 			//计算剩余电量
 			uint16_t n = (float(v - 9600) / (12600 - 9600)) * 100;
+			if (n > 100) n = 100;
 			emit sigBatteryStatus((float)v / 1000, (float)b / 1000, n);
 			m_deviceStatus.battery = n;
 			break;
@@ -686,7 +691,7 @@ void DeviceControl::onUpdateConnectStatus(QString name, QString ip, bool connect
 
 void DeviceControl::onWaypointProcess(QString name, unsigned int index, unsigned int count, int res, bool finish, QString text)
 {
-	emit sigLogMessage(text.toUtf8());
+	emit sigLogMessage(text);
 	ui.progressBar->setValue(index);
 }
 
