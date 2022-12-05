@@ -454,23 +454,6 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 	else emit sigTakeoffFinished(false);
 }
 
-void DeviceManage::allDeviceCalibration()
-{
-	QMap<QString, DeviceControl*> map;
-	for (int i = 0; i < ui.listWidget->count(); i++) {
-		QListWidgetItem* pItem = ui.listWidget->item(i);
-		if (!pItem) continue;
-		QWidget* pWidget = ui.listWidget->itemWidget(pItem);
-		if (!pWidget) continue;
-		DeviceControl* pDevice = dynamic_cast<DeviceControl*>(pWidget);
-		if (!pDevice) continue;
-		QString name = pDevice->getName();
-		map.insert(name, pDevice);
-	}
-	CalibrationDialog* pDialog = new CalibrationDialog(map, this);
-	pDialog->exec();
-}
-
 void DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upload)
 {
 	_MessageListClear
@@ -931,11 +914,12 @@ void DeviceManage::deviceCalibration()
 	int n = pAction->property("Calibration").toInt();
 	DeviceControl* pDevice = getCurrentDevice();
 	if (nullptr == pDevice) return;
-	if (false == pDevice->isConnectDevice()) {
-		QMessageBox::warning(this, tr("提示"), tr("设备未连接，无法校准"));
-		return;
-	}
-	CalibrationDialog* pDialog = new CalibrationDialog(pDevice, dynamic_cast<QWidget*>(parent()));
+	//TODO 测试使用，暂时去掉提示框
+	//if (false == pDevice->isConnectDevice()) {
+	//	QMessageBox::warning(this, tr("提示"), tr("设备未连接，无法校准"));
+	//	return;
+	//}
+	CalibrationDialog* pDialog = new CalibrationDialog(n, pDevice, dynamic_cast<QWidget*>(parent()));
 	pDialog->addLogToBrowser(pDevice->getName() + tr("：校准开始"));
 	switch (n) {
 	case _Gyro: pDevice->Fun_MAV_CALIBRATION(1, 0, 0, 0, 0, 0, 0, false); break;

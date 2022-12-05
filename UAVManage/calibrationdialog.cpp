@@ -21,7 +21,7 @@ CalibrationDialog::CalibrationDialog(QMap<QString, DeviceControl*> map, QWidget 
 	}
 }
 
-CalibrationDialog::CalibrationDialog(DeviceControl* device, QWidget* parent)
+CalibrationDialog::CalibrationDialog(int calib, DeviceControl* device, QWidget* parent)
 	: QDialog(parent)
 {
 	ui.setupUi(this);
@@ -29,6 +29,7 @@ CalibrationDialog::CalibrationDialog(DeviceControl* device, QWidget* parent)
 	ui.treeWidget->setVisible(false);
 	ui.widget->setVisible(false);
 	connect(device, &DeviceControl::sigLogMessage, this, &CalibrationDialog::onDeviceMessage);
+	ui.stackedWidgetProgress->setCurrentIndex(calib);
 }
 
 CalibrationDialog::~CalibrationDialog()
@@ -80,6 +81,30 @@ void CalibrationDialog::onBtnCalibrationClicked()
 void CalibrationDialog::onDeviceMessage(QString data)
 {
 	addLogToBrowser(data);
+
+	QPalette pe;
+	pe.setColor(QPalette::WindowText, Qt::blue);
+	if (data.contains(_AccIng_)) {
+		ui.stackedWidgetProgress->setCurrentIndex(_Accelerometer);
+	}
+	else if (data.contains("Acc +z data get")) {
+		ui.labelAccTop->setPalette(pe);
+	}
+	else if (data.contains("Acc -z data get")) {
+		ui.labelAccBottom->setPalette(pe);
+	}
+	else if (data.contains("Acc +x data get")) {
+		ui.labelAccLeft->setPalette(pe);
+	}
+	else if (data.contains("Acc -x data get")) {
+		ui.labelAccRight->setPalette(pe);
+	}
+	else if (data.contains("Acc +y data get")) {
+		ui.labelAccFront->setPalette(pe);
+	}
+	else if (data.contains("Acc -y data get")) {
+		ui.labelAccBehind->setPalette(pe);
+	}
 }
 
 void CalibrationDialog::showEvent(QShowEvent* event)

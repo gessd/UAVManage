@@ -35,15 +35,6 @@ public:
 		_DeviceQueue,			//列队
 		_DeviceRegain			//回收
 	};
-	enum _CalibrationEnum {
-		_Gyro = 1,			//陀螺校准
-		_Magnetometer,		//磁罗盘校准 
-		_MagEnable,			//磁罗盘使能开关
-		_Remote,			//无效值
-		_Accelerometer,		//加计校准
-		_Compmot,			//无效值
-		_Baro				//电调校准
-	};
 	DeviceManage(QWidget *parent = Q_NULLPTR);
 	~DeviceManage();
 
@@ -105,10 +96,6 @@ public:
 	 * @brief 控制所有设备执行
 	 */
 	void allDeviceControl(_AllDeviceCommand comand);
-	/**
-	* @brief 设备校准
-	*/
-	void allDeviceCalibration();
 
 	/**
 	 * @brief 生成并上传舞步

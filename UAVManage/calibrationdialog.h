@@ -4,13 +4,15 @@
 #include "ui_calibrationdialog.h"
 #include "devicecontrol.h"
 
+#define _AccIng_   "acc calib"
+
 class CalibrationDialog : public QDialog
 {
 	Q_OBJECT
 
 public:
 	CalibrationDialog(QMap<QString, DeviceControl*> map, QWidget *parent);
-	CalibrationDialog(DeviceControl* device, QWidget* parent);
+	CalibrationDialog(int calib, DeviceControl* device, QWidget* parent);
 	~CalibrationDialog();
 	void addLogToBrowser(QString text);
 public slots:

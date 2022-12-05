@@ -56,6 +56,16 @@ enum _WaypointType {
 	_WaypointTime		= 31005		//时间信息
 };
 
+enum _CalibrationEnum {
+	_Gyro = 0,			//陀螺校准
+	_Magnetometer,		//磁罗盘校准 
+	_MagEnable,			//磁罗盘使能开关
+	_Remote,			//无效值
+	_Accelerometer,		//加计校准
+	_Compmot,			//无效值
+	_Baro				//电调校准
+};
+
 enum _DeviceStatus
 {
 	//程序内部错误
