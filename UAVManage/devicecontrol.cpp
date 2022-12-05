@@ -656,7 +656,6 @@ void DeviceControl::onUpdateHeartBeat()
 {
 	unsigned int nTime = QDateTime::currentDateTime().toTime_t();
 	m_timerHeartbeat.setProperty("time", nTime);
-	ui.labelStatus->setVisible(true);
 	QString qstrImagePath = ":/res/images/uavgreen.png";
 	QString qstrCurrent = ui.labelStatus->property("iamgepath").toString();
 	if (qstrCurrent == qstrImagePath) {
