@@ -27,6 +27,12 @@
     <Filter Include="Header Files\qtsingleapplication">
       <UniqueIdentifier>{2a1eb06a-03e7-4da7-bab4-03dac2a3097c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\serial">
+      <UniqueIdentifier>{a2ae34ba-cabd-4121-9dc9-ae717c035344}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\serial">
+      <UniqueIdentifier>{0b950286-0450-4aef-923f-24b5cc924435}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <QtRcc Include="uavmanage.qrc">
@@ -106,6 +112,15 @@
     <ClCompile Include="downloadtool.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="deviceserial.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="serial\qextserialenumerator.cpp">
+      <Filter>Source Files\serial</Filter>
+    </ClCompile>
+    <ClCompile Include="serial\qextserialenumerator_win.cpp">
+      <Filter>Source Files\serial</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="devicemanage.h">
@@ -165,6 +180,12 @@
     <QtMoc Include="downloadtool.h">
       <Filter>Header Files</Filter>
     </QtMoc>
+    <QtMoc Include="deviceserial.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="serial\qextserialenumerator.h">
+      <Filter>Header Files\serial</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="devicemanage.ui">
@@ -197,6 +218,9 @@
     <QtUic Include="aboutdialog.ui">
       <Filter>Form Files</Filter>
     </QtUic>
+    <QtUic Include="deviceserial.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mavlinksetting.h">
@@ -216,6 +240,12 @@
     </ClInclude>
     <ClInclude Include="define3d.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="serial\qextserialport_global.h">
+      <Filter>Header Files\serial</Filter>
+    </ClInclude>
+    <ClInclude Include="serial\qextserialenumerator_p.h">
+      <Filter>Header Files\serial</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

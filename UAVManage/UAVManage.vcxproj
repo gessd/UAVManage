@@ -80,7 +80,7 @@
       <AdditionalIncludeDirectories>.\qtsingleapplication;.\python395-64\include;.\mavlink1-c\common;.\mavlink1-c\;.\libhv\include;.\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Setupapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>.\python395-64\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
     </Link>
@@ -119,6 +119,7 @@
     <QtUic Include="devicecontrol.ui" />
     <QtUic Include="devicedebug.ui" />
     <QtUic Include="devicemanage.ui" />
+    <QtUic Include="deviceserial.ui" />
     <QtUic Include="messagelistdialog.ui" />
     <QtUic Include="placeinfodialog.ui" />
     <QtUic Include="SoundGrade.ui" />
@@ -137,6 +138,7 @@
     </ClCompile>
     <ClCompile Include="devicedebugl.cpp" />
     <ClCompile Include="devicemanage.cpp" />
+    <ClCompile Include="deviceserial.cpp" />
     <ClCompile Include="downloadtool.cpp" />
     <ClCompile Include="messagelistdialog.cpp" />
     <ClCompile Include="musicscale.cpp" />
@@ -146,6 +148,8 @@
     <ClCompile Include="qtsingleapplication\qtsingleapplication.cpp" />
     <ClCompile Include="qwchartview.cpp" />
     <ClCompile Include="resendmessage.cpp" />
+    <ClCompile Include="serial\qextserialenumerator.cpp" />
+    <ClCompile Include="serial\qextserialenumerator_win.cpp" />
     <ClCompile Include="SoundGrade.cpp" />
     <ClCompile Include="spaceparam.cpp" />
     <ClCompile Include="threadpython.cpp" />
@@ -170,6 +174,7 @@
     <ClInclude Include="definesetting.h" />
     <QtMoc Include="devicedebug.h" />
     <QtMoc Include="downloadtool.h" />
+    <QtMoc Include="deviceserial.h" />
     <ClInclude Include="libhvsetting.h" />
     <ClInclude Include="mavlinksetting.h" />
     <QtMoc Include="threadpython.h" />
@@ -183,6 +188,9 @@
     <QtMoc Include="SoundGrade.h" />
     <QtMoc Include="paramreadwrite.h" />
     <QtMoc Include="spaceparam.h" />
+    <QtMoc Include="serial\qextserialenumerator.h" />
+    <ClInclude Include="serial\qextserialenumerator_p.h" />
+    <ClInclude Include="serial\qextserialport_global.h" />
     <ClInclude Include="tinyxml2\tinyxml2.h" />
     <QtMoc Include="resendmessage.h" />
   </ItemGroup>

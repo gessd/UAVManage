@@ -12,6 +12,7 @@
 #include "messagelistdialog.h"
 #include "aboutdialog.h"
 
+class DeviceSerial;
 class SoundGrade;
 class UAVManage : public QMainWindow
 {
@@ -134,6 +135,11 @@ private slots:
      * @brief 项目属性查看
      */
     void onProjectAttribute();
+
+    /**
+     * @brief 无人机串口可用
+     */
+    void onDeviceSerialEnabled(bool enable);
 private:
     /**
      * @brief 新建项目工程文件
@@ -165,5 +171,9 @@ private:
     QToolButton* m_pButtonFlyPrepare;
     //属性菜单，没有打开项目前禁止点击
     QAction* m_pActionAttribute;
+    //升级串口
     AboutDialog* m_pAbout;
+    //无人机网络设置
+    DeviceSerial* m_pDeviceNetwork;
+    QAbstractButton* m_pBtnSerial;
 };

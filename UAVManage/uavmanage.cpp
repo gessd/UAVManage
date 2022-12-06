@@ -19,6 +19,7 @@
 #include "SoundGrade.h"
 #include "paramreadwrite.h"
 #include "spaceparam.h"
+#include "deviceserial.h"
 
 UAVManage::UAVManage(QWidget* parent)
 	: QMainWindow(parent)
@@ -183,6 +184,13 @@ UAVManage::UAVManage(QWidget* parent)
 	connect(m_pSoundWidget, &SoundGrade::sigMsuicTime, this, &UAVManage::onCurrentMusicTime);
 	connect(m_pSoundWidget, &SoundGrade::playeState, this, &UAVManage::onCurrentPlayeState);
 	connect(m_pSoundWidget, &SoundGrade::updateMusicWaveFinished, this, &UAVManage::onMusicWaveFinished);
+
+	//设备IP地址信息
+	m_pDeviceNetwork = new DeviceSerial(this);
+	m_pBtnSerial = initMenuButton(tr("网络"), ":/res/menu/P01_file_open_btn_cli.png", ":/res/menu/P01_file_open_btn_cli.png", nullptr);
+	//m_pBtnSerial->setVisible(false);
+	connect(m_pBtnSerial, &QAbstractButton::clicked, [this]() {m_pDeviceNetwork->exec(); });
+	ui.toolBar->addWidget(m_pBtnSerial);	
 }
 
 UAVManage::~UAVManage()
@@ -205,6 +213,11 @@ UAVManage::~UAVManage()
 		m_pAbout->close();
 		m_pAbout->deleteLater();
 		m_pAbout = nullptr;
+	}
+	if (m_pDeviceNetwork) {
+		m_pDeviceNetwork->close();
+		m_pDeviceNetwork->deleteLater();
+		m_pDeviceNetwork = nullptr;
 	}
 }
 
@@ -831,6 +844,14 @@ void UAVManage::onProjectAttribute()
 	QPoint point = m_pDeviceManage->getSpaceSize();
 	space.setSpaceSize(point.x(), point.y());
 	if (QDialog::Accepted != space.exec())return;
+}
+
+void UAVManage::onDeviceSerialEnabled(bool enable)
+{
+	m_pBtnSerial->setVisible(false);
+	if (enable) {
+		m_pBtnSerial->setVisible(true);
+	}
 }
 
 bool UAVManage::newProjectFile(QString qstrFile, unsigned int X, unsigned int Y)
