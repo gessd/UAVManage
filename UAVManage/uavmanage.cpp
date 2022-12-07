@@ -20,6 +20,7 @@
 #include "paramreadwrite.h"
 #include "spaceparam.h"
 #include "deviceserial.h"
+#include "waitingwidget.h"
 
 UAVManage::UAVManage(QWidget* parent)
 	: QMainWindow(parent)
@@ -29,7 +30,7 @@ UAVManage::UAVManage(QWidget* parent)
 	m_pWebBockly = nullptr;
 	m_pDeviceManage = nullptr;
 	m_p3DProcess = nullptr;
-
+	m_pBackgrounMask = nullptr;
 	MessageListDialog::getInstance()->setParent(this);
 	//程序初始化
 	connect(ui.webEngineView, SIGNAL(loadProgress(int)), this, SLOT(onWebLoadProgress(int)));
@@ -133,11 +134,15 @@ UAVManage::UAVManage(QWidget* parent)
 	
 	connect(pActionFly1, &QAction::triggered, [this]() { m_pDeviceManage->waypointComposeAndUpload(m_qstrCurrentProjectFile, false); });
 	connect(pActionFly2, &QAction::triggered, [this]() { 
-		//if (m_qstrCurrentProjectFile.isEmpty()) return;
+		if (m_pBackgrounMask == nullptr) {
+			m_pBackgrounMask = new WaitingWidget(this);
+		}
+		m_pBackgrounMask->setGeometry(this->rect());
+		m_pBackgrounMask->show();
 		QDir::setCurrent(QApplication::applicationDirPath() + "/3D");
 		m_p3DProcess->start("UAV_Program_UE4.exe");
+		m_p3DProcess->waitForStarted(3000);
 		QDir::setCurrent(QApplication::applicationDirPath());
-		//m_p3DProcess->waitForFinished();
 		});
 	connect(pActionFly3, &QAction::triggered, [this]() { 
 		if (m_qstrCurrentProjectFile.isEmpty()) return;
@@ -195,6 +200,12 @@ UAVManage::UAVManage(QWidget* parent)
 
 UAVManage::~UAVManage()
 {
+	if (m_p3DProcess) {
+		m_p3DProcess->close();
+		m_p3DProcess->kill();
+		m_p3DProcess->deleteLater();
+		m_p3DProcess = nullptr;
+	}
 	if (m_pSoundWidget) {
 		delete m_pSoundWidget;
 		m_pSoundWidget = nullptr;
@@ -826,6 +837,7 @@ void UAVManage::onCurrentPlayeState(qint8 state)
 void UAVManage::on3DDialogStauts(bool connect)
 {
 	if (connect) {
+		if (m_pBackgrounMask) m_pBackgrounMask->close();
 		onMusicWaveFinished();
 		m_pDeviceManage->waypointComposeAndUpload(m_qstrCurrentProjectFile, false);
 	}

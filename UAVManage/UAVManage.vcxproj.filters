@@ -121,6 +121,9 @@
     <ClCompile Include="serial\qextserialenumerator_win.cpp">
       <Filter>Source Files\serial</Filter>
     </ClCompile>
+    <ClCompile Include="waitingwidget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="devicemanage.h">
@@ -186,6 +189,9 @@
     <QtMoc Include="serial\qextserialenumerator.h">
       <Filter>Header Files\serial</Filter>
     </QtMoc>
+    <QtMoc Include="waitingwidget.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="devicemanage.ui">
@@ -219,6 +225,9 @@
       <Filter>Form Files</Filter>
     </QtUic>
     <QtUic Include="deviceserial.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="waitingwidget.ui">
       <Filter>Form Files</Filter>
     </QtUic>
   </ItemGroup>

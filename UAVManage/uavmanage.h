@@ -12,6 +12,7 @@
 #include "messagelistdialog.h"
 #include "aboutdialog.h"
 
+class WaitingWidget;
 class DeviceSerial;
 class SoundGrade;
 class UAVManage : public QMainWindow
@@ -176,4 +177,5 @@ private:
     //无人机网络设置
     DeviceSerial* m_pDeviceNetwork;
     QAbstractButton* m_pBtnSerial;
+    WaitingWidget* m_pBackgrounMask;
 };

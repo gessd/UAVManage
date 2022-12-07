@@ -112,6 +112,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="waitingwidget.cpp" />
     <QtRcc Include="uavmanage.qrc" />
     <QtUic Include="aboutdialog.ui" />
     <QtUic Include="adddevicedialog.ui" />
@@ -156,6 +157,7 @@
     <ClCompile Include="tinyxml2\tinyxml2.cpp" />
     <ClCompile Include="uavmanage.cpp" />
     <ClCompile Include="main.cpp" />
+    <QtUic Include="waitingwidget.ui" />
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="devicemanage.h" />
@@ -167,6 +169,7 @@
     <QtMoc Include="adddevicedialog.h" />
   </ItemGroup>
   <ItemGroup>
+    <QtMoc Include="waitingwidget.h" />
     <QtMoc Include="AudioDecoder.h" />
     <QtMoc Include="calibrationdialog.h" />
     <QtMoc Include="aboutdialog.h" />

@@ -37,5 +37,6 @@
         <file>res/images/newproject.png</file>
         <file>res/images/windows_close.png</file>
         <file>res/images/networkerror.png</file>
+        <file>res/images/waiting.gif</file>
     </qresource>
 </RCC>
