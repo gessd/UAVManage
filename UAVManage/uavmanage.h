@@ -154,6 +154,8 @@ private:
      * @brief 建立工具栏按钮菜单
      */
     QToolButton* initMenuButton(QString text, QString noramlicon, QString activeicon, QMenu* menu);
+signals:        
+    void sigWindowFinished();
 private:
     Ui::UAVManageClass ui;
     //设备列表

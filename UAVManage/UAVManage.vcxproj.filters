@@ -124,6 +124,9 @@
     <ClCompile Include="waitingwidget.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="firstdialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="devicemanage.h">
@@ -192,6 +195,9 @@
     <QtMoc Include="waitingwidget.h">
       <Filter>Header Files</Filter>
     </QtMoc>
+    <QtMoc Include="firstdialog.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="devicemanage.ui">
@@ -228,6 +234,9 @@
       <Filter>Form Files</Filter>
     </QtUic>
     <QtUic Include="waitingwidget.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="firstdialog.ui">
       <Filter>Form Files</Filter>
     </QtUic>
   </ItemGroup>

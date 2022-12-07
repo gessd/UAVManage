@@ -246,6 +246,7 @@ void UAVManage::updateStyle()
 void UAVManage::loadWeb()
 {
 	QString qstrUrl = "file:///" + QApplication::applicationDirPath() + "/blockly_dev/blockly_dev/code/index.html";
+	qInfo() << "打开编程区" << qstrUrl;
 	ui.webEngineView->load(QUrl(qstrUrl));
 }
 
@@ -317,7 +318,7 @@ void UAVManage::onNewProject()
 
 void UAVManage::onOpenProject(QString qstrFile)
 {
-	qDebug() << "打开工程" << qstrFile;
+	qInfo() << "打开工程" << qstrFile;
 	m_qstrCurrentProjectFile.clear();
 	onWebClear();
 	if (m_pDeviceManage) m_pDeviceManage->clearDevice();
@@ -344,7 +345,7 @@ void UAVManage::onOpenProject(QString qstrFile)
 	unsigned int y = place->IntAttribute(_AttributeY_);
 	m_pDeviceManage->setSpaceSize(x, y);
 	if (m_pWebBockly) {
-		qDebug() << "发送场地范围到编程区";
+		qInfo() << "发送场地范围到编程区";
 		QPoint space = m_pDeviceManage->getSpaceSize();
 		QJsonObject jsonObj;
 		jsonObj.insert(_WMID, _WIDSet);
@@ -485,13 +486,14 @@ void UAVManage::onWebLoadProgress(int progress)
 void UAVManage::onWebLoadFinished(bool finished)
 {
 	//网页加载完成
-	static bool bInit = false;
-	if (bInit) return;
-	bInit = true;
-	QString qstrPath = ParamReadWrite::readParam(_Path_).toString();
-	if (qstrPath.isEmpty()) return;
-	if (!QFile::exists(qstrPath)) return;
-	onOpenProject(qstrPath);
+	qInfo() << "编程区加载完成";
+	//static bool bInit = false;
+	//if (bInit) return;
+	//bInit = true;
+	//QString qstrPath = ParamReadWrite::readParam(_Path_).toString();
+	//if (qstrPath.isEmpty()) return;
+	//if (!QFile::exists(qstrPath)) return;
+	//onOpenProject(qstrPath);
 }
 
 void UAVManage::onSocketNewConnection()
@@ -499,10 +501,16 @@ void UAVManage::onSocketNewConnection()
 	//不能同时打开两个软件，否则端口占用无法使用
 	//只记录一个web连接，防止通过浏览器访问blockly
 	if (m_pWebBockly) return;
-	qDebug() << "建立编程区域连接";
+	qInfo() << "建立编程区域连接";
 	m_pWebBockly = m_pSocketServer->nextPendingConnection();
 	connect(m_pWebBockly, SIGNAL(textMessageReceived(QString)), this, SLOT(onSocketTextMessageReceived(QString)));
 	connect(m_pWebBockly, SIGNAL(disconnected()), this, SLOT(onSocketDisconnected()));
+	emit sigWindowFinished();
+	//打开上次记录的项目
+	QString qstrPath = ParamReadWrite::readParam(_Path_).toString();
+	if (qstrPath.isEmpty()) return;
+	if (!QFile::exists(qstrPath)) return;
+	onOpenProject(qstrPath);
 }
 
 void UAVManage::onSocketTextMessageReceived(QString message)

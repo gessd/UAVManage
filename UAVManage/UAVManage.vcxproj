@@ -112,6 +112,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="firstdialog.cpp" />
     <ClCompile Include="waitingwidget.cpp" />
     <QtRcc Include="uavmanage.qrc" />
     <QtUic Include="aboutdialog.ui" />
@@ -121,6 +122,7 @@
     <QtUic Include="devicedebug.ui" />
     <QtUic Include="devicemanage.ui" />
     <QtUic Include="deviceserial.ui" />
+    <QtUic Include="firstdialog.ui" />
     <QtUic Include="messagelistdialog.ui" />
     <QtUic Include="placeinfodialog.ui" />
     <QtUic Include="SoundGrade.ui" />
@@ -178,6 +180,7 @@
     <QtMoc Include="devicedebug.h" />
     <QtMoc Include="downloadtool.h" />
     <QtMoc Include="deviceserial.h" />
+    <QtMoc Include="firstdialog.h" />
     <ClInclude Include="libhvsetting.h" />
     <ClInclude Include="mavlinksetting.h" />
     <QtMoc Include="threadpython.h" />

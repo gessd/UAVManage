@@ -7,6 +7,7 @@
 #include <QTranslator>
 #include "qtsingleapplication.h"
 #include "paramreadwrite.h"
+#include "firstdialog.h"
 
 void outputMessage(QtMsgType type, const QMessageLogContext& context, const QString& msg)
 {
@@ -109,12 +110,15 @@ int main(int argc, char *argv[])
 		return 0;
 	}
 	deleteDir(QApplication::applicationDirPath()+_NewVersionPath_);
-	//主程序
-    UAVManage w;
-    w.show();
-	a.setActivationWindow(&w);
+	//引导界面
+	FirstDialog first;
+	a.setActivationWindow(&first);
+	first.show();
+	UAVManage w;
 	QObject::connect(&a, SIGNAL(messageReceived(const QString&)), &w, SLOT(onAppMessage(const QString&)));
- 	int n = a.exec();
-	qInfo() << "程序退出";
+	QObject::connect(&w, &UAVManage::sigWindowFinished, [&]() {first.close();});
+	QObject::connect(&first, &FirstDialog::sigStartApp, [&]() { w.show(); a.setActivationWindow(&w); });
+	int n = a.exec();
+	qInfo() << "程序退出" << n;
     return n;
 }
