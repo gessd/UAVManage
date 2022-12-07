@@ -60,9 +60,6 @@
        <property name="text">
         <string>连接</string>
        </property>
-       <property name="checkable">
-        <bool>true</bool>
-       </property>
        <property name="checked">
         <bool>false</bool>
        </property>
@@ -210,6 +207,15 @@
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <tabstops>
+  <tabstop>lineEditIP</tabstop>
+  <tabstop>lineEditPass</tabstop>
+  <tabstop>lineEditName</tabstop>
+  <tabstop>btnSet</tabstop>
+  <tabstop>btnSerial</tabstop>
+  <tabstop>btnUpdate</tabstop>
+  <tabstop>comboBoxCom</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

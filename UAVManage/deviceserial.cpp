@@ -7,6 +7,7 @@
 #define _UAVPID_ 60000
 #define _SerialStart_ "qz+"
 #define _SerialEnd_   "\r\n"
+#define _SerialOk_ "ok"
 SerialThread::SerialThread(QSerialPort* ser, QObject* parent /*= nullptr*/)
 {
 	m_pSerial = ser;
@@ -88,7 +89,30 @@ void DeviceSerial::updateSerial()
 void DeviceSerial::onSerialData(QByteArray data)
 {
 	if (data.contains(_SerialStart_) && data.contains(_SerialEnd_)) {
-		
+		QString qstrData = QString::fromLocal8Bit(data);
+		QStringList all = qstrData.split(_SerialEnd_);
+		for (int i = 0; i < all.count(); i++) {
+			QString temp = all.at(i);
+			QStringList list = temp.split(":");
+			if (list.count() < 2) continue;
+			QString key = list.at(0);
+			QString msg = list.at(1);
+			if (key.contains("qz+w+ip:") || key.contains("qz+w+name:") || key.contains("qz+w+password:")){
+				if (_SerialOk_ != msg) {
+					QMessageBox::warning(this, tr("警告"), tr("设置失败")+msg);
+					return;
+				}
+			}
+			else if (key.contains("qz+r+ip:")) {
+				ui.lineEditIP->setText(msg);
+			}
+			else if (key.contains("qz+r+name:")) {
+				ui.lineEditName->setText(msg);
+			}
+			else if (key.contains("qz+r+password:")) {
+				ui.lineEditPass->setText(msg);
+			}
+		}
 	}
 }
 
@@ -120,9 +144,13 @@ void DeviceSerial::onBtnRead()
 
 void DeviceSerial::onBtnSerial()
 {
+	ui.lineEditIP->clear();
+	ui.lineEditName->clear();
+	ui.lineEditPass->clear();
 	if (m_serialPort.isOpen()) {
 		ui.btnSerial->setText(tr("连接"));
 		m_serialPort.close();
+		ui.comboBoxCom->setEnabled(true);
 	}
 	else {
 		QString qstrCom = ui.comboBoxCom->currentText();
@@ -133,6 +161,7 @@ void DeviceSerial::onBtnSerial()
 			return;
 		}
 		ui.btnSerial->setText(tr("断开"));
+		ui.comboBoxCom->setEnabled(false);
 	}
 }
 
@@ -149,7 +178,7 @@ void DeviceSerial::onDeviceRemoved(const QextPortInfo& info)
 		//当前已打开串口与拔出串口相同
 		ui.btnSerial->clicked();
 	}
-	QTimer::singleShot(500, [this]() { updateSerial(); });
+	updateSerial();
 }
 
 void DeviceSerial::showEvent(QShowEvent* event)
@@ -162,13 +191,15 @@ void DeviceSerial::showEvent(QShowEvent* event)
 	m_pLabelBackground->setStyleSheet(QString("background-color: rgba(0, 0, 0, 50%);"));
 	m_pLabelBackground->setFixedSize(dynamic_cast<QWidget*>(parent())->size());
 	m_pLabelBackground->show();
-	updateSerial();
+	QTimer::singleShot(1000, [this]() { updateSerial(); });
 }
 
 void DeviceSerial::closeEvent(QCloseEvent* event)
 {
 	if (m_serialPort.isOpen()) {
 		m_serialPort.close();
+		ui.btnSerial->setText(tr("连接"));
+		ui.comboBoxCom->setEnabled(true);
 	}
 }
 
