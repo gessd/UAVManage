@@ -81,29 +81,26 @@ void CalibrationDialog::onBtnCalibrationClicked()
 void CalibrationDialog::onDeviceMessage(QString data)
 {
 	addLogToBrowser(data);
-
-	QPalette pe;
-	pe.setColor(QPalette::WindowText, Qt::blue);
 	if (data.contains(_AccIng_)) {
 		ui.stackedWidgetProgress->setCurrentIndex(_Accelerometer);
 	}
 	else if (data.contains("Acc +z data get")) {
-		ui.labelAccTop->setPalette(pe);
+		ui.labelAccTop->setStyleSheet("background:#7FFFAA;");
 	}
 	else if (data.contains("Acc -z data get")) {
-		ui.labelAccBottom->setPalette(pe);
-	}
-	else if (data.contains("Acc +x data get")) {
-		ui.labelAccLeft->setPalette(pe);
+		ui.labelAccBottom->setStyleSheet("background:#7FFFAA;");
 	}
 	else if (data.contains("Acc -x data get")) {
-		ui.labelAccRight->setPalette(pe);
+		ui.labelAccLeft->setStyleSheet("background:#7FFFAA;");
 	}
-	else if (data.contains("Acc +y data get")) {
-		ui.labelAccFront->setPalette(pe);
+	else if (data.contains("Acc +x data get")) {
+		ui.labelAccRight->setStyleSheet("background:#7FFFAA;");
 	}
 	else if (data.contains("Acc -y data get")) {
-		ui.labelAccBehind->setPalette(pe);
+		ui.labelAccFront->setStyleSheet("background:#7FFFAA;");
+	}
+	else if (data.contains("Acc +y data get")) {
+		ui.labelAccBehind->setStyleSheet("background:#7FFFAA;");
 	}
 }
 

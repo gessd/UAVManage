@@ -31,4 +31,4 @@
 //日志消息前缀
 #define _DeviceLogPrefix_   "日志"
 //日志消息结束
-#define _DeviceLogEnd_   0x0D0A
+#define _DeviceLogEnd_   "\r\n"

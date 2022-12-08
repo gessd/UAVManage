@@ -361,22 +361,36 @@ void DeviceControl::hvcbReceiveMessage(const hv::SocketChannelPtr& channel, hv::
 	QByteArray arrData((char*)buf->data(), buf->size());
 	if (arrData.isEmpty()) return;
 	QString qstrName = ui.labelDeviceName->text();
-	//qDebug() << "收到消息" << qstrName << channel->peeraddr().c_str() << arrData.toHex().toUpper();
-	QByteArray arrStart = QString(_DeviceLogPrefix_).toLocal8Bit();
-	QByteArray arrEnd = QString(_DeviceLogEnd_).toLocal8Bit();
-	if (arrData.contains(arrStart) && arrData.contains(arrEnd)) {
-		//日志数据
-		QByteArray arrLog = arrData;
-		while (arrLog.contains(arrStart)) {
-			int indexStart = arrLog.indexOf(arrStart);
-			int indexEnd = arrLog.indexOf(arrEnd) + arrEnd.length();
-			if (0 == indexEnd) indexEnd = arrLog.length();
-			QByteArray temp = arrLog.mid(indexStart + arrStart.length(), indexEnd - arrEnd.length());
-			QString log = getName() + ":" + QString::fromLocal8Bit(temp.data());
-			emit sigLogMessage(log);
-			arrLog = arrLog.right(arrLog.length() - indexEnd);
+	QString qstrStart(_DeviceLogPrefix_);
+	QString qstrEnd(_DeviceLogEnd_);
+	QString qstrData = QString::fromLocal8Bit(arrData);
+	//qDebug() << "收到消息" << qstrName << channel->peeraddr().c_str() << qstrData << arrData.toHex().toUpper();
+	if (qstrData.contains(qstrStart)) {
+		QString qstrLog = qstrData;
+		while (qstrLog.contains(qstrStart)){
+			int nStart = qstrLog.indexOf(qstrStart);
+			int nEnd = qstrLog.indexOf(qstrEnd) + qstrEnd.length();
+			if (qstrEnd.length() == nEnd) nEnd = qstrLog.length() - nStart;
+			QString temp = qstrLog.mid(nStart, nEnd);
+			qstrLog.remove(temp);
+			emit sigLogMessage(temp);
 		}
 	}
+	//QByteArray arrStart = QString(_DeviceLogPrefix_).toLocal8Bit();
+	//QByteArray arrEnd = QString(_DeviceLogEnd_).toLocal8Bit();
+	//if (arrData.contains(arrStart) && arrData.contains(arrEnd)) {
+	//	//日志数据
+	//	QByteArray arrLog = arrData;
+	//	while (arrLog.contains(arrStart)) {
+	//		int indexStart = arrLog.indexOf(arrStart);
+	//		int indexEnd = arrLog.indexOf(arrEnd) + arrEnd.length();
+	//		if (0 == indexEnd) indexEnd = arrLog.length();
+	//		QByteArray temp = arrLog.mid(indexStart + arrStart.length(), indexEnd - arrEnd.length());
+	//		QString log = getName() + ":" + QString::fromLocal8Bit(temp.data());
+	//		emit sigLogMessage(log);
+	//		arrLog = arrLog.right(arrLog.length() - indexEnd);
+	//	}
+	//}
 	
 	//解包
 	mavlink_message_t msg;
