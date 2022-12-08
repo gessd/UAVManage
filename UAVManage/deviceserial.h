@@ -29,6 +29,7 @@ public:
 	DeviceSerial(QWidget *parent = nullptr);
 	~DeviceSerial();
 	void updateSerial();
+	bool isSerialEnabled();
 public slots:
 	void onSerialData(QByteArray data);
 	void onBtnWrite();

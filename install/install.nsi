@@ -120,7 +120,6 @@ Section "MainSection" SEC01
 	File    "${appDir}\Qt5WebChannel.dll"
 	File    "${appDir}\Qt5WebEngine.dll"
 	File    "${appDir}\Qt5WebEngineCore.dll"
-	File    "${appDir}\Qt5WebEngined.dll"
 	File    "${appDir}\Qt5WebEngineWidgets.dll"
 	File    "${appDir}\Qt5WebSockets.dll"
 	File    "${appDir}\Qt5WebView.dll"

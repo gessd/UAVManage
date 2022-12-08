@@ -58,6 +58,13 @@ DeviceSerial::DeviceSerial(QWidget *parent)
 	m_qextSerial.setUpNotifications();
 	connect(&m_qextSerial, SIGNAL(deviceDiscovered(const QextPortInfo&)), this, SLOT(onDeviceDiscovered(const QextPortInfo&)));
 	connect(&m_qextSerial, SIGNAL(deviceRemoved(const QextPortInfo&)), this, SLOT(onDeviceRemoved(const QextPortInfo&)));
+
+	foreach(QSerialPortInfo info, QSerialPortInfo::availablePorts()) {
+		quint16 pid = info.productIdentifier();
+		//无人机设备PID值
+		if (_UAVPID_ != pid) continue;
+		ui.comboBoxCom->addItem(info.portName());
+	}
 }
 
 DeviceSerial::~DeviceSerial()
@@ -81,9 +88,15 @@ void DeviceSerial::updateSerial()
 		if (_UAVPID_ != pid) continue;
 		ui.comboBoxCom->addItem(info.portName());
 	}
+	emit sigDeviceEnabled(ui.comboBoxCom->count());
 	if (ui.comboBoxCom->count() > 0 && false == m_serialPort.isOpen()) {
 		ui.btnSerial->clicked();
 	}
+}
+
+bool DeviceSerial::isSerialEnabled()
+{
+	return ui.comboBoxCom->count();
 }
 
 void DeviceSerial::onSerialData(QByteArray data)
@@ -187,9 +200,9 @@ void DeviceSerial::showEvent(QShowEvent* event)
 		delete m_pLabelBackground;
 		m_pLabelBackground = nullptr;
 	}
-	m_pLabelBackground = new QLabel(dynamic_cast<QWidget*>(parent()));
+	m_pLabelBackground = new QLabel(dynamic_cast<QWidget*>(parent()->parent()));
 	m_pLabelBackground->setStyleSheet(QString("background-color: rgba(0, 0, 0, 50%);"));
-	m_pLabelBackground->setFixedSize(dynamic_cast<QWidget*>(parent())->size());
+	m_pLabelBackground->setFixedSize(dynamic_cast<QWidget*>(parent()->parent())->size());
 	m_pLabelBackground->show();
 	QTimer::singleShot(1000, [this]() { updateSerial(); });
 }

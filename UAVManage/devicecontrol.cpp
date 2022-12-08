@@ -211,7 +211,7 @@ int DeviceControl::Fun_MAV_CMD_DO_SET_MODE(float Mode, bool wait, bool again)
 int DeviceControl::DeviceMavWaypointStart(QVector<NavWayPointData> data)
 {
 	//TODO 飞控没有处理起飞位置，暂时去掉
-	data.removeFirst();
+	//data.removeFirst();
 
 	qDebug() << "准备发送航点" << ui.labelDeviceName->text() << _CurrentTime_;
 	if (!isConnectDevice()) return DeviceUnConnect;
@@ -589,14 +589,15 @@ void DeviceControl::DeviceMavWaypointSend(QVector<NavWayPointData> data)
 		qDebug() << "舞步序号" << ui.labelDeviceName->text() << i + 1<< _CurrentTime_;
 		NavWayPointData temp = data.at(i);
 		//TODO 飞行测试使用，起飞XY位置为0，其他非飞行数据XY位置为0
-		if (i == 0) {
-			temp.x = 0;
-			temp.y = 0;
-		}
-		if (temp.commandID != 16) {
-			temp.x = 0;
-			temp.y = 0;
-		}
+		//if (i == 0) {
+		//	temp.x = 0;
+		//	temp.y = 0;
+		//}
+		//if (temp.commandID != 16) {
+		//	temp.x = 0;
+		//	temp.y = 0;
+		//}
+		
 		//与设备通讯协议中规定X与Y值需要*1000
 		QByteArray arrData = getWaypointData(temp.param1, temp.param2, temp.param3, temp.param4, temp.x * 1000, temp.y * 1000, temp.z, i + 1, 0);
 		QByteArray arrAgainData = getWaypointData(temp.param1, temp.param2, temp.param3, temp.param4, temp.x * 1000, temp.y * 1000, temp.z, i + 1, 1);

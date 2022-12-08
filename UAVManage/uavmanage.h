@@ -13,7 +13,6 @@
 #include "aboutdialog.h"
 
 class WaitingWidget;
-class DeviceSerial;
 class SoundGrade;
 class UAVManage : public QMainWindow
 {
@@ -136,11 +135,6 @@ private slots:
      * @brief 项目属性查看
      */
     void onProjectAttribute();
-
-    /**
-     * @brief 无人机串口可用
-     */
-    void onDeviceSerialEnabled(bool enable);
 private:
     /**
      * @brief 新建项目工程文件
@@ -176,8 +170,5 @@ private:
     QAction* m_pActionAttribute;
     //升级串口
     AboutDialog* m_pAbout;
-    //无人机网络设置
-    DeviceSerial* m_pDeviceNetwork;
-    QAbstractButton* m_pBtnSerial;
     WaitingWidget* m_pBackgrounMask;
 };

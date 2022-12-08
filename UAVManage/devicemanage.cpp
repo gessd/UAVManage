@@ -8,6 +8,7 @@
 #include "devicedebug.h"
 #include "define3d.h"
 #include "calibrationdialog.h"
+#include "deviceserial.h"
 
 #define _ItemHeight_ 70
 DeviceManage::DeviceManage(QWidget *parent)
@@ -188,6 +189,12 @@ DeviceManage::DeviceManage(QWidget *parent)
 
 	connect(&m_timerUpdateStatus, &QTimer::timeout, this, &DeviceManage::onUpdateStatusTo3D);
 	connect(&m_timerMessage3D, &QTimer::timeout, this, &DeviceManage::onTimeout3DMessage);
+
+	//设备IP地址信息
+	m_pDeviceNetwork = new DeviceSerial(this);
+	ui.btnSerial->setVisible(m_pDeviceNetwork->isSerialEnabled());
+	connect(m_pDeviceNetwork, &DeviceSerial::sigDeviceEnabled, [this](bool enabled) { ui.btnSerial->setVisible(enabled);});
+	connect(ui.btnSerial, &QAbstractButton::clicked, [this]() { m_pDeviceNetwork->exec(); });
 }
 
 DeviceManage::~DeviceManage()
@@ -201,6 +208,11 @@ DeviceManage::~DeviceManage()
 		m_p3dTcpServer->close();
 		delete m_p3dTcpServer;
 		m_p3dTcpServer = nullptr;
+	}
+	if (m_pDeviceNetwork) {
+		m_pDeviceNetwork->close();
+		m_pDeviceNetwork->deleteLater();
+		m_pDeviceNetwork = nullptr;
 	}
 }
 

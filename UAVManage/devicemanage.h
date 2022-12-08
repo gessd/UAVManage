@@ -21,6 +21,7 @@
 #include <QJsonDocument>
 #include "definesetting.h"
 
+class DeviceSerial;
 class DeviceManage : public QWidget
 {
 	Q_OBJECT
@@ -248,4 +249,6 @@ private:
 	QPoint m_pointSpace;
 	//基站定位位置 基站名称及基站位置
 	QMap<QString, QPoint> m_stationMap;
+	//无人机网络设置
+	DeviceSerial* m_pDeviceNetwork;
 };
