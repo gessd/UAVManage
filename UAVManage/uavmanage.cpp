@@ -30,7 +30,7 @@ UAVManage::UAVManage(QWidget* parent)
 	m_pDeviceManage = nullptr;
 	m_p3DProcess = nullptr;
 	m_pBackgrounMask = nullptr;
-	MessageListDialog::getInstance()->setParent(this);
+	//MessageListDialog::getInstance()->setParent(this);
 	//程序初始化
 	connect(ui.webEngineView, SIGNAL(loadProgress(int)), this, SLOT(onWebLoadProgress(int)));
 	connect(ui.webEngineView, SIGNAL(loadFinished(bool)), this, SLOT(onWebLoadFinished(bool)));
@@ -371,7 +371,6 @@ void UAVManage::onOpenProject(QString qstrFile)
 	this->setWindowTitle(name);
 	m_pDeviceManage->setCurrentDevice(qstrCurrnetName);
 	m_pSoundWidget->updateLoadMusic(qstrMusicFilePath);
-	//m_pDeviceManage->setCurrentMusicPath(qstrMusicFilePath);
 	m_pDeviceManage->setEnabled(true);
 	m_pSoundWidget->setEnabled(true);
 	m_pButtonFlyPrepare->setEnabled(true);
@@ -452,6 +451,8 @@ void UAVManage::onWebClear()
 
 void UAVManage::showEvent(QShowEvent* event)
 {
+	qInfo() << "显示主窗口";
+	MessageListDialog::getInstance()->setParent(this);
 	if(!m_pWebBockly) loadWeb();
 }
 
@@ -474,13 +475,6 @@ void UAVManage::onWebLoadFinished(bool finished)
 {
 	//网页加载完成
 	qInfo() << "编程区加载完成";
-	//static bool bInit = false;
-	//if (bInit) return;
-	//bInit = true;
-	//QString qstrPath = ParamReadWrite::readParam(_Path_).toString();
-	//if (qstrPath.isEmpty()) return;
-	//if (!QFile::exists(qstrPath)) return;
-	//onOpenProject(qstrPath);
 }
 
 void UAVManage::onSocketNewConnection()
@@ -488,7 +482,7 @@ void UAVManage::onSocketNewConnection()
 	//不能同时打开两个软件，否则端口占用无法使用
 	//只记录一个web连接，防止通过浏览器访问blockly
 	if (m_pWebBockly) return;
-	qInfo() << "建立编程区域连接";
+	qInfo() << "已建立编程区域连接";
 	m_pWebBockly = m_pSocketServer->nextPendingConnection();
 	connect(m_pWebBockly, SIGNAL(textMessageReceived(QString)), this, SLOT(onSocketTextMessageReceived(QString)));
 	connect(m_pWebBockly, SIGNAL(disconnected()), this, SLOT(onSocketDisconnected()));

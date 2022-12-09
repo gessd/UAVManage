@@ -4,6 +4,7 @@
 #include <QFile>
 #include <QDir>
 #include <QMessageBox>
+#include <QtCore/qmath.h>
 #include "messagelistdialog.h"
 
 struct _MarkPoint
@@ -338,14 +339,33 @@ PyObject* QZAPI::FlyMove(PyObject* self, PyObject* args)
 	data.y = lastWaypoint.y;
 	data.z = lastWaypoint.z;
 	//["前", "1"],["后", "2"],["右", "3"],["左", "4"],["上", "5"],["下", "6"],
-	switch (direction)
-	{
-	case 1: data.x += n; break;
-	case 2: data.x -= n; break;
-	case 3: data.y += n; break;
-	case 4: data.y -= n; break;
-	case 5: data.z += n; break;
-	case 6: data.z -= n; break;
+	int angle = 0;
+	for (int i = 0; i < g_waypointData.count(); i++) {
+		NavWayPointData way = g_waypointData.at(i);
+		if(_WaypointRevolve != way.commandID) continue;
+		angle += way.param1;
+	}
+	if (0 == angle) {
+		switch (direction){
+		case 1: data.x += n; break;
+		case 2: data.x -= n; break;
+		case 3: data.y += n; break;
+		case 4: data.y -= n; break;
+		case 5: data.z += n; break;
+		case 6: data.z -= n; break;
+		}
+	}
+	else {
+		//根据旋转角度计算飞行方向
+		int angle = angle % 360;
+		switch (direction) {
+		case 1: data.x += qCos(angle) * n; data.y += qSin(angle) * n; break;
+		case 2: data.x -= qCos(angle) * n; data.y -= qSin(angle) * n; break;
+		case 3: data.x += qSin(angle) * n; data.y += qCos(angle) * n; break;
+		case 4: data.x -= qSin(angle) * n; data.y -= qCos(angle) * n; break;
+		case 5: data.z += n; break;
+		case 6: data.z -= n; break;
+		}
 	}
 	g_waypointData.append(data);
 	return QZAPI::Instance()->examineWaypoint();

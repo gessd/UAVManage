@@ -630,14 +630,24 @@ void DeviceManage::sendWaypointTo3D(QMap<QString, QVector<NavWayPointData>> map)
 				lastY = data.at(i).y;
 				lastZ = data.at(i).z;
 			}
+			int angle = 0;
 			NavWayPointData waypoint = data.at(i);
 			if (_WaypointSpeed == waypoint.commandID) {
 				//设置飞行速度
 				speed = waypoint.param1;
-				continue;
 				if (speed <= 0) speed = 60;
+				waypoint.x = lastX;
+				waypoint.y = lastY;
+				waypoint.z = lastZ;
+				waypoint.commandID = _WaypointFly;
+			} else if (_WaypointHover == waypoint.commandID) {
+				waypoint.x = lastX;
+				waypoint.y = lastY;
+				waypoint.z = lastZ;
+				waypoint.commandID = _WaypointFly;
 			}
-			if (_WaypointHover == waypoint.commandID) {
+			else if (_WaypointRevolve) {
+				angle = waypoint.param4;
 				waypoint.x = lastX;
 				waypoint.y = lastY;
 				waypoint.z = lastZ;
@@ -664,7 +674,7 @@ void DeviceManage::sendWaypointTo3D(QMap<QString, QVector<NavWayPointData>> map)
 			}
 			timesum += time;
 			QList<QVariant> value;
-			value << timesum << 20 << 0 << 0 << x << y << z << 16;
+			value << timesum << 20 << 0 << angle << x << y << z << 16;
 			arrWaypoint.append(QJsonArray::fromVariantList(value));
 			lastX = x;
 			lastY = y;
