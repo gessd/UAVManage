@@ -636,22 +636,22 @@ void DeviceManage::sendWaypointTo3D(QMap<QString, QVector<NavWayPointData>> map)
 				//设置飞行速度
 				speed = waypoint.param1;
 				if (speed <= 0) speed = 60;
-				waypoint.x = lastX;
-				waypoint.y = lastY;
-				waypoint.z = lastZ;
+				waypoint.param1 = 0;
 				waypoint.commandID = _WaypointFly;
 			} else if (_WaypointHover == waypoint.commandID) {
-				waypoint.x = lastX;
-				waypoint.y = lastY;
-				waypoint.z = lastZ;
 				waypoint.commandID = _WaypointFly;
 			}
-			else if (_WaypointRevolve) {
+			else if (_WaypointRevolve == waypoint.commandID) {
 				angle = waypoint.param4;
 				waypoint.x = lastX;
 				waypoint.y = lastY;
 				waypoint.z = lastZ;
 				waypoint.commandID = _WaypointFly;
+			}
+			else if (_WaypointStart == waypoint.commandID) {
+				//三维中需要第0秒为初始位置
+				waypoint.commandID = _WaypointFly;
+				waypoint.param1 = waypoint.param2 = waypoint.param3 = waypoint.param4 = 0;
 			}
 			//TODO 非航点信息暂时不处理
 			if(_WaypointFly != waypoint.commandID) continue;
@@ -668,7 +668,7 @@ void DeviceManage::sendWaypointTo3D(QMap<QString, QVector<NavWayPointData>> map)
 			//计算空间点距离
 			int d = getDistance(lastX, lastY, lastZ, x, y, z);
 			//计算飞行时间 时间使用毫秒单位
-			int time = d / speed * 1000;
+			int time = d * 1000 / speed;
 			if (waypoint.param1 > 0) {
 				time = time + waypoint.param1 * 1000;
 			}
