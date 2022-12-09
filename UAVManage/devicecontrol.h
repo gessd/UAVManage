@@ -49,7 +49,6 @@ public:
 	void setCurrentTime(unsigned int time);
 	DeviceDebug* getDeviceDebug();
 	void setStartLocation(long x, long y);
-	QList<long> getStartLocation();
 	_stDeviceCurrentStatus getCurrentStatus();
 	/**
 	 * @brief 连接设备

@@ -178,7 +178,7 @@ UAVManage::UAVManage(QWidget* parent)
 		});
 	connect(pActionFly6, &QAction::triggered, [this]() { 
 		if (m_qstrCurrentProjectFile.isEmpty()) return;
-		m_pDeviceManage->allDeviceControl(DeviceManage::_DeviceSetout); 
+		m_pDeviceManage->allDeviceControl(_DeviceSetout); 
 		});
 
 	m_pSoundWidget = new SoundGrade(this);
@@ -774,9 +774,9 @@ void UAVManage::onWaypointProcess(QString name, unsigned int index, unsigned int
 	if (text.isEmpty()) return;
 	if (_DeviceStatus::DeviceDataSucceed == res) {
 		//舞步上传完成并成功
-		_ShowInfoMessage(name + ": " + text + Utility::waypointMessgeFromStatus(res));
+		_ShowInfoMessage(name + ": " + text + Utility::waypointMessgeFromStatus(_DeviceWaypoint, res));
 	} else{
-		_ShowErrorMessage(name + ": " + text + Utility::waypointMessgeFromStatus(res));
+		_ShowErrorMessage(name + ": " + text + Utility::waypointMessgeFromStatus(_DeviceWaypoint, res));
 	}
 }
 

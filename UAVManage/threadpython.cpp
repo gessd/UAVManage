@@ -357,7 +357,7 @@ PyObject* QZAPI::FlyMove(PyObject* self, PyObject* args)
 	}
 	else {
 		//根据旋转角度计算飞行方向
-		int angle = angle % 360;
+		angle = angle % 360;
 		switch (direction) {
 		case 1: data.x += qCos(angle) * n; data.y += qSin(angle) * n; break;
 		case 2: data.x -= qCos(angle) * n; data.y -= qSin(angle) * n; break;

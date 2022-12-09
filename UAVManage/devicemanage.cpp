@@ -145,21 +145,21 @@ DeviceManage::DeviceManage(QWidget *parent)
 		if (!pControl) return;
 		int res = pControl->Fun_MAV_CMD_NAV_TAKEOFF_LOCAL(0, 0, 0, 0, 0, 0, _TakeoffLocalHeight_);
 		if (res == _DeviceStatus::DeviceDataSucceed) return;
-		_ShowErrorMessage(pControl->getName() + tr("起飞") + Utility::waypointMessgeFromStatus(res));
+		_ShowErrorMessage(pControl->getName() + tr("起飞") + Utility::waypointMessgeFromStatus(_DeviceTakeoffLocal, res));
 		});
 	connect(pLand, &QAction::triggered, [this](bool checked) {
 		DeviceControl* pControl = getCurrentDevice();
 		if (!pControl) return;
 		int res = pControl->Fun_MAV_CMD_NAV_LAND_LOCAL(0, 0, 0, 0, 0, 0, 0);
 		if (res == _DeviceStatus::DeviceDataSucceed) return;
-		_ShowErrorMessage(pControl->getName() + tr("降落") + Utility::waypointMessgeFromStatus(res));
+		_ShowErrorMessage(pControl->getName() + tr("降落") + Utility::waypointMessgeFromStatus(_DeviceLandLocal, res));
 		});
 	connect(pStop, &QAction::triggered, [this](bool checked) {
 		DeviceControl* pControl = getCurrentDevice();
 		if (!pControl) return;
 		int res = pControl->Fun_MAV_QUICK_STOP();
 		if (res == _DeviceStatus::DeviceDataSucceed) return;
-		_ShowErrorMessage(pControl->getName() + tr("急停") + Utility::waypointMessgeFromStatus(res));;
+		_ShowErrorMessage(pControl->getName() + tr("急停") + Utility::waypointMessgeFromStatus(_DeviceQuickStop, res));;
 		});
 	connect(pDebug, &QAction::triggered, [this](bool checked) {
 		DeviceControl* pControl = getCurrentDevice();
@@ -381,7 +381,7 @@ QString DeviceManage::isRepetitionDevice(QString qstrName, QString ip, long x, l
 
 void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 {
-	if (DeviceManage::_DeviceTakeoffLocal == comand) {
+	if (_DeviceTakeoffLocal == comand) {
 		//起飞前增加倒计时
 		QLabel label(dynamic_cast<QWidget*>(parent()));
 		//设置窗体的背景色,这里的百分比就是透明度
@@ -420,28 +420,28 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 		QString qstrText;
 		switch (comand)
 		{
-		case DeviceManage::_DeviceTakeoffLocal:
+		case _DeviceTakeoffLocal:
 			res = pDevice->Fun_MAV_CMD_NAV_TAKEOFF_LOCAL(0, 0, 0, 0, 0, 0, _TakeoffLocalHeight_, false);
 			qstrText = tr("起飞");
 			break;
-		case DeviceManage::_DeviceLandLocal:
+		case _DeviceLandLocal:
 			res = pDevice->Fun_MAV_CMD_NAV_LAND_LOCAL(0, 0, 0, 0, 0, 0, 0, false);
 			qstrText = tr("降落");
 			break;
-		case DeviceManage::_DeviceQuickStop:
+		case _DeviceQuickStop:
 			res = pDevice->Fun_MAV_QUICK_STOP(false);
 			qstrText = tr("急停");
 			break;
-		case DeviceManage::_DeviceSetout:
+		case _DeviceSetout:
 			res = pDevice->Fun_MAV_CMD_DO_SET_MODE(3, false);
 			qstrText = tr("准备起飞");
 			break;
-		case DeviceManage::_DeviceQueue:
+		case _DeviceQueue:
 			//降落到初始位置
 			pDevice->Fun_MAV_Defined_Queue(pDevice->getX(), pDevice->getY());
 			qstrText = tr("列队");
 			break;
-		case DeviceManage::_DeviceRegain:
+		case _DeviceRegain:
 		{
 			//按顺序排列
 			int nInterval = 50;			//无人机间隔
@@ -459,10 +459,10 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 			break;
 		}
 		if (_DeviceStatus::DeviceDataSucceed != res) {
-			_ShowErrorMessage(qstrName+qstrText+tr("出错:")+ Utility::waypointMessgeFromStatus(res));
+			_ShowErrorMessage(qstrName+qstrText+tr("出错:")+ Utility::waypointMessgeFromStatus(comand, res));
 		}
 	}
-	if (DeviceManage::_DeviceTakeoffLocal == comand) emit sigTakeoffFinished(true);
+	if (_DeviceTakeoffLocal == comand) emit sigTakeoffFinished(true);
 	else emit sigTakeoffFinished(false);
 }
 
@@ -544,7 +544,7 @@ void DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upload
 		else {
 			//上传航点到飞控
 			int status = pDevice->DeviceMavWaypointStart(data);
-			if (_DeviceStatus::DeviceDataSucceed != status) _ShowWarningMessage(name+Utility::waypointMessgeFromStatus(status));
+			if (_DeviceStatus::DeviceDataSucceed != status) _ShowWarningMessage(name+Utility::waypointMessgeFromStatus(_DeviceWaypoint, status));
 		}
 		map.insert(name, data);
 	}
@@ -960,5 +960,5 @@ void DeviceManage::onDeviceConrolFinished(QString text, int res, QString explain
 	DeviceControl* pControl = dynamic_cast<DeviceControl*>(sender());
 	if (!pControl) return;
 	text.prepend(pControl->getName());
-	_ShowErrorMessage(text + tr("错误:") + Utility::waypointMessgeFromStatus(res));
+	_ShowErrorMessage(text + tr("错误:") + Utility::waypointMessgeFromStatus(_DeviceWaypoint, res));
 }

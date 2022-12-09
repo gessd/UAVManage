@@ -94,6 +94,17 @@ enum PythonRunState
 	PythonWaypointNull
 };
 
+enum _AllDeviceCommand {
+	_DeviceTakeoffLocal = 1, //起飞
+	_DeviceLandLocal,		 //降落
+	_DeviceQuickStop,		 //急停
+	_DeviceSetout,			 //准备起飞
+	_DeviceQueue,			 //列队
+	_DeviceRegain,			 //回收
+	_DeviceLed,					//LED控制
+	_DeviceWaypoint				//舞步
+};
+
 static QString AppVersion() {
 	return QString("%1.%2.%3").arg(_MajorNumber_).arg(_MinorNumber_).arg(_BuildNumber_);
 }
@@ -123,10 +134,24 @@ static bool deleteDir(const QString& path)
 class Utility :public QObject
 {
 public:
-	static QString waypointMessgeFromStatus(int status)
+	static QString waypointMessgeFromStatus(int control, int status)
 	{
-		QString qstrMessage = QString::number(status);
-		switch (status)
+		if (status <= 0) return getControlError(status);
+		switch (control) {
+		case _DeviceTakeoffLocal: return getTakeoffError(status); break;
+		case _DeviceLandLocal: return getLandError(status); break;
+		case _DeviceQuickStop: return getQueueError(status); break;
+		case _DeviceSetout: return getReadyError(status); break;
+		case _DeviceQueue: return getQueueError(status); break;
+		case _DeviceRegain: return getRegainError(status); break;
+		case _DeviceLed: return getLedError(status); break;
+		case _DeviceWaypoint: return getWaypointError(status); break;
+		}
+	}
+	static QString getControlError(int type)
+	{
+		QString qstrMessage = tr("控制出错");
+		switch (type)
 		{
 		case DeviceMessageToimeout:
 			qstrMessage = QObject::tr("没有回应");
@@ -144,19 +169,10 @@ public:
 			qstrMessage = QObject::tr("设备未连接");
 			break;
 		case DeviceWaiting:
-			qstrMessage = QObject::tr("错误");
+			qstrMessage = QObject::tr("操作超时");
 			break;
 		case DeviceDataSucceed:
 			qstrMessage = QObject::tr("成功");
-			break;
-		case FlyNoWaypoint:
-			qstrMessage = QObject::tr("没有航线或航线错误");
-			break;
-		case Flying:
-			qstrMessage = QObject::tr("正在飞行中");
-			break;
-		case FlyNoPrepare:
-			qstrMessage = QObject::tr("没有准备起飞");
 			break;
 		}
 		return qstrMessage;
@@ -173,6 +189,62 @@ public:
 		case _WaypointStart: qstrText = QObject::tr("初始位置"); break;
 		case _WaypointTime: qstrText = QObject::tr("时间信息"); break;
 		}
+		return qstrText;
+	}
+	//准备起飞
+	static QString getReadyError(int type) {
+		QString qstrText = "操作出错";
+		return qstrText;
+	}
+	//起飞
+	static QString getTakeoffError(int type) {
+		QString qstrMessage = "操作出错";
+		switch (type) {
+		case FlyNoWaypoint:
+			qstrMessage = QObject::tr("没有航线或航线错误");
+			break;
+		case Flying:
+			qstrMessage = QObject::tr("正在飞行中");
+			break;
+		case FlyNoPrepare:
+			qstrMessage = QObject::tr("没有准备起飞");
+			break;
+		}
+		return qstrMessage;
+	}
+	//降落
+	static QString getLandError(int type) {
+		QString qstrText = "操作出错";
+		switch (type)
+		{
+		case 1: qstrText = tr("飞机并未起飞"); break;
+		case 2: qstrText = tr("飞机当前正在降落"); break;
+		}
+		return qstrText;
+	}
+	//停止
+	static QString getStopError(int type) {
+		QString qstrText = "操作出错";
+		return qstrText;
+	}
+	//列队
+	static QString getWaypointError(int type) {
+		QString qstrText = "操作出错";
+		return qstrText;
+	}
+	//列队
+	static QString getQueueError(int type) {
+		QString qstrText = "操作出错";
+		return qstrText;
+	}
+	//回收
+	static QString getRegainError(int type) {
+		QString qstrText = "操作出错";
+		return qstrText;
+	}
+	//LED控制
+	static QString getLedError(int type) {
+		QString qstrText = "操作出错";
 		return qstrText;
 	}
 };

@@ -48,7 +48,7 @@ DeviceControl::DeviceControl(QString name, float x, float y, QString ip, QWidget
 		//手动点亮无人机灯光
 		int res = Fun_MAV_LED_MODE();
 		if (_DeviceStatus::DeviceDataSucceed != res) {
-			_ShowErrorMessage(tr("控制LED出错:") + Utility::waypointMessgeFromStatus(res));
+			_ShowErrorMessage(tr("控制LED出错:") + Utility::waypointMessgeFromStatus(_DeviceLed, res));
 		}
 		});
 	setName(name);
@@ -128,13 +128,6 @@ void DeviceControl::setStartLocation(long x, long y)
 {
 	setX(x);
 	setY(y);
-}
-
-QList<long> DeviceControl::getStartLocation()
-{
-	QList<long> list;
-	list << getX() << getY();
-	return list;
 }
 
 _stDeviceCurrentStatus DeviceControl::getCurrentStatus()
