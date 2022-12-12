@@ -53,9 +53,7 @@ DeviceControl::DeviceControl(QString name, float x, float y, QString ip, QWidget
 		});
 	setName(name);
 	setIp(ip);
-	setX(x);
-	setY(y);
-	onUpdateLocation(0, x / 100.0, y / 100.0, 0);
+	setStartLocation(x, y);
 }
 
 DeviceControl::~DeviceControl()
@@ -126,6 +124,7 @@ DeviceDebug* DeviceControl::getDeviceDebug()
 
 void DeviceControl::setStartLocation(long x, long y)
 {
+	onUpdateLocation(0, x/100.0, y/100.0, 0);
 	setX(x);
 	setY(y);
 }

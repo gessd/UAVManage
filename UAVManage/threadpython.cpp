@@ -53,7 +53,7 @@ PyObject* QZAPI::examineWaypoint()
 			break;
 		case _WaypointRevolve: 
 			//旋转角度
-			if (data.param1 >= 360 || data.param1 <= 0) {
+			if (data.param1 >= 360 || data.param1 <= -360) {
 				showWaypointError(tr("旋转角度设定超出范围"));
 				return nullptr;
 			}
@@ -219,7 +219,7 @@ PyObject* QZAPI::FlyHover(PyObject* self, PyObject* args)
 		QZAPI::Instance()->showWaypointError(tr("没有起飞无法悬停"));
 		return nullptr;
 	}
-	//悬停时间精确到毫秒
+	//TODO 悬停时间精确到毫秒
 	NavWayPointData data;
 	data.x = last.x;
 	data.y = last.y;
@@ -358,11 +358,25 @@ PyObject* QZAPI::FlyMove(PyObject* self, PyObject* args)
 	else {
 		//根据旋转角度计算飞行方向
 		angle = angle % 360;
+		double radian = angle * M_PI / 180;
+		qreal temp = qSin(radian);
 		switch (direction) {
-		case 1: data.x += qCos(angle) * n; data.y += qSin(angle) * n; break;
-		case 2: data.x -= qCos(angle) * n; data.y -= qSin(angle) * n; break;
-		case 3: data.x += qSin(angle) * n; data.y += qCos(angle) * n; break;
-		case 4: data.x -= qSin(angle) * n; data.y -= qCos(angle) * n; break;
+		case 1: 
+			data.x += qCos(radian) * n;
+			data.y += qSin(radian) * n;
+			break;
+		case 2: 
+			data.x -= qCos(radian) * n;
+			data.y -= qSin(radian) * n;
+			break;
+		case 3: 
+			data.x -= qSin(radian) * n;
+			data.y -= qCos(radian) * n;
+			break;
+		case 4: 
+			data.x += qSin(radian) * n;
+			data.y += qCos(radian) * n;
+			break;
 		case 5: data.z += n; break;
 		case 6: data.z -= n; break;
 		}

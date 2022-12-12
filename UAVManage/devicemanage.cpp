@@ -623,14 +623,13 @@ void DeviceManage::sendWaypointTo3D(QMap<QString, QVector<NavWayPointData>> map)
 		int lastX = 0;
 		int lastY = 0;
 		int lastZ = 0;
-
+		int angle = 0;
 		for (int i = 0; i < data.count(); i++) {
 			if (0 == i) {
 				lastX = data.at(i).x;
 				lastY = data.at(i).y;
 				lastZ = data.at(i).z;
 			}
-			int angle = 0;
 			NavWayPointData waypoint = data.at(i);
 			if (_WaypointSpeed == waypoint.commandID) {
 				//设置飞行速度
@@ -642,7 +641,9 @@ void DeviceManage::sendWaypointTo3D(QMap<QString, QVector<NavWayPointData>> map)
 				waypoint.commandID = _WaypointFly;
 			}
 			else if (_WaypointRevolve == waypoint.commandID) {
-				angle = waypoint.param4;
+				angle += waypoint.param1;
+				if (angle >= 360) angle = angle % 360;
+				waypoint.param1 = 1;
 				waypoint.x = lastX;
 				waypoint.y = lastY;
 				waypoint.z = lastZ;

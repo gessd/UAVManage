@@ -30,7 +30,7 @@ UAVManage::UAVManage(QWidget* parent)
 	m_pDeviceManage = nullptr;
 	m_p3DProcess = nullptr;
 	m_pBackgrounMask = nullptr;
-	//MessageListDialog::getInstance()->setParent(this);
+	MessageListDialog::getInstance()->setParent(this);
 	//程序初始化
 	connect(ui.webEngineView, SIGNAL(loadProgress(int)), this, SLOT(onWebLoadProgress(int)));
 	connect(ui.webEngineView, SIGNAL(loadFinished(bool)), this, SLOT(onWebLoadFinished(bool)));
