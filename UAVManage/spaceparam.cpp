@@ -1,20 +1,14 @@
 #include "spaceparam.h"
 #include <QIntValidator>
 #include <QMessageBox>
-#include <QGraphicsDropShadowEffect>
 
 SpaceParam::SpaceParam(bool init, QWidget *parent)
 	: QDialog(parent)
 {
 	ui.setupUi(this);
 	m_pLabelBackground = nullptr;
-	setWindowFlags(windowFlags() | Qt::FramelessWindowHint | Qt::Tool);
+	setWindowFlags(windowFlags() | Qt::FramelessWindowHint | Qt::Dialog);
 	this->setAttribute(Qt::WA_TranslucentBackground);
-	QGraphicsDropShadowEffect* shadow = new QGraphicsDropShadowEffect(this);
-	shadow->setOffset(0, 0);
-	shadow->setColor(QColor("#444444"));
-	shadow->setBlurRadius(10);
-	this->setGraphicsEffect(shadow);
 	ui.lineEditX->setValidator(new QDoubleValidator(2.0, 100.0, 2, this));
 	ui.lineEditY->setValidator(new QDoubleValidator(2.0, 100.0, 2, this));
 	ui.lineEditX->setMaxLength(5);

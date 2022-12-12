@@ -1,20 +1,14 @@
 #include "adddevicedialog.h"
 #include "qlineedit.h"
 #include <QRegExpValidator>
-#include <QGraphicsDropShadowEffect>
 
 AddDeviceDialog::AddDeviceDialog(QString qstrName, QWidget *parent)
 	: QDialog(parent)
 {
 	ui.setupUi(this);
 	m_pLabelBackground = nullptr;
-	setWindowFlags(windowFlags() | Qt::FramelessWindowHint | Qt::Tool);
+	setWindowFlags(windowFlags() | Qt::FramelessWindowHint | Qt::Dialog);
 	this->setAttribute(Qt::WA_TranslucentBackground);
-	QGraphicsDropShadowEffect* shadow = new QGraphicsDropShadowEffect(this);
-	shadow->setOffset(0, 0);
-	shadow->setColor(QColor("#444444"));
-	shadow->setBlurRadius(10);
-	this->setGraphicsEffect(shadow);
 	setName(qstrName);
 
 	ui.btnOK->setVisible(true);
