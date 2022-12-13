@@ -11,15 +11,7 @@
 
 enum _MsgID {
 	_3dDeviceInit = 101,
-	_3dDeviceAdd = 102,
-	_3dDeviceRemove = 103,
-	_3dDeviceRename = 104,
-	_3dDeviceLocation = 105,
-	_3dDeviceWaypoint = 106,
-	//_3dDeviceBattery = 107,
-	_3dDeviceMusicPath = 108,
-	_3dDeviceAction = 201,
-	_3dDeviceTime = 202
+	_3dDeviceLocation = 102
 };
 
 //三维消息头部尾部字符

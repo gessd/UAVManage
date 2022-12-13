@@ -170,5 +170,6 @@ private:
     QAction* m_pActionAttribute;
     //升级串口
     AboutDialog* m_pAbout;
+    //三维启动时遮罩背景
     WaitingWidget* m_pBackgrounMask;
 };

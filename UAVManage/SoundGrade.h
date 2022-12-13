@@ -15,7 +15,13 @@ public:
 	SoundGrade(QWidget *parent = 0);
     ~SoundGrade();
 	void updateLoadMusic(QString filePath);
+	/*
+	* @brief 音乐波形图
+	*/
 	QPixmap getMusicPixmap();
+	/*
+	* @brief 音乐文件路径
+	*/
 	QString getCurrentMusic();
 public slots:
 	void startPlayMusic();

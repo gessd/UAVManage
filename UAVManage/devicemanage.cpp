@@ -95,18 +95,6 @@ DeviceManage::DeviceManage(QWidget *parent)
 			qDebug() << "修改设备名称" << qstrName << qstrNewName;
 			pControl->setName(qstrNewName);
 			emit deviceRenameFinished(qstrNewName, qstrName);
-			if (m_p3dTcpSocket) {
-				QJsonObject obj3dmsg;
-				obj3dmsg.insert(_Ver_, _VerNum_);
-				obj3dmsg.insert(_Tag_, _TabName_);
-				obj3dmsg.insert(_ID_, _3dDeviceRename);
-				obj3dmsg.insert(_Time_, QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"));
-				QJsonObject data;
-				data.insert("oldName", qstrName);
-				data.insert("newName", qstrNewName);
-				obj3dmsg.insert(_Data_, data);
-				sendMessageTo3D(obj3dmsg);
-			}
 		}
 		if (qstrNewIP != pControl->getIP()) {
 			//修改设备IP
@@ -252,41 +240,11 @@ QString DeviceManage::addDevice(QString qstrName, QString ip, long x, long y)
 	emit deviceAddFinished(qstrName, ip, x, y);
 	ui.listWidget->setItemWidget(item, pControl);
 	ui.listWidget->setCurrentItem(item);
-	if (m_p3dTcpSocket) {
-		QJsonObject obj3dmsg;
-		obj3dmsg.insert(_Ver_, _VerNum_);
-		obj3dmsg.insert(_Tag_, _TabName_);
-		obj3dmsg.insert(_ID_, _3dDeviceAdd);
-		obj3dmsg.insert(_Time_, QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"));
-		QJsonObject data;
-		data.insert("name", qstrName);
-		data.insert("x", x);
-		data.insert("y", y);
-		obj3dmsg.insert(_Data_, data);
-		sendMessageTo3D(obj3dmsg);
-	}
 	return "";
 }
 
 void DeviceManage::clearDevice()
 {
-	if (m_p3dTcpSocket) {
-		for (int i = 0; i < ui.listWidget->count(); i++) {
-			QListWidgetItem* pItem = ui.listWidget->item(i);
-			if (!pItem) continue;
-			QWidget* pWidget = ui.listWidget->itemWidget(pItem);
-			if (!pWidget) continue;
-			DeviceControl* pDevice = dynamic_cast<DeviceControl*>(pWidget);
-			if (!pDevice) continue;
-			QJsonObject obj3dmsg;
-			obj3dmsg.insert(_Ver_, _VerNum_);
-			obj3dmsg.insert(_Tag_, _TabName_);
-			obj3dmsg.insert(_ID_, _3dDeviceRemove);
-			obj3dmsg.insert(_Time_, QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"));
-			obj3dmsg.insert("name", pDevice->getName());
-			sendMessageTo3D(obj3dmsg);
-		}
-	}
 	ui.listWidget->clear();
 }
 
@@ -554,62 +512,96 @@ void DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upload
 
 void DeviceManage::setUpdateWaypointTime(int second)
 {
-	return;
-	QJsonObject obj3dmsg;
-	obj3dmsg.insert(_Ver_, _VerNum_);
-	obj3dmsg.insert(_Tag_, _TabName_);
-	obj3dmsg.insert(_ID_, _3dDeviceTime);
-	obj3dmsg.insert(_Time_, QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"));
-	obj3dmsg.insert(_Data_, second);
-	sendMessageTo3D(obj3dmsg);
+
 }
 
 void DeviceManage::setCurrentPlayeState(qint8 state)
 {
-	return;
-	QJsonObject obj3dmsg;
-	obj3dmsg.insert(_Ver_, _VerNum_);
-	obj3dmsg.insert(_Tag_, _TabName_);
-	obj3dmsg.insert(_ID_, _3dDeviceAction);
-	obj3dmsg.insert(_Time_, QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"));
-	obj3dmsg.insert(_Data_, state);
-	sendMessageTo3D(obj3dmsg);
+
 }
 
 void DeviceManage::setCurrentMusicPath(QString filePath, QPixmap pixmap)
 {
-	if (!QFile::exists(filePath)) return;
-	QFileInfo info(filePath);
-	QString qstrPixmapPath = info.path() + "/music.png";
-	if (false == pixmap.save(qstrPixmapPath)) {
-		qDebug() << "保存音乐波形图片失败";
-		return;
-	}
-	QJsonObject obj3dmsg;
-	obj3dmsg.insert(_Ver_, _VerNum_);
-	obj3dmsg.insert(_Tag_, _TabName_);
-	obj3dmsg.insert(_ID_, _3dDeviceMusicPath);
-	obj3dmsg.insert(_Time_, QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"));
-	//obj3dmsg.insert(_Data_, filePath);
-	QJsonObject data;
-	data.insert("file", filePath);
-	data.insert("image", qstrPixmapPath);
-	obj3dmsg.insert(_Data_, data);
-	sendMessageTo3D(obj3dmsg);
+	m_qstrMusicFile = filePath;
+	m_pixmapMusic = pixmap;
+	//if (!QFile::exists(filePath)) return;
+	//QFileInfo info(filePath);
+	//QString qstrPixmapPath = info.path() + "/music.png";
+	//if (false == pixmap.save(qstrPixmapPath)) {
+	//	qDebug() << "保存音乐波形图片失败";
+	//	return;
+	//}
+	//QJsonObject obj3dmsg;
+	//obj3dmsg.insert(_Ver_, _VerNum_);
+	//obj3dmsg.insert(_Tag_, _TabName_);
+	//obj3dmsg.insert(_ID_, _3dDeviceMusicPath);
+	//obj3dmsg.insert(_Time_, QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"));
+	////obj3dmsg.insert(_Data_, filePath);
+	//QJsonObject data;
+	//data.insert("file", filePath);
+	//data.insert("image", qstrPixmapPath);
+	//obj3dmsg.insert(_Data_, data);
+	//sendMessageTo3D(obj3dmsg);
 }
 
 void DeviceManage::sendWaypointTo3D(QMap<QString, QVector<NavWayPointData>> map)
 {
-	qDebug() << "发送航点列表到三维界面";
+	qDebug() << "发送初始化信息到三维";
 	if (!m_p3dTcpSocket) return;
-	QStringList listNmae = map.keys();
 	QJsonObject obj3dmsg;
 	obj3dmsg.insert(_Ver_, _VerNum_);
 	obj3dmsg.insert(_Tag_, _TabName_);
-	obj3dmsg.insert(_ID_, _3dDeviceWaypoint);
+	obj3dmsg.insert(_ID_, _3dDeviceInit);
 	obj3dmsg.insert(_Time_, QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"));
-	QJsonArray jsonData;
-
+	obj3dmsg.insert("x", getSpaceSize().x());
+	obj3dmsg.insert("y", getSpaceSize().y());
+	//无人机初始位置
+	QJsonArray jsonArr;
+	for (int i = 0; i < ui.listWidget->count(); i++) {
+		QListWidgetItem* pItem = ui.listWidget->item(i);
+		if (!pItem) continue;
+		QWidget* pWidget = ui.listWidget->itemWidget(pItem);
+		if (!pWidget) continue;
+		DeviceControl* pDevice = dynamic_cast<DeviceControl*>(pWidget);
+		if (!pDevice) continue;
+		QJsonObject device;
+		device.insert("name", pDevice->getName());
+		device.insert("x", pDevice->getX());
+		device.insert("y", pDevice->getY());
+		jsonArr.append(device);
+	}
+	obj3dmsg.insert(_Data_, jsonArr);
+	//基站坐标
+	QJsonArray arrStation;
+	QStringList keys = m_stationMap.keys();
+	foreach(QString name, keys) {
+		QJsonObject obj;
+		obj.insert("name", name);
+		obj.insert("x", m_stationMap.value(name).x());
+		obj.insert("y", m_stationMap.value(name).y());
+		arrStation.append(obj);
+	}
+	obj3dmsg.insert("station", arrStation);
+	//音乐文件
+	QString filePath = m_qstrMusicFile;
+	QPixmap pixmap = m_pixmapMusic;
+	if (!QFile::exists(filePath)) {
+		qWarning() << "音乐文件不存在";
+		return;
+	}
+	QFileInfo info(filePath);
+	QString qstrPixmapPath = info.path() + "/music.png";
+	if (!pixmap.save(qstrPixmapPath)) {
+		qWarning() << "保存音乐波形图片失败";
+		return;
+	}
+	QJsonObject jsonMusic;
+	jsonMusic.insert("file", filePath);
+	jsonMusic.insert("image", qstrPixmapPath);
+	obj3dmsg.insert("music", jsonMusic);
+	//航点列表
+	QJsonArray jsonWaypoint;
+	QStringList listNmae = map.keys();
 	foreach(QString name, listNmae) {
 		QVector<NavWayPointData> data = map[name];
 		QJsonObject objDevice;
@@ -682,9 +674,9 @@ void DeviceManage::sendWaypointTo3D(QMap<QString, QVector<NavWayPointData>> map)
 			lastZ = z;
 		}
 		objDevice.insert("list", arrWaypoint);
-		jsonData.append(objDevice);
+		jsonWaypoint.append(objDevice);
 	}
-	obj3dmsg.insert(_Data_, jsonData);
+	obj3dmsg.insert("waypoint", jsonWaypoint);
 	sendMessageTo3D(obj3dmsg);
 }
 
@@ -741,45 +733,46 @@ void DeviceManage::on3dNewConnection()
 		if (m_timerMessage3D.isActive()) m_timerMessage3D.stop();
 		});
 	if (!m_timerMessage3D.isActive()) m_timerMessage3D.start(10 * 1000);
-	//发送无人机设备列表
-	QJsonObject obj3dmsg;
-	obj3dmsg.insert(_Ver_, _VerNum_);
-	obj3dmsg.insert(_Tag_, _TabName_);
-	obj3dmsg.insert(_ID_, _3dDeviceInit);
-	obj3dmsg.insert(_Time_, QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"));
-	obj3dmsg.insert("x", getSpaceSize().x());
-	obj3dmsg.insert("y", getSpaceSize().y());
-	//无人机初始位置
-	QJsonArray jsonArr;
-	for (int i = 0; i < ui.listWidget->count(); i++) {
-		QListWidgetItem* pItem = ui.listWidget->item(i);
-		if (!pItem) continue;
-		QWidget* pWidget = ui.listWidget->itemWidget(pItem);
-		if (!pWidget) continue;
-		DeviceControl* pDevice = dynamic_cast<DeviceControl*>(pWidget);
-		if (!pDevice) continue;
-		QJsonObject device;
-		device.insert("name", pDevice->getName());
-		device.insert("x", pDevice->getX());
-		device.insert("y", pDevice->getY());
-		jsonArr.append(device);
-	}
-	obj3dmsg.insert(_Data_, jsonArr);
-	//基站坐标
-	QJsonArray arrStation;
-	QStringList keys = m_stationMap.keys();
-	foreach(QString name, keys) {
-		QJsonObject obj;
-		obj.insert("name", name);
-		obj.insert("x", m_stationMap.value(name).x());
-		obj.insert("y", m_stationMap.value(name).y());
-		arrStation.append(obj);
-	}
-	obj3dmsg.insert("station", arrStation);
-	sendMessageTo3D(obj3dmsg);
+	
+	////发送无人机设备列表
+	//QJsonObject obj3dmsg;
+	//obj3dmsg.insert(_Ver_, _VerNum_);
+	//obj3dmsg.insert(_Tag_, _TabName_);
+	//obj3dmsg.insert(_ID_, _3dDeviceInit);
+	//obj3dmsg.insert(_Time_, QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"));
+	//obj3dmsg.insert("x", getSpaceSize().x());
+	//obj3dmsg.insert("y", getSpaceSize().y());
+	////无人机初始位置
+	//QJsonArray jsonArr;
+	//for (int i = 0; i < ui.listWidget->count(); i++) {
+	//	QListWidgetItem* pItem = ui.listWidget->item(i);
+	//	if (!pItem) continue;
+	//	QWidget* pWidget = ui.listWidget->itemWidget(pItem);
+	//	if (!pWidget) continue;
+	//	DeviceControl* pDevice = dynamic_cast<DeviceControl*>(pWidget);
+	//	if (!pDevice) continue;
+	//	QJsonObject device;
+	//	device.insert("name", pDevice->getName());
+	//	device.insert("x", pDevice->getX());
+	//	device.insert("y", pDevice->getY());
+	//	jsonArr.append(device);
+	//}
+	//obj3dmsg.insert(_Data_, jsonArr);
+	////基站坐标
+	//QJsonArray arrStation;
+	//QStringList keys = m_stationMap.keys();
+	//foreach(QString name, keys) {
+	//	QJsonObject obj;
+	//	obj.insert("name", name);
+	//	obj.insert("x", m_stationMap.value(name).x());
+	//	obj.insert("y", m_stationMap.value(name).y());
+	//	arrStation.append(obj);
+	//}
+	//obj3dmsg.insert("station", arrStation);
+	//sendMessageTo3D(obj3dmsg);
 	emit sig3DDialogStatus(true);
 	//实时状态定时放到最后，必须在发送设备列表之后才能发送实时位置数据
-	if (!m_timerUpdateStatus.isActive()) m_timerUpdateStatus.start(1000);
+	//if (!m_timerUpdateStatus.isActive()) m_timerUpdateStatus.start(1000);
 }
 
 void DeviceManage::onTimeout3DMessage()
@@ -822,15 +815,6 @@ void DeviceManage::onUpdateStatusTo3D()
 		device.insert("roll", status.roll);
 		device.insert("led", status.led);
 		device.insert("battery", status.battery);
-		////TODO 三维测试用，便于更新无人机位置
-		//if (0 == i) {
-		//	int z = QDateTime::currentDateTime().toString("ss").toInt();
-		//	int x = z / 10;
-		//	int y = z;
-		//	device.insert("x", x);
-		//	device.insert("y", y);
-		//	device.insert("z", z);
-		//}
 		jsonArr.append(device);
 	}
 	if (0 == jsonArr.count()) return;
@@ -851,17 +835,6 @@ void DeviceManage::onRemoveDevice(QString name)
 		if(temp != name) continue;
 		ui.listWidget->takeItem(i);
 		emit deviceRemoveFinished(name);
-		if (m_p3dTcpSocket) {
-			QJsonObject obj3dmsg;
-			obj3dmsg.insert(_Ver_, _VerNum_);
-			obj3dmsg.insert(_Tag_, _TabName_);
-			obj3dmsg.insert(_ID_, _3dDeviceRemove);
-			obj3dmsg.insert(_Time_, QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"));
-			QJsonObject data;
-			data.insert("name", name);
-			obj3dmsg.insert(_Data_, data);
-			sendMessageTo3D(obj3dmsg);
-		}
 		return;
 	}
 	
@@ -912,6 +885,7 @@ void DeviceManage::sendMessageTo3D(QJsonObject json3d)
 
 void DeviceManage::analyzeMessageFrom3D(QByteArray data)
 {
+	//解析三维返回消息
 	QJsonParseError jsonError;
 	QJsonDocument jsonDoc = QJsonDocument::fromJson(data, &jsonError);
 	if (QJsonParseError::NoError != jsonError.error || jsonDoc.isEmpty() || !jsonDoc.isObject()) {
@@ -921,6 +895,10 @@ void DeviceManage::analyzeMessageFrom3D(QByteArray data)
 	int id = jsonObj.value(_ID_).toInt();
 	if (m_map3DMsgRecord.contains(id)) {
 		m_map3DMsgRecord.remove(id);
+	}
+	if (id == _3dDeviceInit) {
+		//收到初始化回应后启动实时位置定时
+		if (!m_timerUpdateStatus.isActive()) m_timerUpdateStatus.start(1000);
 	}
 }
 

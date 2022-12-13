@@ -133,6 +133,16 @@ UAVManage::UAVManage(QWidget* parent)
 	
 	connect(pActionFly1, &QAction::triggered, [this]() { m_pDeviceManage->waypointComposeAndUpload(m_qstrCurrentProjectFile, false); });
 	connect(pActionFly2, &QAction::triggered, [this]() { 
+		//没有添加音乐不能启动三维窗口
+		QString qstrFilePath = m_pSoundWidget->getCurrentMusic();
+		if (qstrFilePath.isEmpty()) {
+			QMessageBox::warning(this, tr("警告"), tr("未添加音乐文件无法打开三维窗口"));
+			return;
+		}
+		if (false == QFile::exists(qstrFilePath)) {
+			QMessageBox::warning(this, tr("警告"), tr("音乐文件无法使用无法打开三维窗口"));
+			return;
+		}
 		if (m_pBackgrounMask == nullptr) {
 			m_pBackgrounMask = new WaitingWidget(this);
 		}
@@ -140,7 +150,7 @@ UAVManage::UAVManage(QWidget* parent)
 		m_pBackgrounMask->show();
 		QDir::setCurrent(QApplication::applicationDirPath() + "/3D/UAV_Program_UE4/Binaries/Win64");
 		m_p3DProcess->start("UAV_Program_UE4-Win64-Shipping.exe");
-		m_p3DProcess->waitForStarted(3000);
+		m_p3DProcess->waitForStarted(1000);
 		QDir::setCurrent(QApplication::applicationDirPath());
 		});
 	connect(pActionFly3, &QAction::triggered, [this]() { 
@@ -826,9 +836,11 @@ void UAVManage::onCurrentPlayeState(qint8 state)
 void UAVManage::on3DDialogStauts(bool connect)
 {
 	if (connect) {
-		if (m_pBackgrounMask) m_pBackgrounMask->close();
 		onMusicWaveFinished();
 		m_pDeviceManage->waypointComposeAndUpload(m_qstrCurrentProjectFile, false);
+	}
+	else {
+		if (m_pBackgrounMask) m_pBackgrounMask->close();
 	}
 }
 

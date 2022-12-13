@@ -244,4 +244,7 @@ private:
 	QMap<QString, QPoint> m_stationMap;
 	//无人机网络设置
 	DeviceSerial* m_pDeviceNetwork;
+	//音乐文件及波形图形
+	QString m_qstrMusicFile;
+	QPixmap m_pixmapMusic;
 };
