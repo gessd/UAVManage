@@ -42,6 +42,10 @@ private slots:
     */
     void onSaveasProject();
     /**
+     * @brief 关闭项目
+     */
+    void onCloseProject();
+    /**
      * @brief 清空WEB积木块
      */
     void onWebClear();

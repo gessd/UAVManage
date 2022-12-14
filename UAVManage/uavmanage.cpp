@@ -79,10 +79,12 @@ UAVManage::UAVManage(QWidget* parent)
 	QAction* pActionNew = new QAction(QIcon(":/res/menu/P01_file_new_btn_nor.png"), tr("新建"));
 	QAction* pActionOpen = new QAction(QIcon(":/res/menu/P01_file_open_btn_nor.png"), tr("打开"));
 	QAction* pActionSaveas = new QAction(QIcon(":/res/menu/P01_file_saveus_btn_nor.png"), tr("另存为"));
+	QAction* pActionClose = new QAction(QIcon(":/res/images/windows_close.png"), tr("关闭"));
 	m_pActionAttribute = new QAction(QIcon(":/res/menu/P01_file_saveus_btn_nor.png"), tr("属性"));
 	pProjectMenu->addAction(pActionNew);
 	pProjectMenu->addAction(pActionOpen);
 	pProjectMenu->addAction(pActionSaveas);
+	pProjectMenu->addAction(pActionClose);
 	pProjectMenu->addSeparator();
 	pProjectMenu->addAction(m_pActionAttribute);
 	m_pActionAttribute->setEnabled(false);
@@ -93,6 +95,7 @@ UAVManage::UAVManage(QWidget* parent)
 		onOpenProject(qstrFile);
 		});
 	connect(pActionSaveas, &QAction::triggered, [this]() { onSaveasProject(); });
+	connect(pActionClose, &QAction::triggered, [this]() { onCloseProject(); });
 	connect(m_pActionAttribute, &QAction::triggered, [this]() { onProjectAttribute(); });
 
 	//三维预览进程
@@ -277,21 +280,6 @@ void UAVManage::onNewProject()
 	//选择新建路径
 	QString qstrName = QFileDialog::getSaveFileName(this, tr("项目名"), "", tr("File(*.qz)"));
 	if (qstrName.isEmpty()) return;
-
-	//清空项目信息
-	m_pActionAttribute->setEnabled(false);
-	m_pDeviceManage->setEnabled(false);
-	m_pSoundWidget->setEnabled(false);
-	m_pButtonFlyPrepare->setEnabled(false);
-	//先清空数据
-	if (false == m_qstrCurrentProjectFile.isEmpty()) {
-		QFileInfo info(m_qstrCurrentProjectFile);
-		_ShowInfoMessage(tr("关闭工程") + info.baseName());
-	}
-	m_qstrCurrentProjectFile.clear();
-	onWebClear();
-	m_pSoundWidget->stopPlayMusic();
-	if (m_pDeviceManage) m_pDeviceManage->clearDevice();
 	
 	//新建项目文件夹
 	QFileInfo info(qstrName);
@@ -315,10 +303,8 @@ void UAVManage::onNewProject()
 
 void UAVManage::onOpenProject(QString qstrFile)
 {
+	onCloseProject();
 	qInfo() << "打开工程" << qstrFile;
-	m_qstrCurrentProjectFile.clear();
-	onWebClear();
-	if (m_pDeviceManage) m_pDeviceManage->clearDevice();
 	QTextCodec* code = QTextCodec::codecForName(_XMLNameCoding_);
 	std::string filename = code->fromUnicode(qstrFile).data();
 	tinyxml2::XMLDocument doc;
@@ -448,6 +434,25 @@ void UAVManage::onSaveasProject()
 	copyDirectoryFiles(qstrFromPath, qstrPath + _ProjectDirName_, true);
 	bool bcp = QFile::copy(m_qstrCurrentProjectFile, qstrName);
 	m_qstrCurrentProjectFile = qstrName;
+}
+
+void UAVManage::onCloseProject()
+{
+	//清空项目信息
+	onWebClear();
+	m_pActionAttribute->setEnabled(false);
+	m_pDeviceManage->setEnabled(false);
+	m_pSoundWidget->setEnabled(false);
+	m_pButtonFlyPrepare->setEnabled(false);
+	//先清空数据
+	if (false == m_qstrCurrentProjectFile.isEmpty()) {
+		QFileInfo info(m_qstrCurrentProjectFile);
+		_ShowInfoMessage(tr("关闭工程") + info.baseName());
+	}
+	m_qstrCurrentProjectFile.clear();
+	m_pSoundWidget->stopPlayMusic();
+	if (m_pDeviceManage) m_pDeviceManage->clearDevice();
+	ParamReadWrite::writeParam(_Path_, "");
 }
 
 void UAVManage::onWebClear()

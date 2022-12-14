@@ -147,6 +147,7 @@ public:
 		case _DeviceLed: return getLedError(status); break;
 		case _DeviceWaypoint: return getWaypointError(status); break;
 		}
+		return tr("控制出错");
 	}
 	static QString getControlError(int type)
 	{
