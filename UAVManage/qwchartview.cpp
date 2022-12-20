@@ -264,7 +264,12 @@ void QWChartView::mouseMoveEvent(QMouseEvent *event)
 	
 	QString durationTime = QString::asprintf("%1:%2:%3").arg(strMin).arg(strSec).arg(strMic);
 	m_mouseLabel->setText(durationTime);
-	m_mouseLabel->move(QPoint(point.x() + 10,point.y() - 30));		//跟踪在鼠标右上角显示
+    int x = point.x();
+    int y = point.y();
+    if (x + m_mouseLabel->width() > this->width()) {
+        x = x - m_mouseLabel->width();
+    }
+    m_mouseLabel->move(QPoint(x + 10, point.y() - 20));		//跟踪在鼠标右上角显示
     /*emit mouseMovePoint(point);*/
     QChartView::mouseMoveEvent(event);
 }
