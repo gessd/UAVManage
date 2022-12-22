@@ -502,7 +502,7 @@ void DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upload
 		else {
 			//上传航点到飞控
 			int status = pDevice->DeviceMavWaypointStart(data);
-			if (_DeviceStatus::DeviceDataSucceed != status) _ShowWarningMessage(name+Utility::waypointMessgeFromStatus(_DeviceWaypoint, status));
+			if (_DeviceStatus::DeviceDataSucceed != status) _ShowWarningMessage(name + Utility::waypointMessgeFromStatus(_DeviceWaypoint, status));
 		}
 		map.insert(name, data);
 	}

@@ -38,5 +38,6 @@
         <file>res/images/windows_close.png</file>
         <file>res/images/networkerror.png</file>
         <file>res/images/waiting.gif</file>
+        <file>res/images/app_loading.png</file>
     </qresource>
 </RCC>

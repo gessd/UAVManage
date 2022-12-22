@@ -30,9 +30,10 @@ void MusicScale::paintEvent(QPaintEvent* event)
 		int nWidget = this->width();
 		//painter.drawRect(0, 0, nWidget-1, nHeight-1);
 		int clearance = nWidget / m_nduration;
-		int surplus = nWidget% m_nduration;
+		int surplus = nWidget % m_nduration;
 		int maxwidget = clearance * m_nduration;
-		updateMaxWidget(maxwidget);
+		emit updateMaxWidget(maxwidget);
+		//clearance++;
 		for (int i = 0; i <= m_nduration; i++) {
 			int h = nHeight;
 			int pw = 1;

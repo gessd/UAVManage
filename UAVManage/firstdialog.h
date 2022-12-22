@@ -10,6 +10,8 @@ class FirstDialog : public QDialog
 public:
 	FirstDialog(QWidget *parent = nullptr);
 	~FirstDialog();
+protected:
+	void showEvent(QShowEvent* event);
 public slots:
 	void onBtnClose();
 signals:

@@ -501,12 +501,12 @@ void UAVManage::onSocketNewConnection()
 	m_pWebBockly = m_pSocketServer->nextPendingConnection();
 	connect(m_pWebBockly, SIGNAL(textMessageReceived(QString)), this, SLOT(onSocketTextMessageReceived(QString)));
 	connect(m_pWebBockly, SIGNAL(disconnected()), this, SLOT(onSocketDisconnected()));
-	emit sigWindowFinished();
 	//打开上次记录的项目
 	QString qstrPath = ParamReadWrite::readParam(_Path_).toString();
-	if (qstrPath.isEmpty()) return;
-	if (!QFile::exists(qstrPath)) return;
-	onOpenProject(qstrPath);
+	if (false == qstrPath.isEmpty() && QFile::exists(qstrPath)) {
+		onOpenProject(qstrPath);
+	}
+	QTimer::singleShot(1000, [this]() { emit sigWindowFinished(); });
 }
 
 void UAVManage::onSocketTextMessageReceived(QString message)

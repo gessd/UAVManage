@@ -116,8 +116,8 @@ int main(int argc, char *argv[])
 	first.show();
 	UAVManage w;
 	QObject::connect(&a, SIGNAL(messageReceived(const QString&)), &w, SLOT(onAppMessage(const QString&)));
-	QObject::connect(&w, &UAVManage::sigWindowFinished, [&]() {first.close();});
-	QObject::connect(&first, &FirstDialog::sigStartApp, [&]() { w.show(); a.setActivationWindow(&w); });
+	QObject::connect(&w, &UAVManage::sigWindowFinished, [&]() { a.setActivationWindow(&w); first.close(); });
+	QObject::connect(&first, &FirstDialog::sigStartApp, [&]() { w.show(); });
 	int n = a.exec();
 	qInfo() << "程序退出" << n;
     return n;
