@@ -439,6 +439,8 @@ void UAVManage::onSaveasProject()
 void UAVManage::onCloseProject()
 {
 	//清空项目信息
+	m_pSoundWidget->stopPlayMusic();
+	if (m_pDeviceManage) m_pDeviceManage->clearDevice();
 	onWebClear();
 	m_pActionAttribute->setEnabled(false);
 	m_pDeviceManage->setEnabled(false);
@@ -450,8 +452,6 @@ void UAVManage::onCloseProject()
 		_ShowInfoMessage(tr("关闭工程") + info.baseName());
 	}
 	m_qstrCurrentProjectFile.clear();
-	m_pSoundWidget->stopPlayMusic();
-	if (m_pDeviceManage) m_pDeviceManage->clearDevice();
 	ParamReadWrite::writeParam(_Path_, "");
 }
 
@@ -459,7 +459,7 @@ void UAVManage::onWebClear()
 {
 	if (!m_pWebBockly) return;
 	QJsonObject jsonObj;
-	jsonObj.insert("id", 2);
+	jsonObj.insert(_WMID, _WIDClear);
 	QJsonDocument doc(jsonObj);
 	m_pWebBockly->sendTextMessage(doc.toJson());
 }
