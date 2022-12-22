@@ -6,6 +6,7 @@ MusicScale::MusicScale(QWidget *parent)
 	: QWidget(parent)
 {
 	m_nduration = 0;
+	m_nCurrent = 0;
 }
 
 MusicScale::~MusicScale()
@@ -14,6 +15,12 @@ MusicScale::~MusicScale()
 void MusicScale::updateScale(qint64 duration)
 {
 	m_nduration = duration / 1000;
+	update();
+}
+
+void MusicScale::setCurrentPosition(qint64 position)
+{
+	m_nCurrent = position;
 	update();
 }
 
@@ -33,7 +40,6 @@ void MusicScale::paintEvent(QPaintEvent* event)
 		int surplus = nWidget % m_nduration;
 		int maxwidget = clearance * m_nduration;
 		emit updateMaxWidget(maxwidget);
-		//clearance++;
 		for (int i = 0; i <= m_nduration; i++) {
 			int h = nHeight;
 			int pw = 1;
@@ -59,6 +65,13 @@ void MusicScale::paintEvent(QPaintEvent* event)
 			painter.setPen(pen);
 			painter.drawLine(i * clearance, nHeight, i * clearance, nHeight-h);
 		}
-		
+		if (m_nCurrent > 0) {
+			int n = m_nCurrent % 1000;
+			int x = m_nCurrent / 1000;
+			int pixelx = x * clearance + n * clearance / 1000;
+			pen.setWidth(2);
+			painter.setPen(pen);
+			painter.drawLine(pixelx, 0, pixelx, height());
+		}
 	}
 }
