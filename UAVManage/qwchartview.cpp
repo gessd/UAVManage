@@ -235,8 +235,10 @@ void QWChartView::mousePressEvent(QMouseEvent *event)
 
 void QWChartView::enterEvent(QEvent  *event)
 {//鼠标进入事件
-    m_mouseLabel->setMinimumWidth(80);
-	m_mouseLabel->show();
+    if (isActiveWindow()) {
+        m_mouseLabel->setMinimumWidth(80);
+        m_mouseLabel->show();
+    }
 }
 void QWChartView::leaveEvent(QEvent *event)
 {//鼠标移出事件

@@ -14,6 +14,13 @@ class SoundGrade : public QWidget
 public:
 	SoundGrade(QWidget *parent = 0);
     ~SoundGrade();
+	/**
+	 * @brief 清空播放区域数据
+	 */
+	void clearSound();
+	/**
+	 * @brief 更新播放音乐路径
+	 */
 	void updateLoadMusic(QString filePath);
 	/*
 	* @brief 音乐波形图

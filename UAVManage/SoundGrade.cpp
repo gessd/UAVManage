@@ -54,6 +54,17 @@ SoundGrade::~SoundGrade()
 	stopPlayMusic();
 }
 
+void SoundGrade::clearSound()
+{
+	m_strCurFile.clear();
+	playlist->removeMedia(0, playlist->mediaCount() - 1);
+	m_ui.m_pLblCur->setText("--:--:--");
+	m_ui.m_pLblTotal->setText("--:--:--");
+	m_ui.labelMusicName->clear();
+	m_ui.widgetScale->updateScale(0);
+	m_ui.m_pCuverPlot->clearSeriesPoint();
+}
+
 void SoundGrade::updateLoadMusic(QString filePath)
 {
 	if (!QFile::exists(filePath)) return;

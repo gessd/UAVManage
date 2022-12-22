@@ -440,6 +440,7 @@ void UAVManage::onCloseProject()
 {
 	//清空项目信息
 	m_pSoundWidget->stopPlayMusic();
+	m_pSoundWidget->clearSound();
 	if (m_pDeviceManage) m_pDeviceManage->clearDevice();
 	onWebClear();
 	m_pActionAttribute->setEnabled(false);
