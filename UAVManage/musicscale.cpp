@@ -14,7 +14,7 @@ MusicScale::~MusicScale()
 
 void MusicScale::updateScale(qint64 duration)
 {
-	m_nduration = duration / 1000;
+	m_nduration = duration;
 	update();
 }
 
@@ -36,11 +36,14 @@ void MusicScale::paintEvent(QPaintEvent* event)
 		int nHeight = this->height();
 		int nWidget = this->width();
 		//painter.drawRect(0, 0, nWidget-1, nHeight-1);
-		int clearance = nWidget / m_nduration;
-		int surplus = nWidget % m_nduration;
-		int maxwidget = clearance * m_nduration;
+		int nSecondSum = m_nduration / 1000;
+		int nMilli = m_nduration % 1000;
+		int clearance = nWidget / nSecondSum;
+		int surplus = nWidget % nSecondSum;
+		int remainder = clearance * nMilli / 1000 + 1;
+		int maxwidget = clearance * nSecondSum + remainder;
 		emit updateMaxWidget(maxwidget);
-		for (int i = 0; i <= m_nduration; i++) {
+		for (int i = 0; i <= nSecondSum; i++) {
 			int h = nHeight;
 			int pw = 1;
 			if(0 == i){

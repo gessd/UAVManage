@@ -9,6 +9,7 @@ const int ONTIME_INTERVAL = 1000;
 SoundGrade::SoundGrade(QWidget *parent) :QWidget(parent)
 {
 	m_ui.setupUi(this);
+	m_pLabelPosition = nullptr;
 	player = NULL;
 	player = new QMediaPlayer(this);                                //初始化播放器
 	player->setNotifyInterval(10);
@@ -27,8 +28,8 @@ SoundGrade::SoundGrade(QWidget *parent) :QWidget(parent)
 	connect(m_ui.m_pbtnStop, &QAbstractButton::clicked, [this]() {stopPlayMusic(); });
 	connect(m_ui.m_pCuverPlot, SIGNAL(updateMusicWaveFinished()), this, SIGNAL(updateMusicWaveFinished()));
 	connect(m_ui.widgetScale, &MusicScale::updateMaxWidget, [this](int max) {
-		m_ui.m_pHslider->setMaximumWidth(max);
-		m_ui.m_pCuverPlot->setMaximumWidth(max);
+		m_ui.m_pHslider->setMaximumWidth(max + 8);
+		m_ui.m_pCuverPlot->setMaximumWidth(max + 2);
 		});
 }
 
@@ -100,6 +101,7 @@ void SoundGrade::startPlayMusic()
 
 void SoundGrade::stopPlayMusic()
 {
+	if (m_pLabelPosition) m_pLabelPosition->close();
 	if(player) player->stop();
 	emit sigMsuicTime(0);
 }
@@ -257,9 +259,11 @@ void SoundGrade::onDurationChanged(qint64 duration)
 	secs = secs % 60;				//余数秒
 	strMin = mins < 10 ? QString::asprintf("0%1").arg(QString::number(mins)) : QString::number(mins);
 	strSec = secs < 10 ? QString::asprintf("0%1").arg(QString::number(secs)) : QString::number(secs);
-	durationTime = QString::asprintf("%1:%2").arg(strMin).arg(strSec);
+	QString durationTime = QString::asprintf("%1:%2").arg(strMin).arg(strSec);
 	m_ui.m_pLblTotal->setText(durationTime);
 	m_ui.widgetScale->updateScale(duration);
+	m_nDuration = duration / 1000;
+	if (m_pLabelPosition) m_pLabelPosition->close();
 }
 
 void SoundGrade::onPositionChanged(qint64 position)
@@ -268,18 +272,34 @@ void SoundGrade::onPositionChanged(qint64 position)
 		return;
 	QString strSec, strMin; //豪秒，秒，分钟字符串
 	m_ui.m_pHslider->setSliderPosition(position);//
-	m_ui.m_pCuverPlot->axisXPlaying(position * 1000);
+	//m_ui.m_pCuverPlot->axisXPlaying(position * 1000);
 	int   secs = position / 1000;	//秒
 	int   mins = secs / 60;			//分钟
 	secs = secs % 60;				//余数秒
 	strMin = mins < 10 ? QString::asprintf("0%1").arg(QString::number(mins)) : QString::number(mins);
 	strSec = secs < 10 ? QString::asprintf("0%1").arg(QString::number(secs)) : QString::number(secs);
-	positionTime = QString::asprintf("%1:%2").arg(strMin).arg(strSec);
+	QString positionTime = QString::asprintf("%1:%2").arg(strMin).arg(strSec);
 	m_ui.m_pLblCur->setText(positionTime);
 	unsigned int currentsecs = 0;
 	if (currentsecs != mins * 60 + secs) {
 		currentsecs = mins * 60 + secs;
 		emit sigMsuicTime(currentsecs);
+	}
+	if (m_pLabelPosition) m_pLabelPosition->close();
+	if (position > 0) {
+		if (m_pLabelPosition == nullptr) {
+			m_pLabelPosition = new QLabel(this);
+			int h = m_ui.widgetScale->height() + m_ui.m_pCuverPlot->height();
+			m_pLabelPosition->setFixedSize(2, h);
+			m_pLabelPosition->setStyleSheet("background:#0000FF;");
+		}
+		int nWidget = m_ui.widgetScale->width();
+		int clearance = nWidget / m_nDuration;
+		int n = position % 1000;
+		int x = position / 1000;
+		int pixelx = x * clearance + n * clearance / 1000 + m_ui.widgetScale->geometry().x() - m_pLabelPosition->width();
+		m_pLabelPosition->move(pixelx, 0);
+		m_pLabelPosition->show();
 	}
 }
 

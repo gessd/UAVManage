@@ -46,8 +46,8 @@ private:
 	QAudioProbe     *m_probe;		//探测器
 	QMediaPlaylist  *playlist;		//播放列表
 
-	QString  durationTime;			//总长度
-	QString  positionTime;			//当前播放到位置
+	qint64 m_nDuration;		//音乐时长 毫秒
+	QLabel* m_pLabelPosition;
 signals:
 	void startPlay();
 	void isPlaying(bool);			//是否在播放中信号
