@@ -29,15 +29,21 @@
         <file>res/menu/P02_help_about_btn_new_ic.png</file>
         <file>res/menu/P02_help_about_btn_nor_ic.png</file>
         <file>res/menu/P02_help_about_page_ic.png</file>
+		<file>res/menu/preparation.png</file>
         <file>res/images/flyQueue.png</file>
         <file>res/images/flyRegain.png</file>
         <file>res/images/musicload.png</file>
         <file>res/images/device.png</file>
-        <file>res/menu/preparation.png</file>
         <file>res/images/newproject.png</file>
         <file>res/images/windows_close.png</file>
         <file>res/images/networkerror.png</file>
         <file>res/images/waiting.gif</file>
         <file>res/images/app_loading.png</file>
+        <file>res/gif/behind.gif</file>
+        <file>res/gif/bottom.gif</file>
+        <file>res/gif/front.gif</file>
+        <file>res/gif/left.gif</file>
+        <file>res/gif/right.gif</file>
+        <file>res/gif/top.gif</file>
     </qresource>
 </RCC>
