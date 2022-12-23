@@ -6,110 +6,31 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>674</width>
-    <height>484</height>
+    <width>658</width>
+    <height>418</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="windowTitle">
    <string>校准</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout" rowstretch="0,3,7">
-   <item row="0" column="1">
-    <widget class="QWidget" name="widget" native="true">
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>46</height>
-      </size>
-     </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_2">
-      <property name="leftMargin">
-       <number>2</number>
-      </property>
-      <property name="topMargin">
-       <number>2</number>
-      </property>
-      <property name="rightMargin">
-       <number>2</number>
-      </property>
-      <property name="bottomMargin">
-       <number>2</number>
-      </property>
-      <item>
-       <widget class="QPushButton" name="btnGyro">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string>陀螺校准</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="btnMagnetism">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string>磁罗盘校准</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="btnAccelerometer">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string>加计校准</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="btnBaro">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string>电调校准</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item row="0" column="0" rowspan="2">
-    <widget class="QTreeWidget" name="treeWidget">
-     <property name="editTriggers">
-      <set>QAbstractItemView::NoEditTriggers</set>
-     </property>
-     <property name="headerHidden">
-      <bool>true</bool>
-     </property>
-     <column>
-      <property name="text">
-       <string notr="true">1</string>
-      </property>
-     </column>
-    </widget>
-   </item>
-   <item row="1" column="1">
+  <property name="styleSheet">
+   <string notr="true"/>
+  </property>
+  <layout class="QGridLayout" name="gridLayout" rowstretch="3,7">
+   <item row="0" column="0">
     <widget class="QTextBrowser" name="textBrowser"/>
    </item>
-   <item row="2" column="0" colspan="2">
+   <item row="1" column="0" colspan="2">
     <widget class="QStackedWidget" name="stackedWidgetProgress">
+     <property name="styleSheet">
+      <string notr="true"/>
+     </property>
      <property name="currentIndex">
       <number>4</number>
      </property>
@@ -121,90 +42,136 @@
       <property name="styleSheet">
        <string notr="true"/>
       </property>
-      <layout class="QGridLayout" name="gridLayout_2" rowstretch="1,9">
-       <item row="1" column="4">
-        <widget class="QLabel" name="labelAccBehind">
-         <property name="text">
-          <string>后</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignCenter</set>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QLabel" name="labelAccLeft">
-         <property name="text">
-          <string>左</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignCenter</set>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="2">
-        <layout class="QVBoxLayout" name="verticalLayout">
-         <item>
-          <widget class="QLabel" name="labelAccTop">
-           <property name="text">
-            <string>上</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="labelAccBottom">
-           <property name="text">
-            <string>下</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="labelAccFront">
-         <property name="text">
-          <string>前</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignCenter</set>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="3">
-        <widget class="QLabel" name="labelAccRight">
-         <property name="text">
-          <string>右</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignCenter</set>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="0" colspan="5">
-        <widget class="QLabel" name="label_7">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="font">
-          <font>
-           <pointsize>16</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>请按如下图示放置无人机</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
+      <widget class="QLabel" name="label_7">
+       <property name="geometry">
+        <rect>
+         <x>270</x>
+         <y>60</y>
+         <width>361</width>
+         <height>91</height>
+        </rect>
+       </property>
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>请按图示放置无人机，保持静止直到接收到校准数据</string>
+       </property>
+       <property name="wordWrap">
+        <bool>true</bool>
+       </property>
+      </widget>
+      <widget class="QLabel" name="labelAccGif">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>258</width>
+         <height>258</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="btnAccFinished">
+       <property name="geometry">
+        <rect>
+         <x>530</x>
+         <y>210</y>
+         <width>101</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>完成</string>
+       </property>
+      </widget>
+      <widget class="QWidget" name="widgetAccProgress" native="true">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>260</y>
+         <width>641</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QLabel{background:&quot;#0000FF&quot;;}
+QLabel:disabled{background:&quot;#666666&quot;;}</string>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <property name="topMargin">
+         <number>4</number>
+        </property>
+        <property name="bottomMargin">
+         <number>4</number>
+        </property>
+        <item>
+         <widget class="QLabel" name="labelAcc_1">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="labelAcc_2">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="labelAcc_3">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="labelAcc_4">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="labelAcc_5">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="labelAcc_6">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
      </widget>
      <widget class="QWidget" name="page_5"/>
      <widget class="QWidget" name="page_6"/>

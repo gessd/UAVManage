@@ -1,35 +1,30 @@
 #include "calibrationdialog.h"
 #include <QDateTime>
 #include <QDebug>
-
-CalibrationDialog::CalibrationDialog(QMap<QString, DeviceControl*> map, QWidget *parent)
-	: QDialog(parent)
-{
-	ui.setupUi(this);
-	m_pLabelBackground = nullptr;
-	connect(ui.btnMagnetism, &QAbstractButton::clicked, this, &CalibrationDialog::onBtnCalibrationClicked);
-	connect(ui.btnGyro, &QAbstractButton::clicked, this, &CalibrationDialog::onBtnCalibrationClicked);
-	connect(ui.btnAccelerometer, &QAbstractButton::clicked, this, &CalibrationDialog::onBtnCalibrationClicked);
-	connect(ui.btnBaro, &QAbstractButton::clicked, this, &CalibrationDialog::onBtnCalibrationClicked);
-	QStringList keys = map.keys();
-	foreach(QString name, keys) {
-		QTreeWidgetItem* pItem = new QTreeWidgetItem;
-		pItem->setCheckState(0, Qt::Unchecked);
-		pItem->setText(0, name);
-		pItem->setData(0, Qt::UserRole, QVariant::fromValue(map.value(name)));
-		ui.treeWidget->addTopLevelItem(pItem);
-	}
-}
+#include <QTimer>
 
 CalibrationDialog::CalibrationDialog(int calib, DeviceControl* device, QWidget* parent)
 	: QDialog(parent)
 {
 	ui.setupUi(this);
+	setWindowFlags(windowFlags() | Qt::FramelessWindowHint | Qt::Dialog);
 	m_pLabelBackground = nullptr;
-	ui.treeWidget->setVisible(false);
-	ui.widget->setVisible(false);
+	m_pMovieAcc = nullptr;
+	m_bAccFinished = false;
+	ui.btnAccFinished->setVisible(false);
+	ui.widgetAccProgress->setVisible(false);
 	connect(device, &DeviceControl::sigLogMessage, this, &CalibrationDialog::onDeviceMessage);
+	connect(ui.btnAccFinished, &QAbstractButton::clicked, this, &CalibrationDialog::close);
 	ui.stackedWidgetProgress->setCurrentIndex(calib);
+	if (_Accelerometer == calib) {
+		ui.widgetAccProgress->setVisible(true);
+		m_pMovieAcc = new QMovie(":/res/gif/bottom.gif");
+		ui.labelAccGif->setMovie(m_pMovieAcc);
+		m_pMovieAcc->start();
+		connect(m_pMovieAcc, &QMovie::finished, [this]() { 
+			if(false == m_bAccFinished) QTimer::singleShot(3000, [this]() { m_pMovieAcc->start(); }); 
+			});
+	}
 }
 
 CalibrationDialog::~CalibrationDialog()
@@ -47,61 +42,39 @@ void CalibrationDialog::addLogToBrowser(QString text)
 	ui.textBrowser->append(text);
 }
 
-void CalibrationDialog::onBtnCalibrationClicked()
-{
-	QAbstractButton* pButton = dynamic_cast<QAbstractButton*>(sender());
-	if (nullptr == pButton) return;
-	int count = ui.treeWidget->topLevelItemCount();
-	for (int i = 0; i < count; i++) {
-		QTreeWidgetItem* pItem = ui.treeWidget->topLevelItem(i);
-		if(nullptr == pItem) continue;
-		if (Qt::Unchecked == pItem->checkState(0)) continue;
-		DeviceControl* pDevice = pItem->data(0, Qt::UserRole).value<DeviceControl*>();
-		if(nullptr == pDevice) continue;
-		if (false == pDevice->isConnectDevice()) {
-			addLogToBrowser(pDevice->getName()+ tr("设备未连接，无法校准"));
-			continue;
-		}
-		addLogToBrowser(pDevice->getName() + tr("开始校准"));
-		if (ui.btnGyro == pButton) {
-			pDevice->Fun_MAV_CALIBRATION(1, 0, 0, 0, 0, 0, 0);
-		}
-		else if (ui.btnMagnetism == pButton) {
-			pDevice->Fun_MAV_CALIBRATION(0, 1, 1, 0, 0, 0, 0);
-		}
-		else if (ui.btnAccelerometer == pButton) {
-			pDevice->Fun_MAV_CALIBRATION(0, 0, 0, 0, 1, 0, 0);
-		}
-		else if (ui.btnBaro == pButton) {
-			pDevice->Fun_MAV_CALIBRATION(0, 0, 0, 0, 0, 0, 1);
-		}
-	}
-}
-
 void CalibrationDialog::onDeviceMessage(QString data)
 {
 	addLogToBrowser(data);
+	if (m_pMovieAcc) m_pMovieAcc->stop();
 	if (data.contains(_AccIng_)) {
 		ui.stackedWidgetProgress->setCurrentIndex(_Accelerometer);
 	}
 	else if (data.contains("Acc +z data get")) {
-		ui.labelAccTop->setStyleSheet("background:#7FFFAA;");
+		m_pMovieAcc->setFileName(":/res/gif/behind.gif");
+		ui.labelAcc_1->setEnabled(true);
 	}
 	else if (data.contains("Acc -z data get")) {
-		ui.labelAccBottom->setStyleSheet("background:#7FFFAA;");
+		m_pMovieAcc->setFileName(":/res/gif/left.gif");
+		ui.labelAcc_2->setEnabled(true);
 	}
 	else if (data.contains("Acc -x data get")) {
-		ui.labelAccLeft->setStyleSheet("background:#7FFFAA;");
+		m_pMovieAcc->setFileName(":/res/gif/right.gif");
+		ui.labelAcc_3->setEnabled(true);
 	}
 	else if (data.contains("Acc +x data get")) {
-		ui.labelAccRight->setStyleSheet("background:#7FFFAA;");
+		m_pMovieAcc->setFileName(":/res/gif/front.gif");
+		ui.labelAcc_4->setEnabled(true);
 	}
 	else if (data.contains("Acc -y data get")) {
-		ui.labelAccFront->setStyleSheet("background:#7FFFAA;");
+		m_pMovieAcc->setFileName(":/res/gif/behind.gif");
+		ui.labelAcc_5->setEnabled(true);
 	}
 	else if (data.contains("Acc +y data get")) {
-		ui.labelAccBehind->setStyleSheet("background:#7FFFAA;");
+		ui.labelAcc_6->setEnabled(true);
+		ui.btnAccFinished->setVisible(true);
+		m_bAccFinished = true;
 	}
+	if (false == m_bAccFinished && m_pMovieAcc) m_pMovieAcc->start();
 }
 
 void CalibrationDialog::showEvent(QShowEvent* event)

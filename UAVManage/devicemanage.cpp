@@ -920,6 +920,8 @@ void DeviceManage::deviceCalibration()
 	//	QMessageBox::warning(this, tr("提示"), tr("设备未连接，无法校准"));
 	//	return;
 	//}
+	QMessageBox::StandardButton button = QMessageBox::question(this, tr("询问"), tr("校准开始后无人不允许起飞，是否现在开始校准?"));
+	if (QMessageBox::StandardButton::Yes != button) return;
 	CalibrationDialog* pDialog = new CalibrationDialog(n, pDevice, dynamic_cast<QWidget*>(parent()));
 	pDialog->addLogToBrowser(pDevice->getName() + tr("：校准开始"));
 	switch (n) {
