@@ -18,7 +18,7 @@ FirstDialog::~FirstDialog()
 
 void FirstDialog::showEvent(QShowEvent* event)
 {
-	QTimer::singleShot(500, [this]() { emit sigStartApp(); });
+	QTimer::singleShot(1000, [this]() { emit sigStartApp(); });
 }
 
 void FirstDialog::onBtnClose()

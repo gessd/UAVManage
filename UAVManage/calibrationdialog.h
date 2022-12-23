@@ -3,6 +3,7 @@
 #include <QDialog>
 #include "ui_calibrationdialog.h"
 #include "devicecontrol.h"
+#include <QMovie>
 
 #define _AccIng_   "acc calib"
 
@@ -24,4 +25,5 @@ protected:
 private:
 	Ui::CalibrationDialogClass ui;
 	QLabel* m_pLabelBackground;
+	QMovie* m_pMovieAcc;
 };

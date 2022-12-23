@@ -14,6 +14,6 @@ enum _MsgID {
 	_3dDeviceLocation = 102
 };
 
-//三维消息头部尾部字符
+//涓夌淮娑堟伅澶撮儴灏鹃儴瀛楃
 #define _MsgHead '*'
 #define _MsgTail '#'

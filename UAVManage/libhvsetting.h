@@ -1,6 +1,6 @@
 #pragma once
 
-//libhvÈý·½¿â
+//libhvä¸‰æ–¹åº“
 #include "TcpClient.h"
 #include "htime.h"
 #ifdef _DEBUG
