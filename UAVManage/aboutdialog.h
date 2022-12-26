@@ -24,4 +24,5 @@ private:
 	QString m_qstrNewVersionName;
 	bool m_bShowing;
 	bool m_bAutoUpdate;
+	QLabel* m_pLabelProgress;
 };

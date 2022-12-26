@@ -47,5 +47,6 @@
         <file>res/gif/top.gif</file>
         <file>res/images/deviceicon.png</file>
         <file>res/images/closeproject.png</file>
+        <file>res/images/update_progress.png</file>
     </qresource>
 </RCC>

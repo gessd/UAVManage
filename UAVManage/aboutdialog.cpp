@@ -13,6 +13,7 @@ AboutDialog::AboutDialog(QWidget *parent)
 {
 	ui.setupUi(this);
 	m_pLabelBackground = nullptr;
+	m_pLabelProgress = nullptr;
 	m_bShowing = false;
 	m_bAutoUpdate = false;
 	setWindowFlags(windowFlags() | Qt::FramelessWindowHint | Qt::Dialog);
@@ -109,12 +110,25 @@ void AboutDialog::onStartUpdate()
 	QString qstrSavePath = QApplication::applicationDirPath() + "/temp";
 	QString qstrUrl = QString("%1/%2").arg(_ServerUrl_).arg(m_qstrNewVersionName);
 	//qstrUrl = "http://downmini.yun.kugou.com/web/kugou_10112.exe";
+	//qstrUrl = "http://dl-cdn.oray.com/sunlogin/windows/SunloginClient_13.1.0.48900_x64.exe";
 	DownloadTool* download = new DownloadTool(qstrUrl, qstrSavePath);
 	download->startDownload();
 	//TODO 需要增加下载超时
 	connect(download, &DownloadTool::sigProgress, [this](qint64 bytesRead, qint64 totalBytes, qreal progress) {
 		//文件下载进度
-		ui.progressBar->setValue(progress * 100);
+		if (nullptr == m_pLabelProgress) {
+			m_pLabelProgress = new QLabel(ui.pageProgress);
+			m_pLabelProgress->setFixedSize(22, 22);
+			m_pLabelProgress->setScaledContents(true);
+			m_pLabelProgress->setPixmap(QPixmap(":/res/images/update_progress.png"));
+		}
+		if (m_pLabelProgress) {
+			m_pLabelProgress->show();
+			int x = ui.progressBar->geometry().x() + ui.progressBar->width() * progress - m_pLabelProgress->width() / 2;
+			int y = ui.progressBar->geometry().y() - m_pLabelProgress->height();
+			m_pLabelProgress->move(x, y);
+		}
+		ui.progressBar->setValue(progress * 1000);
 		ui.labelProgress->setText(QString(" %1%").arg(QString::number(progress * 100, 'f', 1)));
 		});
 	connect(download, &DownloadTool::sigDownloadFinished, [this](QString error) {

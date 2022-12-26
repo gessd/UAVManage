@@ -43,6 +43,23 @@ QProgressBar{
 QProgressBar::chunk{
 	border-radius:10px;
 }
+QSlider::groove:horizontal {
+    border:0px solid #3B8CFF;
+}
+QSlider::handle:horizontal {
+    width:6px;
+	height:6px;
+    border: 1px solid #3B8CFF;
+    border-radius:3px;
+}
+QSlider::sub-page:horizontal {
+    background:qlineargradient(spread:pad,x1:0,y1:0,x2:1,y2:0,stop:0 #12B3F6, stop:1 #44D484);
+}
+QSlider::add-page:horizontal {
+    background:qlineargradient(spread:pad,x1:0,y1:0,x2:1,y2:0,stop:0 #3312B3F6, stop:1 #3344D484);
+    margin-top:3px;
+    margin-bottom:3px;
+}
 #dialogWidgetTitle{
 	border-top-left-radius:10px; 
 	border-top-right-radius:10px; 
@@ -463,7 +480,7 @@ QPushButton:pressed,QToolButton:pressed{
            <number>16</number>
           </property>
           <property name="bottomMargin">
-           <number>16</number>
+           <number>26</number>
           </property>
           <property name="horizontalSpacing">
            <number>10</number>
@@ -513,6 +530,19 @@ QPushButton:pressed,QToolButton:pressed{
             </property>
            </spacer>
           </item>
+          <item row="0" column="3">
+           <widget class="QPushButton" name="btnRestart">
+            <property name="minimumSize">
+             <size>
+              <width>90</width>
+              <height>38</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>立即重启</string>
+            </property>
+           </widget>
+          </item>
           <item row="0" column="2">
            <widget class="QLabel" name="labelProgress">
             <property name="sizePolicy">
@@ -536,25 +566,21 @@ QPushButton:pressed,QToolButton:pressed{
            </widget>
           </item>
           <item row="1" column="0" colspan="5">
-           <widget class="QProgressBar" name="progressBar">
-            <property name="value">
-             <number>0</number>
+           <widget class="QSlider" name="progressBar">
+            <property name="enabled">
+             <bool>false</bool>
             </property>
-            <property name="textVisible">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="3">
-           <widget class="QPushButton" name="btnRestart">
-            <property name="minimumSize">
+            <property name="maximumSize">
              <size>
-              <width>90</width>
-              <height>38</height>
+              <width>540</width>
+              <height>10</height>
              </size>
             </property>
-            <property name="text">
-             <string>立即重启</string>
+            <property name="maximum">
+             <number>1000</number>
+            </property>
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
             </property>
            </widget>
           </item>
