@@ -79,7 +79,7 @@ UAVManage::UAVManage(QWidget* parent)
 	QAction* pActionNew = new QAction(QIcon(":/res/menu/P01_file_new_btn_nor.png"), tr("新建"));
 	QAction* pActionOpen = new QAction(QIcon(":/res/menu/P01_file_open_btn_nor.png"), tr("打开"));
 	QAction* pActionSaveas = new QAction(QIcon(":/res/menu/P01_file_saveus_btn_nor.png"), tr("另存为"));
-	QAction* pActionClose = new QAction(QIcon(":/res/images/windows_close.png"), tr("关闭"));
+	QAction* pActionClose = new QAction(QIcon(":/res/images/closeproject.png"), tr("关闭"));
 	m_pActionAttribute = new QAction(QIcon(":/res/menu/P01_file_saveus_btn_nor.png"), tr("属性"));
 	pProjectMenu->addAction(pActionNew);
 	pProjectMenu->addAction(pActionOpen);
