@@ -3,7 +3,7 @@
 //程序版本号
 #define _MajorNumber_ 2
 #define _MinorNumber_ 2
-#define _BuildNumber_ 2
+#define _BuildNumber_ 1
 //新程序下载存放文件夹
 #define _NewVersionPath_	"/update"
 #define _VersionFile_		"version.ini"
@@ -101,8 +101,9 @@ enum _AllDeviceCommand {
 	_DeviceSetout,			 //准备起飞
 	_DeviceQueue,			 //列队
 	_DeviceRegain,			 //回收
-	_DeviceLed,					//LED控制
-	_DeviceWaypoint				//舞步
+	_DeviceLed,				//LED控制
+	_DeviceWaypoint,		//舞步
+	_DeviceCalibration		//设备校准
 };
 
 static QString AppVersion() {

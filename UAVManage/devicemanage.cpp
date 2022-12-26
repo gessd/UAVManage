@@ -916,23 +916,26 @@ void DeviceManage::deviceCalibration()
 	DeviceControl* pDevice = getCurrentDevice();
 	if (nullptr == pDevice) return;
 	//TODO 测试使用，暂时去掉提示框
-	//if (false == pDevice->isConnectDevice()) {
-	//	QMessageBox::warning(this, tr("提示"), tr("设备未连接，无法校准"));
-	//	return;
-	//}
-	QMessageBox::StandardButton button = QMessageBox::question(this, tr("询问"), tr("校准开始后无人不允许起飞，是否现在开始校准?"));
+	if (false == pDevice->isConnectDevice()) {
+		QMessageBox::warning(this, tr("提示"), tr("设备未连接，无法校准"));
+		return;
+	}
+	QMessageBox::StandardButton button = QMessageBox::question(this, tr("询问"), tr("校准开始后无法操控无人机，是否现在开始校准?"));
 	if (QMessageBox::StandardButton::Yes != button) return;
 	CalibrationDialog* pDialog = new CalibrationDialog(n, pDevice, dynamic_cast<QWidget*>(parent()));
 	pDialog->addLogToBrowser(pDevice->getName() + tr("：校准开始"));
+	int res = DeviceDataSucceed;
 	switch (n) {
-	case _Gyro: pDevice->Fun_MAV_CALIBRATION(1, 0, 0, 0, 0, 0, 0, false); break;
-	case _Magnetometer: pDevice->Fun_MAV_CALIBRATION(1, 1, 0, 0, 0, 0, 0, false); break;
-	case _Accelerometer: pDevice->Fun_MAV_CALIBRATION(0, 0, 0, 0, 1, 0, 0, false); break;
-	case _Baro: pDevice->Fun_MAV_CALIBRATION(0, 0, 0, 0, 0, 0, 1, false); break;
+	case _Gyro: res = pDevice->Fun_MAV_CALIBRATION(1, 0, 0, 0, 0, 0, 0); break;
+	case _Magnetometer: res = pDevice->Fun_MAV_CALIBRATION(1, 1, 0, 0, 0, 0, 0); break;
+	case _Accelerometer: res = pDevice->Fun_MAV_CALIBRATION(0, 0, 0, 0, 1, 0, 0); break;
+	case _Baro: res = pDevice->Fun_MAV_CALIBRATION(0, 0, 0, 0, 0, 0, 1); break;
+	}
+	if (DeviceDataSucceed != res) {
+		_ShowErrorMessage(pDevice->getName() + tr("校准") + Utility::waypointMessgeFromStatus(_DeviceCalibration, res));
+		return;
 	}
 	pDialog->exec();
-	pDialog->deleteLater();
-	pDialog = nullptr;
 }
 
 void DeviceManage::onDeviceConrolFinished(QString text, int res, QString explain)
