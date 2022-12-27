@@ -396,7 +396,7 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 			break;
 		case _DeviceQueue:
 			//降落到初始位置
-			pDevice->Fun_MAV_Defined_Queue(pDevice->getX(), pDevice->getY());
+			res = pDevice->Fun_MAV_Defined_Queue(pDevice->getX(), pDevice->getY());
 			qstrText = tr("列队");
 			break;
 		case _DeviceRegain:
@@ -409,7 +409,7 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 				x = r * nInterval;
 				if (0 == r) y += nInterval;
 			}
-			pDevice->Fun_MAV_Defined_Regain(x, y);
+			res = pDevice->Fun_MAV_Defined_Regain(x, y);
 			qstrText = tr("回收");
 			break;
 		}
