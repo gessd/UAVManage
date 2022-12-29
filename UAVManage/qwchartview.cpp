@@ -75,7 +75,7 @@ void QWChartView::initSeries()
 
 	m_timeNode = new QScatterSeries();
 	m_timeNode->setMarkerShape(QScatterSeries::MarkerShapeCircle);//MarkerShapeRectangle,MarkerShapeCircle
-	m_timeNode->setBorderColor(Qt::black);
+	m_timeNode->setBorderColor(Qt::red);
 	m_timeNode->setBrush(QBrush(Qt::darkCyan));
 	m_timeNode->setMarkerSize(12);
 }
@@ -123,7 +123,7 @@ void QWChartView::addAxisAndSeries()
     m_chart->addSeries(m_series1);
     m_chart->addSeries(m_series2);
     m_chart->addSeries(m_series3);
-	m_chart->addSeries(m_timeNode);
+	//m_chart->addSeries(m_timeNode);
 
     m_chart->addAxis(m_axisX,Qt::AlignBottom); //坐标轴添加到图表，并指定方向
     m_chart->addAxis(m_axisY,Qt::AlignLeft);
@@ -137,8 +137,8 @@ void QWChartView::addAxisAndSeries()
     m_series3->attachAxis(m_axisX); //序列 series1 附加坐标轴
     m_series3->attachAxis(m_axisY);
 
-	m_timeNode->attachAxis(m_axisX);
-	m_timeNode->attachAxis(m_axisY);
+	//m_timeNode->attachAxis(m_axisX);
+	//m_timeNode->attachAxis(m_axisY);
 }
 
 void QWChartView::prepareData()

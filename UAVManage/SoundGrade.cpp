@@ -22,6 +22,7 @@ SoundGrade::SoundGrade(QWidget *parent) :QWidget(parent)
 	m_ui.m_pBtnPrev->setVisible(false);
 	m_ui.m_pPlayList->setVisible(false);
 	m_ui.m_pBtnNext->setVisible(false);	
+	m_ui.m_pHslider->setVisible(false);
 
 	m_ui.m_pBtnPlay->setEnabled(false);
 	m_ui.m_pbtnStop->setEnabled(false);
