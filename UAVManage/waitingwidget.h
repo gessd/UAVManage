@@ -14,6 +14,7 @@ class WaitingWidget : public QWidget
 public:
     explicit WaitingWidget(QWidget *parent);
     ~WaitingWidget();
+    void visibleWidget();
 private:
     Ui::WaitingWidget *ui;
 };

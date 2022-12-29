@@ -842,6 +842,7 @@ void UAVManage::onCurrentPlayeState(qint8 state)
 void UAVManage::on3DDialogStauts(bool connect)
 {
 	if (connect) {
+		if (m_pBackgrounMask) m_pBackgrounMask->visibleWidget();
 		onMusicWaveFinished();
 		m_pDeviceManage->waypointComposeAndUpload(m_qstrCurrentProjectFile, false);
 	}
