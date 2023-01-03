@@ -5,7 +5,8 @@
 #include "devicecontrol.h"
 #include <QMovie>
 
-#define _AccIng_   "acc calib"
+#define _AccIng_       "acc calib"
+#define _AccFinished_  "Acc calb success"
 
 class CalibrationDialog : public QDialog
 {

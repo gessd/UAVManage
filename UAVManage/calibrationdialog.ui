@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>658</width>
-    <height>418</height>
+    <width>655</width>
+    <height>500</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -45,8 +45,8 @@
       <widget class="QLabel" name="label_7">
        <property name="geometry">
         <rect>
-         <x>270</x>
-         <y>60</y>
+         <x>260</x>
+         <y>40</y>
          <width>361</width>
          <height>91</height>
         </rect>
@@ -80,8 +80,8 @@
       <widget class="QPushButton" name="btnAccFinished">
        <property name="geometry">
         <rect>
-         <x>530</x>
-         <y>210</y>
+         <x>520</x>
+         <y>200</y>
          <width>101</width>
          <height>31</height>
         </rect>
@@ -95,8 +95,8 @@
         <rect>
          <x>0</x>
          <y>260</y>
-         <width>641</width>
-         <height>16</height>
+         <width>631</width>
+         <height>71</height>
         </rect>
        </property>
        <property name="styleSheet">
@@ -115,8 +115,26 @@ QLabel:disabled{background:&quot;#666666&quot;;}</string>
           <property name="enabled">
            <bool>false</bool>
           </property>
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>64</width>
+            <height>64</height>
+           </size>
+          </property>
           <property name="text">
            <string/>
+          </property>
+          <property name="pixmap">
+           <pixmap resource="uavmanage.qrc">:/res/acc/top.gif</pixmap>
+          </property>
+          <property name="scaledContents">
+           <bool>true</bool>
           </property>
          </widget>
         </item>
@@ -125,8 +143,20 @@ QLabel:disabled{background:&quot;#666666&quot;;}</string>
           <property name="enabled">
            <bool>false</bool>
           </property>
+          <property name="maximumSize">
+           <size>
+            <width>64</width>
+            <height>64</height>
+           </size>
+          </property>
           <property name="text">
            <string/>
+          </property>
+          <property name="pixmap">
+           <pixmap resource="uavmanage.qrc">:/res/acc/bottom.png</pixmap>
+          </property>
+          <property name="scaledContents">
+           <bool>true</bool>
           </property>
          </widget>
         </item>
@@ -135,8 +165,20 @@ QLabel:disabled{background:&quot;#666666&quot;;}</string>
           <property name="enabled">
            <bool>false</bool>
           </property>
+          <property name="maximumSize">
+           <size>
+            <width>64</width>
+            <height>64</height>
+           </size>
+          </property>
           <property name="text">
            <string/>
+          </property>
+          <property name="pixmap">
+           <pixmap resource="uavmanage.qrc">:/res/acc/behind.png</pixmap>
+          </property>
+          <property name="scaledContents">
+           <bool>true</bool>
           </property>
          </widget>
         </item>
@@ -145,8 +187,20 @@ QLabel:disabled{background:&quot;#666666&quot;;}</string>
           <property name="enabled">
            <bool>false</bool>
           </property>
+          <property name="maximumSize">
+           <size>
+            <width>64</width>
+            <height>64</height>
+           </size>
+          </property>
           <property name="text">
            <string/>
+          </property>
+          <property name="pixmap">
+           <pixmap resource="uavmanage.qrc">:/res/acc/front.png</pixmap>
+          </property>
+          <property name="scaledContents">
+           <bool>true</bool>
           </property>
          </widget>
         </item>
@@ -155,8 +209,20 @@ QLabel:disabled{background:&quot;#666666&quot;;}</string>
           <property name="enabled">
            <bool>false</bool>
           </property>
+          <property name="maximumSize">
+           <size>
+            <width>64</width>
+            <height>64</height>
+           </size>
+          </property>
           <property name="text">
            <string/>
+          </property>
+          <property name="pixmap">
+           <pixmap resource="uavmanage.qrc">:/res/acc/left.png</pixmap>
+          </property>
+          <property name="scaledContents">
+           <bool>true</bool>
           </property>
          </widget>
         </item>
@@ -165,8 +231,20 @@ QLabel:disabled{background:&quot;#666666&quot;;}</string>
           <property name="enabled">
            <bool>false</bool>
           </property>
+          <property name="maximumSize">
+           <size>
+            <width>64</width>
+            <height>64</height>
+           </size>
+          </property>
           <property name="text">
            <string/>
+          </property>
+          <property name="pixmap">
+           <pixmap resource="uavmanage.qrc">:/res/acc/right.png</pixmap>
+          </property>
+          <property name="scaledContents">
+           <bool>true</bool>
           </property>
          </widget>
         </item>
@@ -180,6 +258,8 @@ QLabel:disabled{background:&quot;#666666&quot;;}</string>
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources/>
+ <resources>
+  <include location="uavmanage.qrc"/>
+ </resources>
  <connections/>
 </ui>
