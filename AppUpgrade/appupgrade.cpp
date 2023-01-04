@@ -5,6 +5,7 @@
 #include <QTimer>
 #include <QDebug>
 #include <QMovie>
+#include <QDir>
 #include <QMessageBox>
 #include "../UAVManage/paramreadwrite.h"
 
@@ -33,22 +34,21 @@ int AppUpgrade::startUpdate()
     if (bInit) return 0;
     bInit = true;
     QString qstrVersionFile = QApplication::applicationDirPath() + "/version.ini";
+	ui.textBrowser->append("检查文件" + qstrVersionFile);
     if (false == QFile::exists(qstrVersionFile)) return -1;
 	QString qstrNewFile = QApplication::applicationDirPath() + "/" + ParamReadWrite::readParam("file", "", "App", qstrVersionFile).toString();
-    if (false == QFile::exists(qstrNewFile)) return -1;
+	ui.textBrowser->append("检查文件" + qstrNewFile);
+	if (false == QFile::exists(qstrNewFile)) return -2;
     QString qstr7zFile = QApplication::applicationDirPath() + "/../7z/7z.exe";
-    QString qstrParam = QString(" x -y %1 -o%2").arg(qstrNewFile).arg(QApplication::applicationDirPath()+"/../");
-	qDebug() << "执行解压程序" << qstr7zFile + qstrParam;
-	//m_process.setProgram("cmd");
-	//QStringList argument;
-	//argument << "/c" << qstr7zFile + qstrParam;
-	//m_process.setArguments(argument);
-	//m_process.start();
-	//m_process.start("ping baidu.com -t");
-	m_process.start(qstr7zFile + qstrParam);
+	ui.textBrowser->append("检查文件" + qstr7zFile);
+	if (false == QFile::exists(qstr7zFile)) return -3;
+	//防止路径包含空格，所有参数需要使用引号
+    QString qstrParam = QString(" \"x\" \"-y\" \"%1\" \"-o%2\"").arg(qstrNewFile).arg(QApplication::applicationDirPath()+"/../");
+	QString qstrCmd = "\"" + qstr7zFile + "\"" + qstrParam;
+	ui.textBrowser->append("执行解压程序" + qstrCmd);
+	m_process.start(qstrCmd);
 	bool bStart = m_process.waitForStarted();
-	qDebug() << "启动解压程序" << bStart;
-	if (false == bStart) return -1;
+	if (false == bStart) return -4;
     return 0;
 }
 
@@ -65,9 +65,9 @@ void AppUpgrade::onFinished(int code)
 	ui.label->setText(tr("程序升级完成正在启动"));
 	qDebug() << "程序升级完成";
 	ui.textBrowser->append("程序升级完成");
-	QProcess::startDetached(QApplication::applicationDirPath() + "/../UAVManage.exe");
+	QDir::setCurrent(QApplication::applicationDirPath() + "/../");
+	QProcess::startDetached("UAVManage.exe");
 	QTimer::singleShot(3000, this, SLOT(close()));
-	//close();
 }
 
 void AppUpgrade::onErrorOccurred(QProcess::ProcessError error)
@@ -84,8 +84,9 @@ void AppUpgrade::showEvent(QShowEvent* event)
 			m_pMovie->stop();
 			ui.labelGifLoading->setVisible(false);
 			ui.label->setText(tr("程序升级失败正在重启"));
-			QMessageBox::warning(this, tr("提示"), tr("检查更新文件失败，请重试"));
-			QProcess::startDetached(QApplication::applicationDirPath() + "/../UAVManage.exe");
+			QMessageBox::warning(this, tr("提示"), tr("检查更新文件失败，请重试")+QString::number(nUpdate));
+			QDir::setCurrent(QApplication::applicationDirPath() + "/../");
+			QProcess::startDetached("UAVManage.exe");
 			QTimer::singleShot(3000, this, SLOT(close()));
 			return;
 		}

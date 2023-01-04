@@ -182,8 +182,8 @@ void AboutDialog::onRestartApp()
 	}
 	qInfo() << "重启程序";
 	qApp->quit();
-	//QProcess::startDetached(qApp->applicationFilePath());
-	QProcess::startDetached(qstrApp);
+	QDir::setCurrent(QApplication::applicationDirPath() + "/update/");
+	QProcess::startDetached("AppUpgrade.exe");
 }
 
 void AboutDialog::showEvent(QShowEvent* event)

@@ -27,10 +27,10 @@ QLabel{background:transparent;color:rgb(61,213,219);}</string>
    <widget class="QTextBrowser" name="textBrowser">
     <property name="geometry">
      <rect>
-      <x>640</x>
-      <y>10</y>
-      <width>51</width>
-      <height>51</height>
+      <x>0</x>
+      <y>0</y>
+      <width>231</width>
+      <height>461</height>
      </rect>
     </property>
    </widget>
