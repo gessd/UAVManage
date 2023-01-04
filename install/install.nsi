@@ -101,6 +101,7 @@ Section "MainSection" SEC01
 	File /r "${appDir}\styles"
 	File /r "${appDir}\translations"
 	File /r "${appDir}\tools"
+	File /r "${appDir}\update"
 	File    "${appDir}\python3.dll"
 	File    "${appDir}\python39.dll"
 	File    "${appDir}\Qt5Charts.dll"
