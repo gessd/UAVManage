@@ -91,6 +91,7 @@ Section "MainSection" SEC01
 	SetOutPath "$INSTDIR"
 	SetOverwrite on
 	File /r "${appDir}\3D"
+	File /r "${appDir}\7z"
 	File /r "${appDir}\blockly_dev"
 	File /r "${appDir}\imageformats"
 	File /r "${appDir}\mediaservice"

@@ -5,6 +5,8 @@ VisualStudioVersion = 16.0.31911.196
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UAVManage", "UAVManage\UAVManage.vcxproj", "{F8B79D5F-A59A-494D-9806-960F779D99EF}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AppUpgrade", "AppUpgrade\AppUpgrade.vcxproj", "{452CB9A5-70C7-4539-99C2-6DBC7CE56236}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -15,6 +17,10 @@ Global
 		{F8B79D5F-A59A-494D-9806-960F779D99EF}.Debug|x64.Build.0 = Debug|x64
 		{F8B79D5F-A59A-494D-9806-960F779D99EF}.Release|x64.ActiveCfg = Release|x64
 		{F8B79D5F-A59A-494D-9806-960F779D99EF}.Release|x64.Build.0 = Release|x64
+		{452CB9A5-70C7-4539-99C2-6DBC7CE56236}.Debug|x64.ActiveCfg = Debug|x64
+		{452CB9A5-70C7-4539-99C2-6DBC7CE56236}.Debug|x64.Build.0 = Debug|x64
+		{452CB9A5-70C7-4539-99C2-6DBC7CE56236}.Release|x64.ActiveCfg = Release|x64
+		{452CB9A5-70C7-4539-99C2-6DBC7CE56236}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

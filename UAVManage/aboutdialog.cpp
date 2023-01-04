@@ -174,9 +174,16 @@ void AboutDialog::backgroundShow()
 
 void AboutDialog::onRestartApp()
 {
+	QString qstrApp = QApplication::applicationDirPath() + "/update/AppUpgrade.exe";
+	if (false == QFile::exists(qstrApp)) {
+		qWarning() << "自动更新文件不存在";
+		QMessageBox::warning(this, tr("错误"), tr("自动升级文件出错请手动升级"));
+		return;
+	}
 	qInfo() << "重启程序";
 	qApp->quit();
-	QProcess::startDetached(qApp->applicationFilePath());
+	//QProcess::startDetached(qApp->applicationFilePath());
+	QProcess::startDetached(qstrApp);
 }
 
 void AboutDialog::showEvent(QShowEvent* event)

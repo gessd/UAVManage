@@ -52,5 +52,6 @@ build*
 *.opendb
 /x64
 /UAVManage/x64
+/AppUpgrade/x64
 /.vs
 *.aps

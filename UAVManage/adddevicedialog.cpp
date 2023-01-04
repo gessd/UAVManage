@@ -14,7 +14,7 @@ AddDeviceDialog::AddDeviceDialog(QString qstrName, QWidget *parent)
 	ui.btnOK->setVisible(true);
 	QRegExp regExp1("\\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.)"
 		"{3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\b");
-	//ÏÞÖÆÊäÈë
+	//é™åˆ¶è¾“å…¥
 	ui.lineEditIP->setValidator(new QRegExpValidator(regExp1, this));
 	ui.lineEditX->setValidator(new QIntValidator(10, 10000, this));
 	ui.lineEditY->setValidator(new QIntValidator(10, 10000, this));
@@ -47,7 +47,7 @@ void AddDeviceDialog::showEvent(QShowEvent* event)
 		m_pLabelBackground = nullptr;
 	}
 	m_pLabelBackground = new QLabel(dynamic_cast<QWidget*>(parent()->parent()));
-	//ÉèÖÃ´°ÌåµÄ±³¾°É«,ÕâÀïµÄ°Ù·Ö±È¾ÍÊÇÍ¸Ã÷¶È
+	//è®¾ç½®çª—ä½“çš„èƒŒæ™¯è‰²,è¿™é‡Œçš„ç™¾åˆ†æ¯”å°±æ˜¯é€æ˜Žåº¦
 	m_pLabelBackground->setStyleSheet(QString("background-color: rgba(0, 0, 0, 50%);"));
 	m_pLabelBackground->setFixedSize(dynamic_cast<QWidget*>(parent()->parent())->size());
 	m_pLabelBackground->show();

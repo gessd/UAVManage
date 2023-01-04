@@ -105,11 +105,11 @@ int main(int argc, char *argv[])
         qApp->setStyleSheet(file.readAll());
         file.close();
     }
-	if (checkVersion()) {
-		qInfo() << "有新版本程序文件，关闭程序";
-		return 0;
-	}
-	deleteDir(QApplication::applicationDirPath()+_NewVersionPath_);
+	//if (checkVersion()) {
+	//	qInfo() << "有新版本程序文件，关闭程序";
+	//	return 0;
+	//}
+	//deleteDir(QApplication::applicationDirPath()+_NewVersionPath_);
 	//引导界面
 	FirstDialog first;
 	a.setActivationWindow(&first);
