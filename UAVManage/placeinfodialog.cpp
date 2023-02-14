@@ -308,12 +308,14 @@ void PlaceInfoDialog::onComparePlace(QPoint point)
 {
 	if (0 == point.x() || 0 == point.y()) return;
 	if (m_pointPlace == point) return;
-	QMessageBox::StandardButton button = QMessageBox::question(this, tr("询问"), tr("基站范围与项目配置场地大小不一致，是否更新项目配置场地大小？"));
-	if (button != QMessageBox::StandardButton::Yes) {
-		m_stationStatus = 0;
-		return;
-	}
-	m_stationStatus = 1;
+	m_stationStatus = 0;
+	//TODO 场地大小只有初始时设置，防止场地不规则
+	//QMessageBox::StandardButton button = QMessageBox::question(this, tr("询问"), tr("基站范围与项目配置场地大小不一致，是否更新项目配置场地大小？"));
+	//if (button != QMessageBox::StandardButton::Yes) {
+	//	m_stationStatus = 0;
+	//	return;
+	//}
+	//m_stationStatus = 1;
 }
 
 SerialWorker::SerialWorker(QSerialPort* ser, QObject* parent /*= nullptr*/)

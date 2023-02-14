@@ -160,6 +160,8 @@ UAVManage::UAVManage(QWidget* parent)
 		if (m_qstrCurrentProjectFile.isEmpty()) return;
 		PlaceInfoDialog info(m_pDeviceManage->getSpaceSize(), this);
 		info.exec();
+		//不允许更新场地大小
+		return;
 		if (false == info.isValidStation()) return;
 		QMap<QString, QPoint> map = info.getStationAddress();
 		m_pDeviceManage->setStationAddress(map);
