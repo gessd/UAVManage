@@ -863,7 +863,25 @@ void UAVManage::onProjectAttribute()
 	space.setProjectPath(info.path());
 	QPoint point = m_pDeviceManage->getSpaceSize();
 	space.setSpaceSize(point.x(), point.y());
-	if (QDialog::Accepted != space.exec())return;
+	if (QDialog::Accepted != space.exec()) return;
+
+#ifdef _EditSpace_
+	int xmax = space.getSpaceX();
+	int ymax = space.getSpaceY();
+	m_pDeviceManage->setSpaceSize(xmax, ymax);
+	QTextCodec* code = QTextCodec::codecForName(_XMLNameCoding_);
+	std::string filename = code->fromUnicode(m_qstrCurrentProjectFile).data();
+	tinyxml2::XMLDocument doc;
+	tinyxml2::XMLError error = doc.LoadFile(filename.c_str());
+	if (error != tinyxml2::XMLError::XML_SUCCESS) return;
+	tinyxml2::XMLElement* root = doc.RootElement();
+	if (!root) return;
+	tinyxml2::XMLElement* place = root->FirstChildElement(_ElementPlace_);
+	if (!place) return;
+	place->SetAttribute(_AttributeX_, xmax);
+	place->SetAttribute(_AttributeY_, ymax);
+	error = doc.SaveFile(filename.c_str());
+#endif
 }
 
 bool UAVManage::newProjectFile(QString qstrFile, unsigned int X, unsigned int Y)

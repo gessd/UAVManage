@@ -20,9 +20,11 @@ SpaceParam::SpaceParam(bool init, QWidget *parent)
 	else {
 		ui.dialogLabelTitle->setText(tr("项目属性"));
 		ui.widgetProject->setVisible(true);
+#ifndef _EditSpace_
 		ui.btnOK->setVisible(false);
 		ui.lineEditX->setEnabled(false);
 		ui.lineEditY->setEnabled(false);
+#endif
 	}
 	connect(ui.btnOK, &QAbstractButton::clicked, [this]() {
 		//检查输入值

@@ -3,6 +3,7 @@
 #include <QDialog>
 #include "ui_spaceparam.h"
 
+//#define _EditSpace_
 class SpaceParam : public QDialog
 {
 	Q_OBJECT
