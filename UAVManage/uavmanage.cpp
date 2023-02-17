@@ -146,6 +146,12 @@ UAVManage::UAVManage(QWidget* parent)
 			QMessageBox::warning(this, tr("警告"), tr("音乐文件无法使用无法打开三维窗口"));
 			return;
 		}
+		//UE4依赖文件判断
+		if (false == QFile::exists("C:/Windows/System32/D3DX9_43.dll") && false == QFile::exists("C:/Windows/SysWOW64/D3DX9_43.dll")) {
+			QProcess::startDetached(QApplication::applicationDirPath() + "/3D/Engine/Extras/Redist/en-us/UE4PrereqSetup_x64.exe");
+			_ShowErrorMessage("三维仿真必要文件缺失，请安装后重试");
+			return;
+		}
 		if (m_pBackgrounMask == nullptr) {
 			m_pBackgrounMask = new WaitingWidget(this);
 		}
