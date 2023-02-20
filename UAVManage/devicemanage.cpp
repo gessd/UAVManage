@@ -469,7 +469,7 @@ void DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upload
 		QVector<NavWayPointData> data = pythonThread.getWaypointData();
 		//最少2条，第一条是设置的起始位置
 		if (data.count() <= 1) {
-			_ShowWarningMessage(name + tr("没有舞步信息"));
+			_ShowErrorMessage(name + tr("没有舞步信息"));
 			continue;
 		}
 		qDebug() << name << "航点数据" << data.count();
@@ -502,7 +502,7 @@ void DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upload
 		else {
 			//上传航点到飞控
 			int status = pDevice->DeviceMavWaypointStart(data);
-			if (_DeviceStatus::DeviceDataSucceed != status) _ShowWarningMessage(name + Utility::waypointMessgeFromStatus(_DeviceWaypoint, status));
+			if (_DeviceStatus::DeviceDataSucceed != status) _ShowErrorMessage(name + Utility::waypointMessgeFromStatus(_DeviceWaypoint, status));
 		}
 		map.insert(name, data);
 	}

@@ -142,13 +142,13 @@ MessageListDialog QListWidget::item:hover{
 	border-radius:5px;
 }
 MessageListDialog #LabelInfoMessage{
-	color:rgb(250,250,250);background-color:rgb(100,100,100);border-radius:5px;
+	color:#000000;background-color:#FFFFFF;border-radius:5px;
 }
 MessageListDialog #LabelWarningMessage{
-	color:rgb(250,250,50);background-color:rgb(100,100,100);border-radius:5px;
+	color:#0000FF;background-color:#FFFFFF;border-radius:5px;
 }
 MessageListDialog #LabelErrorMessage{
-	color:rgb(250,100,100);background-color:rgb(100,100,100);border-radius:5px;
+	color:#FF0000;background-color:#FFFFFF;border-radius:5px;
 }
 
 /*垂直滑条*/
