@@ -833,13 +833,13 @@ void UAVManage::onUpdateMusic(QString qstrFilePath)
 	QString qstrNewFile = infoProject.path() + _ProjectDirName_ + fileName;
 	if (qstrFilePath == qstrNewFile) return;
 	if (false == QFile::copy(qstrFilePath, qstrNewFile)) {
-		QMessageBox::warning(this, tr("提示"), tr("音乐选择失败"));
+		QMessageBox::warning(this, tr("提示"), tr("音乐使用失败"));
 		return;
 	}
-	//m_pDeviceManage->setCurrentMusicPath(qstrNewFile);
-
 	place->SetAttribute(_ElementMusic_, fileName.toUtf8().data());
 	error = doc.SaveFile(filename.c_str());
+	//音乐文件复制完成后添加音乐
+	m_pSoundWidget->updateLoadMusic(qstrNewFile);
 }
 
 void UAVManage::onCurrentMusicTime(unsigned int second)

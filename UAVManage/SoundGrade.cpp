@@ -148,7 +148,7 @@ void SoundGrade::on_m_pBtnLoad_clicked()
 	//TODO改为使用单独一个音乐的方式
 	QString qstrFile = QFileDialog::getOpenFileName(this, dlgTitle, QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation), filter);
 	if (qstrFile.isEmpty()) return;
-	updateLoadMusic(qstrFile);
+	//此处不添加音乐，主界面复制音乐到工程目录下后再添加
 	emit sigUpdateMusic(qstrFile);
 }
 
