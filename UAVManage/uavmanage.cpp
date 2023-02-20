@@ -104,12 +104,12 @@ UAVManage::UAVManage(QWidget* parent)
 	QMenu* pMenuFlyPrepare = new QMenu(tr("起飞准备"));
 	pMenuFlyPrepare->setWindowFlags(pMenuFlyPrepare->windowFlags() | Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint);
 	pMenuFlyPrepare->setAttribute(Qt::WA_TranslucentBackground);
-	QAction* pActionFly1 = new QAction(QIcon(":/res/images/inspect.png"), tr("1.检查舞步"));
-	QAction* pActionFly2 = new QAction(QIcon(":/res/images/stereoscopic.png"), tr("2.三维仿真"));
-	QAction* pActionFly3 = new QAction(QIcon(":/res/images/basestation.png"), tr("3.基站标定"));
-	QAction* pActionFly4 = new QAction(QIcon(":/res/images/upload.png"), tr("4.上传舞步"));
-	QAction* pActionFly5 = new QAction(QIcon(":/res/images/time.png"), tr("5.定桩授时"));
-	QAction* pActionFly6 = new QAction(QIcon(":/res/images/prepare.png"), tr("6.准备起飞"));
+	QAction* pActionFly1 = new QAction(QIcon(":/res/images/inspect.png"), tr("检查舞步"));
+	QAction* pActionFly2 = new QAction(QIcon(":/res/images/stereoscopic.png"), tr("三维仿真"));
+	QAction* pActionFly3 = new QAction(QIcon(":/res/images/basestation.png"), tr("基站标定"));
+	QAction* pActionFly4 = new QAction(QIcon(":/res/images/upload.png"), tr("上传舞步"));
+	QAction* pActionFly5 = new QAction(QIcon(":/res/images/time.png"), tr("定桩授时"));
+	QAction* pActionFly6 = new QAction(QIcon(":/res/images/prepare.png"), tr("准备起飞"));
 	pMenuFlyPrepare->addAction(pActionFly1);
 	pMenuFlyPrepare->addAction(pActionFly2);
 	pMenuFlyPrepare->addAction(pActionFly3);
@@ -139,11 +139,16 @@ UAVManage::UAVManage(QWidget* parent)
 		//没有添加音乐不能启动三维窗口
 		QString qstrFilePath = m_pSoundWidget->getCurrentMusic();
 		if (qstrFilePath.isEmpty()) {
-			QMessageBox::warning(this, tr("警告"), tr("未添加音乐文件无法打开三维窗口"));
+			QMessageBox::warning(this, tr("警告"), tr("未添加音乐文件无法使用三维仿真窗口"));
+			return;
+		}
+		QFileInfo info(qstrFilePath);
+		if (false == info.isFile()) {
+			QMessageBox::warning(this, tr("警告"), tr("未添加音乐文件无法使用三维仿真窗口"));
 			return;
 		}
 		if (false == QFile::exists(qstrFilePath)) {
-			QMessageBox::warning(this, tr("警告"), tr("音乐文件无法使用无法打开三维窗口"));
+			QMessageBox::warning(this, tr("警告"), tr("音乐文件无法使用无法使用三维仿真窗口"));
 			return;
 		}
 		//UE4依赖文件判断
@@ -285,6 +290,7 @@ void UAVManage::onNewProject()
 	//场地大小
 	unsigned int x = space.getSpaceX();
 	unsigned int y = space.getSpaceY();
+	//QFileDialog::getExistingDirectory(this, tr("选择目录"), QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation), QFileDialog::ShowDirsOnly);
 	//选择新建路径
 	QString qstrName = QFileDialog::getSaveFileName(this, tr("项目名"), QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation), tr("File(*.qz)"));
 	if (qstrName.isEmpty()) return;

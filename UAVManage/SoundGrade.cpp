@@ -142,12 +142,11 @@ void SoundGrade::on_m_pBtnPlay_clicked()
 
 void SoundGrade::on_m_pBtnLoad_clicked()
 {//添加文件按钮
-	QString curPath = QDir::homePath();			//获取系统当前目录
-	QString dlgTitle = QString("选择音频文件");			//对话框标题
-	QString filter = QString("音频文件(*.mp3 *.wav *.wma);;mp3文件(*.mp3);;wav文件(*.wav);;wma文件(*.wma);;所有文件(*.*)"); //文件过滤器
+	QString dlgTitle = tr("选择音频文件");			//对话框标题
+	QString filter = tr("音频文件(*.mp3 *.wav *.wma);;mp3文件(*.mp3);;wav文件(*.wav);;wma文件(*.wma)"); //文件过滤器
 
 	//TODO改为使用单独一个音乐的方式
-	QString qstrFile = QFileDialog::getOpenFileName(this, dlgTitle, "", filter);
+	QString qstrFile = QFileDialog::getOpenFileName(this, dlgTitle, QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation), filter);
 	if (qstrFile.isEmpty()) return;
 	updateLoadMusic(qstrFile);
 	emit sigUpdateMusic(qstrFile);
