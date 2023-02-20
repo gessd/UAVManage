@@ -129,7 +129,7 @@ QProgressBar::chunk{
 	background:qlineargradient(spread:pad,x1:0,y1:0,x2:1,y2:0,stop:0 #12B3F6, stop:1 #44D484);
 	border-radius:2px;
 }
-MessageListDialog, MessageListDialog QListWidget, MessageListDialog QListWidget::item:selected{
+MessageListDialog, MessageListDialog QListWidget, MessageListDialog QListWidget::item, MessageListDialog QListWidget::item:selected{
 	color:blue;
 	background:transparent;
 	border-radius:10px;
