@@ -90,7 +90,7 @@ UAVManage::UAVManage(QWidget* parent)
 	m_pActionAttribute->setEnabled(false);
 	connect(pActionNew, &QAction::triggered, [this]() { onNewProject(); });
 	connect(pActionOpen, &QAction::triggered, [this]() {
-		QString qstrFile = QFileDialog::getOpenFileName(this, tr("项目名"), "", "File(*.qz)");
+		QString qstrFile = QFileDialog::getOpenFileName(this, tr("项目名"), QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation), "File(*.qz)");
 		if (qstrFile.isEmpty()) return;
 		onOpenProject(qstrFile);
 		});
@@ -286,7 +286,7 @@ void UAVManage::onNewProject()
 	unsigned int x = space.getSpaceX();
 	unsigned int y = space.getSpaceY();
 	//选择新建路径
-	QString qstrName = QFileDialog::getSaveFileName(this, tr("项目名"), "", tr("File(*.qz)"));
+	QString qstrName = QFileDialog::getSaveFileName(this, tr("项目名"), QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation), tr("File(*.qz)"));
 	if (qstrName.isEmpty()) return;
 	
 	//新建项目文件夹
@@ -422,7 +422,7 @@ void UAVManage::onSaveasProject()
 {
 	if (m_qstrCurrentProjectFile.isEmpty()) return;
 	//复制工程到新文件夹并重命名
-	QString qstrName = QFileDialog::getSaveFileName(this, tr("项目名"), "", "File(*.qz)");
+	QString qstrName = QFileDialog::getSaveFileName(this, tr("项目名"), QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation), "File(*.qz)");
 	if (qstrName.isEmpty()) return;
 	QFileInfo info(qstrName);
 	QString qstrPath = info.path();
