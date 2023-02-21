@@ -732,7 +732,6 @@ void DeviceManage::on3dNewConnection()
 		if (m_timerUpdateStatus.isActive()) m_timerUpdateStatus.stop();
 		if (m_timerMessage3D.isActive()) m_timerMessage3D.stop();
 		});
-	if (!m_timerMessage3D.isActive()) m_timerMessage3D.start(10 * 1000);
 	
 	////发送无人机设备列表
 	//QJsonObject obj3dmsg;
@@ -872,6 +871,7 @@ void DeviceManage::sendMessageTo3D(QJsonObject json3d)
 	int id = json3d.value(_ID_).toInt();
 	if (id != _3dDeviceLocation) {
 		//使用MAP模式，相同消息只保留最后一条
+		if (!m_timerMessage3D.isActive()) m_timerMessage3D.start(30 * 1000);
 		m_map3DMsgRecord.insert(id, json3d);
 	}
 	QJsonDocument document(json3d);
@@ -895,6 +895,7 @@ void DeviceManage::analyzeMessageFrom3D(QByteArray data)
 	int id = jsonObj.value(_ID_).toInt();
 	if (m_map3DMsgRecord.contains(id)) {
 		m_map3DMsgRecord.remove(id);
+		if (m_map3DMsgRecord.isEmpty()) m_timerMessage3D.stop();
 	}
 	if (id == _3dDeviceInit) {
 		//收到初始化回应后启动实时位置定时
