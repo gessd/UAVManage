@@ -11,6 +11,8 @@
 
 void outputMessage(QtMsgType type, const QMessageLogContext& context, const QString& msg)
 {
+	static QString qstrLast = "";
+	if (msg == qstrLast) return;
 	static QMutex mutex;
 	mutex.lock();
 	QString text;
@@ -43,6 +45,7 @@ void outputMessage(QtMsgType type, const QMessageLogContext& context, const QStr
 		text_stream << message << "\r\n";
 		file.flush();
 		file.close();
+		qstrLast = msg;
 	}
 	mutex.unlock();
 }
