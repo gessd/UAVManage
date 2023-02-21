@@ -42,7 +42,6 @@ DeviceControl QLabel{
 	font-size:12px;
 }
 #btnFlyStop{
-	padding-left:40px;
 	border:1px solid #FF0000;
 	color:#FF0000;
 }

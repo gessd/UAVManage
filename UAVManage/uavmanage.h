@@ -53,6 +53,7 @@ protected:
     virtual void showEvent(QShowEvent* event);
     virtual void closeEvent(QCloseEvent* event);
     virtual void resizeEvent(QResizeEvent* event);
+    virtual bool eventFilter(QObject* watched, QEvent* event);
 private slots:
     /**
      * @brief WEB页面加载进度，百分制

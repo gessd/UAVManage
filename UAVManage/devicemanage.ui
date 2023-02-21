@@ -75,7 +75,7 @@
             </font>
            </property>
            <property name="text">
-            <string>急停</string>
+            <string>急停(CTRL+空格)</string>
            </property>
            <property name="icon">
             <iconset resource="uavmanage.qrc">
@@ -89,12 +89,6 @@
            </property>
            <property name="toolButtonStyle">
             <enum>Qt::ToolButtonTextBesideIcon</enum>
-           </property>
-           <property name="autoRaise">
-            <bool>false</bool>
-           </property>
-           <property name="arrowType">
-            <enum>Qt::NoArrow</enum>
            </property>
           </widget>
          </item>

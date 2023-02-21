@@ -30,6 +30,8 @@ UAVManage::UAVManage(QWidget* parent)
 	m_pDeviceManage = nullptr;
 	m_p3DProcess = nullptr;
 	m_pBackgrounMask = nullptr;
+	//注册时间过滤器，处理快捷键事件
+	installEventFilter(this);
 	MessageListDialog::getInstance()->setParent(this);
 	//程序初始化
 	connect(ui.webEngineView, SIGNAL(loadProgress(int)), this, SLOT(onWebLoadProgress(int)));
@@ -494,6 +496,21 @@ void UAVManage::closeEvent(QCloseEvent* event)
 void UAVManage::resizeEvent(QResizeEvent* event)
 {
 	MessageListDialog::getInstance()->move((width() - MessageListDialog::getInstance()->width()) / 2, 0);
+}
+
+bool UAVManage::eventFilter(QObject* watched, QEvent* event)
+{
+	if (event->type() == QEvent::KeyRelease) {
+		QKeyEvent* keyEvent = dynamic_cast<QKeyEvent*>(event);
+		if (keyEvent) {
+			//增加快捷键控制急停
+			if (keyEvent->modifiers() == Qt::ControlModifier && keyEvent->key() == Qt::Key_Space) {
+				qInfo() << "快捷键控制急停";
+				m_pDeviceManage->allDeviceControl(_DeviceQuickStop);
+			}
+		}
+	}
+	return false;
 }
 
 void UAVManage::onWebLoadProgress(int progress)
