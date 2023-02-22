@@ -20,6 +20,7 @@
 #include "paramreadwrite.h"
 #include "spaceparam.h"
 #include "waitingwidget.h"
+#include "qxtglobalshortcut.h"
 
 UAVManage::UAVManage(QWidget* parent)
 	: QMainWindow(parent)
@@ -285,6 +286,23 @@ QString UAVManage::getCurrentPythonFile()
 	return QString("%1%2%3.py").arg(path).arg(_ProjectDirName_).arg(name);
 }
 
+bool UAVManage::initGlobalShortcut(QString shortcutKey)
+{
+	qInfo() << "注册全局快捷键" << shortcutKey;
+	QxtGlobalShortcut* pShortcut = new QxtGlobalShortcut(this);
+	if (false == pShortcut->setShortcut(QKeySequence(shortcutKey))) {
+		qInfo() << "快捷键已占用" << shortcutKey;
+		_ShowErrorMessage("急停快捷键(Ctrl+空格)已被占用，请解除后重新启动程序");
+		return false;
+	}
+	QObject::connect(pShortcut, &QxtGlobalShortcut::activated, [&]() {
+		qDebug() << "全局快捷键控制";
+		m_pDeviceManage->allDeviceControl(_DeviceQuickStop);
+		});
+	qInfo() << "全局快捷键注册成功";
+	return true;
+}
+
 void UAVManage::onNewProject()
 {
 	SpaceParam space(true, this);
@@ -485,7 +503,10 @@ void UAVManage::showEvent(QShowEvent* event)
 {
 	qInfo() << "显示主窗口";
 	MessageListDialog::getInstance()->setParent(this);
-	if(!m_pWebBockly) loadWeb();
+	if (!m_pWebBockly) {
+		initGlobalShortcut("Ctrl+Space");
+		loadWeb();
+	}
 }
 
 void UAVManage::closeEvent(QCloseEvent* event)

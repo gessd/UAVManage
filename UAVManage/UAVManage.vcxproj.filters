@@ -33,6 +33,12 @@
     <Filter Include="Source Files\serial">
       <UniqueIdentifier>{0b950286-0450-4aef-923f-24b5cc924435}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\qxtglobalshortcut5">
+      <UniqueIdentifier>{3a77c4be-984d-4b29-bbce-959a2dfed487}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\qxtglobalshortcut5">
+      <UniqueIdentifier>{7f305b10-664e-4736-85c9-0b1e5b94f41f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <QtRcc Include="uavmanage.qrc">
@@ -127,6 +133,21 @@
     <ClCompile Include="firstdialog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="qxtglobalshortcut5\core\qxtglobal.cpp">
+      <Filter>Source Files\qxtglobalshortcut5</Filter>
+    </ClCompile>
+    <ClCompile Include="qxtglobalshortcut5\gui\qxtglobalshortcut.cpp">
+      <Filter>Source Files\qxtglobalshortcut5</Filter>
+    </ClCompile>
+    <ClCompile Include="qxtglobalshortcut5\gui\qxtglobalshortcut_win.cpp">
+      <Filter>Source Files\qxtglobalshortcut5</Filter>
+    </ClCompile>
+    <ClCompile Include="qxtglobalshortcut5\gui\qxtwindowsystem.cpp">
+      <Filter>Source Files\qxtglobalshortcut5</Filter>
+    </ClCompile>
+    <ClCompile Include="qxtglobalshortcut5\gui\qxtwindowsystem_win.cpp">
+      <Filter>Source Files\qxtglobalshortcut5</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="devicemanage.h">
@@ -198,6 +219,9 @@
     <QtMoc Include="firstdialog.h">
       <Filter>Header Files</Filter>
     </QtMoc>
+    <QtMoc Include="qxtglobalshortcut5\gui\qxtglobalshortcut.h">
+      <Filter>Header Files\qxtglobalshortcut5</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="devicemanage.ui">
@@ -264,6 +288,15 @@
     </ClInclude>
     <ClInclude Include="serial\qextserialenumerator_p.h">
       <Filter>Header Files\serial</Filter>
+    </ClInclude>
+    <ClInclude Include="qxtglobalshortcut5\core\qxtglobal.h">
+      <Filter>Header Files\qxtglobalshortcut5</Filter>
+    </ClInclude>
+    <ClInclude Include="qxtglobalshortcut5\gui\qxtglobalshortcut_p.h">
+      <Filter>Header Files\qxtglobalshortcut5</Filter>
+    </ClInclude>
+    <ClInclude Include="qxtglobalshortcut5\gui\qxtwindowsystem.h">
+      <Filter>Header Files\qxtglobalshortcut5</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

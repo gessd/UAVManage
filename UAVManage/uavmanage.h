@@ -25,6 +25,7 @@ public:
     void loadWeb();
     QString getCurrentBlocklyFile();
     QString getCurrentPythonFile();
+    bool initGlobalShortcut(QString shortcutKey);
 private slots:
     /**
     * @brief 新建项目

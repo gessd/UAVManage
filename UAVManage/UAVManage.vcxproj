@@ -63,8 +63,8 @@
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <LanguageStandard>Default</LanguageStandard>
       <LanguageStandard_C>stdc11</LanguageStandard_C>
-      <AdditionalIncludeDirectories>.\qtsingleapplication;.\python395-64\include;.\mavlink1-c\common;.\mavlink1-c;.\libhv\include;.\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>HV_STATICLIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>.\qxtglobalshortcut5\core;.\qxtglobalshortcut5\gui;.\qtsingleapplication;.\python395-64\include;.\mavlink1-c\common;.\mavlink1-c;.\libhv\include;.\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BUILD_QXT_CORE;BUILD_QXT_GUI;HV_STATICLIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
@@ -76,8 +76,8 @@
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <PreprocessorDefinitions>HV_STATICLIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>.\qtsingleapplication;.\python395-64\include;.\mavlink1-c\common;.\mavlink1-c\;.\libhv\include;.\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BUILD_QXT_CORE;BUILD_QXT_GUI;HV_STATICLIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>.\qxtglobalshortcut5\core;.\qxtglobalshortcut5\gui;.\qtsingleapplication;.\python395-64\include;.\mavlink1-c\common;.\mavlink1-c\;.\libhv\include;.\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies>Setupapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -113,6 +113,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="firstdialog.cpp" />
+    <ClCompile Include="qxtglobalshortcut5\core\qxtglobal.cpp" />
+    <ClCompile Include="qxtglobalshortcut5\gui\qxtglobalshortcut.cpp" />
+    <ClCompile Include="qxtglobalshortcut5\gui\qxtglobalshortcut_win.cpp" />
+    <ClCompile Include="qxtglobalshortcut5\gui\qxtwindowsystem.cpp" />
+    <ClCompile Include="qxtglobalshortcut5\gui\qxtwindowsystem_win.cpp" />
     <ClCompile Include="waitingwidget.cpp" />
     <QtRcc Include="uavmanage.qrc" />
     <QtUic Include="aboutdialog.ui" />
@@ -195,6 +200,10 @@
     <QtMoc Include="paramreadwrite.h" />
     <QtMoc Include="spaceparam.h" />
     <QtMoc Include="serial\qextserialenumerator.h" />
+    <ClInclude Include="qxtglobalshortcut5\core\qxtglobal.h" />
+    <QtMoc Include="qxtglobalshortcut5\gui\qxtglobalshortcut.h" />
+    <ClInclude Include="qxtglobalshortcut5\gui\qxtglobalshortcut_p.h" />
+    <ClInclude Include="qxtglobalshortcut5\gui\qxtwindowsystem.h" />
     <ClInclude Include="serial\qextserialenumerator_p.h" />
     <ClInclude Include="serial\qextserialport_global.h" />
     <ClInclude Include="tinyxml2\tinyxml2.h" />
