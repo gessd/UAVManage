@@ -21,6 +21,7 @@ class UAVManage : public QMainWindow
 public:
     UAVManage(QWidget *parent = Q_NULLPTR);
     ~UAVManage();
+    void initMenu();
     void updateStyle();
     void loadWeb();
     QString getCurrentBlocklyFile();
@@ -153,7 +154,7 @@ private:
     /**
      * @brief 建立工具栏按钮菜单
      */
-    QToolButton* initMenuButton(QString text, QString noramlicon, QString activeicon, QMenu* menu);
+    QToolButton* initMenuButton(QWidget* parent, QString text, QString noramlicon, QString activeicon, QMenu* menu);
 signals:        
     void sigWindowFinished();
 private:
@@ -163,7 +164,7 @@ private:
     //websocket服务 积木块界面
     QWebSocketServer* m_pSocketServer;
     //web连接 积木块界面
-    QWebSocket* m_pWebBockly;
+    QWebSocket* m_pWebBocklySocket;
     //当前工程文件
     QString m_qstrCurrentProjectFile;
     //底部音乐窗口

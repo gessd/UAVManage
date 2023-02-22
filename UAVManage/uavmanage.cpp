@@ -27,7 +27,7 @@ UAVManage::UAVManage(QWidget* parent)
 {
 	ui.setupUi(this);
 	m_pSocketServer = nullptr;
-	m_pWebBockly = nullptr;
+	m_pWebBocklySocket = nullptr;
 	m_pDeviceManage = nullptr;
 	m_p3DProcess = nullptr;
 	m_pBackgrounMask = nullptr;
@@ -58,9 +58,58 @@ UAVManage::UAVManage(QWidget* parent)
 	connect(m_pDeviceManage, &DeviceManage::sig3DDialogStatus, this, &UAVManage::on3DDialogStauts);
 
 	m_pAbout = new AboutDialog(this);
-	ui.menuBar->setVisible(false);
+	m_pSoundWidget = new SoundGrade(this);
+	m_pSoundWidget->setEnabled(false);
+	ui.horizontalLayoutSound->addWidget(m_pSoundWidget);
+	connect(m_pSoundWidget, &SoundGrade::sigUpdateMusic, this, &UAVManage::onUpdateMusic);
+	connect(m_pSoundWidget, &SoundGrade::sigMsuicTime, this, &UAVManage::onCurrentMusicTime);
+	connect(m_pSoundWidget, &SoundGrade::playeState, this, &UAVManage::onCurrentPlayeState);
+	connect(m_pSoundWidget, &SoundGrade::updateMusicWaveFinished, this, &UAVManage::onMusicWaveFinished);
+	initMenu();
+}
+
+UAVManage::~UAVManage()
+{
+	if (m_p3DProcess) {
+		m_p3DProcess->close();
+		m_p3DProcess->kill();
+		m_p3DProcess->deleteLater();
+		m_p3DProcess = nullptr;
+	}
+	if (m_pSoundWidget) {
+		delete m_pSoundWidget;
+		m_pSoundWidget = nullptr;
+	}
+	if (m_pSocketServer) {
+		m_pSocketServer->close();
+		delete m_pSocketServer;
+		m_pSocketServer = nullptr;
+	}
+	if (m_pDeviceManage) {
+		m_pDeviceManage->clearDevice();
+		delete m_pDeviceManage;
+		m_pDeviceManage = nullptr;
+	}
+	if (m_pAbout) {
+		m_pAbout->close();
+		m_pAbout->deleteLater();
+		m_pAbout = nullptr;
+	}
+}
+
+void UAVManage::initMenu()
+{
+	static bool bInit = false;
+	if (bInit) return;
 	//添加菜单
-	QStyle* style = QApplication::style();
+	ui.menuBar->setMinimumHeight(30);
+	QWidget* pMenuWidget = new QWidget(ui.menuBar);
+	QHBoxLayout* pMenuLayout = new QHBoxLayout(pMenuWidget);
+	pMenuLayout->setSpacing(10);
+	pMenuLayout->setMargin(0);
+	pMenuWidget->setLayout(pMenuLayout);
+	pMenuWidget->setGeometry(0, 0, ui.menuBar->width(), ui.menuBar->height());
+
 	QMenu* pIconMenu = new QMenu(tr("奇正数元"));
 	pIconMenu->setIcon(QIcon(":/res/logo/qz_logo.ico"));
 	pIconMenu->setWindowFlags(pIconMenu->windowFlags() | Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint);
@@ -120,25 +169,28 @@ UAVManage::UAVManage(QWidget* parent)
 	pMenuFlyPrepare->addAction(pActionFly5);
 	pMenuFlyPrepare->addAction(pActionFly6);
 	ui.toolBar->layout()->setSpacing(10);
+	ui.toolBar->addAction(pActionFly1);
+	ui.toolBar->addAction(pActionFly2);
+	ui.toolBar->addAction(pActionFly3);
+	ui.toolBar->addAction(pActionFly4);
+	ui.toolBar->addAction(pActionFly5);
+	ui.toolBar->addAction(pActionFly6);
 
-	ui.toolBar->addWidget(initMenuButton(tr(""), ":/res/logo/qz_logo.ico", ":/res/logo/qz_logo.ico", pIconMenu));
-	ui.toolBar->addWidget(initMenuButton(tr("项目"), ":/res/menu/P01_file_open_btn_cli.png", ":/res/menu/P01_file_open_btn_cli.png", pProjectMenu));
-	m_pButtonFlyPrepare = initMenuButton(tr("起飞准备"), ":/res/menu/preparation.png", ":/res/menu/preparation.png", pMenuFlyPrepare);
+	pMenuLayout->addWidget(initMenuButton(pMenuWidget, tr(""), ":/res/logo/qz_logo.ico", ":/res/logo/qz_logo.ico", pIconMenu));
+	pMenuLayout->addWidget(initMenuButton(pMenuWidget, tr("项目"), ":/res/menu/P01_file_open_btn_cli.png", ":/res/menu/P01_file_open_btn_cli.png", pProjectMenu));
+	m_pButtonFlyPrepare = initMenuButton(pMenuWidget, tr("起飞准备"), ":/res/menu/preparation.png", ":/res/menu/preparation.png", pMenuFlyPrepare);
 	m_pButtonFlyPrepare->setEnabled(false);
-	ui.toolBar->addWidget(m_pButtonFlyPrepare);
-	//QToolButton* pButton = initMenuButton(tr("校准"), ":/res/logo/qz_logo.ico", ":/res/logo/qz_logo.ico", nullptr);
-	//connect(pButton, &QAbstractButton::clicked, [this]() {m_pDeviceManage->allDeviceCalibration();});
-	//ui.toolBar->addWidget(pButton);
+	pMenuLayout->addWidget(m_pButtonFlyPrepare);
 	QMenu* pActionHelp = new QMenu(tr("帮助"));
 	pActionHelp->setWindowFlags(pMenuFlyPrepare->windowFlags() | Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint);
 	pActionHelp->setAttribute(Qt::WA_TranslucentBackground);
 	QAction* pActionAbout = new QAction(QIcon(":/res/menu/P02_help_about_btn_new_ic.png"), tr("版本"));
 	pActionHelp->addAction(pActionAbout);
-	ui.toolBar->addWidget(initMenuButton(tr("帮助"), ":/res/menu/P02_help_about_page_ic.png", ":/res/menu/P02_help_about_page_ic.png", pActionHelp));
+	pMenuLayout->addWidget(initMenuButton(pMenuWidget, tr("帮助"), ":/res/menu/P02_help_about_page_ic.png", ":/res/menu/P02_help_about_page_ic.png", pActionHelp));
 	connect(pActionAbout, &QAction::triggered, [this]() {m_pAbout->exec(); });
-	
+
 	connect(pActionFly1, &QAction::triggered, [this]() { m_pDeviceManage->waypointComposeAndUpload(m_qstrCurrentProjectFile, false); });
-	connect(pActionFly2, &QAction::triggered, [this]() { 
+	connect(pActionFly2, &QAction::triggered, [this]() {
 		//没有添加音乐不能启动三维窗口
 		QString qstrFilePath = m_pSoundWidget->getCurrentMusic();
 		if (qstrFilePath.isEmpty()) {
@@ -170,7 +222,7 @@ UAVManage::UAVManage(QWidget* parent)
 		m_p3DProcess->waitForStarted(1000);
 		QDir::setCurrent(QApplication::applicationDirPath());
 		});
-	connect(pActionFly3, &QAction::triggered, [this]() { 
+	connect(pActionFly3, &QAction::triggered, [this]() {
 		if (m_qstrCurrentProjectFile.isEmpty()) return;
 		PlaceInfoDialog info(m_pDeviceManage->getSpaceSize(), this);
 		info.exec();
@@ -205,47 +257,11 @@ UAVManage::UAVManage(QWidget* parent)
 	connect(pActionFly4, &QAction::triggered, [this]() { m_pDeviceManage->waypointComposeAndUpload(m_qstrCurrentProjectFile, true); });
 	connect(pActionFly5, &QAction::triggered, [this]() {  //暂无功能
 		});
-	connect(pActionFly6, &QAction::triggered, [this]() { 
+	connect(pActionFly6, &QAction::triggered, [this]() {
 		if (m_qstrCurrentProjectFile.isEmpty()) return;
-		m_pDeviceManage->allDeviceControl(_DeviceSetout); 
+		m_pDeviceManage->allDeviceControl(_DeviceSetout);
 		});
-
-	m_pSoundWidget = new SoundGrade(this);
-	m_pSoundWidget->setEnabled(false);
-	ui.horizontalLayoutSound->addWidget(m_pSoundWidget);
-	connect(m_pSoundWidget, &SoundGrade::sigUpdateMusic, this, &UAVManage::onUpdateMusic);
-	connect(m_pSoundWidget, &SoundGrade::sigMsuicTime, this, &UAVManage::onCurrentMusicTime);
-	connect(m_pSoundWidget, &SoundGrade::playeState, this, &UAVManage::onCurrentPlayeState);
-	connect(m_pSoundWidget, &SoundGrade::updateMusicWaveFinished, this, &UAVManage::onMusicWaveFinished);
-}
-
-UAVManage::~UAVManage()
-{
-	if (m_p3DProcess) {
-		m_p3DProcess->close();
-		m_p3DProcess->kill();
-		m_p3DProcess->deleteLater();
-		m_p3DProcess = nullptr;
-	}
-	if (m_pSoundWidget) {
-		delete m_pSoundWidget;
-		m_pSoundWidget = nullptr;
-	}
-	if (m_pSocketServer) {
-		m_pSocketServer->close();
-		delete m_pSocketServer;
-		m_pSocketServer = nullptr;
-	}
-	if (m_pDeviceManage) {
-		m_pDeviceManage->clearDevice();
-		delete m_pDeviceManage;
-		m_pDeviceManage = nullptr;
-	}
-	if (m_pAbout) {
-		m_pAbout->close();
-		m_pAbout->deleteLater();
-		m_pAbout = nullptr;
-	}
+	pMenuLayout->addItem(new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum));
 }
 
 void UAVManage::updateStyle()
@@ -361,7 +377,7 @@ void UAVManage::onOpenProject(QString qstrFile)
 	unsigned int x = place->IntAttribute(_AttributeX_);
 	unsigned int y = place->IntAttribute(_AttributeY_);
 	m_pDeviceManage->setSpaceSize(x, y);
-	if (m_pWebBockly) {
+	if (m_pWebBocklySocket) {
 		qInfo() << "发送场地范围到编程区";
 		QPoint space = m_pDeviceManage->getSpaceSize();
 		QJsonObject jsonObj;
@@ -370,7 +386,7 @@ void UAVManage::onOpenProject(QString qstrFile)
 		jsonObj.insert("y", space.y());
 		jsonObj.insert("z", 10000);
 		QJsonDocument jsonDoc(jsonObj);
-		m_pWebBockly->sendTextMessage(jsonDoc.toJson());
+		m_pWebBocklySocket->sendTextMessage(jsonDoc.toJson());
 	}
 	QFileInfo infoProject(qstrFile);
 	QString qstrMusicFilePath = infoProject.path() + _ProjectDirName_ + place->Attribute(_ElementMusic_);
@@ -492,18 +508,18 @@ void UAVManage::onCloseProject()
 
 void UAVManage::onWebClear()
 {
-	if (!m_pWebBockly) return;
+	if (!m_pWebBocklySocket) return;
 	QJsonObject jsonObj;
 	jsonObj.insert(_WMID, _WIDClear);
 	QJsonDocument doc(jsonObj);
-	m_pWebBockly->sendTextMessage(doc.toJson());
+	m_pWebBocklySocket->sendTextMessage(doc.toJson());
 }
 
 void UAVManage::showEvent(QShowEvent* event)
 {
 	qInfo() << "显示主窗口";
 	MessageListDialog::getInstance()->setParent(this);
-	if (!m_pWebBockly) {
+	if (!m_pWebBocklySocket) {
 		initGlobalShortcut("Ctrl+Space");
 		loadWeb();
 	}
@@ -549,11 +565,11 @@ void UAVManage::onSocketNewConnection()
 {
 	//不能同时打开两个软件，否则端口占用无法使用
 	//只记录一个web连接，防止通过浏览器访问blockly
-	if (m_pWebBockly) return;
+	if (m_pWebBocklySocket) return;
 	qInfo() << "已建立编程区域连接";
-	m_pWebBockly = m_pSocketServer->nextPendingConnection();
-	connect(m_pWebBockly, SIGNAL(textMessageReceived(QString)), this, SLOT(onSocketTextMessageReceived(QString)));
-	connect(m_pWebBockly, SIGNAL(disconnected()), this, SLOT(onSocketDisconnected()));
+	m_pWebBocklySocket = m_pSocketServer->nextPendingConnection();
+	connect(m_pWebBocklySocket, SIGNAL(textMessageReceived(QString)), this, SLOT(onSocketTextMessageReceived(QString)));
+	connect(m_pWebBocklySocket, SIGNAL(disconnected()), this, SLOT(onSocketDisconnected()));
 	//打开上次记录的项目
 	QString qstrPath = ParamReadWrite::readParam(_Path_).toString();
 	if (false == qstrPath.isEmpty() && QFile::exists(qstrPath)) {
@@ -600,7 +616,7 @@ void UAVManage::onSocketTextMessageReceived(QString message)
 void UAVManage::onSocketDisconnected()
 {
 	qDebug() << "编程区域连接断开";
-	m_pWebBockly = nullptr;
+	m_pWebBocklySocket = nullptr;
 }
 
 void UAVManage::onCurrentDeviceNameChanged(QString currentName, QString previousName)
@@ -621,7 +637,7 @@ void UAVManage::onCurrentDeviceNameChanged(QString currentName, QString previous
 	jsonObj.insert("name", currentName);
 	QJsonDocument jsonDoc(jsonObj);
 	QByteArray data = jsonDoc.toJson();
-	if(m_pWebBockly) m_pWebBockly->sendTextMessage(data);
+	if(m_pWebBocklySocket) m_pWebBocklySocket->sendTextMessage(data);
 	
 	//更新项目工程中选中设备
 	QTextCodec* code = QTextCodec::codecForName(_XMLNameCoding_);
@@ -966,7 +982,7 @@ bool UAVManage::newProjectFile(QString qstrFile, unsigned int X, unsigned int Y)
 	
 }
 
-QToolButton* UAVManage::initMenuButton(QString text, QString noramlicon, QString activeicon, QMenu* menu)
+QToolButton* UAVManage::initMenuButton(QWidget* parent, QString text, QString noramlicon, QString activeicon, QMenu* menu)
 {
 	QToolButton* pButton = new QToolButton(this);
 	pButton->setText(text);
@@ -975,7 +991,7 @@ QToolButton* UAVManage::initMenuButton(QString text, QString noramlicon, QString
 	icon.addFile(activeicon, QSize(32, 32), QIcon::Active, QIcon::Off);
 	pButton->setIcon(icon);
 	pButton->setMenu(menu);
-	pButton->setMinimumHeight(40);
+	pButton->setMinimumHeight(parent->height());
 	pButton->setPopupMode(QToolButton::InstantPopup);
 	pButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
 	pButton->setStyleSheet("QToolButton::menu-indicator{image:none;} \

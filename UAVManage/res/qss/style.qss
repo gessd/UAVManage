@@ -20,12 +20,20 @@ QPushButton:hover,QToolButton:hover{
 QPushButton:pressed,QToolButton:pressed{
     background:#DDDDDD;
 }
-QToolBar QToolButton{
+QToolBar QToolButton, QMenuBar QToolButton{
 	background:transparent;
 	color:#FFFFFF;
 }
-QToolBar QToolButton:hover{
-	border:1px solid #FFFFFF;
+QToolBar QToolButton{
+	border:0px solid blue;
+	border-radius:0px;
+}
+QMenuBar QToolButton:hover, QMenuBar QToolButton:pressed{
+	background:#2C6ACC;
+}
+QToolBar QToolButton:hover, QToolBar QToolButton:pressed{
+	border:0px solid blue;
+	background:#F8F8FF;
 }
 QDialogButtonBox QPushButton{
 	min-height:30px;
@@ -168,29 +176,28 @@ QScrollBar::sub-line:vertical, QScrollBar::add-line:vertical{
 	border: none; 
     background: none; 
 }
-QToolBar{
+QToolBar, QMenuBar, QMenuBar QWidget{
 	border:0px;
 	border-radius:0px;
 	background:rgb(59,140,255);
 }
+QToolBar{
+	background:#C2DDF0;
+}
 QMenu{
 	border:1px solid rgb(125, 125, 125);
     border-radius:10px; 
-	background:rgb(242,242,242);
+	background:#FFFFFF;
 }
 QMenu:hover{
 	background:#11FFFF;
 }
 QMenu::item{
-	background:transparent;
-	
+	background:transparent;	
 }
-/* 选中条目时 */
-QMenu::item:selected {
+/* 选中条目时 border-radius不可以使用，会造成item左对齐*/
+QMenu::item:hover, QMenu::item:selected {
 	background:#CCCCCC;
-}
-QMenu::item:hover{
-	background:#C8C8C8;
 }
 /* 条目被选中时*/
 QMenu::icon::checked {
