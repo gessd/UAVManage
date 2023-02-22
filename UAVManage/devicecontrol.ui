@@ -13,6 +13,9 @@
   <property name="windowTitle">
    <string>DeviceControl</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true"/>
+  </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">
     <number>2</number>
@@ -111,11 +114,46 @@
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QToolButton" name="btnRemove">
+        <property name="minimumSize">
+         <size>
+          <width>24</width>
+          <height>24</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>24</width>
+          <height>24</height>
+         </size>
+        </property>
+        <property name="toolTip">
+         <string>删除</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset resource="uavmanage.qrc">
+          <normaloff>:/res/images/delete.png</normaloff>:/res/images/delete.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>20</width>
+          <height>20</height>
+         </size>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
    <item>
     <widget class="QStackedWidget" name="stackedWidgetStatus">
+     <property name="toolTip">
+      <string>急停</string>
+     </property>
      <property name="styleSheet">
       <string notr="true">background:transparent;</string>
      </property>
@@ -198,7 +236,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QToolButton" name="btnRemove">
+        <widget class="QToolButton" name="btnStop">
          <property name="minimumSize">
           <size>
            <width>24</width>
@@ -211,15 +249,12 @@
            <height>24</height>
           </size>
          </property>
-         <property name="toolTip">
-          <string>删除</string>
-         </property>
          <property name="text">
-          <string/>
+          <string>...</string>
          </property>
          <property name="icon">
           <iconset resource="uavmanage.qrc">
-           <normaloff>:/res/images/delete.png</normaloff>:/res/images/delete.png</iconset>
+           <normaloff>:/res/images/flystop.png</normaloff>:/res/images/flystop.png</iconset>
          </property>
          <property name="iconSize">
           <size>

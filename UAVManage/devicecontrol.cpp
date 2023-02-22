@@ -51,6 +51,11 @@ DeviceControl::DeviceControl(QString name, float x, float y, QString ip, QWidget
 			_ShowErrorMessage(tr("控制LED出错:") + Utility::waypointMessgeFromStatus(_DeviceLed, res));
 		}
 		});
+	connect(ui.btnStop, &QToolButton::clicked, [this]() {
+		int res = Fun_MAV_QUICK_STOP();
+		if (res == _DeviceStatus::DeviceDataSucceed) return;
+		_ShowErrorMessage(getName() + tr("急停") + Utility::waypointMessgeFromStatus(_DeviceQuickStop, res));
+		});
 	setName(name);
 	setIp(ip);
 	setStartLocation(x, y);

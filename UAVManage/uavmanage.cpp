@@ -292,7 +292,7 @@ bool UAVManage::initGlobalShortcut(QString shortcutKey)
 	QxtGlobalShortcut* pShortcut = new QxtGlobalShortcut(this);
 	if (false == pShortcut->setShortcut(QKeySequence(shortcutKey))) {
 		qInfo() << "快捷键已占用" << shortcutKey;
-		_ShowErrorMessage("急停快捷键(Ctrl+空格)已被占用，请解除后重新启动程序");
+		_ShowErrorMessage("急停快捷键(Ctrl+空格)已被其他程序占用，请解除后重新启动程序");
 		return false;
 	}
 	QObject::connect(pShortcut, &QxtGlobalShortcut::activated, [&]() {

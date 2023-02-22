@@ -147,7 +147,7 @@ DeviceManage::DeviceManage(QWidget *parent)
 		if (!pControl) return;
 		int res = pControl->Fun_MAV_QUICK_STOP();
 		if (res == _DeviceStatus::DeviceDataSucceed) return;
-		_ShowErrorMessage(pControl->getName() + tr("急停") + Utility::waypointMessgeFromStatus(_DeviceQuickStop, res));;
+		_ShowErrorMessage(pControl->getName() + tr("急停") + Utility::waypointMessgeFromStatus(_DeviceQuickStop, res));
 		});
 	connect(pDebug, &QAction::triggered, [this](bool checked) {
 		DeviceControl* pControl = getCurrentDevice();
