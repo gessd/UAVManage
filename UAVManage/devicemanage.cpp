@@ -95,6 +95,7 @@ DeviceManage::DeviceManage(QWidget *parent)
 			qDebug() << "修改设备名称" << qstrName << qstrNewName;
 			pControl->setName(qstrNewName);
 			emit deviceRenameFinished(qstrNewName, qstrName);
+			emit currentDeviceNameChanged(qstrNewName, qstrName);
 		}
 		if (qstrNewIP != pControl->getIP()) {
 			//修改设备IP
