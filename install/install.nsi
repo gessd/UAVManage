@@ -79,7 +79,7 @@ SetCompressor lzma
 
 Name "${PRODUCT_NAME}"
 OutFile "无人机炫舞编程.exe"
-InstallDir "$PROGRAMFILES\UAVManage"
+InstallDir "D:\UAVManage"
 InstallDirRegKey HKLM "${PRODUCT_UNINST_KEY}" "UninstallString"
 ShowInstDetails show
 ShowUnInstDetails show
