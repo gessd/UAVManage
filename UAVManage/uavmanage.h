@@ -25,7 +25,7 @@ public:
     void updateStyle();
     void loadWeb();
     QString getCurrentBlocklyFile();
-    QString getCurrentPythonFile();
+    QString getCurrentPythonFile(bool manual=false);
     bool initGlobalShortcut(QString shortcutKey);
 private slots:
     /**

@@ -295,7 +295,8 @@ typedef struct __NavWayPointData
  */
 #define _WMID "msgID"
 enum _TypeWMID {
-	_WIDUpdate = 1,
-	_WIDClear = 2,
-	_WIDSet = 3
+	_WIDUpdate = 1,	//blockly区域更新
+	_WIDClear = 2,	//情况编程区域
+	_WIDSet = 3,	//设置场地大小
+	_WIDManual = 4	//手动python代码更新
 };

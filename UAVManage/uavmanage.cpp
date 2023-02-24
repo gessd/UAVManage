@@ -292,13 +292,15 @@ QString UAVManage::getCurrentBlocklyFile()
 	return QString("%1%2%3.blockly").arg(path).arg(_ProjectDirName_).arg(name);
 }
 
-QString UAVManage::getCurrentPythonFile()
+QString UAVManage::getCurrentPythonFile(bool manual)
 {
 	if (m_qstrCurrentProjectFile.isEmpty() || !m_pDeviceManage) return QString();
 	QString name = m_pDeviceManage->getCurrentDeviceName();
 	if (name.isEmpty()) return QString();
 	QFileInfo info(m_qstrCurrentProjectFile);
 	QString path = info.path();
+	//mp手动编写的python文件
+	if(manual) return QString("%1%2%3.mp").arg(path).arg(_ProjectDirName_).arg(name);
 	return QString("%1%2%3.py").arg(path).arg(_ProjectDirName_).arg(name);
 }
 
@@ -565,7 +567,7 @@ void UAVManage::onSocketNewConnection()
 {
 	//不能同时打开两个软件，否则端口占用无法使用
 	//只记录一个web连接，防止通过浏览器访问blockly
-	if (m_pWebBocklySocket) return;
+	//if (m_pWebBocklySocket) return;
 	qInfo() << "已建立编程区域连接";
 	m_pWebBocklySocket = m_pSocketServer->nextPendingConnection();
 	connect(m_pWebBocklySocket, SIGNAL(textMessageReceived(QString)), this, SLOT(onSocketTextMessageReceived(QString)));
@@ -593,18 +595,22 @@ void UAVManage::onSocketTextMessageReceived(QString message)
 	//使用python方式传送blockly中的数据
 	QJsonObject jsonObj = jsonDoc.object();
 	int id = jsonObj.value(_WMID).toInt();
-	if (_WIDUpdate != id) return;
+	if (_WIDUpdate != id && _WIDManual != id) return;
 	QString xml = jsonObj.value(_name2str(xml)).toString();
 	QString python = jsonObj.value(_name2str(python)).toString();
-
 	QString blocklyFileName = getCurrentBlocklyFile();
-	QString pythonFileName = getCurrentPythonFile();
+	QString pythonFileName = getCurrentPythonFile();	
 	qDebug() << "更新文件" << blocklyFileName << pythonFileName;
 	if (blocklyFileName.isEmpty() || pythonFileName.isEmpty()) return;
-	QFile blocklyFile(blocklyFileName);
-	if (blocklyFile.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)){
-		blocklyFile.write(xml.toUtf8());
-		blocklyFile.close();
+	if (_WIDUpdate == id) {
+		QFile blocklyFile(blocklyFileName);
+		if (blocklyFile.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
+			blocklyFile.write(xml.toUtf8());
+			blocklyFile.close();
+		}
+	}
+	if (_WIDManual == id) {
+		pythonFileName = getCurrentPythonFile(true);
 	}
 	QFile pythonFile(pythonFileName);
 	if (pythonFile.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
@@ -630,11 +636,18 @@ void UAVManage::onCurrentDeviceNameChanged(QString currentName, QString previous
 		arrBlockly = file.readAll();
 		file.close();
 	}
+	QByteArray arrPythonCode;
+	QFile filePython(getCurrentPythonFile(true));
+	if (filePython.open(QIODevice::ReadOnly)) {
+		arrPythonCode = filePython.readAll();
+		filePython.close();
+	}
 	qDebug() << "更新编程区域";
 	QJsonObject jsonObj;
 	jsonObj.insert(_WMID, _WIDUpdate);
 	jsonObj.insert("xml", arrBlockly.data());
 	jsonObj.insert("name", currentName);
+	if (false == arrPythonCode.isEmpty())jsonObj.insert("pythonCode", arrPythonCode.data());
 	QJsonDocument jsonDoc(jsonObj);
 	QByteArray data = jsonDoc.toJson();
 	if(m_pWebBocklySocket) m_pWebBocklySocket->sendTextMessage(data);
@@ -748,8 +761,10 @@ void UAVManage::onDeviceRemove(QString name)
 	QString qstrPath = info.path();
 	QString qstrBlocklyFile = QString("%1%2%3.blockly").arg(qstrPath).arg(_ProjectDirName_).arg(name);
 	QString qstrPythonFile = QString("%1%2%3.py").arg(qstrPath).arg(_ProjectDirName_).arg(name);
+	QString qstrManualFile = QString("%1%2%3.mp").arg(qstrPath).arg(_ProjectDirName_).arg(name);
 	QFile::remove(qstrBlocklyFile);
 	QFile::remove(qstrPythonFile);
+	QFile::remove(qstrManualFile);
 }
 
 void UAVManage::onDeviceRename(QString newName, QString oldName)
@@ -780,10 +795,13 @@ void UAVManage::onDeviceRename(QString newName, QString oldName)
 	QString qstrPath = info.path();
 	QString qstrNewBlocklyFile = QString("%1%2%3.blockly").arg(qstrPath).arg(_ProjectDirName_).arg(newName);
 	QString qstrNewPythonFile = QString("%1%2%3.py").arg(qstrPath).arg(_ProjectDirName_).arg(newName);
+	QString qstrNewManualFile = QString("%1%2%3.mp").arg(qstrPath).arg(_ProjectDirName_).arg(newName);
 	QString qstrOldBlocklyFile = QString("%1%2%3.blockly").arg(qstrPath).arg(_ProjectDirName_).arg(oldName);
 	QString qstrOldPythonFile = QString("%1%2%3.py").arg(qstrPath).arg(_ProjectDirName_).arg(oldName);
+	QString qstrOldManualFile = QString("%1%2%3.mp").arg(qstrPath).arg(_ProjectDirName_).arg(oldName);
 	QFile::rename(qstrOldBlocklyFile, qstrNewBlocklyFile);
 	QFile::rename(qstrOldPythonFile, qstrNewPythonFile);
+	QFile::rename(qstrOldManualFile, qstrNewManualFile);
 }
 
 void UAVManage::onDeviceResetIp(QString name, QString ip)
