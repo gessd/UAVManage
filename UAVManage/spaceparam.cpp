@@ -1,8 +1,10 @@
 #include "spaceparam.h"
 #include <QIntValidator>
 #include <QMessageBox>
+#include <QFileDialog>
+#include <QStandardPaths>
 
-SpaceParam::SpaceParam(bool init, QWidget *parent)
+SpaceParam::SpaceParam(bool create, QWidget *parent)
 	: QDialog(parent)
 {
 	ui.setupUi(this);
@@ -13,21 +15,41 @@ SpaceParam::SpaceParam(bool init, QWidget *parent)
 	ui.lineEditY->setValidator(new QDoubleValidator(2.0, 100.0, 2, this));
 	ui.lineEditX->setMaxLength(5);
 	ui.lineEditY->setMaxLength(5);
-	if (init) {
+	if (create) {
 		ui.dialogLabelTitle->setText(tr("新建项目"));
-		ui.widgetProject->setVisible(false);
 	}
 	else {
 		ui.dialogLabelTitle->setText(tr("项目属性"));
-		ui.widgetProject->setVisible(true);
+		ui.widgetProject->setEnabled(false);
+		ui.frameName->setEnabled(false);
 #ifndef _EditSpace_
+		ui.frameSpace->setEnabled(false);
 		ui.btnOK->setVisible(false);
-		ui.lineEditX->setEnabled(false);
-		ui.lineEditY->setEnabled(false);
 #endif
 	}
 	connect(ui.btnOK, &QAbstractButton::clicked, [this]() {
 		//检查输入值
+		QString name = ui.lineEditName->text();
+		if (name.isEmpty()) {
+			QMessageBox::warning(this, tr("提示"), tr("未输入项目名称"));
+			return;
+		}
+		QString path = ui.labelPath->text();
+		if (path.isEmpty()) {
+			QMessageBox::warning(this, tr("提示"), tr("未选择项目存放路径"));
+			return;
+		}
+		QFileInfo fileInfo(path);
+		if (false == fileInfo.isDir() || false == fileInfo.exists()) {
+			QMessageBox::warning(this, tr("提示"), tr("选择路径不存在"));
+			return;
+		}
+		QString dir = path + "/" + name;
+		QFileInfo fileDir(dir);
+		if (fileDir.exists()) {
+			QMessageBox::warning(this, tr("提示"), tr("当前路径已存在相同名称文件或文件夹"));
+			return;
+		}
 		int x = ui.lineEditX->text().toInt();
 		int y = ui.lineEditY->text().toInt();
 		if (x < 5 || y < 5) {
@@ -39,6 +61,10 @@ SpaceParam::SpaceParam(bool init, QWidget *parent)
 			return;
 		}
 		accept();
+		});
+	connect(ui.btnPath, &QAbstractButton::clicked, [this]() {
+		QString path = QFileDialog::getExistingDirectory(this, tr("选择目录"), QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation), QFileDialog::ShowDirsOnly);
+		ui.labelPath->setText(path);
 		});
 	connect(ui.btnCancel, &QAbstractButton::clicked, [this]() {  reject(); });
 }
@@ -61,8 +87,15 @@ unsigned int SpaceParam::getSpaceY()
 	return ui.lineEditY->text().trimmed().toUInt() * 100;
 }
 
+QString SpaceParam::getProjectPath()
+{
+	return ui.labelPath->text() + "/" + ui.lineEditName->text().trimmed();
+}
+
 void SpaceParam::setProjectPath(QString path)
 {
+	QFileInfo info(path);
+	ui.lineEditName->setText(info.fileName());
 	ui.labelPath->setText(path);
 }
 

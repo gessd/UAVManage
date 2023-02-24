@@ -328,15 +328,15 @@ void UAVManage::onNewProject()
 	//场地大小
 	unsigned int x = space.getSpaceX();
 	unsigned int y = space.getSpaceY();
-	//QFileDialog::getExistingDirectory(this, tr("选择目录"), QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation), QFileDialog::ShowDirsOnly);
+	QString qstrName = space.getProjectPath();
 	//选择新建路径
-	QString qstrName = QFileDialog::getSaveFileName(this, tr("项目名"), QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation), tr("File(*.qz)"));
-	if (qstrName.isEmpty()) return;
+	//QString qstrName = QFileDialog::getSaveFileName(this, tr("项目名"), QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation), tr("File(*.qz)"));
+	//if (qstrName.isEmpty()) return;
 	
 	//新建项目文件夹
 	QFileInfo info(qstrName);
 	QString qstrDir = info.path() + "/" + info.baseName();
-	QString qstrFile = qstrDir + "/" + info.fileName();
+	QString qstrFile = qstrDir + "/" + info.fileName() + ".qz";
 	QDir dir;
 	if (!dir.mkdir(qstrDir)) {
 		_ShowErrorMessage(info.baseName() + tr("项目创建失败"));
@@ -416,7 +416,6 @@ void UAVManage::onOpenProject(QString qstrFile)
 	_ShowInfoMessage(tr("打开工程完成"));
 	QFileInfo info(m_qstrCurrentProjectFile);
 	QString name = info.baseName();
-	this->setWindowTitle(name);
 	m_pDeviceManage->setCurrentDevice(qstrCurrnetName);
 	m_pSoundWidget->updateLoadMusic(qstrMusicFilePath);
 	m_pDeviceManage->setEnabled(true);
