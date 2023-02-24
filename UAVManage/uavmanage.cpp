@@ -325,6 +325,7 @@ void UAVManage::onNewProject()
 {
 	SpaceParam space(true, this);
 	if (QDialog::Accepted != space.exec())return;
+	onCloseProject();
 	//场地大小
 	unsigned int x = space.getSpaceX();
 	unsigned int y = space.getSpaceY();
@@ -332,7 +333,7 @@ void UAVManage::onNewProject()
 	//选择新建路径
 	//QString qstrName = QFileDialog::getSaveFileName(this, tr("项目名"), QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation), tr("File(*.qz)"));
 	//if (qstrName.isEmpty()) return;
-	
+	qInfo() << "开始新建项目" << qstrName;
 	//新建项目文件夹
 	QFileInfo info(qstrName);
 	QString qstrDir = info.path() + "/" + info.baseName();
@@ -342,13 +343,13 @@ void UAVManage::onNewProject()
 		_ShowErrorMessage(info.baseName() + tr("项目创建失败"));
 		return;
 	}
+	dir.mkdir(qstrDir + _ProjectDirName_);
 	//新建项目文件并写入初始化内容
 	if (!newProjectFile(qstrFile, x, y)) {
 		dir.rmdir(qstrDir);
 		_ShowErrorMessage(info.baseName() + tr("创建项目文件失败"));
 		return;
 	}
-	dir.mkdir(qstrDir + _ProjectDirName_);
 	_ShowInfoMessage(info.baseName()+tr("新建项目完成"));
 	onOpenProject(qstrFile);
 }
@@ -396,7 +397,6 @@ void UAVManage::onOpenProject(QString qstrFile)
 	tinyxml2::XMLElement* device = root->FirstChildElement(_ElementDevice_);
 	if (!device) {
 		_ShowErrorMessage(tr("工程中没有添加设备"));
-		//return;
 	}
 	m_qstrCurrentProjectFile = qstrFile;
 	while (device){
@@ -409,7 +409,7 @@ void UAVManage::onOpenProject(QString qstrFile)
 		if (m_pDeviceManage) {
 			QString error = m_pDeviceManage->addDevice(devicename, ip, x, y);
 			if (!error.isEmpty()) {
-				_ShowErrorMessage(tr("无法添加设备") + devicename + error);
+				_ShowErrorMessage(tr("无法使用设备") + devicename + error);
 			}
 		}
 	}
@@ -981,20 +981,15 @@ bool UAVManage::newProjectFile(QString qstrFile, unsigned int X, unsigned int Y)
 	user->SetAttribute(_AttributeX_, X);
 	user->SetAttribute(_AttributeY_, Y);
 	root->InsertEndChild(user);
-	tinyxml2::XMLElement* device = doc.NewElement(_ElementDevice_);
-	QString qstrDeviceName = QString(_DeviceNamePrefix_) + QString::number(1);
-	device->SetAttribute(_AttributeName_, qstrDeviceName.toUtf8().data());
-	device->SetAttribute(_AttributeIP_, "");
-	device->SetAttribute(_AttributeX_, 0);
-	device->SetAttribute(_AttributeY_, 0);
-	user->SetAttribute(_AttributeName_, qstrDeviceName.toUtf8().data());
-	root->InsertEndChild(device);
 	QTextCodec* code = QTextCodec::codecForName(_XMLNameCoding_);
 	std::string name = code->fromUnicode(qstrFile).data();
 	error = doc.SaveFile(name.c_str());
 	if (error != tinyxml2::XMLError::XML_SUCCESS) {
 		return false;
 	}
+	//新建项目后默认新建一个无人机设备
+	m_qstrCurrentProjectFile = qstrFile;
+	onDeviceAdd(QString(_DeviceNamePrefix_) + QString::number(1), "", 100, 100);
 	return true;
 	
 }
