@@ -110,6 +110,7 @@ QZAPI QZAPI::m_qzaip;
 ////Python to c++ data start////
 //python接口格式，注册c++函数到python中，便于通过python调用c++函数
 PyMethodDef xWrapMethods[] = {	
+	//blockly积木块转换python接口
 	{"FlyAddMarkPoint", QZAPI::FlyAddMarkPoint,		METH_VARARGS, "FlyAddMarkPoint"},
 	{"FlySetSpeed",		QZAPI::FlySetSpeed,			METH_VARARGS, "FlySetSpeed"},
 	{"FlySetLed",		QZAPI::FlySetLed,			METH_VARARGS, "FlySetLed"},
@@ -121,6 +122,18 @@ PyMethodDef xWrapMethods[] = {
 	{"FlyTo",			QZAPI::FlyTo,				METH_VARARGS, "FlyTo"},
 	{"FlyMove",			QZAPI::FlyMove,				METH_VARARGS, "FlyMove"},
 	{"FlyToMarkPoint",	QZAPI::FlyToMarkPoint,		METH_VARARGS, "FlyToMarkPoint"},
+	//手动编写python使用接口
+	{"Fly_AddMarkPoint",QZAPI::FlyAddMarkPoint,		METH_VARARGS, "FlyAddMarkPoint"},
+	{"Fly_SetSpeed",	QZAPI::FlySetSpeed,			METH_VARARGS, "FlySetSpeed"},
+	{"Fly_SetLed",		QZAPI::FlySetLed,			METH_VARARGS, "FlySetLed"},
+	{"Fly_Hover",		QZAPI::FlyHover,			METH_VARARGS, "FlyHover"},
+	{"Fly_Takeoff",		QZAPI::FlyTakeoff,			METH_VARARGS, "FlyTakeoff"},
+	{"Fly_Land",		QZAPI::FlyLand,				METH_VARARGS, "FlyLand"},
+	{"Fly_TimeGroup",	QZAPI::FlyTimeGroup,		METH_VARARGS, "FlyTimeGroup"},
+	{"Fly_Revolve",		QZAPI::FlyRevolve,			METH_VARARGS, "FlyRevolve"},
+	{"Fly_To",			QZAPI::FlyTo,				METH_VARARGS, "FlyTo"},
+	{"Fly_Move",		QZAPI::FlyMove,				METH_VARARGS, "FlyMove"},
+	{"Fly_ToMarkPoint",	QZAPI::FlyToMarkPoint,		METH_VARARGS, "FlyToMarkPoint"},
 	{ NULL, NULL, 0, NULL }
 };
 static struct PyModuleDef BicubicModule = {
