@@ -47,6 +47,9 @@
        </property>
        <item row="0" column="0">
         <widget class="QWebEngineView" name="webEngineView">
+         <property name="contextMenuPolicy">
+          <enum>Qt::NoContextMenu</enum>
+         </property>
          <property name="url">
           <url>
            <string>about:blank</string>
