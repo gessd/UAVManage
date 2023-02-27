@@ -39,6 +39,7 @@ socket.onmessage = function(event) {
         } else if(2 == msgID){
             console.log("清空编程区域");
             document.getElementById("tab_blocks").click();
+            document.getElementById("deviceName").textContent = "";
             Code.workspace.clear();
             //情况回撤功能数据
             Code.workspace.clearUndo();

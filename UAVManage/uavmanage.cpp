@@ -180,6 +180,7 @@ void UAVManage::initMenu()
 	pMenuLayout->addWidget(initMenuButton(pMenuWidget, tr("项目"), ":/res/menu/P01_file_open_btn_cli.png", ":/res/menu/P01_file_open_btn_cli.png", pProjectMenu));
 	m_pButtonFlyPrepare = initMenuButton(pMenuWidget, tr("起飞准备"), ":/res/menu/preparation.png", ":/res/menu/preparation.png", pMenuFlyPrepare);
 	m_pButtonFlyPrepare->setEnabled(false);
+	ui.toolBar->setEnabled(false);
 	pMenuLayout->addWidget(m_pButtonFlyPrepare);
 	QMenu* pActionHelp = new QMenu(tr("帮助"));
 	pActionHelp->setWindowFlags(pMenuFlyPrepare->windowFlags() | Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint);
@@ -421,6 +422,7 @@ void UAVManage::onOpenProject(QString qstrFile)
 	m_pDeviceManage->setEnabled(true);
 	m_pSoundWidget->setEnabled(true);
 	m_pButtonFlyPrepare->setEnabled(true);
+	ui.toolBar->setEnabled(true);
 	ParamReadWrite::writeParam(_Path_, m_qstrCurrentProjectFile);
 	m_pActionAttribute->setEnabled(true);
 }
@@ -498,6 +500,7 @@ void UAVManage::onCloseProject()
 	m_pDeviceManage->setEnabled(false);
 	m_pSoundWidget->setEnabled(false);
 	m_pButtonFlyPrepare->setEnabled(false);
+	ui.toolBar->setEnabled(false);
 	//先清空数据
 	if (false == m_qstrCurrentProjectFile.isEmpty()) {
 		QFileInfo info(m_qstrCurrentProjectFile);
@@ -566,7 +569,7 @@ void UAVManage::onSocketNewConnection()
 {
 	//不能同时打开两个软件，否则端口占用无法使用
 	//只记录一个web连接，防止通过浏览器访问blockly
-	//if (m_pWebBocklySocket) return;
+	if (m_pWebBocklySocket) return;
 	qInfo() << "已建立编程区域连接";
 	m_pWebBocklySocket = m_pSocketServer->nextPendingConnection();
 	connect(m_pWebBocklySocket, SIGNAL(textMessageReceived(QString)), this, SLOT(onSocketTextMessageReceived(QString)));
@@ -628,7 +631,10 @@ void UAVManage::onCurrentDeviceNameChanged(QString currentName, QString previous
 {
 	qDebug() << "设备切换" << currentName << previousName;
 	QString blocklyFilePath = getCurrentBlocklyFile();
-	if (blocklyFilePath.isEmpty()) return;
+	if (blocklyFilePath.isEmpty()) {
+		onWebClear();
+		return;
+	}
 	QFile file(blocklyFilePath);
 	QByteArray arrBlockly;
 	if (file.open(QIODevice::ReadOnly)) {
@@ -734,6 +740,7 @@ void UAVManage::onDeviceAdd(QString name, QString ip, float x, float y)
 
 void UAVManage::onDeviceRemove(QString name)
 {
+	//删除无人机项目中文件
 	if (m_qstrCurrentProjectFile.isEmpty()) return;
 	QTextCodec* code = QTextCodec::codecForName(_XMLNameCoding_);
 	std::string filename = code->fromUnicode(m_qstrCurrentProjectFile).data();
