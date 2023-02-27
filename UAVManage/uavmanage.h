@@ -142,6 +142,11 @@ private slots:
      * @brief 项目属性查看
      */
     void onProjectAttribute();
+
+    /**
+     * @brief 消息记录
+     */
+    void onMessageData(QString text, _Messagelevel level, bool clear);
 private:
     /**
      * @brief 新建项目工程文件

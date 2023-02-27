@@ -66,6 +66,7 @@
 </head>
 
 <body>
+  <button id="btnTest" class="notext" onclick="buttonTest()" style="width:60px; height:30px;display: none;">按钮</button>
 	<div style="width: 6.375rem; background: none; height: 2rem;  z-index:886 !important; margin-top: 0px; position: absolute; padding-top: 3px;">
 		<li style="list-style: none; font-size: 1.25rem; color:  #3B8CFF;margin-left: 0.375rem; text-indent: 1.65rem; background: url(icons/tetle_ic_piece.svg) no-repeat scroll center 0.3rem;">控件</li>
 	</div>
@@ -109,7 +110,9 @@
             <td id="tab_python" class="taboff tab_collapse" onclick="tab_python();" title="python编程区"></td>
             <td style="display: none; visibility: hidden;" id="tab_javascript" class="taboff tab_collapse"> </td>
             <td style="display: none;" id="tab_xml" class="taboff tab_collapse"> </td>
-            <td style="" id="tab_code" class="taboff"><select id="code_menu"></select></td>
+            <td style="" id="tab_code" class="taboff">
+              <select id="code_menu"></select>
+            </td>
           </tr>
         </table>
       </td>
@@ -118,6 +121,7 @@
       <td height="99%" width="70%" id="content_area">
       </td>
       <td style="display:none;height:100%;width:0.3%;background: #ddd;cursor: w-resize;" id="partitionFlag"></td>
+      <!--右侧缩放区域-->
       <td width="30%" style="background-color:#eee;display: none;border-radius: 0px 0px 10px 0px;" id="show_content_python">
         <div style="width:100%;height:100%;display:none;border-radius: 0px 0px 10px 0px;" id="content_python_text"></div>
       </td>
@@ -128,7 +132,6 @@
   <pre style="display: none; visibility: hidden;" id="content_javascript" class="content prettyprint lang-js"></pre>
   <div id="content_python" style="position: absolute;border-radius: 0px 0px 8px 8px;"></div>
   <textarea style="display: none; visibility: hidden;" id="contenttexl" class="content" wrap="off"></textarea>
-  <button id="btnTest" class="notext" onclick="buttonTest()" style="width:60px; height:30px; display:none;">按钮</button>
   <xml xmlns="https://developers.google.com/blockly/xml" id="toolbox" style="display: none;">
     <category name="事件" colour="#FF6680">    
       <block type="FlyTakeoff"></block>
@@ -298,10 +301,22 @@
         document.getElementById("content_python_text").style.display = "none";
         document.getElementById("partitionFlag").style.display = 'none';
       }
+      console.log("点击图形按钮");
       Blockly.fireUiEvent(window, 'resize');
     }
     function buttonTest(){
       document.getElementById("deviceName").textContent="abc";
+      var date = new Date();
+			var year = date.getFullYear();        //年 ,从 Date 对象以四位数字返回年份
+			var month = date.getMonth() + 1;      //月 ,从 Date 对象返回月份 (0 ~ 11) ,date.getMonth()比实际月份少 1 个月
+			var day = date.getDate();             //日 ,从 Date 对象返回一个月中的某一天 (1 ~ 31)
+			var hours = date.getHours();          //小时 ,返回 Date 对象的小时 (0 ~ 23)
+			var minutes = date.getMinutes();      //分钟 ,返回 Date 对象的分钟 (0 ~ 59)
+			var seconds = date.getSeconds();      //秒 ,返回 Date 对象的秒数 (0 ~ 59)   
+      var ss = date.getMilliseconds();
+			var currentDate = year + "-" + month + "-" + day + " " + hours + ":" + minutes + ":" + seconds+"."+ss;
+      console.log(currentDate);
+      ace.edit("content_python").setValue(currentDate, 1);
     }
     function tab_python() {
       document.getElementById("tab_python").style.backgroundImage = "url(icons/workspace_button_python_cli&hov.svg)";
@@ -311,7 +326,9 @@
       document.getElementById("content_python_text").style.display = "none";
       document.getElementById("partitionFlag").style.display = "none";
       document.getElementById("showButton").style.display = "none";
+      //document.getElementById("tab_blocks").style.display = "none";
       Blockly.fireUiEvent(window, 'resize');
+      console.log("点击编程按钮");
     }
 
     //前进按钮

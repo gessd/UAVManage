@@ -5824,6 +5824,9 @@
         }, this.onDocumentChange = function (e) {
             var t = this.session.$useWrapMode, n = e.start.row == e.end.row ? e.end.row : Infinity;
             this.renderer.updateLines(e.start.row, n, t), this._signal("change", e), this.$cursorChange(), this.$updateHighlightActiveLine()
+            if(typeof this.myEditPythonChange === "function"){
+                this.myEditPythonChange(this.getValue());
+            }
         }, this.onTokenizerUpdate = function (e) {
             var t = e.data;
             this.renderer.updateLines(t.first, t.last)

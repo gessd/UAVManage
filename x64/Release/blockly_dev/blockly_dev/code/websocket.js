@@ -28,7 +28,7 @@ socket.onmessage = function(event) {
         if(1 == msgID){
             console.log("更新编程区域");
             Code.workspace.clear();
-            //情况回撤功能数据
+            //清空回撤功能数据
             Code.workspace.clearUndo();
             document.getElementById("tab_blocks").click();
             var xml = Blockly.Xml.textToDom(jsonObject.xml);
@@ -36,12 +36,21 @@ socket.onmessage = function(event) {
             var name = jsonObject.name;
             console.log("设备名称:"+name);
             document.getElementById("deviceName").textContent = name;
+            var pythonCode = jsonObject.pythonCode;
+            if (typeof (pythonCode) == "undefined") {
+                document.getElementById("tab_blocks").click();
+                document.getElementById("tab_blocks").style.display = "";
+                ace.edit("content_python").setValue("", 1);
+            } else {
+                document.getElementById("tab_python").click();
+                ace.edit("content_python").setValue(pythonCode, 1);
+            }
         } else if(2 == msgID){
             console.log("清空编程区域");
             document.getElementById("tab_blocks").click();
-            document.getElementById("deviceName").textContent = "";
+			document.getElementById("deviceName").textContent = "";
             Code.workspace.clear();
-            //情况回撤功能数据
+            //清空回撤功能数据
             Code.workspace.clearUndo();
         } else if(3 == msgID){
             console.log("更新空间范围");

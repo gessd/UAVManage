@@ -343,17 +343,9 @@ Code.attemptCodeGeneration = function(generator) {
     editor_content_python.setShowPrintMargin(false);
     editor_content_python.setScrollSpeed(0.05);
     editor_content_python.setHighlightActiveLine(true);//行高亮
-    //editor_content_python.setOptions({
-    //  enableBasicAutocompletion: true,
-    //  enableSnippets: true,
-    //  enableLiveAutocompletion: true
-    //});
-    var code = generator.workspaceToCode(Code.workspace);
-    editor_content_python.setValue(code,-1);
-    //console.log(code)
-    //content.textContent = code;
-    // Remove the 'prettyprinted' class, so that Prettify will recalculate.
-    //content.className = content.className.replace('prettyprinted', '');
+    //更新python编程区域内容
+    //var code = generator.workspaceToCode(Code.workspace);
+    //editor_content_python.setValue(code,-1);
   }
 };
 
@@ -486,14 +478,14 @@ Code.init = function() {
   onresize();
   Blockly.svgResize(Code.workspace);
 
+  //右侧python缩放区域
   editor_content_python_text = ace.edit("content_python_text")
   editor_content_python_text.getSession().setMode("ace/mode/python");
   editor_content_python_text.setFontSize(17);
   editor_content_python_text.setShowPrintMargin(false);
   editor_content_python_text.setReadOnly(true);
   editor_content_python_text.setScrollSpeed(0.05);
-  editor_content_python_text.setHighlightActiveLine(true);//行高亮
-
+  editor_content_python_text.setHighlightActiveLine(true);//行高亮  
   // Lazy-load the syntax-highlighting.
   window.setTimeout(Code.importPrettify, 1);
 
@@ -501,18 +493,32 @@ Code.init = function() {
   function myUpdateFunction(event) {
     if (event.type == Blockly.Events.UI || event.type == Blockly.Events.CREATE) return
     var python = Blockly.Python.workspaceToCode(Code.workspace);
-    editor_content_python_text.setValue(python,-1)
+    //实时更新右侧python缩放区域内容
+    editor_content_python_text.setValue(python,-1);
     var jsonObj = {};
     jsonObj.msgID = 1;
     jsonObj.xml = Blockly.Xml.domToPrettyText(Blockly.Xml.workspaceToDom(Code.workspace));
     jsonObj.python = python;
     var jsonStr = JSON.stringify(jsonObj);
-    if(1 == socket.readyState){
+    if(WebSocket.OPEN == socket.readyState){
       //连接中则发送数据
       socket.send(jsonStr);
     }
   }
   Code.workspace.addChangeListener(myUpdateFunction);
+
+  function myEditPythonChange(code){
+    if(WebSocket.OPEN == socket.readyState){
+        var jsonObj = {};
+        jsonObj.msgID = 4;
+        jsonObj.python = code;
+        var jsonStr = JSON.stringify(jsonObj);
+        if(WebSocket.OPEN == socket.readyState){
+          socket.send(jsonStr);
+        }
+    }
+  }
+  ace.edit("content_python").myEditPythonChange = myEditPythonChange;
 };
 
 /**

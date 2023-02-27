@@ -34,6 +34,7 @@ UAVManage::UAVManage(QWidget* parent)
 	//注册时间过滤器，处理快捷键事件
 	installEventFilter(this);
 	MessageListDialog::getInstance()->setParent(this);
+	connect(MessageListDialog::getInstance(), SIGNAL(sigMessage(QString, _Messagelevel, bool)), this, SLOT(onMessageData(QString, _Messagelevel, bool)));
 	//程序初始化
 	connect(ui.webEngineView, SIGNAL(loadProgress(int)), this, SLOT(onWebLoadProgress(int)));
 	connect(ui.webEngineView, SIGNAL(loadFinished(bool)), this, SLOT(onWebLoadFinished(bool)));
@@ -619,6 +620,11 @@ void UAVManage::onSocketTextMessageReceived(QString message)
 		pythonFile.write(python.toUtf8());
 		pythonFile.close();
 	}
+	//如果手动编写python内容为空则删除本地中的文件
+	//因切换无人机设备是会清空上一次记录造成手动编写python传回空内容
+	if (_WIDManual == id && true == python.isEmpty()) {
+		pythonFile.remove();
+	}
 }
 
 void UAVManage::onSocketDisconnected()
@@ -974,6 +980,11 @@ void UAVManage::onProjectAttribute()
 	place->SetAttribute(_AttributeY_, ymax);
 	error = doc.SaveFile(filename.c_str());
 #endif
+}
+
+void UAVManage::onMessageData(QString text, _Messagelevel level, bool clear)
+{
+
 }
 
 bool UAVManage::newProjectFile(QString qstrFile, unsigned int X, unsigned int Y)

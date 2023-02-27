@@ -443,6 +443,9 @@ void DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upload
 		QFileInfo infoProject(qstrProjectFile);
 		QString qstrDevicePyFile = infoProject.path() + _ProjectDirName_ + name + _PyFileSuffix_;
 		if (false == QFile::exists(qstrDevicePyFile)) continue;
+		//如果手动编写python文件存在则使用手动编写python
+		QString qstrManualFile = infoProject.path() + _ProjectDirName_ + name + _PyManualSuffix_;
+		if (true == QFile::exists(qstrManualFile)) qstrDevicePyFile = qstrManualFile;
 		QFile file(qstrDevicePyFile);
 		if (!file.open(QIODevice::ReadOnly)) continue;
 		QByteArray arrData = file.readAll();
