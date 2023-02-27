@@ -466,8 +466,9 @@ void DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upload
 		while (!pythonThread.isFinished()) {
 			QApplication::processEvents();
 		}
-		if (PythonSuccessful != pythonThread.getLastState()) {
-			_ShowErrorMessage(name + tr("舞步转换失败"));
+		int state = pythonThread.getLastState();
+		if (PythonSuccessful != state) {
+			_ShowErrorMessage(name + tr("舞步转换失败")+pythonThread.getErrorString(state));
 			continue;
 		}
 		QVector<NavWayPointData> data = pythonThread.getWaypointData();

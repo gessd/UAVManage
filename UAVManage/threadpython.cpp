@@ -492,6 +492,24 @@ PythonRunState ThreadPython::getLastState()
 	return m_pythonState;
 }
 
+QString ThreadPython::getErrorString(int state)
+{
+	QString error = "未知错误";
+	switch (state)
+	{
+	case PythonRunNone: error = "编程解析失败"; break;
+	case PythonError: error = "编程解析失败"; break;
+	case PythonFileError: error = "编程文件不存在"; break;
+	case PythonTimeout: error = "编程文件不存在"; break;
+	case PythonCodeError: error = "编程代码错误"; break;
+	case PythonWaypointError: error = "舞步转换失败"; break;
+	case PythonWaypointNull: error = "没有编写舞步"; break;
+	default:
+		break;
+	}
+	return error;
+}
+
 QVector<NavWayPointData> ThreadPython::getWaypointData()
 {
 	return g_waypointData;

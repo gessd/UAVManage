@@ -107,6 +107,11 @@ public:
 	 */
 	PythonRunState getLastState();
 	/**
+	 * @brief 获取错误信息
+	 * @return 错误信息
+	 */
+	QString getErrorString(int state);
+	/**
 	 * @brief 得到航点数据
 	 * @return 通过python代码交互得到的航点数据
 	 */
