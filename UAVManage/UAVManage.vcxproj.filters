@@ -148,6 +148,9 @@
     <ClCompile Include="qxtglobalshortcut5\gui\qxtwindowsystem_win.cpp">
       <Filter>Source Files\qxtglobalshortcut5</Filter>
     </ClCompile>
+    <ClCompile Include="historymessage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="devicemanage.h">
@@ -222,6 +225,9 @@
     <QtMoc Include="qxtglobalshortcut5\gui\qxtglobalshortcut.h">
       <Filter>Header Files\qxtglobalshortcut5</Filter>
     </QtMoc>
+    <QtMoc Include="historymessage.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="devicemanage.ui">
@@ -261,6 +267,9 @@
       <Filter>Form Files</Filter>
     </QtUic>
     <QtUic Include="firstdialog.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="historymessage.ui">
       <Filter>Form Files</Filter>
     </QtUic>
   </ItemGroup>

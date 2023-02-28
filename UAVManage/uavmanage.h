@@ -12,6 +12,7 @@
 #include "messagelistdialog.h"
 #include "aboutdialog.h"
 
+class HistoryMessage;
 class WaitingWidget;
 class SoundGrade;
 class UAVManage : public QMainWindow
@@ -142,11 +143,6 @@ private slots:
      * @brief 项目属性查看
      */
     void onProjectAttribute();
-
-    /**
-     * @brief 消息记录
-     */
-    void onMessageData(QString text, _Messagelevel level, bool clear);
 private:
     /**
      * @brief 新建项目工程文件
@@ -169,7 +165,7 @@ private:
     //websocket服务 积木块界面
     QWebSocketServer* m_pSocketServer;
     //web连接 积木块界面
-    QWebSocket* m_pWebBocklySocket;
+    QWebSocket* m_pWebBlocklySocket;
     //当前工程文件
     QString m_qstrCurrentProjectFile;
     //底部音乐窗口
@@ -184,4 +180,6 @@ private:
     AboutDialog* m_pAbout;
     //三维启动时遮罩背景
     WaitingWidget* m_pBackgrounMask;
+    //历史消息窗口
+    HistoryMessage* m_pHistory;
 };

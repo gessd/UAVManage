@@ -113,6 +113,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="firstdialog.cpp" />
+    <ClCompile Include="historymessage.cpp" />
     <ClCompile Include="qxtglobalshortcut5\core\qxtglobal.cpp" />
     <ClCompile Include="qxtglobalshortcut5\gui\qxtglobalshortcut.cpp" />
     <ClCompile Include="qxtglobalshortcut5\gui\qxtglobalshortcut_win.cpp" />
@@ -128,6 +129,7 @@
     <QtUic Include="devicemanage.ui" />
     <QtUic Include="deviceserial.ui" />
     <QtUic Include="firstdialog.ui" />
+    <QtUic Include="historymessage.ui" />
     <QtUic Include="messagelistdialog.ui" />
     <QtUic Include="placeinfodialog.ui" />
     <QtUic Include="SoundGrade.ui" />
@@ -186,6 +188,7 @@
     <QtMoc Include="downloadtool.h" />
     <QtMoc Include="deviceserial.h" />
     <QtMoc Include="firstdialog.h" />
+    <QtMoc Include="historymessage.h" />
     <ClInclude Include="libhvsetting.h" />
     <ClInclude Include="mavlinksetting.h" />
     <QtMoc Include="threadpython.h" />

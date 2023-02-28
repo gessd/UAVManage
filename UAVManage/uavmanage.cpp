@@ -21,20 +21,22 @@
 #include "spaceparam.h"
 #include "waitingwidget.h"
 #include "qxtglobalshortcut.h"
+#include "historymessage.h"
 
 UAVManage::UAVManage(QWidget* parent)
 	: QMainWindow(parent)
 {
 	ui.setupUi(this);
 	m_pSocketServer = nullptr;
-	m_pWebBocklySocket = nullptr;
+	m_pWebBlocklySocket = nullptr;
 	m_pDeviceManage = nullptr;
 	m_p3DProcess = nullptr;
 	m_pBackgrounMask = nullptr;
-	//注册时间过滤器，处理快捷键事件
+	//注册事件过滤器，处理快捷键事件
 	installEventFilter(this);
 	MessageListDialog::getInstance()->setParent(this);
-	connect(MessageListDialog::getInstance(), SIGNAL(sigMessage(QString, _Messagelevel, bool)), this, SLOT(onMessageData(QString, _Messagelevel, bool)));
+	m_pHistory = new HistoryMessage(this);
+	connect(MessageListDialog::getInstance(), SIGNAL(sigMessage(QString, _Messagelevel, bool)), m_pHistory, SLOT(onMessageData(QString, _Messagelevel, bool)));
 	//程序初始化
 	connect(ui.webEngineView, SIGNAL(loadProgress(int)), this, SLOT(onWebLoadProgress(int)));
 	connect(ui.webEngineView, SIGNAL(loadFinished(bool)), this, SLOT(onWebLoadFinished(bool)));
@@ -382,7 +384,7 @@ void UAVManage::onOpenProject(QString qstrFile)
 	unsigned int x = place->IntAttribute(_AttributeX_);
 	unsigned int y = place->IntAttribute(_AttributeY_);
 	m_pDeviceManage->setSpaceSize(x, y);
-	if (m_pWebBocklySocket) {
+	if (m_pWebBlocklySocket) {
 		qInfo() << "发送场地范围到编程区";
 		QPoint space = m_pDeviceManage->getSpaceSize();
 		QJsonObject jsonObj;
@@ -391,7 +393,7 @@ void UAVManage::onOpenProject(QString qstrFile)
 		jsonObj.insert("y", space.y());
 		jsonObj.insert("z", 10000);
 		QJsonDocument jsonDoc(jsonObj);
-		m_pWebBocklySocket->sendTextMessage(jsonDoc.toJson());
+		m_pWebBlocklySocket->sendTextMessage(jsonDoc.toJson());
 	}
 	QFileInfo infoProject(qstrFile);
 	QString qstrMusicFilePath = infoProject.path() + _ProjectDirName_ + place->Attribute(_ElementMusic_);
@@ -513,21 +515,22 @@ void UAVManage::onCloseProject()
 
 void UAVManage::onWebClear()
 {
-	if (!m_pWebBocklySocket) return;
+	if (!m_pWebBlocklySocket) return;
 	QJsonObject jsonObj;
 	jsonObj.insert(_WMID, _WIDClear);
 	QJsonDocument doc(jsonObj);
-	m_pWebBocklySocket->sendTextMessage(doc.toJson());
+	m_pWebBlocklySocket->sendTextMessage(doc.toJson());
 }
 
 void UAVManage::showEvent(QShowEvent* event)
 {
 	qInfo() << "显示主窗口";
 	MessageListDialog::getInstance()->setParent(this);
-	if (!m_pWebBocklySocket) {
+	if (!m_pWebBlocklySocket) {
 		initGlobalShortcut("Ctrl+Space");
 		loadWeb();
 	}
+	m_pHistory->resetWidget();
 }
 
 void UAVManage::closeEvent(QCloseEvent* event)
@@ -538,6 +541,7 @@ void UAVManage::closeEvent(QCloseEvent* event)
 void UAVManage::resizeEvent(QResizeEvent* event)
 {
 	MessageListDialog::getInstance()->move((width() - MessageListDialog::getInstance()->width()) / 2, 0);
+	m_pHistory->resetWidget();
 }
 
 bool UAVManage::eventFilter(QObject* watched, QEvent* event)
@@ -570,11 +574,11 @@ void UAVManage::onSocketNewConnection()
 {
 	//不能同时打开两个软件，否则端口占用无法使用
 	//只记录一个web连接，防止通过浏览器访问blockly
-	if (m_pWebBocklySocket) return;
+	if (m_pWebBlocklySocket) return;
 	qInfo() << "已建立编程区域连接";
-	m_pWebBocklySocket = m_pSocketServer->nextPendingConnection();
-	connect(m_pWebBocklySocket, SIGNAL(textMessageReceived(QString)), this, SLOT(onSocketTextMessageReceived(QString)));
-	connect(m_pWebBocklySocket, SIGNAL(disconnected()), this, SLOT(onSocketDisconnected()));
+	m_pWebBlocklySocket = m_pSocketServer->nextPendingConnection();
+	connect(m_pWebBlocklySocket, SIGNAL(textMessageReceived(QString)), this, SLOT(onSocketTextMessageReceived(QString)));
+	connect(m_pWebBlocklySocket, SIGNAL(disconnected()), this, SLOT(onSocketDisconnected()));
 	//打开上次记录的项目
 	QString qstrPath = ParamReadWrite::readParam(_Path_).toString();
 	if (false == qstrPath.isEmpty() && QFile::exists(qstrPath)) {
@@ -630,7 +634,7 @@ void UAVManage::onSocketTextMessageReceived(QString message)
 void UAVManage::onSocketDisconnected()
 {
 	qDebug() << "编程区域连接断开";
-	m_pWebBocklySocket = nullptr;
+	m_pWebBlocklySocket = nullptr;
 }
 
 void UAVManage::onCurrentDeviceNameChanged(QString currentName, QString previousName)
@@ -661,7 +665,7 @@ void UAVManage::onCurrentDeviceNameChanged(QString currentName, QString previous
 	if (false == arrPythonCode.isEmpty())jsonObj.insert("pythonCode", arrPythonCode.data());
 	QJsonDocument jsonDoc(jsonObj);
 	QByteArray data = jsonDoc.toJson();
-	if(m_pWebBocklySocket) m_pWebBocklySocket->sendTextMessage(data);
+	if(m_pWebBlocklySocket) m_pWebBlocklySocket->sendTextMessage(data);
 	
 	//更新项目工程中选中设备
 	QTextCodec* code = QTextCodec::codecForName(_XMLNameCoding_);
@@ -980,11 +984,6 @@ void UAVManage::onProjectAttribute()
 	place->SetAttribute(_AttributeY_, ymax);
 	error = doc.SaveFile(filename.c_str());
 #endif
-}
-
-void UAVManage::onMessageData(QString text, _Messagelevel level, bool clear)
-{
-
 }
 
 bool UAVManage::newProjectFile(QString qstrFile, unsigned int X, unsigned int Y)
