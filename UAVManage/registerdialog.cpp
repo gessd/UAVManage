@@ -1,6 +1,9 @@
 #include "registerdialog.h"
 #include <QCloseEvent>
+#include <QSettings>
+#include <QMessageBox>
 
+#define _KeyPath_ "HKEY_CLASSES_ROOT\\QZ\\UAV"
 void getCpuInfo(unsigned int* CPUInfo, unsigned int InfoType)
 {
 #if defined(__GNUC__)// GCC  
@@ -32,6 +35,14 @@ RegisterDialog::RegisterDialog(QWidget *parent):QDialog(parent)
 	m_pLabelBackground = nullptr;
 	ui.lineEditID->setText(getCpuId());
 	connect(ui.btnRegister, &QAbstractButton::clicked, [this]() {
+		QSettings set(_KeyPath_, QSettings::NativeFormat);
+		QString key = ui.lineEditKey->text().trimmed();
+		set.setValue("key", key);
+		if (key.isEmpty()) {
+			QMessageBox::warning(this, tr("提示"), tr("授权码不能为空！"));
+			return;
+		}
+		QMessageBox::information(this, tr("提示"), tr("软件授权成功"));
 		close();
 		});
 }
@@ -46,18 +57,16 @@ RegisterDialog::~RegisterDialog()
 
 bool RegisterDialog::isRegister()
 {
-	return !ui.lineEditKey->text().isEmpty();
-}
-
-void RegisterDialog::resizeEvent(QResizeEvent* event)
-{
-	if (m_pLabelBackground) {
-		m_pLabelBackground->setFixedSize(dynamic_cast<QWidget*>(parent())->size());
-	}
+	QSettings set(_KeyPath_, QSettings::NativeFormat);
+	QString key = set.value("key").toString();
+	return !key.isEmpty();
 }
 
 void RegisterDialog::showEvent(QShowEvent* event)
 {
+	QSettings set(_KeyPath_, QSettings::NativeFormat);
+	QString key = set.value("key").toString();
+	ui.lineEditKey->setText(key);
 	if (m_pLabelBackground) {
 		delete m_pLabelBackground;
 		m_pLabelBackground = nullptr;
@@ -66,7 +75,7 @@ void RegisterDialog::showEvent(QShowEvent* event)
 	m_pLabelBackground->setStyleSheet(QString("background-color: rgba(0, 0, 0, 80%);font:60px;color:#FFFFFF;"));
 	m_pLabelBackground->setFixedSize(dynamic_cast<QWidget*>(parent())->size());
 	m_pLabelBackground->setAlignment(Qt::AlignHCenter | Qt::AlignBottom);
-	m_pLabelBackground->setText(tr("请注册授权后使用"));
+	m_pLabelBackground->setText(tr("请授权注册后使用"));
 	m_pLabelBackground->show();
 }
 

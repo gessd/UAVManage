@@ -76,7 +76,7 @@
        <item>
         <widget class="QLabel" name="label_2">
          <property name="text">
-          <string>许可证： </string>
+          <string>授权码： </string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>

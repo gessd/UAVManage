@@ -12,7 +12,6 @@ public:
 	RegisterDialog(QWidget *parent = nullptr);
 	~RegisterDialog();
 	bool isRegister();
-	void resizeEvent(QResizeEvent* event);
 protected:
 	void showEvent(QShowEvent* event);
 	void closeEvent(QCloseEvent* event);
