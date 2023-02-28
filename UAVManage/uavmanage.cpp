@@ -22,6 +22,7 @@
 #include "waitingwidget.h"
 #include "qxtglobalshortcut.h"
 #include "historymessage.h"
+#include "registerdialog.h"
 
 UAVManage::UAVManage(QWidget* parent)
 	: QMainWindow(parent)
@@ -192,6 +193,10 @@ void UAVManage::initMenu()
 	pActionHelp->addAction(pActionAbout);
 	pMenuLayout->addWidget(initMenuButton(pMenuWidget, tr("帮助"), ":/res/menu/P02_help_about_page_ic.png", ":/res/menu/P02_help_about_page_ic.png", pActionHelp));
 	connect(pActionAbout, &QAction::triggered, [this]() {m_pAbout->exec(); });
+	m_pRegister = new RegisterDialog(this);
+	QAction* pActionReg = new QAction(QIcon(":/res/logo/qz_logo.ico"), tr("授权"));
+	connect(pActionReg, &QAction::triggered, [this]() {m_pRegister->exec(); });
+	pActionHelp->addAction(pActionReg);
 
 	connect(pActionFly1, &QAction::triggered, [this]() { m_pDeviceManage->waypointComposeAndUpload(m_qstrCurrentProjectFile, false); });
 	connect(pActionFly2, &QAction::triggered, [this]() {
@@ -530,7 +535,7 @@ void UAVManage::showEvent(QShowEvent* event)
 		initGlobalShortcut("Ctrl+Space");
 		loadWeb();
 	}
-	m_pHistory->resetWidget();
+	m_pHistory->resetWidget();	
 }
 
 void UAVManage::closeEvent(QCloseEvent* event)
@@ -584,7 +589,11 @@ void UAVManage::onSocketNewConnection()
 	if (false == qstrPath.isEmpty() && QFile::exists(qstrPath)) {
 		onOpenProject(qstrPath);
 	}
-	QTimer::singleShot(1000, [this]() { emit sigWindowFinished(); });
+	QTimer::singleShot(1000, [this]() { 
+		emit sigWindowFinished(); 
+		//判断是否注册授权
+		if (false == m_pRegister->isRegister()) m_pRegister->exec();
+		});
 }
 
 void UAVManage::onSocketTextMessageReceived(QString message)

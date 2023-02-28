@@ -151,6 +151,9 @@
     <ClCompile Include="historymessage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="registerdialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="devicemanage.h">
@@ -228,6 +231,9 @@
     <QtMoc Include="historymessage.h">
       <Filter>Header Files</Filter>
     </QtMoc>
+    <QtMoc Include="registerdialog.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="devicemanage.ui">
@@ -270,6 +276,9 @@
       <Filter>Form Files</Filter>
     </QtUic>
     <QtUic Include="historymessage.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="registerdialog.ui">
       <Filter>Form Files</Filter>
     </QtUic>
   </ItemGroup>

@@ -15,6 +15,7 @@
 class HistoryMessage;
 class WaitingWidget;
 class SoundGrade;
+class RegisterDialog;
 class UAVManage : public QMainWindow
 {
     Q_OBJECT
@@ -182,4 +183,6 @@ private:
     WaitingWidget* m_pBackgrounMask;
     //历史消息窗口
     HistoryMessage* m_pHistory;
+    //软件授权窗口
+    RegisterDialog* m_pRegister;
 };
