@@ -43,7 +43,7 @@ UAVManage::UAVManage(QWidget* parent)
 	connect(ui.webEngineView, SIGNAL(loadFinished(bool)), this, SLOT(onWebLoadFinished(bool)));
 	//初始化web
 	m_pSocketServer = new QWebSocketServer(QStringLiteral("Socket Server"), QWebSocketServer::NonSecureMode, this);
-	m_pSocketServer->listen(QHostAddress::LocalHost, _WebSocketPort_);
+	m_pSocketServer->listen(QHostAddress::Any, _WebSocketPort_);
 	connect(m_pSocketServer, SIGNAL(newConnection()), this, SLOT(onSocketNewConnection()));
 
 	//增加设备列表
@@ -579,9 +579,14 @@ void UAVManage::onSocketNewConnection()
 {
 	//不能同时打开两个软件，否则端口占用无法使用
 	//只记录一个web连接，防止通过浏览器访问blockly
-	if (m_pWebBlocklySocket) return;
+	QWebSocket* pSocket = m_pSocketServer->nextPendingConnection();
+	qDebug() << "blockly新连接" << pSocket->peerAddress() << pSocket->peerPort();
+	if (m_pWebBlocklySocket) {
+		if (pSocket) pSocket->disconnected();
+		return;
+	}
 	qInfo() << "已建立编程区域连接";
-	m_pWebBlocklySocket = m_pSocketServer->nextPendingConnection();
+	m_pWebBlocklySocket = pSocket;
 	connect(m_pWebBlocklySocket, SIGNAL(textMessageReceived(QString)), this, SLOT(onSocketTextMessageReceived(QString)));
 	connect(m_pWebBlocklySocket, SIGNAL(disconnected()), this, SLOT(onSocketDisconnected()));
 	//打开上次记录的项目
