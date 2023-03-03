@@ -8,7 +8,7 @@ class AddDeviceDialog : public QDialog
 	Q_OBJECT
 
 public:
-	AddDeviceDialog(QString qstrName, QWidget *parent);
+	AddDeviceDialog(QString qstrName, unsigned int maxX, unsigned int maxY, QWidget *parent);
 	~AddDeviceDialog();
 	void setName(QString qstrName) { ui.lineEditName->setText(qstrName); }
 	QString getName() { return ui.lineEditName->text().trimmed(); }

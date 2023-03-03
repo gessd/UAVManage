@@ -77,6 +77,12 @@ public:
 	* @return 按顺序返回设备名称
 	*/
 	QString getNewDefaultName();
+
+	/**
+	 * @brief 获取新的可用位置
+	 */
+	QPoint getNewDevicePoint();
+
 	/**
 	* @brief 判断是否重复,为空则不判断
 	* @param [in] qstrName 设备名

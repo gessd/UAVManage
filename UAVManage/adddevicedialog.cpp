@@ -2,7 +2,7 @@
 #include "qlineedit.h"
 #include <QRegExpValidator>
 
-AddDeviceDialog::AddDeviceDialog(QString qstrName, QWidget *parent)
+AddDeviceDialog::AddDeviceDialog(QString qstrName, unsigned int maxX, unsigned int maxY, QWidget *parent)
 	: QDialog(parent)
 {
 	ui.setupUi(this);
@@ -16,8 +16,8 @@ AddDeviceDialog::AddDeviceDialog(QString qstrName, QWidget *parent)
 		"{3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\b");
 	//限制输入
 	ui.lineEditIP->setValidator(new QRegExpValidator(regExp1, this));
-	ui.lineEditX->setValidator(new QIntValidator(10, 10000, this));
-	ui.lineEditY->setValidator(new QIntValidator(10, 10000, this));
+	ui.lineEditX->setValidator(new QIntValidator(100, maxX - 100, this));
+	ui.lineEditY->setValidator(new QIntValidator(100, maxY - 100, this));
 	ui.lineEditX->setMaxLength(5);
 	ui.lineEditY->setMaxLength(5);
 	connect(ui.btnOK, &QAbstractButton::clicked, [this]() { 
@@ -30,6 +30,8 @@ AddDeviceDialog::AddDeviceDialog(QString qstrName, QWidget *parent)
 		ui.btnOK->setVisible(true);
 		if (text.isEmpty()) ui.btnOK->setVisible(false);
 		});
+	ui.lineEditX->setText(QString::number(100));
+	ui.lineEditY->setText(QString::number(100));
 }
 
 AddDeviceDialog::~AddDeviceDialog()

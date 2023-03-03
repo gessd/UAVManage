@@ -79,7 +79,7 @@ DeviceManage::DeviceManage(QWidget *parent)
 		DeviceControl* pControl = getCurrentDevice();
 		if (!pControl) return;
 		QString qstrName = pControl->getName();
-		AddDeviceDialog dialog(qstrName, this);
+		AddDeviceDialog dialog(qstrName, m_pointSpace.x(), m_pointSpace.y(), this);
 		dialog.setParam(qstrName, pControl->getIP(), pControl->getX(), pControl->getY());
 		if (QDialog::Accepted != dialog.exec())return;
 		QString qstrNewName = dialog.getName();
@@ -160,7 +160,10 @@ DeviceManage::DeviceManage(QWidget *parent)
 		pDebug->show();
 		});
 	connect(ui.btnAddDevice, &QAbstractButton::clicked, [this]() {
-		AddDeviceDialog dialog(getNewDefaultName(), this);
+		AddDeviceDialog dialog(getNewDefaultName(), m_pointSpace.x(), m_pointSpace.y(), this);
+		QPoint point = getNewDevicePoint();
+		dialog.setX(point.x());
+		dialog.setY(point.y());
 		if (QDialog::Accepted != dialog.exec())return;
 		QString qstrError = addDevice(dialog.getName(), dialog.getIP(), dialog.getX(), dialog.getY());
 		if (!qstrError.isEmpty()) {
@@ -307,6 +310,33 @@ QString DeviceManage::getNewDefaultName()
 		index = qMax(index, n);
 	}
 	return QString("%1%2").arg(_DeviceNamePrefix_).arg(index + 1);
+}
+
+QPoint DeviceManage::getNewDevicePoint()
+{
+	long maxx = 100;
+	long maxy = 100;
+	for (int i = 0; i < ui.listWidget->count(); i++) {
+		QListWidgetItem* pItem = ui.listWidget->item(i);
+		if (!pItem) continue;
+		QWidget* pWidget = ui.listWidget->itemWidget(pItem);
+		if (!pWidget) continue;
+		DeviceControl* pDevice = dynamic_cast<DeviceControl*>(pWidget);
+		if (!pDevice) continue;
+		maxx = qMax(maxx, pDevice->getX());
+		maxy = qMax(maxy, pDevice->getY());
+	}
+	//设备间隔50厘米
+	//以Y轴方向顺序排放
+	int x = maxx;
+	int y = maxy + 100;
+	if (y > (m_pointSpace.y()-100)) {
+		y = 100;
+		x = maxx + 100;
+		if (x >= (m_pointSpace.x() - 100)) x = 100;
+	}
+	QPoint point(x, y);
+	return point;
 }
 
 //设备名称是否重复

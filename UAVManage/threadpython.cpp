@@ -40,7 +40,7 @@ PyObject* QZAPI::examineWaypoint()
 		case _WaypointFly: 
 			//判断是否飞出场地范围
 			if (data.x < 100 || data.y < 100 || data.x > (g_nSpaceX-100) || data.y > (g_nSpaceY-100)) {
-				showWaypointError(tr("飞出场地范围"));
+				showWaypointError(tr("飞出限制区域"));
 				return nullptr;
 			}
 			break;
