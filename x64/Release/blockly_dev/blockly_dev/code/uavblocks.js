@@ -122,13 +122,13 @@ Blockly.Blocks['FlyAddMarkPoint'] = {
             .appendField("名称")
             .appendField(field, "name")
             .appendField(" X")
-            .appendField(new Blockly.FieldNumber(10, 0, getMaxX(), 1), "coordinateX")
+            .appendField(new Blockly.FieldNumber(100, 100, getMaxX(), 1), "coordinateX")
             .appendField("cm")
             .appendField("Y")
-            .appendField(new Blockly.FieldNumber(10, 0, getMaxY(), 1), "coordinateY")
+            .appendField(new Blockly.FieldNumber(100, 100, getMaxY(), 1), "coordinateY")
             .appendField("cm")
             .appendField("Z")
-            .appendField(new Blockly.FieldNumber(10, 0, getMaxZ(), 1), "coordinateZ")
+            .appendField(new Blockly.FieldNumber(100, 100, getMaxZ(), 1), "coordinateZ")
             .appendField("cm");
         this.setInputsInline(true);
         this.setPreviousStatement(true, ["action", "notReachAction", "ReachAction"]);
@@ -178,18 +178,18 @@ Blockly.Blocks['FlyTo'] = {
         this.appendDummyInput()
             .appendField("飞行到")
             .appendField(" X")
-            .appendField(new Blockly.FieldNumber(10, 0, getMaxX(), 1), "coordinateX")
+            .appendField(new Blockly.FieldNumber(100, 100, getMaxX(), 1), "coordinateX")
             .appendField("cm")
             .appendField("Y")
-            .appendField(new Blockly.FieldNumber(10, 0, getMaxY(), 1), "coordinateY")
+            .appendField(new Blockly.FieldNumber(100, 100, getMaxY(), 1), "coordinateY")
             .appendField("cm")
             .appendField("Z")
-            .appendField(new Blockly.FieldNumber(10, 0, getMaxZ(), 1), "coordinateZ")
+            .appendField(new Blockly.FieldNumber(100, 100, getMaxZ(), 1), "coordinateZ")
             .appendField("cm");
         this.setPreviousStatement(true, ["action", "notReachAction", "ReachAction"]);
         this.setNextStatement(true, ["action", "notReachAction", "ReachAction"]);
         this.setColour('#3B8CFF');
-        this.setTooltip("[0<X<"+getMaxX()+"] [0<Y<"+getMaxY()+"] [0<Z<"+getMaxZ()+"]");
+        this.setTooltip("[100<X<"+getMaxX()+"] [100<Y<"+getMaxY()+"] [100<Z<"+getMaxZ()+"]");
         this.setHelpUrl("");
     }
 };
@@ -229,11 +229,11 @@ Blockly.Blocks['FlyHover'] = {
     init: function() {
         this.appendDummyInput()
             .appendField("悬停")
-            .appendField(new Blockly.FieldNumber(100, 1, 1000, 1), "hover")
+            .appendField(new Blockly.FieldNumber(1, 1, 1000, 1), "hover")
         this.appendDummyInput()
 			.appendField(new Blockly.FieldDropdown([
-				["毫秒", "1"],
-				["秒", "2"]
+                ["秒", "2"],
+				["毫秒", "1"]
              ]), "unit");
         this.setPreviousStatement(true,["action", "notReachAction", "ReachAction"]);
         this.setNextStatement(true,["action", "notReachAction", "ReachAction"]);
@@ -248,7 +248,7 @@ Blockly.Python['FlyHover'] = function(block) {
     initHead("FlyHover");
     var t = block.getFieldValue('hover');
     var u = block.getFieldValue('unit');
-    if(2 == u){
+    if(1 == u){
         t = t*1000;
     }
     var code = 'FlyHover('+t+')' + '\n';

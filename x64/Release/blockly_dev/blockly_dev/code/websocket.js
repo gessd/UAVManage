@@ -1,8 +1,8 @@
 'use strict';
 goog.require('Blockly.JavaScript');
 var url = "ws://127.0.0.1:25252";
-window.spaceX = 10000;
-window.spaceY = 10000;
+window.spaceX = 9000;
+window.spaceY = 9000;
 window.spaceZ = 10000;
 //兼容 FireFox
 if ("WebSocket" in window) {
@@ -54,8 +54,8 @@ socket.onmessage = function(event) {
             Code.workspace.clearUndo();
         } else if(3 == msgID){
             console.log("更新空间范围");
-            window.spaceX = jsonObject.x;
-            window.spaceY = jsonObject.y;
+            window.spaceX = jsonObject.x-100;
+            window.spaceY = jsonObject.y-100;
             window.spaceZ = jsonObject.z;
             console.log("x:"+window.spaceX+" y:"+window.spaceY+" z:"+window.spaceZ);
         }
