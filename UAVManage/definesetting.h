@@ -255,7 +255,7 @@ public:
 //航点属性
 typedef struct __NavWayPointData
 {
-	float param1;       //停留时间
+	float param1;       //停留时间 秒
 	float param2;       //接受半径
 	float param3;       //轨迹控制
 	float param4;       //偏转角度

@@ -232,7 +232,6 @@ PyObject* QZAPI::FlyHover(PyObject* self, PyObject* args)
 		QZAPI::Instance()->showWaypointError(tr("没有起飞无法悬停"));
 		return nullptr;
 	}
-	//TODO 悬停时间精确到毫秒
 	NavWayPointData data;
 	data.x = last.x;
 	data.y = last.y;

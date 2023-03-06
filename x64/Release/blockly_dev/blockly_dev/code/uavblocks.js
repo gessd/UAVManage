@@ -225,6 +225,12 @@ Blockly.Python['FlySetSpeed'] = function(block) {
     return code;
 };
 
+Blockly.Python['FlySetSpeed'] = function(block) {
+    initHead("FlySetSpeed");
+    var s = block.getFieldValue("speed");
+    var code = 'FlySetSpeed(' + s +')' + '\n';
+    return code;
+};
 Blockly.Blocks['FlyHover'] = {
     init: function() {
         this.appendDummyInput()
@@ -232,8 +238,8 @@ Blockly.Blocks['FlyHover'] = {
             .appendField(new Blockly.FieldNumber(1, 1, 1000, 1), "hover")
         this.appendDummyInput()
 			.appendField(new Blockly.FieldDropdown([
-                ["秒", "2"],
-				["毫秒", "1"]
+				["秒", "1"],
+                ["毫秒", "2"]
              ]), "unit");
         this.setPreviousStatement(true,["action", "notReachAction", "ReachAction"]);
         this.setNextStatement(true,["action", "notReachAction", "ReachAction"]);
@@ -243,7 +249,6 @@ Blockly.Blocks['FlyHover'] = {
         this.setInputsInline(true);
     }
 };
-
 Blockly.Python['FlyHover'] = function(block) {
     initHead("FlyHover");
     var t = block.getFieldValue('hover');
