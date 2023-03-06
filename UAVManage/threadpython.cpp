@@ -110,7 +110,7 @@ QZAPI QZAPI::m_qzaip;
 ////Python to c++ data start////
 //python接口格式，注册c++函数到python中，便于通过python调用c++函数
 PyMethodDef xWrapMethods[] = {	
-	//blockly积木块转换python接口
+	//手动编写python使用接口
 	{"FlyAddMarkPoint", QZAPI::FlyAddMarkPoint,		METH_VARARGS, "FlyAddMarkPoint"},
 	{"FlySetSpeed",		QZAPI::FlySetSpeed,			METH_VARARGS, "FlySetSpeed"},
 	{"FlySetLed",		QZAPI::FlySetLed,			METH_VARARGS, "FlySetLed"},
@@ -122,7 +122,7 @@ PyMethodDef xWrapMethods[] = {
 	{"FlyTo",			QZAPI::FlyTo,				METH_VARARGS, "FlyTo"},
 	{"FlyMove",			QZAPI::FlyMove,				METH_VARARGS, "FlyMove"},
 	{"FlyToMarkPoint",	QZAPI::FlyToMarkPoint,		METH_VARARGS, "FlyToMarkPoint"},
-	//手动编写python使用接口
+	//blockly积木块转换python接口
 	{"Fly_AddMarkPoint",QZAPI::FlyAddMarkPoint,		METH_VARARGS, "FlyAddMarkPoint"},
 	{"Fly_SetSpeed",	QZAPI::FlySetSpeed,			METH_VARARGS, "FlySetSpeed"},
 	{"Fly_SetLed",		QZAPI::FlySetLed,			METH_VARARGS, "FlySetLed"},
@@ -410,7 +410,7 @@ PyObject* QZAPI::FlyToMarkPoint(PyObject* self, PyObject* args)
 	}
 	QString qstrName(name);
 	if (false == g_mapMarkPoint.contains(qstrName)) {
-		QZAPI::Instance()->showWaypointError(tr("飞到标定点中的名称不存在"));
+		QZAPI::Instance()->showWaypointError(qstrName + tr("标定点未添加"));
 		return nullptr;
 	}
 	_MarkPoint point = g_mapMarkPoint[qstrName];

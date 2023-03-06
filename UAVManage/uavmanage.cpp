@@ -733,14 +733,14 @@ void UAVManage::onDeviceAdd(QString name, QString ip, float x, float y)
 			//当设备不存在写入默认blockly控件
 			QString qstrBlock = "\
 <xml xmlns=\"https://developers.google.com/blockly/xml\">\
-  <block type=\"FlyTakeoff\" id=\"RHfWI7IcqrRM~UK}OEnp\" x=\"88\" y=\"38\">\
+  <block type=\"Fly_Takeoff\" id=\"RHfWI7IcqrRM~UK}OEnp\" x=\"88\" y=\"38\">\
     <field name=\"height\">100</field>\
     <next>\
-      <block type=\"FlyTimeGroup\" id=\"W5WBWFi9LI[Xy{I/4OG3\">\
+      <block type=\"Fly_TimeGroup\" id=\"W5WBWFi9LI[Xy{I/4OG3\">\
         <field name=\"minute\">0</field>\
         <field name=\"second\">1</field>\
         <next>\
-          <block type=\"FlyLand\" id=\"4X4;~Xwrm@Qa53W;3T2.\"></block>\
+          <block type=\"Fly_Land\" id=\"4X4;~Xwrm@Qa53W;3T2.\"></block>\
         </next>\
       </block>\
     </next>\

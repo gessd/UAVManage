@@ -474,14 +474,27 @@ void DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upload
 		QString qstrDevicePyFile = infoProject.path() + _ProjectDirName_ + name + _PyFileSuffix_;
 		if (false == QFile::exists(qstrDevicePyFile)) continue;
 		//如果手动编写python文件存在则使用手动编写python
+		bool bMauanl = false;
 		QString qstrManualFile = infoProject.path() + _ProjectDirName_ + name + _PyManualSuffix_;
-		if (true == QFile::exists(qstrManualFile)) qstrDevicePyFile = qstrManualFile;
+		if (true == QFile::exists(qstrManualFile)) {
+			qstrDevicePyFile = qstrManualFile;
+			bMauanl = true;
+			_ShowInfoMessage(name + tr("使用python代码编译舞步"));
+		}
 		QFile file(qstrDevicePyFile);
 		if (!file.open(QIODevice::ReadOnly)) continue;
 		QByteArray arrData = file.readAll();
 		file.close();
 		if (arrData.isEmpty()) {
 			_ShowErrorMessage(name + tr("没有编写舞步"));
+			continue;
+		}
+		int index = arrData.indexOf("Fly_");
+		if (bMauanl && index >= 0) {
+			//积木块接口前缀Fly_,用于区分
+			//PyImport_AppendInittab会全局添加到python内置表中，无法区分积木块与python编程调用库的区分，所以此处直接判断是否使用了积木块的接口
+			//判断是否使用积木块的python代码
+			_ShowErrorMessage(name + tr("python编程代码API使用错误"));
 			continue;
 		}
 		//执行python脚本之前初始参数，用于检查无人机编程参数

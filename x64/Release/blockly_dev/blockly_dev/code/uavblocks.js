@@ -45,8 +45,11 @@ function initHead(name){
         Blockly.Python.definitions_.import_PythonWrap += "from QZAPI import " +name+ "\n";
     }
 }
+function addHead(){
+    Blockly.Python.definitions_.import_PythonWrap = "#coding=utf-8\nfrom QZAPI import *";
+}
 
-Blockly.Blocks['FlyTakeoff'] = {
+Blockly.Blocks['Fly_Takeoff'] = {
     init: function() {
         this.appendDummyInput()
             .appendField("起飞至")
@@ -58,14 +61,14 @@ Blockly.Blocks['FlyTakeoff'] = {
     }
 };
 
-Blockly.Python['FlyTakeoff'] = function(block) {
-    initHead("FlyTakeoff");
+Blockly.Python['Fly_Takeoff'] = function(block) {
+    addHead();
     var alt = block.getFieldValue("height");
-    var code = 'FlyTakeoff('+ alt + ')' + '\n';
+    var code = 'Fly_Takeoff('+ alt + ')' + '\n';
     return code;
 };
 
-Blockly.Blocks['FlyTimeGroup'] = {
+Blockly.Blocks['Fly_TimeGroup'] = {
     init: function() {
         this.appendDummyInput()
             .appendField("开始时间 第")
@@ -80,19 +83,19 @@ Blockly.Blocks['FlyTimeGroup'] = {
     }
 };
 
-Blockly.Python['FlyTimeGroup'] = function(block) {
-    initHead("FlyTimeGroup");
+Blockly.Python['Fly_TimeGroup'] = function(block) {
+    addHead();
     var m = block.getFieldValue("minute");
     var s = block.getFieldValue("second");
     var ff = Blockly.Python.statementToCode(block, 'interiorfunction');
-    var code = "FlyTimeGroup("+m+","+s+")\n";
+    var code = "Fly_TimeGroup("+m+","+s+")\n";
     if(false == isEmpty(ff)) {
         code = code + "if True:\n"+ff;
     }
     return code;
 };
 
-Blockly.Blocks['FlyLand'] = {
+Blockly.Blocks['Fly_Land'] = {
     init: function() {
         this.appendDummyInput()
             .appendField("降落 ");
@@ -102,13 +105,13 @@ Blockly.Blocks['FlyLand'] = {
     }
 };
 
-Blockly.Python['FlyLand'] = function(block) {
-    initHead("FlyLand");
-    var code = 'FlyLand()' + '\n';
+Blockly.Python['Fly_Land'] = function(block) {
+    addHead();
+    var code = 'Fly_Land()' + '\n';
     return code;
 };
 
-Blockly.Blocks['FlyAddMarkPoint'] = {
+Blockly.Blocks['Fly_AddMarkPoint'] = {
     init: function() {
         var validator = function(newValue) {
             //限制字符串长度
@@ -138,17 +141,17 @@ Blockly.Blocks['FlyAddMarkPoint'] = {
     }
 };
 
-Blockly.Python['FlyAddMarkPoint'] = function(block) {
-    initHead("FlyAddMarkPoint");
+Blockly.Python['Fly_AddMarkPoint'] = function(block) {
+    addHead();
     var name = block.getFieldValue('name');
     var px = block.getFieldValue("coordinateX");
     var py = block.getFieldValue("coordinateY");
     var pz = block.getFieldValue("coordinateZ");
-    var code = 'FlyAddMarkPoint(\'' + name + '\',' + px + ',' + py + ',' + pz + ')' + '\n';
+    var code = 'Fly_AddMarkPoint(\'' + name + '\',' + px + ',' + py + ',' + pz + ')' + '\n';
     return code;
 };
 
-Blockly.Blocks['FlyToMarkPoint'] = {
+Blockly.Blocks['Fly_ToMarkPoint'] = {
     init: function() {
         var validator = function(newValue) {
             //限制字符串长度
@@ -166,14 +169,14 @@ Blockly.Blocks['FlyToMarkPoint'] = {
         this.setColour('#3B8CFF');
     }
 };
-Blockly.Python['FlyToMarkPoint'] = function(block) {
-    initHead("FlyToMarkPoint");
+Blockly.Python['Fly_ToMarkPoint'] = function(block) {
+    addHead();
     var point = block.getFieldValue('mark');
-    var code = 'FlyToMarkPoint(\'' + point + '\')' + '\n';
+    var code = 'Fly_ToMarkPoint(\'' + point + '\')' + '\n';
     return code;
 };
 
-Blockly.Blocks['FlyTo'] = {
+Blockly.Blocks['Fly_To'] = {
     init: function() {
         this.appendDummyInput()
             .appendField("飞行到")
@@ -194,16 +197,16 @@ Blockly.Blocks['FlyTo'] = {
     }
 };
 
-Blockly.Python['FlyTo'] = function(block) {
-    initHead("FlyTo");
+Blockly.Python['Fly_To'] = function(block) {
+    addHead();
     var px = block.getFieldValue("coordinateX");
     var py = block.getFieldValue("coordinateY");
     var pz = block.getFieldValue("coordinateZ");
-    var code = 'FlyTo(' + px + ',' + py + ',' + pz +')' + '\n';
+    var code = 'Fly_To(' + px + ',' + py + ',' + pz +')' + '\n';
     return code;
 };
 
-Blockly.Blocks['FlySetSpeed'] = {
+Blockly.Blocks['Fly_SetSpeed'] = {
     init: function() {
         this.appendDummyInput()
             .appendField("速度")
@@ -218,20 +221,14 @@ Blockly.Blocks['FlySetSpeed'] = {
     }
 };
 
-Blockly.Python['FlySetSpeed'] = function(block) {
-    initHead("FlySetSpeed");
+Blockly.Python['Fly_SetSpeed'] = function(block) {
+    addHead();
     var s = block.getFieldValue("speed");
-    var code = 'FlySetSpeed(' + s +')' + '\n';
+    var code = 'Fly_SetSpeed(' + s +')' + '\n';
     return code;
 };
 
-Blockly.Python['FlySetSpeed'] = function(block) {
-    initHead("FlySetSpeed");
-    var s = block.getFieldValue("speed");
-    var code = 'FlySetSpeed(' + s +')' + '\n';
-    return code;
-};
-Blockly.Blocks['FlyHover'] = {
+Blockly.Blocks['Fly_Hover'] = {
     init: function() {
         this.appendDummyInput()
             .appendField("悬停")
@@ -249,18 +246,18 @@ Blockly.Blocks['FlyHover'] = {
         this.setInputsInline(true);
     }
 };
-Blockly.Python['FlyHover'] = function(block) {
-    initHead("FlyHover");
+Blockly.Python['Fly_Hover'] = function(block) {
+    addHead();
     var t = block.getFieldValue('hover');
     var u = block.getFieldValue('unit');
     if(1 == u){
         t = t*1000;
     }
-    var code = 'FlyHover('+t+')' + '\n';
+    var code = 'Fly_Hover('+t+')' + '\n';
     return code; 
 };
 
-Blockly.Blocks['FlyRevolve'] = {
+Blockly.Blocks['Fly_Revolve'] = {
     init: function() {
         this.appendDummyInput()
             .appendField("向")
@@ -280,18 +277,18 @@ Blockly.Blocks['FlyRevolve'] = {
     }
 };
 
-Blockly.Python['FlyRevolve'] = function(block) {
-    initHead("FlyRevolve");
+Blockly.Python['Fly_Revolve'] = function(block) {
+    addHead();
     var r = block.getFieldValue('revolve');
     var d = block.getFieldValue('direction');
     if("right" == d){
-        return 'FlyRevolve('+r+')' + '\n';
+        return 'Fly_Revolve('+r+')' + '\n';
     } else if("left" == d){
-        return 'FlyRevolve('+-r+')' + '\n';
+        return 'Fly_Revolve('+-r+')' + '\n';
     }
 };
 
-Blockly.Blocks['FlyMove'] = {
+Blockly.Blocks['Fly_Move'] = {
     init: function() {
         this.appendDummyInput()
             .appendField("向")
@@ -315,14 +312,14 @@ Blockly.Blocks['FlyMove'] = {
     }
 };
 
-Blockly.Python['FlyMove'] = function(block) {
-    initHead("FlyMove");
+Blockly.Python['Fly_Move'] = function(block) {
+    addHead();
     var d = block.getFieldValue('direction');
     var s = block.getFieldValue('distance');
-    return 'FlyMove('+d+','+s+')\n';
+    return 'Fly_Move('+d+','+s+')\n';
 };
 
-Blockly.Blocks['FlySetLed'] = {
+Blockly.Blocks['Fly_SetLed'] = {
     init: function() {
         this.appendDummyInput()
             .appendField("设置LED灯为")
@@ -344,8 +341,8 @@ Blockly.Blocks['FlySetLed'] = {
     }
 };
 
-Blockly.Python['FlySetLed'] = function(block) {
-    initHead("FlySetLed");
+Blockly.Python['Fly_SetLed'] = function(block) {
+    addHead();
     var m = block.getFieldValue('mode');
-    return 'FlySetLed('+m+')\n';
+    return 'Fly_SetLed('+m+')\n';
 };
