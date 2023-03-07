@@ -55,6 +55,9 @@
            <property name="text">
             <string>项目名称：</string>
            </property>
+           <property name="buddy">
+            <cstring>lineEditName</cstring>
+           </property>
           </widget>
          </item>
          <item>
@@ -64,6 +67,19 @@
              <width>0</width>
              <height>25</height>
             </size>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnPath">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>保存位置</string>
            </property>
           </widget>
          </item>
@@ -102,15 +118,9 @@
           <number>0</number>
          </property>
          <item>
-          <widget class="QPushButton" name="btnPath">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
+          <widget class="QLabel" name="label_5">
            <property name="text">
-            <string>选择路径</string>
+            <string>项目位置：</string>
            </property>
           </widget>
          </item>
@@ -237,6 +247,9 @@
            <property name="text">
             <string>场地大小：</string>
            </property>
+           <property name="buddy">
+            <cstring>lineEditX</cstring>
+           </property>
           </widget>
          </item>
          <item>
@@ -290,6 +303,9 @@
            </property>
            <property name="alignment">
             <set>Qt::AlignCenter</set>
+           </property>
+           <property name="buddy">
+            <cstring>lineEditY</cstring>
            </property>
           </widget>
          </item>
@@ -381,6 +397,14 @@
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <tabstops>
+  <tabstop>lineEditName</tabstop>
+  <tabstop>btnPath</tabstop>
+  <tabstop>lineEditX</tabstop>
+  <tabstop>lineEditY</tabstop>
+  <tabstop>btnOK</tabstop>
+  <tabstop>btnCancel</tabstop>
+ </tabstops>
  <resources>
   <include location="uavmanage.qrc"/>
  </resources>

@@ -20,6 +20,14 @@ QPushButton:hover,QToolButton:hover{
 QPushButton:pressed,QToolButton:pressed{
     background:#DDDDDD;
 }
+SpaceParam QPushButton{
+	color:#FFFFFF;
+    background:#3B8CFF;
+	border:3px solid #FFFFFF;
+}
+SpaceParam QPushButton:pressed{
+	background:#3B88CC;
+}
 QToolBar QToolButton, QMenuBar QToolButton{
 	background:transparent;
 	color:#FFFFFF;
