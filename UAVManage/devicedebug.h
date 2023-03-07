@@ -23,7 +23,7 @@ public slots:
 	void onSetBatteryStatus(float voltages, float battery, unsigned short electric);
 	void onUpdateHighresImu(unsigned long long time, QList<float> list);
 	void onUpdateAttitude(unsigned int time, float roll, float pitch, float yaw);
-	void onUpdateLocalPosition(unsigned int time_boot_ms, float x, float y, float z);
+	void onUpdateLocalPosition(unsigned int time_boot_ms, int x, int y, int z);
 private:
 	Ui::DeviceDebug ui;
 };

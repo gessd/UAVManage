@@ -175,11 +175,11 @@ private slots:
 	/**
 	 * @brief 更新界面定位
 	 * @param 时间
-	 * @param X 米
-	 * @param Y 米
-	 * @param Z 米
+	 * @param X 厘米
+	 * @param Y 厘米
+	 * @param Z 厘米
 	 */
-	void onUpdateLocation(unsigned int time, float x, float y, float z);
+	void onUpdateLocation(unsigned int time, int x, int y, int z);
 private:
 	/**
 	* @brief TCP连接状态，子线程回调函数
@@ -285,7 +285,7 @@ signals:
 	//日志消息
 	void sigLogMessage(QString data);
 	//当前位置信息
-	void sigLocalPosition(unsigned int time_boot_ms, float x, float y, float z);
+	void sigLocalPosition(unsigned int time_boot_ms, int x, int y, int z);
 	//IMU数据
 	void sigHighresImu(unsigned long long, QList<float>);
 	//姿态角

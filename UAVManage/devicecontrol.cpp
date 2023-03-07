@@ -129,7 +129,7 @@ DeviceDebug* DeviceControl::getDeviceDebug()
 
 void DeviceControl::setStartLocation(long x, long y)
 {
-	onUpdateLocation(0, x/100.0, y/100.0, 0);
+	onUpdateLocation(0, x, y, 0);
 	setX(x);
 	setY(y);
 }
@@ -243,7 +243,7 @@ int DeviceControl::DeviceMavWaypointStart(QVector<NavWayPointData> data)
 int DeviceControl::Fun_MAV_CMD_NAV_TAKEOFF_LOCAL(float Pitch, float Empty, float AscendRate, float Yaw, float X, float Y, float Z, bool wait, bool again)
 {
 	if (isConnectDevice()) {
-		_stDeviceCurrentStatus status = m_deviceStatus;
+		_stDeviceCurrentStatus status = getCurrentStatus();
 		if (status.battery < 60) return DeviceLowBattery;
 	}
 	//参数1无效
@@ -318,9 +318,9 @@ void DeviceControl::onUpdateBatteryStatus(float voltages, float battery, unsigne
 	m_pDebugDialog->onSetBatteryStatus(voltages, battery, electric);
 }
 
-void DeviceControl::onUpdateLocation(unsigned int time, float x, float y, float z)
+void DeviceControl::onUpdateLocation(unsigned int time, int x, int y, int z)
 {
-	QString text = QString("X:%1 Y:%2 Z:%3").arg(QString::number(x, 'f', 1)).arg(QString::number(y, 'f', 1)).arg(QString::number(z, 'f', 1));
+	QString text = QString("X:%1 Y:%2 Z:%3").arg(x).arg(y).arg(x);
 	ui.labelLocation->setText(text);
 }
 
@@ -435,10 +435,10 @@ void DeviceControl::hvcbReceiveMessage(const hv::SocketChannelPtr& channel, hv::
 			mavlink_local_position_ned_t t;
 			mavlink_msg_local_position_ned_decode(&msg, &t);
 			//单位转换成cm
-			m_deviceStatus.x = QString::number(t.x * 100, 'f', 3).toInt();
-			m_deviceStatus.y = QString::number(t.y * 100, 'f', 3).toInt();
-			m_deviceStatus.z = QString::number(t.z * 100, 'f', 3).toInt();
-			emit sigLocalPosition(t.time_boot_ms, QString::number(t.x, 'f', 3).toFloat(), QString::number(t.y, 'f', 3).toFloat(), QString::number(t.z, 'f', 3).toFloat());
+			m_deviceStatus.x = QString::number(t.x * 100, 'f', 2).toInt();
+			m_deviceStatus.y = QString::number(t.y * 100, 'f', 2).toInt();
+			m_deviceStatus.z = QString::number(t.z * 100, 'f', 2).toInt();
+			emit sigLocalPosition(t.time_boot_ms, m_deviceStatus.x, m_deviceStatus.y, m_deviceStatus.y);
 			break;
 		}
 		case MAVLINK_MSG_ID_HIGHRES_IMU:	//IMU数据

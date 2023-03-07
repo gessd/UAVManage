@@ -109,7 +109,7 @@ void DeviceDebug::onUpdateAttitude(unsigned int time, float roll, float pitch, f
 	ui.lineEdityaw->setText(QString::number(yaw, 'f', 3));
 }
 
-void DeviceDebug::onUpdateLocalPosition(unsigned int time_boot_ms, float x, float y, float z)
+void DeviceDebug::onUpdateLocalPosition(unsigned int time_boot_ms, int x, int y, int z)
 {
 	ui.lineEditTime->setText(QString("%1").arg(time_boot_ms / 1000.0));
 	ui.lineEditX->setText(QString("%1").arg(x));

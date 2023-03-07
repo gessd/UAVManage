@@ -49,6 +49,9 @@ DeviceControl QToolButton:hover{
 DeviceControl QLabel{
 	font-size:12px;
 }
+#labelLocation{
+	font-size:10px;
+}
 #btnFlyStop{
 	border:1px solid #FF0000;
 	color:#FF0000;
