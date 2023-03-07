@@ -180,7 +180,7 @@ void UAVManage::initMenu()
 	ui.toolBar->addAction(pActionFly5);
 	ui.toolBar->addAction(pActionFly6);
 
-	pMenuLayout->addWidget(initMenuButton(pMenuWidget, tr(""), ":/res/logo/qz_logo.ico", ":/res/logo/qz_logo.ico", pIconMenu));
+	//pMenuLayout->addWidget(initMenuButton(pMenuWidget, tr(""), ":/res/logo/qz_logo.ico", ":/res/logo/qz_logo.ico", pIconMenu));
 	pMenuLayout->addWidget(initMenuButton(pMenuWidget, tr("项目"), ":/res/menu/P01_file_open_btn_cli.png", ":/res/menu/P01_file_open_btn_cli.png", pProjectMenu));
 	m_pButtonFlyPrepare = initMenuButton(pMenuWidget, tr("起飞准备"), ":/res/menu/preparation.png", ":/res/menu/preparation.png", pMenuFlyPrepare);
 	m_pButtonFlyPrepare->setEnabled(false);

@@ -30,4 +30,6 @@ protected:
 private:
 	Ui::AddDeviceDialog ui;
 	QLabel* m_pLabelBackground;
+	unsigned int m_maxX;
+	unsigned int m_maxY;
 };

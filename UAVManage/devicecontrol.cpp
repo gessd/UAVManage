@@ -320,7 +320,7 @@ void DeviceControl::onUpdateBatteryStatus(float voltages, float battery, unsigne
 
 void DeviceControl::onUpdateLocation(unsigned int time, int x, int y, int z)
 {
-	QString text = QString("X:%1 Y:%2 Z:%3").arg(x).arg(y).arg(x);
+	QString text = QString("X:%1 Y:%2 Z:%3").arg(x).arg(y).arg(z);
 	ui.labelLocation->setText(text);
 }
 

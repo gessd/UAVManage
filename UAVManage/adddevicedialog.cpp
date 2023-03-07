@@ -1,6 +1,7 @@
 #include "adddevicedialog.h"
 #include "qlineedit.h"
 #include <QRegExpValidator>
+#include <QMessageBox>
 
 AddDeviceDialog::AddDeviceDialog(QString qstrName, unsigned int maxX, unsigned int maxY, QWidget *parent)
 	: QDialog(parent)
@@ -10,7 +11,8 @@ AddDeviceDialog::AddDeviceDialog(QString qstrName, unsigned int maxX, unsigned i
 	setWindowFlags(windowFlags() | Qt::FramelessWindowHint | Qt::Dialog);
 	this->setAttribute(Qt::WA_TranslucentBackground);
 	setName(qstrName);
-
+	m_maxX = maxX;
+	m_maxY = maxY;
 	ui.btnOK->setVisible(true);
 	QRegExp regExp1("\\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.)"
 		"{3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\b");
@@ -22,7 +24,20 @@ AddDeviceDialog::AddDeviceDialog(QString qstrName, unsigned int maxX, unsigned i
 	ui.lineEditY->setMaxLength(5);
 	connect(ui.btnOK, &QAbstractButton::clicked, [this]() { 
 		QString name = ui.lineEditName->text().trimmed();
-		if (name.isEmpty()) return;
+		if (name.isEmpty()) {
+			QMessageBox::warning(this, tr("提示"), tr("请输入设备名称"));
+			return;
+		}
+		int number = ui.lineEditX->text().toInt();
+		if (number < 100 || number >(m_maxX - 100)) {
+			QMessageBox::warning(this, tr("提示"), tr("X轴位置距离场地边界太近，最小100厘米"));
+			return;
+		}
+		number = ui.lineEditY->text().toInt();
+		if (number < 100 || number >(m_maxY - 100)) {
+			QMessageBox::warning(this, tr("提示"), tr("Y轴位置距离场地边界太近，最小100厘米"));
+			return;
+		}
 		accept();
 		});
 	connect(ui.btnCancel, &QAbstractButton::clicked, [this]() {  reject(); });
