@@ -373,7 +373,7 @@ QString DeviceManage::isRepetitionDevice(QString qstrName, QString ip, long x, l
 
 void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 {
-	if (_DeviceTakeoffLocal == comand) {
+	if (_DeviceTakeoffLocal == comand || _DeviceSetout == comand) {
 		//起飞前判断所有设备连接正常
 		QString qstrNames;
 		for (int i = 0; i < ui.listWidget->count(); i++) {
@@ -387,33 +387,37 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 			qstrNames.append(", " + pDevice->getName());
 		}
 		if (false == qstrNames.isEmpty()) {
-			QString error = tr("无法起飞，部分设备未连接") + qstrNames;
+			QString error = tr("部分设备未连接") + qstrNames;
+			if (_DeviceTakeoffLocal == comand) error.prepend(tr("无法起飞，"));
+			else error.prepend("无法准备，");
 			_ShowErrorMessage(error);
 			QMessageBox::warning(this, tr("警告"), error);
 			return;
 		}
-		//起飞前增加倒计时
-		QLabel label(dynamic_cast<QWidget*>(parent()));
-		//设置窗体的背景色,这里的百分比就是透明度
-		label.setStyleSheet(QString("background-color: rgba(0, 0, 0, 50%);color:#FF0000;border:1px solid blue;font-size:100px;"));
-		//label.setGeometry(dynamic_cast<QWidget*>(parent())->rect()); //获取父窗体的几何形状设置当前窗口
-		label.setFixedSize(dynamic_cast<QWidget*>(parent())->size());
-		label.show();
-		label.setAlignment(Qt::AlignCenter);
-		QFont font = label.font();
-		font.setPixelSize(font.pixelSize()*4);
-		//label.setFont(font);
-		label.setText("3");
-		QTimer timer;
-		timer.start(1000);
-		int index = 1;
-		connect(&timer, &QTimer::timeout, [&, this]() {
-			index++;
-			label.setText(QString::number(label.text().toInt() - 1));
-			if (index > 3) timer.stop();
-			});
-		while (timer.isActive()) {
-			QApplication::processEvents();
+		if (_DeviceTakeoffLocal == comand) {
+			//起飞前增加倒计时
+			QLabel label(dynamic_cast<QWidget*>(parent()));
+			//设置窗体的背景色,这里的百分比就是透明度
+			label.setStyleSheet(QString("background-color: rgba(0, 0, 0, 50%);color:#FF0000;border:1px solid blue;font-size:100px;"));
+			//label.setGeometry(dynamic_cast<QWidget*>(parent())->rect()); //获取父窗体的几何形状设置当前窗口
+			label.setFixedSize(dynamic_cast<QWidget*>(parent())->size());
+			label.show();
+			label.setAlignment(Qt::AlignCenter);
+			QFont font = label.font();
+			font.setPixelSize(font.pixelSize() * 4);
+			//label.setFont(font);
+			label.setText("3");
+			QTimer timer;
+			timer.start(1000);
+			int index = 1;
+			connect(&timer, &QTimer::timeout, [&, this]() {
+				index++;
+				label.setText(QString::number(label.text().toInt() - 1));
+				if (index > 3) timer.stop();
+				});
+			while (timer.isActive()) {
+				QApplication::processEvents();
+			}
 		}
 	}
 	int x = 0;
