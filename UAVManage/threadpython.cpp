@@ -34,70 +34,74 @@ QMap<QString, _MarkPoint> g_mapMarkPoint;
 
 PyObject* QZAPI::examineWaypoint()
 {
-		NavWayPointData data = g_waypointData.back();
-		switch (data.commandID)
-		{
-		case _WaypointFly: 
-			//判断是否飞出场地范围
-			if (data.x < 100 || data.y < 100 || data.x > (g_nSpaceX-100) || data.y > (g_nSpaceY-100)) {
-				showWaypointError(tr("飞出限制区域"));
-				return nullptr;
-			}
-			break;
-		case _WaypointSpeed: 
-			//飞行速度范围
-			if (data.param1 > 100 || data.param1 < 10) {
-				showWaypointError(tr("飞行速度设定超出范围"));
-				return nullptr;
-			}
-			break;
-		case _WaypointRevolve: 
-			//旋转角度
-			if (data.param1 >= 360 || data.param1 <= -360) {
-				showWaypointError(tr("旋转角度设定超出范围"));
-				return nullptr;
-			}
-			break;
-		case _WaypointHover: 
-			//悬停时间
-			if (data.param1 >= 100 || data.param1 <= 0) {
-				showWaypointError(tr("悬停时间设定超出范围"));
-				return nullptr;
-			}
-			break;
-		case _WaypointLed: 
-			//LED灯模式
-			if (data.param1 > 7 || data.param1 <= 0) {
-				showWaypointError(tr("LED模式选择超出范围"));
-				return nullptr;
-			}
-			break;
-		case _WaypointStart: 
-			//只有第一步才能是起飞位置
-			if (g_waypointData.count() != 2) {
-				//第一条为初始位置，第二条为起飞
-				showWaypointError(tr("起飞设定错误"));
-				return nullptr;
-			}
-			break;
-		case _WaypointTime: 
-			//时间范围,需要检查是否为递进关系
-			for (int i = g_waypointData.count() - 2; i >= 0; i--) {
-				NavWayPointData last = g_waypointData.at(i);
-				if(_WaypointTime != last.commandID) continue;
-				if (last.param1 >= data.param1) {
-					//航点中存在比当前时间小的记录
-					showWaypointError(tr("时间范围设定顺序错误"));
-					return nullptr;
-				}
-			}
-			break;
-		default:
-			showWaypointError(tr("舞步编程中有无法解析内容"));
+	NavWayPointData data = g_waypointData.back();
+	switch (data.commandID)
+	{
+	case _WaypointFly:
+		//判断是否飞出场地范围
+		if (data.x < 100 || data.y < 100 || data.x >(g_nSpaceX - 100) || data.y >(g_nSpaceY - 100)) {
+			QString error = QString(data.message + tr("飞出限制区域，设定值[X:%1 Y:%2]厘米，限制区域[X:100--%3 Y:100--%4]厘米")
+				.arg(data.x).arg(data.y).arg(g_nSpaceX - 100).arg(g_nSpaceY - 100));
+			showWaypointError(error);
 			return nullptr;
-			break;
 		}
-		return Py_BuildValue("i", 0);
+		break;
+	case _WaypointSpeed:
+		//飞行速度范围
+		if (data.param1 > 100 || data.param1 < 10) {
+			showWaypointError(QString(tr("飞行速度设定超出范围，设定值:[%1]，最小最大值[%2-%3]")
+				.arg(data.param1).arg(10).arg(100)));
+			return nullptr;
+		}
+		break;
+	case _WaypointRevolve:
+		//旋转角度
+		if (data.param1 >= 360 || data.param1 <= -360) {
+			showWaypointError(tr("旋转角度设定超出范围"));
+			return nullptr;
+		}
+		break;
+	case _WaypointHover:
+		//悬停时间
+		if (data.param1 >= 100 || data.param1 < 0.1) {
+			showWaypointError(QString(tr("悬停时间设定超出范围，设定值:[%1]秒，最小最大值[%2-%3]秒")
+				.arg(data.param1).arg(0).arg(100)));
+			return nullptr;
+		}
+		break;
+	case _WaypointLed:
+		//LED灯模式
+		if (data.param1 > 7 || data.param1 <= 0) {
+			showWaypointError(tr("LED模式选择超出范围"));
+			return nullptr;
+		}
+		break;
+	case _WaypointStart:
+		//只有第一步才能是起飞位置
+		if (g_waypointData.count() != 2) {
+			//第一条为初始位置，第二条为起飞
+			showWaypointError(tr("起飞位置放置错误"));
+			return nullptr;
+		}
+		break;
+	case _WaypointTime:
+		//时间范围,需要检查是否为递进关系
+		for (int i = g_waypointData.count() - 2; i >= 0; i--) {
+			NavWayPointData last = g_waypointData.at(i);
+			if (_WaypointTime != last.commandID) continue;
+			if (last.param1 >= data.param1) {
+				//航点中存在比当前时间小的记录
+				showWaypointError(tr("时间范围设定顺序错误"));
+				return nullptr;
+			}
+		}
+		break;
+	default:
+		showWaypointError(tr("舞步编程中有无法解析内容"));
+		return nullptr;
+		break;
+	}
+	return Py_BuildValue("i", 0);
 }
 
 void QZAPI::showWaypointError(QString error)
@@ -359,12 +363,12 @@ PyObject* QZAPI::FlyMove(PyObject* self, PyObject* args)
 	}
 	if (0 == angle) {
 		switch (direction){
-		case 1: data.x += n; break;
-		case 2: data.x -= n; break;
-		case 3: data.y += n; break;
-		case 4: data.y -= n; break;
-		case 5: data.z += n; break;
-		case 6: data.z -= n; break;
+		case 1: data.x += n; data.message = tr("向前飞行"); break;
+		case 2: data.x -= n; data.message = tr("向后飞行"); break;
+		case 3: data.y += n; data.message = tr("向右飞行"); break;
+		case 4: data.y -= n; data.message = tr("向左飞行"); break;
+		case 5: data.z += n; data.message = tr("向上飞行"); break;
+		case 6: data.z -= n; data.message = tr("向下飞行"); break;
 		}
 	}
 	else {
@@ -376,23 +380,28 @@ PyObject* QZAPI::FlyMove(PyObject* self, PyObject* args)
 		case 1: 
 			data.x += qCos(radian) * n;
 			data.y += qSin(radian) * n;
+			data.message = tr("向前飞行");
 			break;
 		case 2: 
 			data.x -= qCos(radian) * n;
 			data.y -= qSin(radian) * n;
+			data.message = tr("向后飞行");
 			break;
 		case 3: 
 			data.x -= qSin(radian) * n;
 			data.y -= qCos(radian) * n;
+			data.message = tr("向右飞行");
 			break;
 		case 4: 
 			data.x += qSin(radian) * n;
 			data.y += qCos(radian) * n;
+			data.message = tr("向左飞行");
 			break;
-		case 5: data.z += n; break;
-		case 6: data.z -= n; break;
+		case 5: data.z += n; data.message = tr("向上飞行"); break;
+		case 6: data.z -= n; data.message = tr("向下飞行"); break;
 		}
 	}
+	data.message.append(QString("%1厘米后").arg(n));
 	g_waypointData.append(data);
 	return QZAPI::Instance()->examineWaypoint();
 }

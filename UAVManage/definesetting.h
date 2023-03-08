@@ -263,6 +263,7 @@ typedef struct __NavWayPointData
 	int y;
 	float z;
 	unsigned int commandID;
+	QString message;
 	__NavWayPointData() {
 		param2 = 0.20;   //接受半径需要有默认值 TODO 参数单位
 		param1 = param3 = param4 = z = 0.0;
