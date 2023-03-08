@@ -42,7 +42,7 @@ void HistoryMessage::resetWidget()
 
 void HistoryMessage::onMessageData(QString text, _Messagelevel level, bool clear)
 {
-	QString qstrText = QDateTime::currentDateTime().toString("[hh:mm:ss.zzz]:");
+	QString qstrTime = QDateTime::currentDateTime().toString("[hh:mm:ss.zzz]:");
 	QString qstrColor = "#000000";
 	switch (level)
 	{
@@ -56,7 +56,7 @@ void HistoryMessage::onMessageData(QString text, _Messagelevel level, bool clear
 	default:
 		break;
 	}
-	QString qstrCss = QString("<font color=%1>%2</font>").arg(qstrColor).arg(qstrText + text);
+	QString qstrCss = QString(qstrTime+"<font color=%1>%2</font>").arg(qstrColor).arg(text);
 	ui.textBrowser->append(qstrCss);
 	if (clear) {
 		ui.textBrowser->clear();

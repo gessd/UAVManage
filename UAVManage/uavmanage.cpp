@@ -607,7 +607,6 @@ void UAVManage::onSocketTextMessageReceived(QString message)
 	static QString qstrLastWebMessage = "";
 	if (qstrLastWebMessage == message) return;
 	qstrLastWebMessage = message;
-	qDebug() << "积木块变动,自动保存编程文件";
 	QJsonParseError jsonError;
 	QJsonDocument jsonDoc = QJsonDocument::fromJson(message.toUtf8(), &jsonError);
 	if (QJsonParseError::NoError != jsonError.error || jsonDoc.isEmpty() || !jsonDoc.isObject()) {
@@ -621,26 +620,28 @@ void UAVManage::onSocketTextMessageReceived(QString message)
 	QString python = jsonObj.value(_name2str(python)).toString();
 	QString blocklyFileName = getCurrentBlocklyFile();
 	QString pythonFileName = getCurrentPythonFile();	
-	qDebug() << "更新文件" << blocklyFileName << pythonFileName;
 	if (blocklyFileName.isEmpty() || pythonFileName.isEmpty()) return;
 	if (_WIDUpdate == id) {
+		qDebug() << "编程区域变动,自动保存文件" << blocklyFileName;
 		QFile blocklyFile(blocklyFileName);
-		if (blocklyFile.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
+		if (blocklyFile.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
 			blocklyFile.write(xml.toUtf8());
 			blocklyFile.close();
 		}
 	}
 	if (_WIDManual == id) {
 		pythonFileName = getCurrentPythonFile(true);
+		qDebug() << "编码区域变动,自动保存文件" << pythonFileName;
 	}
 	QFile pythonFile(pythonFileName);
-	if (pythonFile.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
+	if (pythonFile.open(QIODevice::ReadWrite | QIODevice::Truncate)) {
 		pythonFile.write(python.toUtf8());
 		pythonFile.close();
 	}
 	//如果手动编写python内容为空则删除本地中的文件
 	//因切换无人机设备是会清空上一次记录造成手动编写python传回空内容
 	if (_WIDManual == id && true == python.isEmpty()) {
+		qDebug() << "删除编写代码文件" << pythonFileName;
 		pythonFile.remove();
 	}
 }
@@ -671,7 +672,6 @@ void UAVManage::onCurrentDeviceNameChanged(QString currentName, QString previous
 		arrPythonCode = filePython.readAll();
 		filePython.close();
 	}
-	qDebug() << "更新编程区域";
 	QJsonObject jsonObj;
 	jsonObj.insert(_WMID, _WIDUpdate);
 	jsonObj.insert("xml", arrBlockly.data());
@@ -679,6 +679,7 @@ void UAVManage::onCurrentDeviceNameChanged(QString currentName, QString previous
 	if (false == arrPythonCode.isEmpty())jsonObj.insert("pythonCode", arrPythonCode.data());
 	QJsonDocument jsonDoc(jsonObj);
 	QByteArray data = jsonDoc.toJson();
+	//qDebug() << "更新编程区域" << jsonDoc;
 	if(m_pWebBlocklySocket) m_pWebBlocklySocket->sendTextMessage(data);
 	
 	//更新项目工程中选中设备
