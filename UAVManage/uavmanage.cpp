@@ -221,6 +221,15 @@ void UAVManage::initMenu()
 			_ShowErrorMessage("三维仿真必要文件缺失，请安装后重试");
 			return;
 		}
+		//先检查舞步编写是否正确
+		QString qstrErrorNames = m_pDeviceManage->waypointComposeAndUpload(m_qstrCurrentProjectFile, false);
+		if (false == qstrErrorNames.isEmpty()) {
+			QString qstrErrorMsg = tr("检查舞步有错误，请修正后重试") + qstrErrorNames;
+			_ShowErrorMessage(qstrErrorMsg);
+			QMessageBox::warning(this, tr("警告"), qstrErrorMsg);
+			return;
+		}
+
 		if (m_pBackgrounMask == nullptr) {
 			m_pBackgrounMask = new WaitingWidget(this);
 		}

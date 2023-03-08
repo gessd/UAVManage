@@ -14,6 +14,8 @@ DeviceControl::DeviceControl(QString name, float x, float y, QString ip, QWidget
 	m_bHeartbeatEnable = true;
 	m_bWaypointSending = false;
 	m_nCurrentMusicTime = 0;
+	m_bUploadFinished = false;
+	m_bPrepareTakeoff = false;
 	ui.stackedWidgetStatus->setCurrentIndex(0);
 	QPixmap pixmap(":/res/images/uavred.png");
 	ui.labelStatus->setPixmap(pixmap.scaled(ui.labelStatus->size()));
@@ -168,6 +170,7 @@ bool DeviceControl::connectDevice()
 //断开连接
 void DeviceControl::disconnectDevice()
 {
+	m_bUploadFinished = false;
 	if (isConnectDevice()) 
 		m_pHvTcpClient->stop();
 	SAFE_DELETE(m_pHvTcpClient);
@@ -196,13 +199,25 @@ void DeviceControl::setHeartbeatEnable(bool enable)
 	m_bHeartbeatEnable = enable;
 }
 
+bool DeviceControl::isUploadWaypoint()
+{
+	return m_bUploadFinished;
+}
+
+bool DeviceControl::isPrepareTakeoff()
+{
+	return m_bPrepareTakeoff;
+}
+
 //无人机设置模式
 int DeviceControl::Fun_MAV_CMD_DO_SET_MODE(float Mode, bool wait, bool again)
 {
 	//参数2,3,4,5,6,7无效
 	//1姿态模式|2定高模式|3航点模式
 	QByteArray arrData = mavCommandLongToBuffer(Mode, 0, 0, 0, 0, 0, 0, MAV_CMD_DO_SET_MODE);
-	return MavSendCommandLongMessage(tr("准备起飞"), MAV_CMD_DO_SET_MODE, arrData, again ? arrData : "", false);
+	int res = MavSendCommandLongMessage(tr("准备起飞"), MAV_CMD_DO_SET_MODE, arrData, again ? arrData : "", false);
+	if (DeviceDataSucceed == res) m_bPrepareTakeoff = true;
+	return res;
 }
 
 int DeviceControl::DeviceMavWaypointStart(QVector<NavWayPointData> data)
@@ -250,7 +265,12 @@ int DeviceControl::Fun_MAV_CMD_NAV_TAKEOFF_LOCAL(float Pitch, float Empty, float
 	//参数2用了标记是否为重发的消息
 	QByteArray arrData = mavCommandLongToBuffer(0, 0, AscendRate, Yaw, X, Y, Z, MAV_CMD_NAV_TAKEOFF_LOCAL);
 	QByteArray againData = mavCommandLongToBuffer(0, _MavResendFlag_, AscendRate, Yaw, X, Y, Z, MAV_CMD_NAV_TAKEOFF_LOCAL);
-	return MavSendCommandLongMessage(tr("起飞"), MAV_CMD_NAV_TAKEOFF_LOCAL, arrData, again ? arrData : "", wait);
+	int res = MavSendCommandLongMessage(tr("起飞"), MAV_CMD_NAV_TAKEOFF_LOCAL, arrData, again ? arrData : "", wait);
+	if (DeviceDataSucceed == res) {
+		m_bPrepareTakeoff = false;
+		m_bUploadFinished = false;
+	}
+	return res;
 }
 
 //无人机降落
@@ -644,8 +664,9 @@ void DeviceControl::DeviceMavWaypointEnd(unsigned int count)
 	pMessageThread->deleteLater();
 	//整个上传航点过程结束
 	m_bWaypointSending = false;
+	m_bUploadFinished = true;
 	emit sigWaypointProcess(ui.labelDeviceName->text(), count, count, res, true, tr("结束上传舞步"));
-	ui.stackedWidgetStatus->setCurrentIndex(0);
+	ui.stackedWidgetStatus->setCurrentIndex(0);	
 }
 
 void DeviceControl::onUpdateHeartBeat()

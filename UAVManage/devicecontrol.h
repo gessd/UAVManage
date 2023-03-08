@@ -16,9 +16,9 @@
 //无人机当前姿态
 struct _stDeviceCurrentStatus
 {
-	int x;
-	int y;
-	int z;
+	int x;	//厘米
+	int y;	//厘米
+	int z;	//厘米
 	float roll;
 	float pitch;
 	float yaw;
@@ -69,6 +69,15 @@ public:
 	 * @brief 启用心跳
 	 */
 	void setHeartbeatEnable(bool enable);
+	
+	/**
+	 * @brief 设备是否已经上传航点
+	 */
+	bool isUploadWaypoint();
+	/**
+	 * @brief 设备是否在准备起飞状态
+	 */
+	bool isPrepareTakeoff();
 
 	/**
 	 * @brief 准备上传航点数据，根据信号sigWaypointProcess处理进度
@@ -317,4 +326,8 @@ private:
 	_stDeviceCurrentStatus m_deviceStatus;
 	//当前音乐播放进度
 	unsigned int m_nCurrentMusicTime;
+	//已上传航点
+	bool m_bUploadFinished;
+	//是否在准备起飞状态
+	bool m_bPrepareTakeoff;
 };

@@ -102,7 +102,7 @@ public:
 	 * @param 打开的工程文件，根据工程文件目录打开每个无人机的py文件
 	 * @param 是否上传到飞控
 	 */
-	void waypointComposeAndUpload(QString qstrProjectFile, bool upload);
+	QString waypointComposeAndUpload(QString qstrProjectFile, bool upload);
 
 	/**
 	* @brief 根据音乐进度更新舞步时间
@@ -253,4 +253,5 @@ private:
 	//音乐文件及波形图形
 	QString m_qstrMusicFile;
 	QPixmap m_pixmapMusic;
+	//已上传航点设备列表
 };

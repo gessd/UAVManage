@@ -374,8 +374,20 @@ QString DeviceManage::isRepetitionDevice(QString qstrName, QString ip, long x, l
 void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 {
 	if (_DeviceTakeoffLocal == comand || _DeviceSetout == comand) {
-		//起飞前判断所有设备连接正常
-		QString qstrNames;
+		//起飞前检查所有设备状态
+		//设备连接状态
+		//设备电量
+		//舞步已上传
+		//基站电量
+		//基站校准
+		//无人机是否在初始位置附近
+		//起飞时_DeviceTakeoffLocal检查已经准备起飞
+		//TODO 需要考虑已上传舞步后又重新编辑舞步处理方式
+		
+		//先清空错误消息
+		_MessageListClear;
+		//记录出错设备名称
+		QStringList listNames;
 		for (int i = 0; i < ui.listWidget->count(); i++) {
 			QListWidgetItem* pItem = ui.listWidget->item(i);
 			if (!pItem) continue;
@@ -383,13 +395,38 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 			if (!pWidget) continue;
 			DeviceControl* pDevice = dynamic_cast<DeviceControl*>(pWidget);
 			if (!pDevice) continue;
-			if (pDevice->isConnectDevice()) continue;
-			qstrNames.append(", " + pDevice->getName());
+			QString name = pDevice->getName();
+			listNames.append(name);
+			if (false == pDevice->isConnectDevice()) {
+				_ShowErrorMessage(name + tr("设备未连接无法起飞"));
+				continue;
+			}
+			if (false == pDevice->getCurrentStatus().battery < 60) {
+				_ShowErrorMessage(name + tr("设备电量过低无法起飞"));
+				continue;
+			}
+			if (false == pDevice->isUploadWaypoint()) {
+				_ShowErrorMessage(name + tr("设备未上传舞步无法起飞"));
+				continue;
+			}
+			if (qAbs(pDevice->getX() - pDevice->getCurrentStatus().x) > 100) {
+				_ShowErrorMessage(name + tr("设备X轴方向当前位置距离初始位置超过1米"));
+				continue;
+			}
+			if (qAbs(pDevice->getY() - pDevice->getCurrentStatus().y) > 100) {
+				_ShowErrorMessage(name + tr("设备Y轴方向当前位置距离初始位置超过1米"));
+				continue;
+			}
+			if (_DeviceTakeoffLocal == comand && false == pDevice->isPrepareTakeoff()) {
+				_ShowErrorMessage(name + tr("设备未准备起飞"));
+				continue;
+			}
+			//所有判断检查通过
+			listNames.removeOne(name);
 		}
-		if (false == qstrNames.isEmpty()) {
-			QString error = tr("部分设备未连接") + qstrNames;
-			if (_DeviceTakeoffLocal == comand) error.prepend(tr("无法起飞，"));
-			else error.prepend("无法准备，");
+		if (false == listNames.isEmpty()) {
+			QString qstrError = listNames.join("、");
+			QString error = tr("部分设备检查出错，请重试") + qstrError;
 			_ShowErrorMessage(error);
 			QMessageBox::warning(this, tr("警告"), error);
 			return;
@@ -480,12 +517,13 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 	else emit sigTakeoffFinished(false);
 }
 
-void DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upload)
+QString DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upload)
 {
 	_MessageListClear
 	//MAP用于统一发送航点信息到三维
 	QMap<QString, QVector<NavWayPointData>> map;
 	qDebug() << "准备生成舞步信息";
+	QString qstrErrorNames;
 	for (int i = 0; i < ui.listWidget->count(); i++) {
 		QListWidgetItem* pItem = ui.listWidget->item(i);
 		if (!pItem) continue;
@@ -512,6 +550,7 @@ void DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upload
 		file.close();
 		if (arrData.isEmpty()) {
 			_ShowErrorMessage(name + tr("没有编写舞步"));
+			qstrErrorNames.append("," + pDevice->getName());
 			continue;
 		}
 		int index = arrData.indexOf("Fly_");
@@ -520,6 +559,7 @@ void DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upload
 			//PyImport_AppendInittab会全局添加到python内置表中，无法区分积木块与python编程调用库的区分，所以此处直接判断是否使用了积木块的接口
 			//判断是否使用积木块的python代码
 			_ShowErrorMessage(name + tr("python编程代码API使用错误"));
+			qstrErrorNames.append("," + pDevice->getName());
 			continue;
 		}
 		//执行python脚本之前初始参数，用于检查无人机编程参数
@@ -528,6 +568,7 @@ void DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upload
 		if (!pythonThread.compilePythonCode(arrData)) {
 			//生成舞步失败
 			_ShowErrorMessage(name + tr("解析舞步积木块失败"));
+			qstrErrorNames.append("," + pDevice->getName());
 			continue;
 		}
 		//TODO 等待python文件执行完成，此处需要优化，有可能造成死循环
@@ -537,18 +578,21 @@ void DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upload
 		int state = pythonThread.getLastState();
 		if (PythonSuccessful != state) {
 			_ShowErrorMessage(name + tr("舞步转换失败")+pythonThread.getErrorString(state));
+			qstrErrorNames.append("," + pDevice->getName());
 			continue;
 		}
 		QVector<NavWayPointData> data = pythonThread.getWaypointData();
 		//最少2条，第一条是设置的起始位置
 		if (data.count() <= 1) {
 			_ShowErrorMessage(name + tr("没有舞步信息"));
+			qstrErrorNames.append("," + pDevice->getName());
 			continue;
 		}
 		qDebug() << name << "航点数据" << data.count();
 		//TODO 判断最低起飞高度 暂定为0
 		if (0 > data.at(1).z) {
 			_ShowErrorMessage(name + tr("起飞高度太低"));
+			qstrErrorNames.append("," + pDevice->getName());
 			continue;
 		}
 		//保存航点数据到本地，便于查看
@@ -575,12 +619,16 @@ void DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upload
 		else {
 			//上传航点到飞控
 			int status = pDevice->DeviceMavWaypointStart(data);
-			if (_DeviceStatus::DeviceDataSucceed != status) _ShowErrorMessage(name + Utility::waypointMessgeFromStatus(_DeviceWaypoint, status));
+			if (_DeviceStatus::DeviceDataSucceed != status) {
+				qstrErrorNames.append("," + pDevice->getName());
+				_ShowErrorMessage(name + Utility::waypointMessgeFromStatus(_DeviceWaypoint, status));
+			}
 		}
 		map.insert(name, data);
 	}
 	//发送航点到三维
 	sendWaypointTo3D(map);
+	return qstrErrorNames;
 }
 
 void DeviceManage::setUpdateWaypointTime(int second)
