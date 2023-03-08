@@ -738,7 +738,7 @@ void UAVManage::onDeviceAdd(QString name, QString ip, float x, float y)
     <next>\
       <block type=\"Fly_TimeGroup\" id=\"W5WBWFi9LI[Xy{I/4OG3\">\
         <field name=\"minute\">0</field>\
-        <field name=\"second\">1</field>\
+        <field name=\"second\">2</field>\
         <next>\
           <block type=\"Fly_Land\" id=\"4X4;~Xwrm@Qa53W;3T2.\"></block>\
         </next>\

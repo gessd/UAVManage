@@ -210,7 +210,7 @@ Blockly.Blocks['Fly_SetSpeed'] = {
     init: function() {
         this.appendDummyInput()
             .appendField("速度")
-            .appendField(new Blockly.FieldNumber(60, 1, 500, 1), "speed")
+            .appendField(new Blockly.FieldNumber(60, 1, 100, 1), "speed")
             .appendField("cm/s")
         this.setPreviousStatement(true, ["action", "notReachAction", "ReachAction"]);
         this.setNextStatement(true, ["action", "notReachAction", "ReachAction"]);
