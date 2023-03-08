@@ -315,7 +315,7 @@ QString DeviceManage::getNewDefaultName()
 QPoint DeviceManage::getNewDevicePoint()
 {
 	long maxx = 100;
-	long maxy = 100;
+	long maxy = 0;
 	for (int i = 0; i < ui.listWidget->count(); i++) {
 		QListWidgetItem* pItem = ui.listWidget->item(i);
 		if (!pItem) continue;
@@ -325,9 +325,12 @@ QPoint DeviceManage::getNewDevicePoint()
 		if (!pDevice) continue;
 		maxx = qMax(maxx, pDevice->getX());
 		maxy = qMax(maxy, pDevice->getY());
+		if (maxx >= pDevice->getX()) {
+			maxy = pDevice->getY();
+		}
 	}
-	//设备间隔50厘米
-	//以Y轴方向顺序排放
+	//设备间隔100厘米
+	//以水平Y轴方向顺序排放
 	int x = maxx;
 	int y = maxy + 100;
 	if (y > (m_pointSpace.y()-100)) {
