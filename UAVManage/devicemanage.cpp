@@ -371,6 +371,24 @@ QString DeviceManage::isRepetitionDevice(QString qstrName, QString ip, long x, l
 void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 {
 	if (_DeviceTakeoffLocal == comand) {
+		//起飞前判断所有设备连接正常
+		QString qstrNames;
+		for (int i = 0; i < ui.listWidget->count(); i++) {
+			QListWidgetItem* pItem = ui.listWidget->item(i);
+			if (!pItem) continue;
+			QWidget* pWidget = ui.listWidget->itemWidget(pItem);
+			if (!pWidget) continue;
+			DeviceControl* pDevice = dynamic_cast<DeviceControl*>(pWidget);
+			if (!pDevice) continue;
+			if (pDevice->isConnectDevice()) continue;
+			qstrNames.append(", " + pDevice->getName());
+		}
+		if (false == qstrNames.isEmpty()) {
+			QString error = tr("无法起飞，部分设备未连接") + qstrNames;
+			_ShowErrorMessage(error);
+			QMessageBox::warning(this, tr("警告"), error);
+			return;
+		}
 		//起飞前增加倒计时
 		QLabel label(dynamic_cast<QWidget*>(parent()));
 		//设置窗体的背景色,这里的百分比就是透明度
