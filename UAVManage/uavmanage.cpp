@@ -390,17 +390,17 @@ void UAVManage::onOpenProject(QString qstrFile)
 	tinyxml2::XMLDocument doc;
 	tinyxml2::XMLError error = doc.LoadFile(filename.c_str());
 	if (error != tinyxml2::XMLError::XML_SUCCESS) {
-		_ShowErrorMessage(tr("打开工程文件失败"));
+		_ShowErrorMessage(tr("打开工程文件失败，不是有效工程文件"));
 		return;
 	}
 	tinyxml2::XMLElement* root = doc.RootElement();
 	if (!root) {
-		_ShowErrorMessage(tr("读取工程文件失败"));
+		_ShowErrorMessage(tr("读取工程文件失败，工程文件不完整"));
 		return;
 	}
 	tinyxml2::XMLElement* place = root->FirstChildElement(_ElementPlace_);
 	if (!place) {
-		_ShowErrorMessage(tr("工程文件损坏,无法读取"));
+		_ShowErrorMessage(tr("无法打开，缺少关键数据"));
 		return;
 	}
 	//读取场地大小
