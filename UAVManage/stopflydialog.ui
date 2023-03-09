@@ -6,13 +6,13 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>200</width>
+    <width>400</width>
     <height>200</height>
    </rect>
   </property>
   <property name="maximumSize">
    <size>
-    <width>200</width>
+    <width>400</width>
     <height>200</height>
    </size>
   </property>
@@ -20,7 +20,11 @@
    <string>紧急停止</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">background-color: rgba(0, 0, 0, 80%);</string>
+   <string notr="true">QToolButton{
+color:red;
+border-radius:0px;
+font-size:24px;
+}</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <property name="leftMargin">
@@ -46,10 +50,11 @@
        <height>200</height>
       </size>
      </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
      <property name="styleSheet">
-      <string notr="true">color:red;
-border-radius:0px;
-font-size:24px;</string>
+      <string notr="true"/>
      </property>
      <property name="text">
       <string>紧急停止</string>
@@ -69,9 +74,42 @@ font-size:24px;</string>
      </property>
     </widget>
    </item>
+   <item row="0" column="1">
+    <widget class="QToolButton" name="btnFlyLandCont">
+     <property name="minimumSize">
+      <size>
+       <width>200</width>
+       <height>200</height>
+      </size>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="text">
+      <string>降落</string>
+     </property>
+     <property name="icon">
+      <iconset resource="uavmanage.qrc">
+       <normaloff>:/res/images/flyland.png</normaloff>:/res/images/flyland.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>140</width>
+       <height>140</height>
+      </size>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonTextUnderIcon</enum>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <tabstops>
+  <tabstop>btnStopFly</tabstop>
+  <tabstop>btnFlyLandCont</tabstop>
+ </tabstops>
  <resources>
   <include location="uavmanage.qrc"/>
  </resources>

@@ -1,10 +1,17 @@
 #include "stopflydialog.h"
+#include <QDebug>
 
 StopFlyDialog::StopFlyDialog(QWidget *parent) : QDialog(parent)
 	//: QDialog(parent, Qt::Dialog | Qt::FramelessWindowHint)
 {
 	ui.setupUi(this);
 	m_pLabelBackground = nullptr;
+	//setAutoFillBackground(true);
+	//QPalette pal = palette();
+	//pal.setColor(QPalette::Background, Qt::transparent);
+	//setPalette(pal);
+	//setWindowOpacity(1);
+	//setAttribute(Qt::WA_TranslucentBackground, true);
 }
 
 StopFlyDialog::~StopFlyDialog()
@@ -17,7 +24,12 @@ StopFlyDialog::~StopFlyDialog()
 
 void StopFlyDialog::on_btnStopFly_clicked()
 {
-	emit sigFlyControl();
+	emit sigFlyControl(true);
+}
+
+void StopFlyDialog::on_btnFlyLandCont_clicked()
+{
+	emit sigFlyControl(false);
 }
 
 void StopFlyDialog::showEvent(QShowEvent* event)

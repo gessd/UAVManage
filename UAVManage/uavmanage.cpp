@@ -285,8 +285,9 @@ void UAVManage::initMenu()
 	
 	m_pStopDialog = new StopFlyDialog(this);
 	m_pStopDialog->close();
-	connect(m_pStopDialog, &StopFlyDialog::sigFlyControl, [this]() {
-		m_pDeviceManage->allDeviceControl(_DeviceQuickStop);
+	connect(m_pStopDialog, &StopFlyDialog::sigFlyControl, [this](bool stop) {
+		if (stop)m_pDeviceManage->allDeviceControl(_DeviceQuickStop);
+		else m_pDeviceManage->allDeviceControl(_DeviceLandLocal);
 		});
 }
 
@@ -909,6 +910,7 @@ void UAVManage::onDeviceTakeoffFinished(bool takeoff)
 {
 	if (takeoff) {
 		m_pSoundWidget->startPlayMusic();
+		//TODO 定时查询飞机状态，如果都飞完则关闭此窗口，同时关闭音乐
 		m_pStopDialog->exec();
 	}
 	else {

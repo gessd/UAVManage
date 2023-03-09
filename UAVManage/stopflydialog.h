@@ -13,11 +13,12 @@ public:
 	~StopFlyDialog();
 private slots:
 	void on_btnStopFly_clicked();
+	void on_btnFlyLandCont_clicked();
 protected:
 	void showEvent(QShowEvent* event);
 	void hideEvent(QHideEvent* event);
 signals:
-	void sigFlyControl();
+	void sigFlyControl(bool stop);
 private:
 	Ui::StopFlyDialog ui;
 	QLabel* m_pLabelBackground;
