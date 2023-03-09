@@ -120,6 +120,7 @@
     <ClCompile Include="qxtglobalshortcut5\gui\qxtwindowsystem.cpp" />
     <ClCompile Include="qxtglobalshortcut5\gui\qxtwindowsystem_win.cpp" />
     <ClCompile Include="registerdialog.cpp" />
+    <ClCompile Include="stopflydialog.cpp" />
     <ClCompile Include="waitingwidget.cpp" />
     <QtRcc Include="uavmanage.qrc" />
     <QtUic Include="aboutdialog.ui" />
@@ -136,6 +137,7 @@
     <QtUic Include="registerdialog.ui" />
     <QtUic Include="SoundGrade.ui" />
     <QtUic Include="spaceparam.ui" />
+    <QtUic Include="stopflydialog.ui" />
     <QtUic Include="uavmanage.ui" />
     <QtMoc Include="uavmanage.h" />
     <ClCompile Include="aboutdialog.cpp" />
@@ -212,6 +214,7 @@
     <QtMoc Include="registerdialog.h" />
     <ClInclude Include="serial\qextserialenumerator_p.h" />
     <ClInclude Include="serial\qextserialport_global.h" />
+    <QtMoc Include="stopflydialog.h" />
     <ClInclude Include="tinyxml2\tinyxml2.h" />
     <QtMoc Include="resendmessage.h" />
   </ItemGroup>

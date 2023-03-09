@@ -23,6 +23,7 @@
 #include "qxtglobalshortcut.h"
 #include "historymessage.h"
 #include "registerdialog.h"
+#include "stopflydialog.h"
 
 UAVManage::UAVManage(QWidget* parent)
 	: QMainWindow(parent)
@@ -105,6 +106,7 @@ void UAVManage::initMenu()
 {
 	static bool bInit = false;
 	if (bInit) return;
+	bInit = true;
 	//添加菜单
 	ui.menuBar->setMinimumHeight(30);
 	QWidget* pMenuWidget = new QWidget(ui.menuBar);
@@ -280,6 +282,12 @@ void UAVManage::initMenu()
 		m_pDeviceManage->allDeviceControl(_DeviceSetout);
 		});
 	pMenuLayout->addItem(new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum));
+	
+	m_pStopDialog = new StopFlyDialog(this);
+	m_pStopDialog->close();
+	connect(m_pStopDialog, &StopFlyDialog::sigFlyControl, [this]() {
+		m_pDeviceManage->allDeviceControl(_DeviceQuickStop);
+		});
 }
 
 void UAVManage::updateStyle()
@@ -899,8 +907,14 @@ void UAVManage::onDeviceResetLocation(QString name, long x, long y)
 
 void UAVManage::onDeviceTakeoffFinished(bool takeoff)
 {
-	if(takeoff) m_pSoundWidget->startPlayMusic();
-	else m_pSoundWidget->stopPlayMusic();
+	if (takeoff) {
+		m_pSoundWidget->startPlayMusic();
+		m_pStopDialog->exec();
+	}
+	else {
+		m_pStopDialog->close();
+		m_pSoundWidget->stopPlayMusic();
+	}
 }
 
 void UAVManage::onAppMessage(const QString& message)
@@ -963,6 +977,7 @@ void UAVManage::onCurrentPlayeState(qint8 state)
 {
 	//播放状态 1:开始 2 : 暂停 3 : 结束
 	m_pDeviceManage->setCurrentPlayeState(state);
+	if (3 == state) m_pStopDialog->close();
 }
 
 void UAVManage::on3DDialogStauts(bool connect)

@@ -12,6 +12,7 @@
 #include "messagelistdialog.h"
 #include "aboutdialog.h"
 
+class StopFlyDialog;
 class HistoryMessage;
 class WaitingWidget;
 class SoundGrade;
@@ -185,4 +186,6 @@ private:
     HistoryMessage* m_pHistory;
     //软件授权窗口
     RegisterDialog* m_pRegister;
+    //紧急停止背景
+    StopFlyDialog* m_pStopDialog;
 };
