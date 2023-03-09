@@ -253,5 +253,4 @@ private:
 	//音乐文件及波形图形
 	QString m_qstrMusicFile;
 	QPixmap m_pixmapMusic;
-	//已上传航点设备列表
 };

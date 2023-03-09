@@ -244,11 +244,11 @@ void UAVManage::initMenu()
 		if (m_qstrCurrentProjectFile.isEmpty()) return;
 		PlaceInfoDialog info(m_pDeviceManage->getSpaceSize(), this);
 		info.exec();
-		//不允许更新场地大小
-		return;
 		if (false == info.isValidStation()) return;
 		QMap<QString, QPoint> map = info.getStationAddress();
 		m_pDeviceManage->setStationAddress(map);
+		//不允许更新场地大小
+		return;
 		//根据基站判断场地大小，修改场地范围
 		QStringList keys = map.keys();
 		int xmax = 0;

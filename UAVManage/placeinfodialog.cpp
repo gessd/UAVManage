@@ -286,14 +286,14 @@ void PlaceInfoDialog::onParseSettingFrame(QByteArray arrNLINKData)
 			}
 			//判断场地是否太小或太大
 			if (xmax > 100 || ymax > 100) {
-				QMessageBox::warning(this, tr("提示"), tr("基站范围距离太远"));
+				QMessageBox::warning(this, tr("提示"), tr("基站范围距离太远，请检查后重新标定"));
 				return;
 			}
-			if (xmax < 2 || ymax < 2) {
-				QMessageBox::warning(this, tr("提示"), tr("基站范围距离太近"));
+			if (xmax < 5 || ymax < 5) {
+				QMessageBox::warning(this, tr("提示"), tr("基站范围距离太近，请检查后重新标定"));
 				return;
 			}
-			ui.labelStationSpace->setText(QString("基站范围:%1 X %2米").arg(xmax).arg(ymax));
+			ui.labelStationSpace->setText(QString("基站范围:%1米 X %2米").arg(xmax).arg(ymax));
 			onComparePlace(QPoint(xmax * 100, ymax * 100));
 			m_stationStatus = 1;
 			return;
@@ -309,13 +309,6 @@ void PlaceInfoDialog::onComparePlace(QPoint point)
 	if (0 == point.x() || 0 == point.y()) return;
 	if (m_pointPlace == point) return;
 	m_stationStatus = 0;
-	//TODO 场地大小只有初始时设置，防止场地不规则
-	//QMessageBox::StandardButton button = QMessageBox::question(this, tr("询问"), tr("基站范围与项目配置场地大小不一致，是否更新项目配置场地大小？"));
-	//if (button != QMessageBox::StandardButton::Yes) {
-	//	m_stationStatus = 0;
-	//	return;
-	//}
-	//m_stationStatus = 1;
 }
 
 SerialWorker::SerialWorker(QSerialPort* ser, QObject* parent /*= nullptr*/)

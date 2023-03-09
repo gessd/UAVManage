@@ -378,8 +378,8 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 		//设备连接状态
 		//设备电量
 		//舞步已上传
-		//基站电量
 		//基站校准
+		//基站电量
 		//无人机是否在初始位置附近
 		//起飞时_DeviceTakeoffLocal检查已经准备起飞
 		//TODO 需要考虑已上传舞步后又重新编辑舞步处理方式
@@ -405,16 +405,20 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 				_ShowErrorMessage(name + tr("设备电量过低无法起飞"));
 				continue;
 			}
+			if (0 == m_stationMap.count()) {
+				_ShowErrorMessage(name + tr("基站未成功标定无法起飞"));
+				continue;
+			}
 			if (false == pDevice->isUploadWaypoint()) {
 				_ShowErrorMessage(name + tr("设备未上传舞步无法起飞"));
 				continue;
 			}
-			if (qAbs(pDevice->getX() - pDevice->getCurrentStatus().x) > 100) {
-				_ShowErrorMessage(name + tr("设备X轴方向当前位置距离初始位置超过1米"));
+			if (qAbs(pDevice->getX() - pDevice->getCurrentStatus().x) > 50) {
+				_ShowErrorMessage(name + tr("设备X轴方向距离初始位置超过50厘米"));
 				continue;
 			}
-			if (qAbs(pDevice->getY() - pDevice->getCurrentStatus().y) > 100) {
-				_ShowErrorMessage(name + tr("设备Y轴方向当前位置距离初始位置超过1米"));
+			if (qAbs(pDevice->getY() - pDevice->getCurrentStatus().y) > 50) {
+				_ShowErrorMessage(name + tr("设备Y轴方向距离初始位置超过50厘米"));
 				continue;
 			}
 			if (_DeviceTakeoffLocal == comand && false == pDevice->isPrepareTakeoff()) {
@@ -853,46 +857,7 @@ void DeviceManage::on3dNewConnection()
 		if (m_timerUpdateStatus.isActive()) m_timerUpdateStatus.stop();
 		if (m_timerMessage3D.isActive()) m_timerMessage3D.stop();
 		});
-	
-	////发送无人机设备列表
-	//QJsonObject obj3dmsg;
-	//obj3dmsg.insert(_Ver_, _VerNum_);
-	//obj3dmsg.insert(_Tag_, _TabName_);
-	//obj3dmsg.insert(_ID_, _3dDeviceInit);
-	//obj3dmsg.insert(_Time_, QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"));
-	//obj3dmsg.insert("x", getSpaceSize().x());
-	//obj3dmsg.insert("y", getSpaceSize().y());
-	////无人机初始位置
-	//QJsonArray jsonArr;
-	//for (int i = 0; i < ui.listWidget->count(); i++) {
-	//	QListWidgetItem* pItem = ui.listWidget->item(i);
-	//	if (!pItem) continue;
-	//	QWidget* pWidget = ui.listWidget->itemWidget(pItem);
-	//	if (!pWidget) continue;
-	//	DeviceControl* pDevice = dynamic_cast<DeviceControl*>(pWidget);
-	//	if (!pDevice) continue;
-	//	QJsonObject device;
-	//	device.insert("name", pDevice->getName());
-	//	device.insert("x", pDevice->getX());
-	//	device.insert("y", pDevice->getY());
-	//	jsonArr.append(device);
-	//}
-	//obj3dmsg.insert(_Data_, jsonArr);
-	////基站坐标
-	//QJsonArray arrStation;
-	//QStringList keys = m_stationMap.keys();
-	//foreach(QString name, keys) {
-	//	QJsonObject obj;
-	//	obj.insert("name", name);
-	//	obj.insert("x", m_stationMap.value(name).x());
-	//	obj.insert("y", m_stationMap.value(name).y());
-	//	arrStation.append(obj);
-	//}
-	//obj3dmsg.insert("station", arrStation);
-	//sendMessageTo3D(obj3dmsg);
 	emit sig3DDialogStatus(true);
-	//实时状态定时放到最后，必须在发送设备列表之后才能发送实时位置数据
-	//if (!m_timerUpdateStatus.isActive()) m_timerUpdateStatus.start(1000);
 }
 
 void DeviceManage::onTimeout3DMessage()

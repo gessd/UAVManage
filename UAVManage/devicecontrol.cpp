@@ -50,7 +50,7 @@ DeviceControl::DeviceControl(QString name, float x, float y, QString ip, QWidget
 		//手动点亮无人机灯光
 		int res = Fun_MAV_LED_MODE();
 		if (_DeviceStatus::DeviceDataSucceed != res) {
-			_ShowErrorMessage(tr("控制LED出错:") + Utility::waypointMessgeFromStatus(_DeviceLed, res));
+			_ShowErrorMessage(tr("灯光控制出错:") + Utility::waypointMessgeFromStatus(_DeviceLed, res));
 		}
 		});
 	connect(ui.btnStop, &QToolButton::clicked, [this]() {
