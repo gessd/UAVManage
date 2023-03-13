@@ -284,6 +284,7 @@ void PlaceInfoDialog::onParseSettingFrame(QByteArray arrNLINKData)
 					if (0 == column) ymax = qMax(ymax, value);
 				}
 			}
+			ui.labelStationSpace->setText(QString("基站范围:%1米 X %2米").arg(xmax).arg(ymax));
 			//判断场地是否太小或太大
 			if (xmax > 100 || ymax > 100) {
 				QMessageBox::warning(this, tr("提示"), tr("基站范围距离太远，请检查后重新标定"));
@@ -293,7 +294,14 @@ void PlaceInfoDialog::onParseSettingFrame(QByteArray arrNLINKData)
 				QMessageBox::warning(this, tr("提示"), tr("基站范围距离太近，请检查后重新标定"));
 				return;
 			}
-			ui.labelStationSpace->setText(QString("基站范围:%1米 X %2米").arg(xmax).arg(ymax));
+			if (xmax < m_pointPlace.x()) {
+				QMessageBox::warning(this, tr("提示"), tr("X轴方向比项目设定场地小"));
+				return;
+			}
+			if (ymax < m_pointPlace.y()) {
+				QMessageBox::warning(this, tr("提示"), tr("Y轴方向比项目设定场地小"));
+				return;
+			}
 			onComparePlace(QPoint(xmax * 100, ymax * 100));
 			m_stationStatus = 1;
 			return;
