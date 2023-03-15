@@ -64,10 +64,10 @@ void QWChartView::initSeries()
 
     QPen    pen;
     pen.setStyle(Qt::SolidLine);//Qt::SolidLine, Qt::DashLine, Qt::DotLine, Qt::DashDotLine
-    pen.setColor(Qt::green);
+    pen.setColor("#A9E2FC");
     pen.setWidth(1);
     m_series1->setPen(pen);
-    pen.setColor("#7DFF7B");
+    pen.setColor("#12B3F6");
     m_series2->setPen(pen);
     pen.setColor(Qt::blue);
 	pen.setWidth(2);
