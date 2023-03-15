@@ -23,10 +23,16 @@ public:
 	 */
 	static PyObject* FlySetSpeed(PyObject* self, PyObject* args);
 	/**
-	 * @brief 设置LED
+	 * @brief 设置LED模式
 	 * @param int 模式
 	 */
-	static PyObject* FlySetLed(PyObject* self, PyObject* args);
+	static PyObject* FlySetLedMode(PyObject* self, PyObject* args);
+
+	/**
+	 * @brief 设置LED颜色
+	 * @param string 颜色十六进制值(#FFFFFF)
+	 */
+	static PyObject* FlySetLedColor(PyObject* self, PyObject* args);
 	/**
 	 * @brief 悬停
 	 * @param int 时间 s

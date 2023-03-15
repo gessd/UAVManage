@@ -74,7 +74,7 @@ Blockly.Blocks['Fly_TimeGroup'] = {
             .appendField("开始时间 第")
             .appendField(new Blockly.FieldNumber(0, 0, 100, 1), "minute")
             .appendField("分")
-            .appendField(new Blockly.FieldNumber(1, 0, 59, 1), "second")
+            .appendField(new Blockly.FieldNumber(2, 0, 59, 1), "second")
             .appendField("秒")
         this.appendStatementInput("interiorfunction").setCheck(null);
         this.setPreviousStatement(true, "time");
@@ -321,10 +321,10 @@ Blockly.Python['Fly_Move'] = function(block) {
     return 'Fly_Move('+d+','+s+')\n';
 };
 
-Blockly.Blocks['Fly_SetLed'] = {
+Blockly.Blocks['Fly_SetLedMode'] = {
     init: function() {
         this.appendDummyInput()
-            .appendField("设置LED灯为")
+            .appendField("设置LED灯闪烁模式为")
 			.appendField(new Blockly.FieldDropdown([
 				["模式1", "1"],
 				["模式2", "2"],
@@ -343,8 +343,28 @@ Blockly.Blocks['Fly_SetLed'] = {
     }
 };
 
-Blockly.Python['Fly_SetLed'] = function(block) {
+Blockly.Python['Fly_SetLedMode'] = function(block) {
     addHead();
     var m = block.getFieldValue('mode');
-    return 'Fly_SetLed('+m+')\n';
+    return 'Fly_SetLedMode('+m+')\n';
+};
+
+Blockly.Blocks['Fly_SetLedColor'] = {
+    init: function() {
+        this.appendDummyInput()
+        .appendField("设置LED灯颜色")
+        .appendField(new Blockly.FieldColour("#0000FF"), "color");	
+        this.setPreviousStatement(true,["action", "notReachAction", "ReachAction"]);
+        this.setNextStatement(true,["action", "notReachAction", "ReachAction"]);
+        this.setColour('#3B8CFF');
+        this.setTooltip('选择预定义的颜色');
+        this.setHelpUrl('');
+        this.setInputsInline(true);
+      }
+};
+
+Blockly.Python['Fly_SetLedColor'] = function(block) {
+    addHead();
+    var color = block.getFieldValue('color');
+    return "Fly_SetLedColor('"+color+"')\n";
 };

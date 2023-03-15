@@ -117,7 +117,8 @@ PyMethodDef xWrapMethods[] = {
 	//手动编写python使用接口
 	{"FlyAddMarkPoint", QZAPI::FlyAddMarkPoint,		METH_VARARGS, "FlyAddMarkPoint"},
 	{"FlySetSpeed",		QZAPI::FlySetSpeed,			METH_VARARGS, "FlySetSpeed"},
-	{"FlySetLed",		QZAPI::FlySetLed,			METH_VARARGS, "FlySetLed"},
+	{"FlySetLedMode",	QZAPI::FlySetLedMode,		METH_VARARGS, "FlySetLedMode"},
+	{"FlySetLedColor",	QZAPI::FlySetLedColor,		METH_VARARGS, "FlySetLedColor"},
 	{"FlyHover",		QZAPI::FlyHover,			METH_VARARGS, "FlyHover"},
 	{"FlyTakeoff",		QZAPI::FlyTakeoff,			METH_VARARGS, "FlyTakeoff"},
 	{"FlyLand",			QZAPI::FlyLand,				METH_VARARGS, "FlyLand"},
@@ -129,7 +130,8 @@ PyMethodDef xWrapMethods[] = {
 	//blockly积木块转换python接口
 	{"Fly_AddMarkPoint",QZAPI::FlyAddMarkPoint,		METH_VARARGS, "FlyAddMarkPoint"},
 	{"Fly_SetSpeed",	QZAPI::FlySetSpeed,			METH_VARARGS, "FlySetSpeed"},
-	{"Fly_SetLed",		QZAPI::FlySetLed,			METH_VARARGS, "FlySetLed"},
+	{"Fly_SetLedMode",	QZAPI::FlySetLedMode,		METH_VARARGS, "FlySetLedMode"},
+	{"Fly_SetLedColor",	QZAPI::FlySetLedColor,		METH_VARARGS, "FlySetLedColor"},
 	{"Fly_Hover",		QZAPI::FlyHover,			METH_VARARGS, "FlyHover"},
 	{"Fly_Takeoff",		QZAPI::FlyTakeoff,			METH_VARARGS, "FlyTakeoff"},
 	{"Fly_Land",		QZAPI::FlyLand,				METH_VARARGS, "FlyLand"},
@@ -203,7 +205,7 @@ PyObject* QZAPI::FlySetSpeed(PyObject* self, PyObject* args)
 	return QZAPI::Instance()->examineWaypoint();
 }
 
-PyObject* QZAPI::FlySetLed(PyObject* self, PyObject* args)
+PyObject* QZAPI::FlySetLedMode(PyObject* self, PyObject* args)
 {
 	int n = 0;
 	if (!PyArg_ParseTuple(args, "i", &n)) {
@@ -219,6 +221,22 @@ PyObject* QZAPI::FlySetLed(PyObject* self, PyObject* args)
 	data.param1 = n;
 	data.commandID = _WaypointLed;
 	g_waypointData.append(data);
+	return QZAPI::Instance()->examineWaypoint();
+}
+
+PyObject* QZAPI::FlySetLedColor(PyObject* self, PyObject* args)
+{
+	char* color = NULL;
+	if (!PyArg_ParseTuple(args, "s", &color)) {
+		QZAPI::Instance()->showWaypointError(tr("LED颜色值设置有错误"));
+		return nullptr;
+	}
+	if (NULL == color) {
+		QZAPI::Instance()->showWaypointError(tr("LED颜色值无法使用"));
+		return nullptr;
+	}
+	qDebug() << "设置LED灯颜色" << color;
+	//TODO 暂时未定义LED灯颜色使用方式
 	return QZAPI::Instance()->examineWaypoint();
 }
 
