@@ -1,11 +1,16 @@
 QWidget{
 	color:#000000;
-	background:#C2DDF0;
 	font-size:16px;
 	font-family:"微软雅黑";
 }
 QWidget:disabled{
 	color:#666666;
+}
+QDialog{
+	background:#FFFFFF;
+}
+#centralWidget{
+	background:#C2DDF0;
 }
 /*通用按钮样式*/
 QPushButton,QToolButton{
@@ -93,7 +98,6 @@ QTableWidget QLineEdit{
 	padding-left:0px;
 	border-radius:0px;
 	color:#000000;
-	background:#C2DDF0;
 }
 QTableWidget{
 	background:transparent;
@@ -103,7 +107,6 @@ QTableWidget::item:selected{
 	color:#000000;
 }
 QHeaderView::section{
-	background:#C2DDF0;
 	text-align:center;
 	margin:0px;
 }
