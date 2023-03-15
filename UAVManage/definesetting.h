@@ -1,14 +1,14 @@
 #pragma once
 #include <QDir>
 //程序版本号
-#define _MajorNumber_ 2
-#define _MinorNumber_ 2
+#define _MajorNumber_ 1
+#define _MinorNumber_ 0
 #define _BuildNumber_ 2
 //新程序下载存放文件夹
 #define _NewVersionPath_	"/update"
 #define _VersionFile_		"version.ini"
 //服务器地址
-#define _ServerUrl_ "http://39.96.33.244/image/"
+#define _ServerUrl_ "http://192.168.40.222:16868/"
 
 //blockly交互端口
 #define _WebSocketPort_ 25252

@@ -53,13 +53,13 @@ void AboutDialog::onCheckNewVersion()
 		qDebug() << "正在更新中";
 		return;
 	}
-	ui.stackedWidget->setCurrentIndex(1);
 	QString qstrSavePath = QApplication::applicationDirPath() + _NewVersionPath_;
 	QString qstrUrl = QString("%1/%2").arg(_ServerUrl_).arg(_VersionFile_);
 	DownloadTool* download = new DownloadTool(qstrUrl, qstrSavePath);
 	download->startDownload();
 	connect(download, &DownloadTool::sigDownloadFinished, [this](QString error) {
 		if (error.isEmpty()) {
+			ui.stackedWidget->setCurrentIndex(1);
 			//解析升级配置文件，读取最新版本号
 			QString config = QString("%1%2/%3").arg(QApplication::applicationDirPath()).arg(_NewVersionPath_).arg(_VersionFile_);
 			QString qstrNewVersionNumber = ParamReadWrite::readParam("version", AppVersion(), _Root_, config).toString();
