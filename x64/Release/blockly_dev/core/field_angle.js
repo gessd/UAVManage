@@ -375,7 +375,7 @@ Blockly.FieldAngle.prototype.onMouseMove_ = function(e) {
     return;
   }
   angle = Blockly.utils.math.toDegrees(angle);
-  // 0: East, 90: North, 180: West, 270: South.
+  //0: East, 90: North, 180: West, 270: South.
   if (dx < 0) {
     angle += 180;
   } else if (dy > 0) {
@@ -502,12 +502,17 @@ Blockly.FieldAngle.prototype.doClassValidation_ = function(opt_newValue) {
  * @private
  */
 Blockly.FieldAngle.prototype.wrapValue_ = function(value) {
+  var original = value;
   value %= 360;
   if (value < 0) {
     value += 360;
   }
   if (value > this.wrap_) {
     value -= 360;
+  }
+  //允许使用360
+  if(original >= 360 && value == 0){
+    return 360;
   }
   return value;
 };

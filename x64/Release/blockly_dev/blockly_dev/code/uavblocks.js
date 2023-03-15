@@ -54,7 +54,7 @@ Blockly.Blocks['Fly_Takeoff'] = {
         this.appendDummyInput()
             .appendField("起飞至")
             .appendField(new Blockly.FieldNumber(100, 100, 100, 1), "height")
-            .appendField("cm");
+            .appendField("厘米");
         this.setNextStatement(true, ["time"]);
         this.setColour('#FF6680');
         this.setTooltip('值必须为100');
@@ -127,17 +127,17 @@ Blockly.Blocks['Fly_AddMarkPoint'] = {
             .appendField(field, "name")
             .appendField(" X")
             .appendField(new Blockly.FieldNumber(100, 100, getMaxX(), 1), "coordinateX")
-            .appendField("cm")
+            .appendField("厘米")
             .appendField("Y")
             .appendField(new Blockly.FieldNumber(100, 100, getMaxY(), 1), "coordinateY")
-            .appendField("cm")
+            .appendField("厘米")
             .appendField("Z")
             .appendField(new Blockly.FieldNumber(100, 100, getMaxZ(), 1), "coordinateZ")
-            .appendField("cm");
+            .appendField("厘米");
         this.setInputsInline(true);
         this.setPreviousStatement(true, ["action", "notReachAction", "ReachAction"]);
         this.setNextStatement(true, ["action", "notReachAction", "ReachAction", "time"]);
-        this.setColour('#008080');
+        this.setColour('#3B8CFF');
         this.setTooltip('标定点名称不可以重复,最长10个字符');
     }
 };
@@ -184,13 +184,13 @@ Blockly.Blocks['Fly_To'] = {
             .appendField("飞行到")
             .appendField(" X")
             .appendField(new Blockly.FieldNumber(100, 100, getMaxX(), 1), "coordinateX")
-            .appendField("cm")
+            .appendField("厘米")
             .appendField("Y")
             .appendField(new Blockly.FieldNumber(100, 100, getMaxY(), 1), "coordinateY")
-            .appendField("cm")
+            .appendField("厘米")
             .appendField("Z")
             .appendField(new Blockly.FieldNumber(100, 100, getMaxZ(), 1), "coordinateZ")
-            .appendField("cm");
+            .appendField("厘米");
         this.setPreviousStatement(true, ["action", "notReachAction", "ReachAction"]);
         this.setNextStatement(true, ["action", "notReachAction", "ReachAction"]);
         this.setColour('#3B8CFF');
@@ -211,9 +211,9 @@ Blockly.Python['Fly_To'] = function(block) {
 Blockly.Blocks['Fly_SetSpeed'] = {
     init: function() {
         this.appendDummyInput()
-            .appendField("速度")
+            .appendField("飞行速度每秒")
             .appendField(new Blockly.FieldNumber(60, 10, 100, 1), "speed")
-            .appendField("cm/s")
+            .appendField("厘米")
         this.setPreviousStatement(true, ["action", "notReachAction", "ReachAction"]);
         this.setNextStatement(true, ["action", "notReachAction", "ReachAction"]);
         this.setColour('#3B8CFF');
@@ -304,7 +304,7 @@ Blockly.Blocks['Fly_Move'] = {
              ]), "direction")
              .appendField("飞")
              .appendField(new Blockly.FieldNumber(100, 10, getMaxX(), 1), "distance")
-             .appendField("cm")
+             .appendField("厘米")
         this.setPreviousStatement(true,["action", "notReachAction", "ReachAction"]);
         this.setNextStatement(true,["action", "notReachAction", "ReachAction"]);
         this.setColour('#3B8CFF');
