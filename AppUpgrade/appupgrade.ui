@@ -64,6 +64,9 @@ QLabel{background:transparent;color:rgb(61,213,219);}</string>
       <pointsize>20</pointsize>
      </font>
     </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(255, 255, 255);</string>
+    </property>
     <property name="text">
      <string>程序正在升级中请稍后</string>
     </property>
