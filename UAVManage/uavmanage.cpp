@@ -187,7 +187,8 @@ void UAVManage::initMenu()
 	m_pButtonFlyPrepare = initMenuButton(pMenuWidget, tr("起飞准备"), ":/res/menu/preparation.png", ":/res/menu/preparation.png", pMenuFlyPrepare);
 	m_pButtonFlyPrepare->setEnabled(false);
 	ui.toolBar->setEnabled(false);
-	pMenuLayout->addWidget(m_pButtonFlyPrepare);
+	m_pButtonFlyPrepare->close();
+	//pMenuLayout->addWidget(m_pButtonFlyPrepare);
 	QMenu* pActionHelp = new QMenu(tr("帮助"));
 	pActionHelp->setWindowFlags(pMenuFlyPrepare->windowFlags() | Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint);
 	pActionHelp->setAttribute(Qt::WA_TranslucentBackground);
