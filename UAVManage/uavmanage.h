@@ -12,6 +12,7 @@
 #include "messagelistdialog.h"
 #include "aboutdialog.h"
 
+class FirmwareDialog;
 class StopFlyDialog;
 class HistoryMessage;
 class WaitingWidget;

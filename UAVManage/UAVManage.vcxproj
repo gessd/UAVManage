@@ -112,6 +112,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="firmwaredialog.cpp" />
     <ClCompile Include="firstdialog.cpp" />
     <ClCompile Include="historymessage.cpp" />
     <ClCompile Include="qxtglobalshortcut5\core\qxtglobal.cpp" />
@@ -130,6 +131,7 @@
     <QtUic Include="devicedebug.ui" />
     <QtUic Include="devicemanage.ui" />
     <QtUic Include="deviceserial.ui" />
+    <QtUic Include="firmwaredialog.ui" />
     <QtUic Include="firstdialog.ui" />
     <QtUic Include="historymessage.ui" />
     <QtUic Include="messagelistdialog.ui" />
@@ -193,6 +195,7 @@
     <QtMoc Include="deviceserial.h" />
     <QtMoc Include="firstdialog.h" />
     <QtMoc Include="historymessage.h" />
+    <QtMoc Include="firmwaredialog.h" />
     <ClInclude Include="libhvsetting.h" />
     <ClInclude Include="mavlinksetting.h" />
     <QtMoc Include="threadpython.h" />

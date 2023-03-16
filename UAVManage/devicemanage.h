@@ -21,6 +21,7 @@
 #include <QJsonDocument>
 #include "definesetting.h"
 
+class FirmwareDialog;
 class DeviceSerial;
 class DeviceManage : public QWidget
 {
@@ -129,6 +130,11 @@ public:
 	 * @param 第N秒
 	 */
 	void updateMusicTime(unsigned int time);
+
+	/**
+	 * @brief 固件更新
+	 */
+	void showFirmwareDialog();
 signals:
 	/**
 	 * @brief 设备添加完成
@@ -253,4 +259,6 @@ private:
 	//音乐文件及波形图形
 	QString m_qstrMusicFile;
 	QPixmap m_pixmapMusic;
+	//固件更新窗口
+	FirmwareDialog* m_pFirmwareDialog;
 };

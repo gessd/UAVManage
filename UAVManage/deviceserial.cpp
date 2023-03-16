@@ -54,6 +54,9 @@ DeviceSerial::DeviceSerial(QWidget *parent)
 	connect(ui.btnUpdate, &QAbstractButton::clicked, this, &DeviceSerial::onBtnRead);
 	connect(ui.btnSerial, &QAbstractButton::clicked, this, &DeviceSerial::onBtnSerial);
 
+	connect(ui.btnCheckFirmware, &QAbstractButton::clicked, this, &DeviceSerial::onBtnCheckFirmware);
+	connect(ui.btnManualFirmware, &QAbstractButton::clicked, this, &DeviceSerial::onBtnManualFirmware);
+
 	ui.widgetDeviceParam->setEnabled(false);
 	//监控串口插拔
 	m_qextSerial.setUpNotifications();

@@ -157,6 +157,9 @@
     <ClCompile Include="stopflydialog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="firmwaredialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="devicemanage.h">
@@ -240,6 +243,9 @@
     <QtMoc Include="stopflydialog.h">
       <Filter>Header Files</Filter>
     </QtMoc>
+    <QtMoc Include="firmwaredialog.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="devicemanage.ui">
@@ -288,6 +294,9 @@
       <Filter>Form Files</Filter>
     </QtUic>
     <QtUic Include="stopflydialog.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="firmwaredialog.ui">
       <Filter>Form Files</Filter>
     </QtUic>
   </ItemGroup>

@@ -9,6 +9,7 @@
 #include "define3d.h"
 #include "calibrationdialog.h"
 #include "deviceserial.h"
+#include "firmwaredialog.h"
 
 #define _ItemHeight_ 70
 DeviceManage::DeviceManage(QWidget *parent)
@@ -17,6 +18,7 @@ DeviceManage::DeviceManage(QWidget *parent)
 	ui.setupUi(this);
 	m_pointSpace.setX(0);
 	m_pointSpace.setY(0);
+	m_pFirmwareDialog = nullptr;
 	m_p3dTcpSocket = nullptr;
 	m_p3dTcpServer = new QTcpServer(this);
 	m_p3dTcpServer->listen(QHostAddress::Any, _TcpPort_);
@@ -816,6 +818,15 @@ void DeviceManage::updateMusicTime(unsigned int time)
 		if (!pDevice) continue;
 		pDevice->setCurrentTime(time);
 	}
+}
+
+void DeviceManage::showFirmwareDialog()
+{
+	if (!m_pFirmwareDialog) {
+		m_pFirmwareDialog = new FirmwareDialog(this);
+	}
+	m_pFirmwareDialog->setDeviceNameList(getDeviceNameList());
+	m_pFirmwareDialog->exec();
 }
 
 bool DeviceManage::eventFilter(QObject* watched, QEvent* event)

@@ -24,6 +24,7 @@
 #include "historymessage.h"
 #include "registerdialog.h"
 #include "stopflydialog.h"
+#include "firmwaredialog.h"
 
 UAVManage::UAVManage(QWidget* parent)
 	: QMainWindow(parent)
@@ -70,6 +71,7 @@ UAVManage::UAVManage(QWidget* parent)
 	connect(m_pSoundWidget, &SoundGrade::sigMsuicTime, this, &UAVManage::onCurrentMusicTime);
 	connect(m_pSoundWidget, &SoundGrade::playeState, this, &UAVManage::onCurrentPlayeState);
 	connect(m_pSoundWidget, &SoundGrade::updateMusicWaveFinished, this, &UAVManage::onMusicWaveFinished);
+
 	initMenu();
 }
 
@@ -194,8 +196,13 @@ void UAVManage::initMenu()
 	pActionHelp->setAttribute(Qt::WA_TranslucentBackground);
 	QAction* pActionAbout = new QAction(QIcon(":/res/menu/P02_help_about_btn_new_ic.png"), tr("版本"));
 	pActionHelp->addAction(pActionAbout);
+	QAction* pActionFirmware = new QAction(QIcon(":/res/logo/qz_logo.ico"), tr("固件"));
+	pActionHelp->addAction(pActionFirmware);
 	pMenuLayout->addWidget(initMenuButton(pMenuWidget, tr("帮助"), ":/res/menu/P02_help_about_page_ic.png", ":/res/menu/P02_help_about_page_ic.png", pActionHelp));
 	connect(pActionAbout, &QAction::triggered, [this]() {m_pAbout->exec(); });
+	connect(pActionFirmware, &QAction::triggered, [this]() {
+		m_pDeviceManage->showFirmwareDialog();
+		});
 	m_pRegister = new RegisterDialog(this);
 	QAction* pActionReg = new QAction(QIcon(":/res/logo/qz_logo.ico"), tr("授权"));
 	connect(pActionReg, &QAction::triggered, [this]() {m_pRegister->exec(); });
