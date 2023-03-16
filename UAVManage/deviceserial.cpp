@@ -54,6 +54,7 @@ DeviceSerial::DeviceSerial(QWidget *parent)
 	connect(ui.btnUpdate, &QAbstractButton::clicked, this, &DeviceSerial::onBtnRead);
 	connect(ui.btnSerial, &QAbstractButton::clicked, this, &DeviceSerial::onBtnSerial);
 
+	ui.widgetDeviceParam->setEnabled(false);
 	//监控串口插拔
 	m_qextSerial.setUpNotifications();
 	connect(&m_qextSerial, SIGNAL(deviceDiscovered(const QextPortInfo&)), this, SLOT(onDeviceDiscovered(const QextPortInfo&)));
@@ -61,6 +62,7 @@ DeviceSerial::DeviceSerial(QWidget *parent)
 
 	foreach(QSerialPortInfo info, QSerialPortInfo::availablePorts()) {
 		quint16 pid = info.productIdentifier();
+		qDebug() << info.portName() << pid;
 		//无人机设备PID值
 		if (_UAVPID_ != pid) continue;
 		ui.comboBoxCom->addItem(info.portName());
@@ -164,6 +166,7 @@ void DeviceSerial::onBtnSerial()
 		ui.btnSerial->setText(tr("连接"));
 		m_serialPort.close();
 		ui.comboBoxCom->setEnabled(true);
+		ui.widgetDeviceParam->setEnabled(false);
 	}
 	else {
 		QString qstrCom = ui.comboBoxCom->currentText();
@@ -175,6 +178,7 @@ void DeviceSerial::onBtnSerial()
 		}
 		ui.btnSerial->setText(tr("断开"));
 		ui.comboBoxCom->setEnabled(false);
+		ui.widgetDeviceParam->setEnabled(true);
 	}
 }
 
@@ -194,6 +198,18 @@ void DeviceSerial::onDeviceRemoved(const QextPortInfo& info)
 	updateSerial();
 }
 
+void DeviceSerial::onBtnCheckFirmware()
+{
+	//通过网络获取最新版本固件
+	QMessageBox::information(this, tr("提示"), tr("功能开发中"));
+}
+
+void DeviceSerial::onBtnManualFirmware()
+{
+	//选择本地已存在固件文件
+	QMessageBox::information(this, tr("提示"), tr("功能开发中"));
+}
+
 void DeviceSerial::showEvent(QShowEvent* event)
 {
 	if (m_pLabelBackground) {
@@ -204,7 +220,10 @@ void DeviceSerial::showEvent(QShowEvent* event)
 	m_pLabelBackground->setStyleSheet(QString("background-color: rgba(0, 0, 0, 50%);"));
 	m_pLabelBackground->setFixedSize(dynamic_cast<QWidget*>(parent()->parent())->size());
 	m_pLabelBackground->show();
-	QTimer::singleShot(1000, [this]() { updateSerial(); });
+	if (false == m_serialPort.isOpen()) {
+		ui.btnSerial->setText(tr("连接中"));
+		QTimer::singleShot(1000, [this]() { updateSerial(); });
+	}
 }
 
 void DeviceSerial::closeEvent(QCloseEvent* event)

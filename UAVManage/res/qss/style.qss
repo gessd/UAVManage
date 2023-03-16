@@ -245,7 +245,7 @@ AddDeviceDialog .QFrame, SpaceParam .QFrame{
 #widgetCommand{
 	background:transparent;
 }
-#widgetBackgroundMain, QGroupBox, QTextBrowser, QTreeWidget{
+#widgetBackgroundMain, QTextBrowser, QTreeWidget{
 	background:#F0F0F0;
 	border-radius:10px;
 }

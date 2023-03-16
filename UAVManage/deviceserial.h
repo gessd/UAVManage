@@ -37,6 +37,8 @@ public slots:
 	void onBtnSerial();
 	void onDeviceDiscovered(const QextPortInfo& info);
 	void onDeviceRemoved(const QextPortInfo& info);
+	void onBtnCheckFirmware();
+	void onBtnManualFirmware();
 protected:
 	void showEvent(QShowEvent* event);
 	void closeEvent(QCloseEvent* event);
