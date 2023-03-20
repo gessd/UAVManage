@@ -114,7 +114,7 @@ void UAVManage::initMenu()
 	QWidget* pMenuWidget = new QWidget(ui.menuBar);
 	QHBoxLayout* pMenuLayout = new QHBoxLayout(pMenuWidget);
 	pMenuLayout->setSpacing(10);
-	pMenuLayout->setMargin(0);
+	pMenuLayout->setContentsMargins(8, 0, 0, 0);
 	pMenuWidget->setLayout(pMenuLayout);
 	pMenuWidget->setGeometry(0, 0, ui.menuBar->width(), ui.menuBar->height());
 
@@ -176,13 +176,14 @@ void UAVManage::initMenu()
 	pMenuFlyPrepare->addAction(pActionFly4);
 	pMenuFlyPrepare->addAction(pActionFly5);
 	pMenuFlyPrepare->addAction(pActionFly6);
-	ui.toolBar->layout()->setSpacing(10);
 	ui.toolBar->addAction(pActionFly1);
 	ui.toolBar->addAction(pActionFly2);
 	ui.toolBar->addAction(pActionFly3);
 	ui.toolBar->addAction(pActionFly4);
 	ui.toolBar->addAction(pActionFly5);
 	ui.toolBar->addAction(pActionFly6);
+	ui.toolBar->layout()->setSpacing(2);
+	ui.toolBar->layout()->setContentsMargins(0, 8, 0, 0);
 
 	//pMenuLayout->addWidget(initMenuButton(pMenuWidget, tr(""), ":/res/logo/qz_logo.ico", ":/res/logo/qz_logo.ico", pIconMenu));
 	pMenuLayout->addWidget(initMenuButton(pMenuWidget, tr("项目"), ":/res/menu/P01_file_open_btn_cli.png", ":/res/menu/P01_file_open_btn_cli.png", pProjectMenu));
