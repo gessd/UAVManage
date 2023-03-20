@@ -6,9 +6,7 @@ QWidget{
 QWidget:disabled{
 	color:#666666;
 }
-QDialog{
-	background:#FFFFFF;
-}
+
 #centralWidget{
 	background:#C2DDF0;
 }
@@ -95,16 +93,12 @@ QLineEdit:disabled{
 QTableWidget QLineEdit{
 	border-width:0px;
 	padding:0px;
-	padding-left:0px;
 	border-radius:0px;
 	color:#000000;
-}
-QTableWidget{
-	background:transparent;
+	background:#FFFFFF;
 }
 QTableWidget::item:selected{
     background:#F0F0F0;
-	color:#000000;
 }
 QHeaderView::section{
 	text-align:center;
