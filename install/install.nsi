@@ -32,7 +32,7 @@ ShowUnInstDetails hide
 
 ; 安装程序初始定义常量
 !define PRODUCT_NAME "无人机炫舞编程"											
-!define PRODUCT_VERSION "1.0.2"
+!define PRODUCT_VERSION "1.0.3"
 !define PRODUCT_PUBLISHER "奇正数元"
 !define PRODUCT_WEB_SITE ""
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
@@ -60,7 +60,7 @@ SetCompressor lzma
 !insertmacro MUI_PAGE_INSTFILES
 ; 安装完成页面
 ;!define MUI_FINISHPAGE_SHOWREADME
-;!define MUI_FINISHPAGE_SHOWREADME_Function AutoBoot
+;!define MUI_FINISHPAGE_SHOWREADME_Function installDrivers
 ;!define MUI_FINISHPAGE_SHOWREADME_TEXT "开机自动启动"
 !define MUI_FINISHPAGE_RUN "$INSTDIR\UAVManage.exe"
 !insertmacro MUI_PAGE_FINISH
@@ -90,6 +90,8 @@ Section "MainSection" SEC01
 	; 安全认证
 	SetOutPath "$INSTDIR"
 	SetOverwrite on
+	File /r ".\CH340驱动"
+	File /r ".\CP2102驱动"
 	File /r "${appDir}\3D"
 	File /r "${appDir}\7z"
 	File /r "${appDir}\blockly_dev"
@@ -216,4 +218,10 @@ FunctionEnd
 Function un.onUninstSuccess
   HideWindow
   ;MessageBox MB_ICONINFORMATION|MB_OK "$(^Name) 已成功地从您的计算机移除。"
+FunctionEnd
+
+#安装完成
+Function .onInstSuccess
+  ExecWait "$INSTDIR\CP2102驱动\CP210xVCPInstaller_x64.exe"
+  ExecWait "$INSTDIR\CH340驱动\CH341SER.EXE"
 FunctionEnd
