@@ -160,6 +160,9 @@
     <ClCompile Include="firmwaredialog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="managertopwidget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="devicemanage.h">
@@ -246,6 +249,9 @@
     <QtMoc Include="firmwaredialog.h">
       <Filter>Header Files</Filter>
     </QtMoc>
+    <QtMoc Include="managertopwidget.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="devicemanage.ui">
@@ -297,6 +303,9 @@
       <Filter>Form Files</Filter>
     </QtUic>
     <QtUic Include="firmwaredialog.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="managertopwidget.ui">
       <Filter>Form Files</Filter>
     </QtUic>
   </ItemGroup>

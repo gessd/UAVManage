@@ -115,6 +115,7 @@
     <ClCompile Include="firmwaredialog.cpp" />
     <ClCompile Include="firstdialog.cpp" />
     <ClCompile Include="historymessage.cpp" />
+    <ClCompile Include="managertopwidget.cpp" />
     <ClCompile Include="qxtglobalshortcut5\core\qxtglobal.cpp" />
     <ClCompile Include="qxtglobalshortcut5\gui\qxtglobalshortcut.cpp" />
     <ClCompile Include="qxtglobalshortcut5\gui\qxtglobalshortcut_win.cpp" />
@@ -134,6 +135,7 @@
     <QtUic Include="firmwaredialog.ui" />
     <QtUic Include="firstdialog.ui" />
     <QtUic Include="historymessage.ui" />
+    <QtUic Include="managertopwidget.ui" />
     <QtUic Include="messagelistdialog.ui" />
     <QtUic Include="placeinfodialog.ui" />
     <QtUic Include="registerdialog.ui" />
@@ -197,6 +199,7 @@
     <QtMoc Include="historymessage.h" />
     <QtMoc Include="firmwaredialog.h" />
     <ClInclude Include="libhvsetting.h" />
+    <QtMoc Include="managertopwidget.h" />
     <ClInclude Include="mavlinksetting.h" />
     <QtMoc Include="threadpython.h" />
     <QtMoc Include="messagelistdialog.h" />

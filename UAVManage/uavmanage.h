@@ -12,6 +12,7 @@
 #include "messagelistdialog.h"
 #include "aboutdialog.h"
 
+class ManagerTopWidget;
 class FirmwareDialog;
 class StopFlyDialog;
 class HistoryMessage;
@@ -146,6 +147,14 @@ private slots:
      * @brief 项目属性查看
      */
     void onProjectAttribute();
+    /**
+     * @brief 起飞检查界面展开
+     */
+    void onPrepareWidget();
+    /**
+     * @brief 启动三维仿真窗口
+     */
+    void onStart3DDialog();
 private:
     /**
      * @brief 新建项目工程文件
@@ -189,4 +198,6 @@ private:
     RegisterDialog* m_pRegister;
     //紧急停止背景
     StopFlyDialog* m_pStopDialog;
+    //起飞检查展开窗口
+    ManagerTopWidget* m_pTopWidget;
 };

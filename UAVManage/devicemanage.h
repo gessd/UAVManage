@@ -135,6 +135,10 @@ public:
 	 * @brief 固件更新
 	 */
 	void showFirmwareDialog();
+	/**
+	 * @brief 设置当前工程文件路径
+	 */
+	void setCrrentProject(QString path);
 signals:
 	/**
 	 * @brief 设备添加完成
@@ -191,8 +195,17 @@ signals:
 	* @brief 三维窗口连接状态
 	*/
 	void sig3DDialogStatus(bool connect);
+	/**
+	 * @brief 控制界面展开
+	 */
+	void sigPrepareWidget();
+	/**
+	 * @brief 三维仿真
+	 */
+	void sigStart3D();
 protected:
 	virtual bool eventFilter(QObject* watched, QEvent* event);
+	virtual void resizeEvent(QResizeEvent* event);
 private slots:
 	void onDeviceConrolFinished(QString text, int res, QString explain);
 	/**
@@ -258,7 +271,10 @@ private:
 	DeviceSerial* m_pDeviceNetwork;
 	//音乐文件及波形图形
 	QString m_qstrMusicFile;
+	//音乐波形图片
 	QPixmap m_pixmapMusic;
 	//固件更新窗口
 	FirmwareDialog* m_pFirmwareDialog;
+	//当前工程文件
+	QString m_qstrCurrentProjectFile;
 };

@@ -3,7 +3,7 @@
 //程序版本号
 #define _MajorNumber_ 1
 #define _MinorNumber_ 0
-#define _BuildNumber_ 2
+#define _BuildNumber_ 4
 //新程序下载存放文件夹
 #define _NewVersionPath_	"/update"
 #define _VersionFile_		"version.ini"
@@ -99,7 +99,7 @@ enum _AllDeviceCommand {
 	_DeviceTakeoffLocal = 1, //起飞
 	_DeviceLandLocal,		 //降落
 	_DeviceQuickStop,		 //急停
-	_DeviceSetout,			 //准备起飞
+	_DevicePrepare,			 //准备起飞
 	_DeviceQueue,			 //列队
 	_DeviceRegain,			 //回收
 	_DeviceLed,				//LED控制
@@ -143,7 +143,7 @@ public:
 		case _DeviceTakeoffLocal: return getTakeoffError(status); break;
 		case _DeviceLandLocal: return getLandError(status); break;
 		case _DeviceQuickStop: return getQueueError(status); break;
-		case _DeviceSetout: return getReadyError(status); break;
+		case _DevicePrepare: return getReadyError(status); break;
 		case _DeviceQueue: return getQueueError(status); break;
 		case _DeviceRegain: return getRegainError(status); break;
 		case _DeviceLed: return getLedError(status); break;

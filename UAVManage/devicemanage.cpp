@@ -10,6 +10,7 @@
 #include "calibrationdialog.h"
 #include "deviceserial.h"
 #include "firmwaredialog.h"
+#include "placeinfodialog.h"
 
 #define _ItemHeight_ 70
 DeviceManage::DeviceManage(QWidget *parent)
@@ -22,8 +23,8 @@ DeviceManage::DeviceManage(QWidget *parent)
 	m_p3dTcpSocket = nullptr;
 	m_p3dTcpServer = new QTcpServer(this);
 	m_p3dTcpServer->listen(QHostAddress::Any, _TcpPort_);
+	ui.widgetPreflightCheck->setVisible(false);
 	connect(m_p3dTcpServer, SIGNAL(newConnection()), this, SLOT(on3dNewConnection()));
-
 	//设置设备列表
 	ui.listWidget->installEventFilter(this);
 	ui.listWidget->setSpacing(4);
@@ -172,6 +173,12 @@ DeviceManage::DeviceManage(QWidget *parent)
 			QMessageBox::warning(this, tr("错误"), qstrError);
 		}
 		});
+	connect(ui.btnCheckAction, &QAbstractButton::clicked, this, &DeviceManage::sigPrepareWidget);
+	connect(ui.btnClose, &QAbstractButton::clicked, this, &DeviceManage::sigPrepareWidget);
+	connect(ui.btnWaypointCheck, &QAbstractButton::clicked, [this]() { waypointComposeAndUpload(m_qstrCurrentProjectFile, false); });
+	connect(ui.btn3DFly, &QAbstractButton::clicked, [this]() { emit sigStart3D(); });
+	connect(ui.btnWaypointUpload, &QAbstractButton::clicked, [this]() { waypointComposeAndUpload(m_qstrCurrentProjectFile, true); });
+	connect(ui.btnDevicePrepare, &QAbstractButton::clicked, [this]() { allDeviceControl(_DevicePrepare); });
 	connect(ui.btnFlyTakeoff, &QAbstractButton::clicked, [this]() { allDeviceControl(_DeviceTakeoffLocal); });
 	connect(ui.btnFlyLand, &QAbstractButton::clicked, [this]() { allDeviceControl(_DeviceLandLocal); });
 	connect(ui.btnFlyStop, &QAbstractButton::clicked, [this]() { allDeviceControl(_DeviceQuickStop); });
@@ -179,6 +186,13 @@ DeviceManage::DeviceManage(QWidget *parent)
 	connect(ui.btnRegain, &QAbstractButton::clicked, [this]() { allDeviceControl(_DeviceRegain); });
 	connect(&m_timerUpdateStatus, &QTimer::timeout, this, &DeviceManage::onUpdateStatusTo3D);
 	connect(&m_timerMessage3D, &QTimer::timeout, this, &DeviceManage::onTimeout3DMessage);
+	connect(ui.btnBaseStation, &QAbstractButton::clicked, [this]() { 
+		PlaceInfoDialog info(getSpaceSize(), this);
+		info.exec();
+		if (false == info.isValidStation()) return;
+		QMap<QString, QPoint> map = info.getStationAddress();
+		setStationAddress(map);
+		});
 
 	//设备IP地址信息
 	m_pDeviceNetwork = new DeviceSerial(this);
@@ -371,7 +385,7 @@ QString DeviceManage::isRepetitionDevice(QString qstrName, QString ip, long x, l
 
 void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 {
-	if (_DeviceTakeoffLocal == comand || _DeviceSetout == comand) {
+	if (_DeviceTakeoffLocal == comand || _DevicePrepare == comand) {
 		//起飞前检查所有设备状态
 		//设备连接状态
 		//设备电量
@@ -433,6 +447,7 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 			QMessageBox::warning(this, tr("警告"), error);
 			return;
 		}
+		
 		if (_DeviceTakeoffLocal == comand) {
 			//起飞前增加倒计时
 			QLabel label(dynamic_cast<QWidget*>(parent()));
@@ -485,7 +500,7 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 			res = pDevice->Fun_MAV_QUICK_STOP(false);
 			qstrText = tr("急停");
 			break;
-		case _DeviceSetout:
+		case _DevicePrepare:
 			res = pDevice->Fun_MAV_CMD_DO_SET_MODE(3, false);
 			qstrText = tr("准备起飞");
 			break;
@@ -825,6 +840,11 @@ void DeviceManage::showFirmwareDialog()
 	m_pFirmwareDialog->exec();
 }
 
+void DeviceManage::setCrrentProject(QString path)
+{
+	m_qstrCurrentProjectFile = path;
+}
+
 bool DeviceManage::eventFilter(QObject* watched, QEvent* event)
 {
 	if (!isEnabled()) return false;
@@ -835,6 +855,13 @@ bool DeviceManage::eventFilter(QObject* watched, QEvent* event)
 		m_pMenu->exec(QCursor::pos());
 	} 
 	return false;
+}
+
+void DeviceManage::resizeEvent(QResizeEvent* event)
+{
+	if (width() > ui.widgetBackgroundMain->width()) {
+		ui.widgetPreflightCheck->setVisible(true);
+	} else ui.widgetPreflightCheck->setVisible(false);
 }
 
 void DeviceManage::on3dNewConnection()

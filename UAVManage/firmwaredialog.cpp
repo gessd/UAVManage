@@ -14,6 +14,7 @@ FirmwareDialog::~FirmwareDialog()
 
 void FirmwareDialog::setDeviceNameList(QStringList list)
 {
+	ui.listWidgetDevice->clear();
 	ui.listWidgetDevice->addItems(list);
 }
 

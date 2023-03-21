@@ -25,6 +25,7 @@
 #include "registerdialog.h"
 #include "stopflydialog.h"
 #include "firmwaredialog.h"
+#include "managertopwidget.h"
 
 UAVManage::UAVManage(QWidget* parent)
 	: QMainWindow(parent)
@@ -48,11 +49,13 @@ UAVManage::UAVManage(QWidget* parent)
 	m_pSocketServer->listen(QHostAddress::Any, _WebSocketPort_);
 	connect(m_pSocketServer, SIGNAL(newConnection()), this, SLOT(onSocketNewConnection()));
 
+	m_pTopWidget = new ManagerTopWidget(this);
+	m_pTopWidget->close();
+	connect(m_pTopWidget, &ManagerTopWidget::sigPrepareWidget, this, &UAVManage::onPrepareWidget);
 	//增加设备列表
 	m_pDeviceManage = new DeviceManage(this);
 	m_pDeviceManage->setEnabled(false);
-	m_pDeviceManage->setMaximumWidth(200);
-	ui.gridLayoutMain->addWidget(m_pDeviceManage, 0, 1);
+	ui.layoutManger->addWidget(m_pDeviceManage);
 	connect(m_pDeviceManage, &DeviceManage::currentDeviceNameChanged, this, &UAVManage::onCurrentDeviceNameChanged);
 	connect(m_pDeviceManage, &DeviceManage::deviceAddFinished, this, &UAVManage::onDeviceAdd);
 	connect(m_pDeviceManage, &DeviceManage::deviceRemoveFinished, this, &UAVManage::onDeviceRemove);
@@ -62,6 +65,8 @@ UAVManage::UAVManage(QWidget* parent)
 	connect(m_pDeviceManage, &DeviceManage::sigWaypointProcess, this, &UAVManage::onWaypointProcess);
 	connect(m_pDeviceManage, &DeviceManage::sigTakeoffFinished, this, &UAVManage::onDeviceTakeoffFinished);
 	connect(m_pDeviceManage, &DeviceManage::sig3DDialogStatus, this, &UAVManage::on3DDialogStauts);
+	connect(m_pDeviceManage, &DeviceManage::sigStart3D, this, &UAVManage::onStart3DDialog);
+	connect(m_pDeviceManage, &DeviceManage::sigPrepareWidget, this, &UAVManage::onPrepareWidget);
 
 	m_pAbout = new AboutDialog(this);
 	m_pSoundWidget = new SoundGrade(this);
@@ -184,6 +189,7 @@ void UAVManage::initMenu()
 	ui.toolBar->addAction(pActionFly6);
 	ui.toolBar->layout()->setSpacing(2);
 	ui.toolBar->layout()->setContentsMargins(0, 8, 0, 0);
+	ui.toolBar->setVisible(false);
 
 	//pMenuLayout->addWidget(initMenuButton(pMenuWidget, tr(""), ":/res/logo/qz_logo.ico", ":/res/logo/qz_logo.ico", pIconMenu));
 	pMenuLayout->addWidget(initMenuButton(pMenuWidget, tr("项目"), ":/res/menu/P01_file_open_btn_cli.png", ":/res/menu/P01_file_open_btn_cli.png", pProjectMenu));
@@ -210,47 +216,7 @@ void UAVManage::initMenu()
 	pActionHelp->addAction(pActionReg);
 
 	connect(pActionFly1, &QAction::triggered, [this]() { m_pDeviceManage->waypointComposeAndUpload(m_qstrCurrentProjectFile, false); });
-	connect(pActionFly2, &QAction::triggered, [this]() {
-		//没有添加音乐不能启动三维窗口
-		QString qstrFilePath = m_pSoundWidget->getCurrentMusic();
-		if (qstrFilePath.isEmpty()) {
-			QMessageBox::warning(this, tr("警告"), tr("未添加音乐文件无法使用三维仿真窗口"));
-			return;
-		}
-		QFileInfo info(qstrFilePath);
-		if (false == info.isFile()) {
-			QMessageBox::warning(this, tr("警告"), tr("未添加音乐文件无法使用三维仿真窗口"));
-			return;
-		}
-		if (false == QFile::exists(qstrFilePath)) {
-			QMessageBox::warning(this, tr("警告"), tr("音乐文件无法使用无法使用三维仿真窗口"));
-			return;
-		}
-		//UE4依赖文件判断
-		if (false == QFile::exists("C:/Windows/System32/D3DX9_43.dll") && false == QFile::exists("C:/Windows/SysWOW64/D3DX9_43.dll")) {
-			QProcess::startDetached(QApplication::applicationDirPath() + "/3D/Engine/Extras/Redist/en-us/UE4PrereqSetup_x64.exe");
-			_ShowErrorMessage("三维仿真必要文件缺失，请安装后重试");
-			return;
-		}
-		//先检查舞步编写是否正确
-		QString qstrErrorNames = m_pDeviceManage->waypointComposeAndUpload(m_qstrCurrentProjectFile, false);
-		if (false == qstrErrorNames.isEmpty()) {
-			QString qstrErrorMsg = tr("检查舞步有错误，请修正后重试") + qstrErrorNames;
-			_ShowErrorMessage(qstrErrorMsg);
-			QMessageBox::warning(this, tr("警告"), qstrErrorMsg);
-			return;
-		}
-
-		if (m_pBackgrounMask == nullptr) {
-			m_pBackgrounMask = new WaitingWidget(this);
-		}
-		m_pBackgrounMask->setGeometry(this->rect());
-		m_pBackgrounMask->show();
-		QDir::setCurrent(QApplication::applicationDirPath() + "/3D/UAV_Program_UE4/Binaries/Win64");
-		m_p3DProcess->start("UAV_Program_UE4-Win64-Shipping.exe");
-		m_p3DProcess->waitForStarted(1000);
-		QDir::setCurrent(QApplication::applicationDirPath());
-		});
+	connect(pActionFly2, &QAction::triggered, [this]() { onStart3DDialog();});
 	connect(pActionFly3, &QAction::triggered, [this]() {
 		if (m_qstrCurrentProjectFile.isEmpty()) return;
 		PlaceInfoDialog info(m_pDeviceManage->getSpaceSize(), this);
@@ -288,7 +254,7 @@ void UAVManage::initMenu()
 		});
 	connect(pActionFly6, &QAction::triggered, [this]() {
 		if (m_qstrCurrentProjectFile.isEmpty()) return;
-		m_pDeviceManage->allDeviceControl(_DeviceSetout);
+		m_pDeviceManage->allDeviceControl(_DevicePrepare);
 		});
 	pMenuLayout->addItem(new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum));
 	
@@ -435,6 +401,7 @@ void UAVManage::onOpenProject(QString qstrFile)
 		_ShowErrorMessage(tr("工程中没有添加设备"));
 	}
 	m_qstrCurrentProjectFile = qstrFile;
+	m_pDeviceManage->setCrrentProject(m_qstrCurrentProjectFile);
 	while (device){
 		//遍历无人机属性
 		QString devicename = device->Attribute(_AttributeName_);
@@ -522,6 +489,7 @@ void UAVManage::onSaveasProject()
 	copyDirectoryFiles(qstrFromPath, qstrPath + _ProjectDirName_, true);
 	bool bcp = QFile::copy(m_qstrCurrentProjectFile, qstrName);
 	m_qstrCurrentProjectFile = qstrName;
+	m_pDeviceManage->setCrrentProject(m_qstrCurrentProjectFile);
 }
 
 void UAVManage::onCloseProject()
@@ -542,6 +510,7 @@ void UAVManage::onCloseProject()
 		_ShowInfoMessage(tr("关闭工程") + info.baseName());
 	}
 	m_qstrCurrentProjectFile.clear();
+	m_pDeviceManage->setCrrentProject(m_qstrCurrentProjectFile);
 	ParamReadWrite::writeParam(_Path_, "");
 }
 
@@ -574,6 +543,7 @@ void UAVManage::resizeEvent(QResizeEvent* event)
 {
 	MessageListDialog::getInstance()->move((width() - MessageListDialog::getInstance()->width()) / 2, 0);
 	m_pHistory->resetWidget();
+	if(!m_pTopWidget->isHidden()) m_pTopWidget->setGeometry(0, 0, width(), height());
 }
 
 bool UAVManage::eventFilter(QObject* watched, QEvent* event)
@@ -1036,6 +1006,64 @@ void UAVManage::onProjectAttribute()
 #endif
 }
 
+void UAVManage::onPrepareWidget()
+{
+	//展开或收缩控制列表界面
+	if (m_pTopWidget->isHidden()) {
+		m_pTopWidget->setGeometry(0, 0, width(), height());
+		m_pTopWidget->show();
+		m_pTopWidget->addWidget(m_pDeviceManage);
+	}
+	else {
+		m_pTopWidget->close();
+		m_pTopWidget->removeWidget(m_pDeviceManage);
+		ui.layoutManger->addWidget(m_pDeviceManage);
+	}
+}
+
+void UAVManage::onStart3DDialog()
+{
+	//没有添加音乐不能启动三维窗口
+	QString qstrFilePath = m_pSoundWidget->getCurrentMusic();
+	if (qstrFilePath.isEmpty()) {
+		QMessageBox::warning(this, tr("警告"), tr("未添加音乐文件无法使用三维仿真窗口"));
+		return;
+	}
+	QFileInfo info(qstrFilePath);
+	if (false == info.isFile()) {
+		QMessageBox::warning(this, tr("警告"), tr("未添加音乐文件无法使用三维仿真窗口"));
+		return;
+	}
+	if (false == QFile::exists(qstrFilePath)) {
+		QMessageBox::warning(this, tr("警告"), tr("音乐文件无法使用无法使用三维仿真窗口"));
+		return;
+	}
+	//UE4依赖文件判断
+	if (false == QFile::exists("C:/Windows/System32/D3DX9_43.dll") && false == QFile::exists("C:/Windows/SysWOW64/D3DX9_43.dll")) {
+		QProcess::startDetached(QApplication::applicationDirPath() + "/3D/Engine/Extras/Redist/en-us/UE4PrereqSetup_x64.exe");
+		_ShowErrorMessage("三维仿真必要文件缺失，请安装后重试");
+		return;
+	}
+	//先检查舞步编写是否正确
+	QString qstrErrorNames = m_pDeviceManage->waypointComposeAndUpload(m_qstrCurrentProjectFile, false);
+	if (false == qstrErrorNames.isEmpty()) {
+		QString qstrErrorMsg = tr("检查舞步有错误，请修正后重试") + qstrErrorNames;
+		_ShowErrorMessage(qstrErrorMsg);
+		QMessageBox::warning(this, tr("警告"), qstrErrorMsg);
+		return;
+	}
+
+	if (m_pBackgrounMask == nullptr) {
+		m_pBackgrounMask = new WaitingWidget(this);
+	}
+	m_pBackgrounMask->setGeometry(this->rect());
+	m_pBackgrounMask->show();
+	QDir::setCurrent(QApplication::applicationDirPath() + "/3D/UAV_Program_UE4/Binaries/Win64");
+	m_p3DProcess->start("UAV_Program_UE4-Win64-Shipping.exe");
+	m_p3DProcess->waitForStarted(1000);
+	QDir::setCurrent(QApplication::applicationDirPath());
+}
+
 bool UAVManage::newProjectFile(QString qstrFile, unsigned int X, unsigned int Y)
 {	
 	const char* declaration = _XMLVersion_;
@@ -1056,6 +1084,7 @@ bool UAVManage::newProjectFile(QString qstrFile, unsigned int X, unsigned int Y)
 	}
 	//新建项目后默认新建一个无人机设备
 	m_qstrCurrentProjectFile = qstrFile;
+	m_pDeviceManage->setCrrentProject(m_qstrCurrentProjectFile);
 	onDeviceAdd(QString(_DeviceNamePrefix_) + QString::number(1), "", 100, 100);
 	return true;
 	
