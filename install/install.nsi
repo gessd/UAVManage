@@ -223,5 +223,5 @@ FunctionEnd
 #安装完成
 Function .onInstSuccess
   ExecWait "$INSTDIR\CP2102驱动\CP210xVCPInstaller_x64.exe"
-  ExecWait "$INSTDIR\CH340驱动\CH341SER.EXE"
+  ExecWait "$INSTDIR\CH340驱动\CH343SER.EXE"
 FunctionEnd
