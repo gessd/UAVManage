@@ -177,10 +177,6 @@ DeviceManage::DeviceManage(QWidget *parent)
 	connect(ui.btnFlyStop, &QAbstractButton::clicked, [this]() { allDeviceControl(_DeviceQuickStop); });
 	connect(ui.btnQueue, &QAbstractButton::clicked, [this]() { allDeviceControl(_DeviceQueue); });
 	connect(ui.btnRegain, &QAbstractButton::clicked, [this]() { allDeviceControl(_DeviceRegain); });
-
-	ui.checkBoxAutoLand->setVisible(false);
-	ui.checkBoxMagnetismStatus->setVisible(false);
-
 	connect(&m_timerUpdateStatus, &QTimer::timeout, this, &DeviceManage::onUpdateStatusTo3D);
 	connect(&m_timerMessage3D, &QTimer::timeout, this, &DeviceManage::onTimeout3DMessage);
 
