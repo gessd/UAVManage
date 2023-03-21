@@ -82,6 +82,8 @@ MessageListDialog::~MessageListDialog()
 
 void MessageListDialog::onShowMessageText(QString text, _Messagelevel level, bool clear)
 {
+	//提升窗口置顶显示
+	raise();
 	if (true == clear) {
 		int count = ui.listWidget->count();
 		qDebug() << "清空提示消息" << count;
