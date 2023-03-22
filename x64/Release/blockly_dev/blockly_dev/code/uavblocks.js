@@ -208,6 +208,36 @@ Blockly.Python['Fly_To'] = function(block) {
     return code;
 };
 
+Blockly.Blocks['Fly_ToNumber'] = {
+    init: function() {
+        this.appendDummyInput()
+            .appendField('飞行到');
+        this.appendValueInput('X')
+            .setCheck('Number')
+            .appendField('X');
+        this.appendValueInput('Y')
+            .setCheck('Number')
+            .appendField('Y');
+        this.appendValueInput('Z')
+            .setCheck('Number')
+            .appendField('Z');
+        this.setInputsInline(true);
+        this.setPreviousStatement(true, ["action", "notReachAction", "ReachAction"]);
+        this.setNextStatement(true, ["action", "notReachAction", "ReachAction"]);
+        this.setColour('#3B8CFF');
+        this.setTooltip('自定义飞行位置');
+        this.setHelpUrl('');
+    }
+};
+Blockly.Python['Fly_ToNumber'] = function(block) {
+    addHead();
+    var px = Blockly.Python.valueToCode(block, 'X', Blockly.Python.ORDER_NONE);
+	var py = Blockly.Python.valueToCode(block, 'Y', Blockly.Python.ORDER_NONE);
+	var pz = Blockly.Python.valueToCode(block, 'Z', Blockly.Python.ORDER_NONE);
+    var code = 'Fly_To(' + px + ',' + py + ',' + pz +')' + '\n';
+    return code;
+};
+
 Blockly.Blocks['Fly_SetSpeed'] = {
     init: function() {
         this.appendDummyInput()
