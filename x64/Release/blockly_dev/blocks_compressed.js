@@ -1163,7 +1163,7 @@ Blockly.defineBlocksWithJsonArray([{
 		name: "NUM",
 		value: 0,
 		min: 0,
-		max: 2000
+		max: 50*1000
 	}],
 	output: "Number",
 	helpUrl: "%{BKY_MATH_NUMBER_HELPURL}",
