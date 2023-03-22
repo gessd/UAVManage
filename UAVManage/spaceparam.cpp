@@ -56,7 +56,7 @@ SpaceParam::SpaceParam(bool create, QWidget *parent)
 			QMessageBox::warning(this, tr("提示"), tr("场地范围太小"));
 			return;
 		}
-		if (x > 100 || y > 100) {
+		if (x > 50 || y > 50) {
 			QMessageBox::warning(this, tr("提示"), tr("场地范围太大"));
 			return;
 		}
