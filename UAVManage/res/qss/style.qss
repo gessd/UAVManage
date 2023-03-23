@@ -71,7 +71,7 @@ DeviceControl QLabel{
 	border-width:2px;
 }
 
-#btnWaypointCheck,#btn3DFly,#btnCheckAction{
+#btnWaypointCheck,#btn3DFly,#btnCheckAction,#btnFlyLand{
 	padding-left:30px;
 }
 #btnFlyStop{

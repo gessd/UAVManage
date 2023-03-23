@@ -453,7 +453,6 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 			QLabel label(dynamic_cast<QWidget*>(parent()));
 			//设置窗体的背景色,这里的百分比就是透明度
 			label.setStyleSheet(QString("background-color: rgba(0, 0, 0, 50%);color:#FF0000;border:1px solid blue;font-size:100px;"));
-			//label.setGeometry(dynamic_cast<QWidget*>(parent())->rect()); //获取父窗体的几何形状设置当前窗口
 			label.setFixedSize(dynamic_cast<QWidget*>(parent())->size());
 			label.show();
 			label.setAlignment(Qt::AlignCenter);
@@ -550,6 +549,7 @@ QString DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upl
 		if (!pDevice) continue;
 		QString name = pDevice->getName();
 		if (name.isEmpty()) continue;
+		if(false == pDevice->isCheckDevice()) continue;
 		QFileInfo infoProject(qstrProjectFile);
 		QString qstrDevicePyFile = infoProject.path() + _ProjectDirName_ + name + _PyFileSuffix_;
 		if (false == QFile::exists(qstrDevicePyFile)) continue;
@@ -861,7 +861,21 @@ void DeviceManage::resizeEvent(QResizeEvent* event)
 {
 	if (width() > ui.widgetBackgroundMain->width()) {
 		ui.widgetPreflightCheck->setVisible(true);
-	} else ui.widgetPreflightCheck->setVisible(false);
+		ui.btnAddDevice->setEnabled(false);
+	}
+	else {
+		ui.widgetPreflightCheck->setVisible(false);
+		ui.btnAddDevice->setEnabled(true);
+	}
+	for (int i = 0; i < ui.listWidget->count(); i++) {
+		QListWidgetItem* pItem = ui.listWidget->item(i);
+		if (!pItem) continue;
+		QWidget* pWidget = ui.listWidget->itemWidget(pItem);
+		if (!pWidget) continue;
+		DeviceControl* pDevice = dynamic_cast<DeviceControl*>(pWidget);
+		if (!pDevice) continue;
+		pDevice->enableControl(ui.btnAddDevice->isEnabled());
+	}
 }
 
 void DeviceManage::on3dNewConnection()

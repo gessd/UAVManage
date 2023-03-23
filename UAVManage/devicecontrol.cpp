@@ -61,6 +61,7 @@ DeviceControl::DeviceControl(QString name, float x, float y, QString ip, QWidget
 	setName(name);
 	setIp(ip);
 	setStartLocation(x, y);
+	ui.checkBox->setChecked(true);
 }
 
 DeviceControl::~DeviceControl()
@@ -139,6 +140,16 @@ void DeviceControl::setStartLocation(long x, long y)
 _stDeviceCurrentStatus DeviceControl::getCurrentStatus()
 {
 	return m_deviceStatus;
+}
+
+void DeviceControl::enableControl(bool enable)
+{
+	ui.btnRemove->setEnabled(enable);
+}
+
+bool DeviceControl::isCheckDevice()
+{
+	return ui.checkBox->isChecked();
 }
 
 //连接设备

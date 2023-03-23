@@ -51,6 +51,14 @@ public:
 	void setStartLocation(long x, long y);
 	_stDeviceCurrentStatus getCurrentStatus();
 	/**
+	 * @brief 允许控制
+	 */
+	void enableControl(bool enable);
+	/**
+	 * @brief 是否勾选设备
+	 */
+	bool isCheckDevice();
+	/**
 	 * @brief 连接设备
 	 */
 	bool connectDevice();
