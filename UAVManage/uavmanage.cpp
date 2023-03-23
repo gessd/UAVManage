@@ -26,6 +26,7 @@
 #include "stopflydialog.h"
 #include "firmwaredialog.h"
 #include "managertopwidget.h"
+#include "mytooltip.h"
 
 UAVManage::UAVManage(QWidget* parent)
 	: QMainWindow(parent)
@@ -36,6 +37,7 @@ UAVManage::UAVManage(QWidget* parent)
 	m_pDeviceManage = nullptr;
 	m_p3DProcess = nullptr;
 	m_pBackgrounMask = nullptr;
+	m_pToopTip = nullptr;
 	//注册事件过滤器，处理快捷键事件
 	installEventFilter(this);
 	MessageListDialog::getInstance()->setParent(this);
@@ -76,7 +78,8 @@ UAVManage::UAVManage(QWidget* parent)
 	connect(m_pSoundWidget, &SoundGrade::sigMsuicTime, this, &UAVManage::onCurrentMusicTime);
 	connect(m_pSoundWidget, &SoundGrade::playeState, this, &UAVManage::onCurrentPlayeState);
 	connect(m_pSoundWidget, &SoundGrade::updateMusicWaveFinished, this, &UAVManage::onMusicWaveFinished);
-
+	
+	m_pToopTip = new MyTooltip(this);
 	initMenu();
 }
 
@@ -548,6 +551,25 @@ void UAVManage::resizeEvent(QResizeEvent* event)
 
 bool UAVManage::eventFilter(QObject* watched, QEvent* event)
 {
+	static QPoint mouseGloblePos;
+	if (event->type() == QEvent::MouseMove) {
+		mouseGloblePos = static_cast<QMouseEvent*>(event)->globalPos();
+	}
+	if (QEvent::ToolTip == event->type()) {
+		QWidget* pWidget = dynamic_cast<QWidget*>(watched);
+		if (pWidget) {
+			QString qstrText = pWidget->toolTip();
+			if (!qstrText.isEmpty()) {
+				m_pToopTip->setText(qstrText);
+				QHelpEvent HE(QEvent::Type(MyTooltip::MyToolTipEvent), QPoint(), mouseGloblePos);
+				QApplication::sendEvent(m_pToopTip, &HE);
+				return true;
+			}
+		}
+	}
+	if (event->type() == QEvent::Leave) {
+		m_pToopTip->onHide();
+	}
 	if (event->type() == QEvent::KeyRelease) {
 		QKeyEvent* keyEvent = dynamic_cast<QKeyEvent*>(event);
 		if (keyEvent) {
@@ -558,7 +580,7 @@ bool UAVManage::eventFilter(QObject* watched, QEvent* event)
 			}
 		}
 	}
-	return false;
+	return __super::eventFilter(watched, event);
 }
 
 void UAVManage::onWebLoadProgress(int progress)

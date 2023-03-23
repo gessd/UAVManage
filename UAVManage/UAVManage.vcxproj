@@ -116,6 +116,7 @@
     <ClCompile Include="firstdialog.cpp" />
     <ClCompile Include="historymessage.cpp" />
     <ClCompile Include="managertopwidget.cpp" />
+    <ClCompile Include="mytooltip.cpp" />
     <ClCompile Include="qxtglobalshortcut5\core\qxtglobal.cpp" />
     <ClCompile Include="qxtglobalshortcut5\gui\qxtglobalshortcut.cpp" />
     <ClCompile Include="qxtglobalshortcut5\gui\qxtglobalshortcut_win.cpp" />
@@ -213,6 +214,7 @@
     <QtMoc Include="paramreadwrite.h" />
     <QtMoc Include="spaceparam.h" />
     <QtMoc Include="serial\qextserialenumerator.h" />
+    <QtMoc Include="mytooltip.h" />
     <ClInclude Include="qxtglobalshortcut5\core\qxtglobal.h" />
     <QtMoc Include="qxtglobalshortcut5\gui\qxtglobalshortcut.h" />
     <ClInclude Include="qxtglobalshortcut5\gui\qxtglobalshortcut_p.h" />

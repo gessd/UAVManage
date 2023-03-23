@@ -12,6 +12,7 @@
 #include "messagelistdialog.h"
 #include "aboutdialog.h"
 
+class MyTooltip;
 class ManagerTopWidget;
 class FirmwareDialog;
 class StopFlyDialog;
@@ -200,4 +201,5 @@ private:
     StopFlyDialog* m_pStopDialog;
     //起飞检查展开窗口
     ManagerTopWidget* m_pTopWidget;
+    MyTooltip* m_pToopTip;
 };

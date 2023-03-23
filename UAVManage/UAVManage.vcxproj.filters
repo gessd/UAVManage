@@ -163,6 +163,9 @@
     <ClCompile Include="managertopwidget.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="mytooltip.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="devicemanage.h">
@@ -250,6 +253,9 @@
       <Filter>Header Files</Filter>
     </QtMoc>
     <QtMoc Include="managertopwidget.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="mytooltip.h">
       <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>
