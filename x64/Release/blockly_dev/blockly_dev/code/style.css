@@ -1,6 +1,8 @@
 html,
 body {
 	height: 100%;
+	width: 100%;
+	margin: 0;
 }
 
 body {
@@ -116,7 +118,6 @@ td {
 	margin: 0;
 	padding: 1ex;
 	position: absolute;
-	direction: ltr;
 }
 
 pre.content {
