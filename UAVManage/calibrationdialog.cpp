@@ -115,9 +115,15 @@ void CalibrationDialog::showEvent(QShowEvent* event)
 		delete m_pLabelBackground;
 		m_pLabelBackground = nullptr;
 	}
-	m_pLabelBackground = new QLabel(dynamic_cast<QWidget*>(parent()));
+	QWidget* pWidget = this;
+	while (true) {
+		QWidget* pTemp = dynamic_cast<QWidget*>(pWidget->parent());
+		if (!pTemp) break;
+		pWidget = pTemp;
+	}
+	m_pLabelBackground = new QLabel(pWidget);
 	m_pLabelBackground->setStyleSheet(QString("background-color: rgba(0, 0, 0, 50%);"));
-	m_pLabelBackground->setFixedSize(dynamic_cast<QWidget*>(parent())->size());
+	m_pLabelBackground->setFixedSize(pWidget->size());
 	m_pLabelBackground->show();
 	if (ui.stackedWidgetProgress->currentIndex() == _Accelerometer && m_pMovieAcc) m_pMovieAcc->start();
 }

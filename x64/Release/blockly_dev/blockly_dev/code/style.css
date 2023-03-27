@@ -6,7 +6,7 @@ body {
 }
 
 body {
-	background-color: #c2ddf0;
+	background-color: #C2DDF0;
 	font-family: "Microsoft Yahei";
 	overflow: hidden;
 }
@@ -132,7 +132,7 @@ pre.content {
 #content_xml {
 	resize: none;
 	outline: none;
-	border: 1px solid #ccc;
+	border: 10px solid #ccc;
 	font-family: monospace;
 	overflow: scroll;
 }
@@ -150,7 +150,7 @@ button {
 	border-radius: 4px;
 	border: 1px solid #ddd;
 	font-size: 16px;
-	background-color: #eee;
+	background-color: #FFFFFF;
 	color: #000;
 	outline:0;
 }
@@ -219,14 +219,16 @@ button.notext {
 }
 
 .blocklyToolboxDiv {
-	border: 0.0625rem solid #C7C7C7;
+	background-color: #FFFFFF;
+	border-top: 0.0625rem solid #C7C7C7;
+	border-right: 0.0625rem solid #C7C7C7;
 }
 
 .blocklySvg {
-	background-color: #f2f2f2 !important;
-	border: 0.0625rem solid #C7C7C7;
+	background-color: #FFFFFF !important;
 	outline: none;
 	overflow: hidden;
+	border: 0px solid #C7C7C7;
 	/* IE overflows by default. */
 	position: absolute;
 	display: block;
@@ -285,7 +287,7 @@ button.notext {
 }
 
 .blocklyTooltipDiv {
-	background-color: #ffffc7;
+	background-color: #FFFFFF;
 	border: 1px solid #ddc;
 	box-shadow: 4px 4px 20px 1px rgba(0, 0, 0, .15);
 	color: #000;
@@ -311,7 +313,7 @@ button.notext {
 	display: none;
 	border: 1px solid;
 	border-color: #dadce0;
-	background-color: #fff;
+	background-color: #FFFFFF;
 	border-radius: 2px;
 	padding: 4px;
 	box-shadow: 0px 0px 3px 1px rgba(0, 0, 0, .3);
@@ -334,7 +336,7 @@ button.notext {
 	width: 16px;
 	height: 16px;
 	z-index: -1;
-	background-color: inherit;
+	background-color: #FFFFFF;
 	border-color: inherit;
 }
 

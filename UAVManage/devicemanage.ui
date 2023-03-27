@@ -6,15 +6,30 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>649</width>
-    <height>680</height>
+    <width>500</width>
+    <height>629</height>
    </rect>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>500</width>
+    <height>16777215</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>DeviceManage</string>
   </property>
   <property name="styleSheet">
-   <string notr="true"/>
+   <string notr="true">#labelManager,#labelControl,#labelDevceSet,#labelCheckTitle{
+border-top:1px solid #ACACAC;
+border-bottom:1px solid #ACACAC;
+}
+#widgetBackgroundMain{
+border-right:1px solid #ACACAC;
+}
+.QWidget{
+border-radius:0px;
+}</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <property name="leftMargin">
@@ -35,6 +50,12 @@
    <item row="0" column="1">
     <widget class="QWidget" name="widgetPreflightCheck" native="true">
      <layout class="QVBoxLayout" name="verticalLayout">
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
       <item>
        <widget class="QWidget" name="widgetCheckTitle" native="true">
         <property name="maximumSize">
@@ -44,7 +65,7 @@
          </size>
         </property>
         <property name="styleSheet">
-         <string notr="true">.QWidget{background:transparent;border-bottom:1px solid rgb(75,85,97);}</string>
+         <string notr="true"/>
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout_4">
          <property name="leftMargin">
@@ -60,43 +81,27 @@
           <number>6</number>
          </property>
          <item>
-          <widget class="QLabel" name="label_5">
+          <widget class="QLabel" name="labelCheckTitle">
            <property name="minimumSize">
             <size>
-             <width>22</width>
-             <height>22</height>
+             <width>0</width>
+             <height>28</height>
             </size>
            </property>
-           <property name="maximumSize">
-            <size>
-             <width>22</width>
-             <height>22</height>
-            </size>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="pixmap">
-            <pixmap resource="uavmanage.qrc">:/res/images/device.png</pixmap>
-           </property>
-           <property name="scaledContents">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_6">
            <property name="maximumSize">
             <size>
              <width>16777215</width>
-             <height>22</height>
+             <height>28</height>
             </size>
            </property>
            <property name="styleSheet">
-            <string notr="true">color: rgb(59, 140, 255);</string>
+            <string notr="true"/>
            </property>
            <property name="text">
             <string>起飞检查</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
            </property>
           </widget>
          </item>
@@ -127,10 +132,10 @@
         <widget class="QGroupBox" name="groupBox">
          <property name="geometry">
           <rect>
-           <x>120</x>
-           <y>10</y>
-           <width>281</width>
-           <height>341</height>
+           <x>10</x>
+           <y>0</y>
+           <width>221</width>
+           <height>281</height>
           </rect>
          </property>
          <property name="title">
@@ -226,14 +231,14 @@
         <widget class="QWidget" name="layoutWidget">
          <property name="geometry">
           <rect>
-           <x>0</x>
-           <y>10</y>
-           <width>111</width>
-           <height>341</height>
+           <x>10</x>
+           <y>290</y>
+           <width>221</width>
+           <height>111</height>
           </rect>
          </property>
-         <layout class="QVBoxLayout" name="verticalLayout_2">
-          <item>
+         <layout class="QGridLayout" name="gridLayout_5">
+          <item row="0" column="0">
            <widget class="QToolButton" name="btnBaseStation">
             <property name="minimumSize">
              <size>
@@ -265,39 +270,7 @@
             </property>
            </widget>
           </item>
-          <item>
-           <widget class="QToolButton" name="btnWaypointUpload">
-            <property name="minimumSize">
-             <size>
-              <width>80</width>
-              <height>40</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>120</width>
-              <height>16777215</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>上传舞步</string>
-            </property>
-            <property name="icon">
-             <iconset resource="uavmanage.qrc">
-              <normaloff>:/res/images/upload.png</normaloff>:/res/images/upload.png</iconset>
-            </property>
-            <property name="iconSize">
-             <size>
-              <width>22</width>
-              <height>22</height>
-             </size>
-            </property>
-            <property name="toolButtonStyle">
-             <enum>Qt::ToolButtonTextBesideIcon</enum>
-            </property>
-           </widget>
-          </item>
-          <item>
+          <item row="2" column="0">
            <widget class="QToolButton" name="toolButton">
             <property name="minimumSize">
              <size>
@@ -329,7 +302,39 @@
             </property>
            </widget>
           </item>
-          <item>
+          <item row="0" column="1">
+           <widget class="QToolButton" name="btnWaypointUpload">
+            <property name="minimumSize">
+             <size>
+              <width>80</width>
+              <height>40</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>120</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>上传舞步</string>
+            </property>
+            <property name="icon">
+             <iconset resource="uavmanage.qrc">
+              <normaloff>:/res/images/upload.png</normaloff>:/res/images/upload.png</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>22</width>
+              <height>22</height>
+             </size>
+            </property>
+            <property name="toolButtonStyle">
+             <enum>Qt::ToolButtonTextBesideIcon</enum>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
            <widget class="QToolButton" name="btnDevicePrepare">
             <property name="minimumSize">
              <size>
@@ -361,38 +366,6 @@
             </property>
            </widget>
           </item>
-          <item>
-           <widget class="QToolButton" name="btnFlyTakeoff">
-            <property name="minimumSize">
-             <size>
-              <width>80</width>
-              <height>40</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>120</width>
-              <height>16777215</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>起飞</string>
-            </property>
-            <property name="icon">
-             <iconset resource="uavmanage.qrc">
-              <normaloff>:/res/images/flytakeoff.png</normaloff>:/res/images/flytakeoff.png</iconset>
-            </property>
-            <property name="iconSize">
-             <size>
-              <width>22</width>
-              <height>22</height>
-             </size>
-            </property>
-            <property name="toolButtonStyle">
-             <enum>Qt::ToolButtonTextBesideIcon</enum>
-            </property>
-           </widget>
-          </item>
          </layout>
         </widget>
        </widget>
@@ -404,29 +377,40 @@
     <widget class="QWidget" name="widgetBackgroundMain" native="true">
      <property name="minimumSize">
       <size>
-       <width>220</width>
+       <width>240</width>
        <height>0</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
-       <width>220</width>
+       <width>240</width>
        <height>16777215</height>
       </size>
      </property>
-     <layout class="QGridLayout" name="gridLayout_3">
-      <item row="2" column="0">
-       <widget class="QListWidget" name="listWidget">
-        <property name="styleSheet">
-         <string notr="true"/>
+     <property name="styleSheet">
+      <string notr="true"/>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_4">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>1</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="QLabel" name="labelManager">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>28</height>
+         </size>
         </property>
-        <property name="spacing">
-         <number>2</number>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0">
-       <widget class="QWidget" name="widgetDeviceTitle" native="true">
         <property name="maximumSize">
          <size>
           <width>16777215</width>
@@ -434,137 +418,104 @@
          </size>
         </property>
         <property name="styleSheet">
-         <string notr="true">.QWidget{background:transparent;border-bottom:1px solid rgb(75,85,97);}</string>
+         <string notr="true"/>
         </property>
-        <layout class="QHBoxLayout" name="horizontalLayout_2">
-         <property name="leftMargin">
-          <number>0</number>
-         </property>
+        <property name="text">
+         <string>设备管理</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QWidget" name="widgetList" native="true">
+        <layout class="QVBoxLayout" name="verticalLayout_3">
          <property name="topMargin">
           <number>0</number>
          </property>
-         <property name="rightMargin">
-          <number>0</number>
-         </property>
-         <property name="bottomMargin">
-          <number>6</number>
-         </property>
          <item>
-          <widget class="QLabel" name="label">
-           <property name="minimumSize">
-            <size>
-             <width>22</width>
-             <height>22</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>22</width>
-             <height>22</height>
-            </size>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="pixmap">
-            <pixmap resource="uavmanage.qrc">:/res/images/device.png</pixmap>
-           </property>
-           <property name="scaledContents">
-            <bool>true</bool>
-           </property>
-          </widget>
+          <layout class="QHBoxLayout" name="horizontalLayout">
+           <item>
+            <spacer name="horizontalSpacer_3">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QToolButton" name="btnAddDevice">
+             <property name="minimumSize">
+              <size>
+               <width>77</width>
+               <height>35</height>
+              </size>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">border-image:url(&quot;res/images/add.png&quot;);
+border-radius:0px;</string>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QToolButton" name="btnSerial">
+             <property name="minimumSize">
+              <size>
+               <width>80</width>
+               <height>40</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>配置</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_4">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
          </item>
          <item>
-          <widget class="QLabel" name="label_2">
+          <widget class="QListWidget" name="listWidget">
            <property name="styleSheet">
-            <string notr="true">color: rgb(59, 140, 255);</string>
+            <string notr="true"/>
            </property>
-           <property name="text">
-            <string>设备管理</string>
+           <property name="spacing">
+            <number>2</number>
            </property>
           </widget>
          </item>
         </layout>
        </widget>
       </item>
-      <item row="1" column="0">
-       <layout class="QHBoxLayout" name="horizontalLayout">
-        <item>
-         <spacer name="horizontalSpacer_3">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <widget class="QToolButton" name="btnAddDevice">
-          <property name="minimumSize">
-           <size>
-            <width>80</width>
-            <height>40</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>添加</string>
-          </property>
-          <property name="icon">
-           <iconset resource="uavmanage.qrc">
-            <normaloff>:/res/images/add.png</normaloff>:/res/images/add.png</iconset>
-          </property>
-          <property name="iconSize">
-           <size>
-            <width>22</width>
-            <height>22</height>
-           </size>
-          </property>
-          <property name="toolButtonStyle">
-           <enum>Qt::ToolButtonTextBesideIcon</enum>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QToolButton" name="btnSerial">
-          <property name="minimumSize">
-           <size>
-            <width>80</width>
-            <height>40</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>配置</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <spacer name="horizontalSpacer_4">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-       </layout>
-      </item>
-      <item row="3" column="0">
-       <widget class="QWidget" name="widgetCommand" native="true">
+      <item>
+       <widget class="QWidget" name="widget" native="true">
         <property name="maximumSize">
          <size>
           <width>16777215</width>
-          <height>400</height>
+          <height>380</height>
          </size>
         </property>
-        <layout class="QGridLayout" name="gridLayout_2">
+        <layout class="QVBoxLayout" name="verticalLayout_2">
          <property name="leftMargin">
           <number>0</number>
          </property>
@@ -577,8 +528,14 @@
          <property name="bottomMargin">
           <number>0</number>
          </property>
-         <item row="0" column="0" colspan="2">
-          <widget class="QWidget" name="widget" native="true">
+         <item>
+          <widget class="QLabel" name="labelDevceSet">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>28</height>
+            </size>
+           </property>
            <property name="maximumSize">
             <size>
              <width>16777215</width>
@@ -586,303 +543,254 @@
             </size>
            </property>
            <property name="styleSheet">
-            <string notr="true">.QWidget{background:transparent;border-bottom:1px solid rgb(75,85,97);}</string>
+            <string notr="true"/>
            </property>
-           <layout class="QHBoxLayout" name="horizontalLayout_3">
-            <property name="leftMargin">
-             <number>0</number>
-            </property>
+           <property name="text">
+            <string>设备设置</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QWidget" name="widgetDeviceSet" native="true">
+           <layout class="QGridLayout" name="gridLayout_2">
             <property name="topMargin">
              <number>0</number>
             </property>
-            <property name="rightMargin">
+            <property name="bottomMargin">
              <number>0</number>
             </property>
-            <property name="bottomMargin">
-             <number>6</number>
-            </property>
-            <item>
-             <widget class="QLabel" name="label_3">
+            <item row="0" column="0">
+             <widget class="QToolButton" name="btnWaypointCheck">
               <property name="minimumSize">
                <size>
-                <width>22</width>
-                <height>22</height>
+                <width>210</width>
+                <height>42</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
-                <width>22</width>
-                <height>22</height>
+                <width>210</width>
+                <height>42</height>
                </size>
               </property>
+              <property name="styleSheet">
+               <string notr="true">border-image:url(&quot;res/images/checkout.png&quot;);
+border-radius:0px;
+padding-left:20px;</string>
+              </property>
               <property name="text">
-               <string/>
-              </property>
-              <property name="pixmap">
-               <pixmap resource="uavmanage.qrc">:/res/images/device.png</pixmap>
-              </property>
-              <property name="scaledContents">
-               <bool>true</bool>
+               <string>检查舞步</string>
               </property>
              </widget>
             </item>
-            <item>
-             <widget class="QLabel" name="label_4">
+            <item row="1" column="0">
+             <widget class="QToolButton" name="btn3DFly">
+              <property name="minimumSize">
+               <size>
+                <width>210</width>
+                <height>42</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>210</width>
+                <height>42</height>
+               </size>
+              </property>
               <property name="styleSheet">
-               <string notr="true">color: rgb(59, 140, 255);</string>
+               <string notr="true">border-image:url(&quot;res/images/stereoscopic.png&quot;);
+border-radius:0px;
+padding-left:20px;</string>
               </property>
               <property name="text">
-               <string>设备控制</string>
+               <string>三维仿真</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0">
+             <widget class="QToolButton" name="btnCheckAction">
+              <property name="minimumSize">
+               <size>
+                <width>210</width>
+                <height>40</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>210</width>
+                <height>42</height>
+               </size>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">border-image:url(&quot;res/images/inspection.png&quot;);
+border-radius:0px;
+padding-left:20px;</string>
+              </property>
+              <property name="text">
+               <string>起飞检查</string>
               </property>
              </widget>
             </item>
            </layout>
           </widget>
          </item>
-         <item row="1" column="1">
-          <layout class="QHBoxLayout" name="horizontalLayout_5">
-           <item>
-            <widget class="QToolButton" name="btnQueue">
-             <property name="minimumSize">
-              <size>
-               <width>80</width>
-               <height>40</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>列队</string>
-             </property>
-             <property name="icon">
-              <iconset resource="uavmanage.qrc">
-               <normaloff>:/res/images/flyQueue.png</normaloff>:/res/images/flyQueue.png</iconset>
-             </property>
-             <property name="iconSize">
-              <size>
-               <width>22</width>
-               <height>22</height>
-              </size>
-             </property>
-             <property name="toolButtonStyle">
-              <enum>Qt::ToolButtonTextBesideIcon</enum>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QToolButton" name="btnRegain">
-             <property name="minimumSize">
-              <size>
-               <width>80</width>
-               <height>40</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>回收</string>
-             </property>
-             <property name="icon">
-              <iconset resource="uavmanage.qrc">
-               <normaloff>:/res/images/flyRegain.png</normaloff>:/res/images/flyRegain.png</iconset>
-             </property>
-             <property name="iconSize">
-              <size>
-               <width>22</width>
-               <height>22</height>
-              </size>
-             </property>
-             <property name="toolButtonStyle">
-              <enum>Qt::ToolButtonTextBesideIcon</enum>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-         <item row="2" column="1">
-          <widget class="QToolButton" name="btnWaypointCheck">
+         <item>
+          <widget class="QLabel" name="labelControl">
            <property name="minimumSize">
             <size>
-             <width>160</width>
-             <height>40</height>
+             <width>0</width>
+             <height>28</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
-             <width>240</width>
-             <height>16777215</height>
+             <width>16777215</width>
+             <height>28</height>
             </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true"/>
            </property>
            <property name="text">
-            <string>检查舞步</string>
+            <string>设备控制</string>
            </property>
-           <property name="icon">
-            <iconset resource="uavmanage.qrc">
-             <normaloff>:/res/images/inspect.png</normaloff>:/res/images/inspect.png</iconset>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>32</width>
-             <height>32</height>
-            </size>
-           </property>
-           <property name="toolButtonStyle">
-            <enum>Qt::ToolButtonTextBesideIcon</enum>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
            </property>
           </widget>
          </item>
-         <item row="3" column="0">
-          <spacer name="horizontalSpacer">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>8</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item row="3" column="1">
-          <widget class="QToolButton" name="btn3DFly">
-           <property name="minimumSize">
-            <size>
-             <width>160</width>
-             <height>40</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>240</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>三维仿真</string>
-           </property>
-           <property name="icon">
-            <iconset resource="uavmanage.qrc">
-             <normaloff>:/res/images/stereoscopic.png</normaloff>:/res/images/stereoscopic.png</iconset>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>32</width>
-             <height>32</height>
-            </size>
-           </property>
-           <property name="toolButtonStyle">
-            <enum>Qt::ToolButtonTextBesideIcon</enum>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="2">
-          <spacer name="horizontalSpacer_2">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>8</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item row="4" column="1">
-          <widget class="QToolButton" name="btnCheckAction">
-           <property name="minimumSize">
-            <size>
-             <width>160</width>
-             <height>40</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>240</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>起飞检查</string>
-           </property>
-           <property name="icon">
-            <iconset resource="uavmanage.qrc">
-             <normaloff>:/res/images/prepare.png</normaloff>:/res/images/prepare.png</iconset>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>32</width>
-             <height>32</height>
-            </size>
-           </property>
-           <property name="toolButtonStyle">
-            <enum>Qt::ToolButtonTextBesideIcon</enum>
-           </property>
-          </widget>
-         </item>
-         <item row="5" column="1">
-          <widget class="QToolButton" name="btnFlyLand">
-           <property name="minimumSize">
-            <size>
-             <width>160</width>
-             <height>40</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>240</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>降落</string>
-           </property>
-           <property name="icon">
-            <iconset resource="uavmanage.qrc">
-             <normaloff>:/res/images/flyland.png</normaloff>:/res/images/flyland.png</iconset>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>32</width>
-             <height>32</height>
-            </size>
-           </property>
-           <property name="toolButtonStyle">
-            <enum>Qt::ToolButtonTextBesideIcon</enum>
-           </property>
-           <property name="autoRaise">
-            <bool>false</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="6" column="1">
-          <widget class="QToolButton" name="btnFlyStop">
-           <property name="minimumSize">
-            <size>
-             <width>160</width>
-             <height>50</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>240</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>急停
-(CTRL+空格)</string>
-           </property>
-           <property name="icon">
-            <iconset resource="uavmanage.qrc">
-             <normaloff>:/res/images/flystop.png</normaloff>:/res/images/flystop.png</iconset>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>38</width>
-             <height>38</height>
-            </size>
-           </property>
-           <property name="toolButtonStyle">
-            <enum>Qt::ToolButtonTextBesideIcon</enum>
-           </property>
+         <item>
+          <widget class="QWidget" name="widgetCommand" native="true">
+           <layout class="QGridLayout" name="gridLayout_3">
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <item row="1" column="0">
+             <layout class="QHBoxLayout" name="horizontalLayout_5">
+              <item>
+               <widget class="QToolButton" name="btnQueue">
+                <property name="minimumSize">
+                 <size>
+                  <width>100</width>
+                  <height>42</height>
+                 </size>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">border-image:url(&quot;res/images/flyQueue.png&quot;);
+border-radius:0px;
+padding-left:10px;</string>
+                </property>
+                <property name="text">
+                 <string>列队</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QToolButton" name="btnRegain">
+                <property name="minimumSize">
+                 <size>
+                  <width>100</width>
+                  <height>42</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>100</width>
+                  <height>42</height>
+                 </size>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">border-image:url(&quot;res/images/flyRecover.png&quot;);
+border-radius:0px;
+padding-left:10px;</string>
+                </property>
+                <property name="text">
+                 <string>回收</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item row="3" column="0">
+             <widget class="QToolButton" name="btnFlyStop">
+              <property name="minimumSize">
+               <size>
+                <width>210</width>
+                <height>62</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>210</width>
+                <height>62</height>
+               </size>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">border-image:url(&quot;res/images/flystop.png&quot;);
+border-radius:0px;
+padding-left:20px;</string>
+              </property>
+              <property name="text">
+               <string>急停(CTRL+空格)</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="0">
+             <layout class="QHBoxLayout" name="horizontalLayout_3">
+              <item>
+               <widget class="QToolButton" name="btnFlyTakeoff">
+                <property name="minimumSize">
+                 <size>
+                  <width>100</width>
+                  <height>42</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>100</width>
+                  <height>42</height>
+                 </size>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">border-image:url(&quot;res/images/flytakeoff.png&quot;);
+border-radius:0px;
+padding-left:10px;</string>
+                </property>
+                <property name="text">
+                 <string>起飞</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QToolButton" name="btnFlyLand">
+                <property name="minimumSize">
+                 <size>
+                  <width>100</width>
+                  <height>42</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>100</width>
+                  <height>42</height>
+                 </size>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">border-image:url(&quot;res/images/flyland.png&quot;);
+border-radius:0px;
+padding-left:10px;</string>
+                </property>
+                <property name="text">
+                 <string>降落</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
           </widget>
          </item>
         </layout>

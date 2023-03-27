@@ -65,8 +65,8 @@ private slots:
 	void onDurationChanged(qint64 duration);
 	void onPositionChanged(qint64 position);
 	void on_m_pBtnPlay_clicked();	//播放按钮
-	void on_m_pBtnPrev_clicked();	//上一首
-	void on_m_pBtnNext_clicked();	//上一首
+	//void on_m_pBtnPrev_clicked();	//上一首
+	//void on_m_pBtnNext_clicked();	//上一首
 	void on_m_pBtnLoad_clicked();	//添加文件
 	void on_m_pHslider_sliderPressed();								//拖动滑块后进行音频播放进度调控
 	void on_m_pHslider_sliderReleased();							//拖动滑块后进行音频播放进度调控

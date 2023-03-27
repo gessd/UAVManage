@@ -33,7 +33,7 @@ void HistoryMessage::resetWidget()
 	ui.btnShow->setVisible(!m_bShowIng);
 	this->setFixedWidth(pWidget->width() / 2);
 	if (m_bShowIng) {
-		this->setGeometry(pWidget->width() / 2 - width() / 2, 0, width(), pWidget->height());
+		this->setGeometry(pWidget->width() / 2 - width() / 2, 0, width(), pWidget->height() / 2);
 	}
 	else {
 		this->setGeometry(pWidget->width() / 2 - width() / 2, ui.widgetButton->height() - height(), width(), height());

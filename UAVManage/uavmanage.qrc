@@ -7,11 +7,14 @@
         <file>res/images/flystop.png</file>
         <file>res/images/add.png</file>
         <file>res/images/delete.png</file>
+		<file>res/images/stop.png</file>
+		<file>res/images/openMusic.png</file>
         <file>res/images/playmusic.png</file>
         <file>res/images/stopmusic.png</file>
         <file>res/images/pausemusic.png</file>
+		<file>res/images/checkout.png</file>
         <file>res/images/lighting.png</file>
-        <file>res/images/inspect.png</file>
+        <file>res/images/inspection.png</file>
         <file>res/images/prepare.png</file>
         <file>res/images/stereoscopic.png</file>
         <file>res/images/upload.png</file>
@@ -31,7 +34,7 @@
         <file>res/menu/P02_help_about_page_ic.png</file>
         <file>res/menu/preparation.png</file>
         <file>res/images/flyQueue.png</file>
-        <file>res/images/flyRegain.png</file>
+        <file>res/images/flyRecover.png</file>
         <file>res/images/musicload.png</file>
         <file>res/images/device.png</file>
         <file>res/images/newproject.png</file>

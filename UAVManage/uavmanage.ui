@@ -21,7 +21,19 @@
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayoutMain">
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
     <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
+    <property name="spacing">
      <number>0</number>
     </property>
     <item row="0" column="0">
@@ -33,17 +45,11 @@
        </size>
       </property>
       <layout class="QGridLayout" name="gridLayout_2" rowstretch="8,2">
-       <property name="leftMargin">
+       <property name="horizontalSpacing">
         <number>0</number>
        </property>
-       <property name="topMargin">
-        <number>0</number>
-       </property>
-       <property name="rightMargin">
-        <number>0</number>
-       </property>
-       <property name="bottomMargin">
-        <number>0</number>
+       <property name="verticalSpacing">
+        <number>9</number>
        </property>
        <item row="0" column="0">
         <widget class="QWebEngineView" name="webEngineView">
@@ -67,15 +73,18 @@
      <widget class="QWidget" name="widgetManager" native="true">
       <property name="minimumSize">
        <size>
-        <width>220</width>
+        <width>240</width>
         <height>0</height>
        </size>
       </property>
       <property name="maximumSize">
        <size>
-        <width>220</width>
+        <width>240</width>
         <height>16777215</height>
        </size>
+      </property>
+      <property name="styleSheet">
+       <string notr="true"/>
       </property>
       <layout class="QVBoxLayout" name="layoutManger">
        <property name="spacing">

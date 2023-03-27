@@ -862,10 +862,12 @@ void DeviceManage::resizeEvent(QResizeEvent* event)
 	if (width() > ui.widgetBackgroundMain->width()) {
 		ui.widgetPreflightCheck->setVisible(true);
 		ui.btnAddDevice->setEnabled(false);
+		ui.btnSerial->setEnabled(false);
 	}
 	else {
 		ui.widgetPreflightCheck->setVisible(false);
 		ui.btnAddDevice->setEnabled(true);
+		ui.btnSerial->setEnabled(true);
 	}
 	for (int i = 0; i < ui.listWidget->count(); i++) {
 		QListWidgetItem* pItem = ui.listWidget->item(i);
@@ -957,6 +959,8 @@ void DeviceManage::onUpdateStatusTo3D()
 
 void DeviceManage::onRemoveDevice(QString name)
 {
+	QMessageBox::StandardButton button = QMessageBox::question(this, tr("删除"), QString("确定删除%1设备，删除后无法恢复？").arg(name));
+	if (QMessageBox::Yes != button) return;
 	for (int i = 0; i < ui.listWidget->count(); i++) {
 		QListWidgetItem* pItem = ui.listWidget->item(i);
 		if (!pItem) continue;

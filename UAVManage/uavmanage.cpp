@@ -40,6 +40,7 @@ UAVManage::UAVManage(QWidget* parent)
 	m_pToopTip = nullptr;
 	//注册事件过滤器，处理快捷键事件
 	installEventFilter(this);
+	setWindowFlags(Qt::FramelessWindowHint);
 	MessageListDialog::getInstance()->setParent(this);
 	m_pHistory = new HistoryMessage(this);
 	connect(MessageListDialog::getInstance(), SIGNAL(sigMessage(QString, _Messagelevel, bool)), m_pHistory, SLOT(onMessageData(QString, _Messagelevel, bool)));
@@ -118,13 +119,18 @@ void UAVManage::initMenu()
 	if (bInit) return;
 	bInit = true;
 	//添加菜单
-	ui.menuBar->setMinimumHeight(30);
+	ui.menuBar->setFixedHeight(30);
 	QWidget* pMenuWidget = new QWidget(ui.menuBar);
 	QHBoxLayout* pMenuLayout = new QHBoxLayout(pMenuWidget);
 	pMenuLayout->setSpacing(10);
 	pMenuLayout->setContentsMargins(8, 0, 0, 0);
 	pMenuWidget->setLayout(pMenuLayout);
 	pMenuWidget->setGeometry(0, 0, ui.menuBar->width(), ui.menuBar->height());
+	QLabel* pLableIcon = new QLabel(this);
+	pLableIcon->setFixedSize(22, 22);
+	pLableIcon->setPixmap(QPixmap(":/res/logo/qz_logo.ico"));
+	pLableIcon->setScaledContents(true);
+	pMenuLayout->addWidget(pLableIcon);
 
 	QMenu* pIconMenu = new QMenu(tr("奇正数元"));
 	pIconMenu->setIcon(QIcon(":/res/logo/qz_logo.ico"));
@@ -267,6 +273,13 @@ void UAVManage::initMenu()
 		if (stop)m_pDeviceManage->allDeviceControl(_DeviceQuickStop);
 		else m_pDeviceManage->allDeviceControl(_DeviceLandLocal);
 		});
+
+	//无边框时程序增加最大化最小化按钮
+	pMenuLayout->addItem(new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum));
+	QToolButton* pBtnClose = new QToolButton(this);
+	pBtnClose->setText("X");
+	pMenuLayout->addWidget(pBtnClose);
+	connect(pBtnClose, &QAbstractButton::clicked, this, &UAVManage::close);
 }
 
 void UAVManage::updateStyle()

@@ -19,9 +19,9 @@ SoundGrade::SoundGrade(QWidget *parent) :QWidget(parent)
 	signalConnectSlot();
 
 	//TODO暂时隐藏
-	m_ui.m_pBtnPrev->setVisible(false);
+	//m_ui.m_pBtnPrev->setVisible(false);
 	m_ui.m_pPlayList->setVisible(false);
-	m_ui.m_pBtnNext->setVisible(false);	
+	//m_ui.m_pBtnNext->setVisible(false);	
 	m_ui.m_pHslider->setVisible(false);
 
 	m_ui.m_pBtnPlay->setEnabled(false);
@@ -165,22 +165,23 @@ void SoundGrade::on_m_pPlayList_doubleClicked(const QModelIndex &index)
 	playlist->setCurrentIndex(rowNo);
 }
 
-void SoundGrade::on_m_pBtnPrev_clicked()
-{//上一首
-	if (player->state() != QMediaPlayer::State::StoppedState)
-		player->stop();
-	int Row = m_ui.m_pPlayList->currentRow();
-	if (Row > 0)
-		m_ui.m_pPlayList->setCurrentRow(--Row);
-}
-void SoundGrade::on_m_pBtnNext_clicked()
-{//下一首
-	if (player->state() != QMediaPlayer::State::StoppedState)
-		player->stop();
-	int Row = m_ui.m_pPlayList->currentRow();
-	if (Row < m_ui.m_pPlayList->count() - 1)
-		m_ui.m_pPlayList->setCurrentRow(++Row);
-}
+//void SoundGrade::on_m_pBtnPrev_clicked()
+//{//上一首
+//	if (player->state() != QMediaPlayer::State::StoppedState)
+//		player->stop();
+//	int Row = m_ui.m_pPlayList->currentRow();
+//	if (Row > 0)
+//		m_ui.m_pPlayList->setCurrentRow(--Row);
+//}
+//void SoundGrade::on_m_pBtnNext_clicked()
+//{//下一首
+//	if (player->state() != QMediaPlayer::State::StoppedState)
+//		player->stop();
+//	int Row = m_ui.m_pPlayList->currentRow();
+//	if (Row < m_ui.m_pPlayList->count() - 1)
+//		m_ui.m_pPlayList->setCurrentRow(++Row);
+//}
+
 void SoundGrade::onDecoderFinished()
 {//解码成功后槽函数
 	bufferList tmpBufferList = m_decoder->getBufferList();
@@ -291,7 +292,7 @@ void SoundGrade::onPositionChanged(qint64 position)
 			m_pLabelPosition = new QLabel(this);
 			int h = m_ui.widgetScale->height() + m_ui.m_pCuverPlot->height();
 			m_pLabelPosition->setFixedSize(2, h);
-			m_pLabelPosition->setStyleSheet("background:#0000FF;");
+			m_pLabelPosition->setStyleSheet("background:#FF0000;");
 		}
 		int nWidget = m_ui.widgetScale->width();
 		int clearance = nWidget / m_nDuration;

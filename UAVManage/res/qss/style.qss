@@ -1,21 +1,18 @@
 QWidget{
-	color:#000000;
-	font-size:16px;
+	color:#467FC1;
+	font-size:14px;
 	font-family:"微软雅黑";
+	background:#FFFFFF;
 }
 QWidget:disabled{
 	color:#666666;
 }
 
-#centralWidget{
-	background:#C2DDF0;
-}
 /*通用按钮样式*/
 QPushButton,QToolButton{
-	color:#3B8CFF;
     background:#FFFFFF;
 	border-radius:10px;
-	border:1px solid #3B8CFF;
+	border:1px solid #467FC1;
 }
 QPushButton:hover,QToolButton:hover{
 	border-width:2px;
@@ -23,13 +20,9 @@ QPushButton:hover,QToolButton:hover{
 QPushButton:pressed,QToolButton:pressed{
     background:#DDDDDD;
 }
-SpaceParam QPushButton{
-	color:#FFFFFF;
-    background:#3B8CFF;
-	border:3px solid #FFFFFF;
-}
-SpaceParam QPushButton:pressed{
-	background:#3B88CC;
+QCheckBox::indicator{
+	width:24px;
+	height:24px;
 }
 QToolBar QToolButton, QMenuBar QToolButton{
 	background:transparent;
@@ -57,11 +50,17 @@ DeviceControl QToolButton{
 DeviceControl QToolButton:hover{
 	border-width:1px;
 }
-DeviceControl QLabel{
-	font-size:12px;
+#pMenuWidget{
+	background:#467FC1;
+}
+#widgetMain{
+	background:#C2DDF0;
+}
+#widgetManager{
+	border-radius:0px;
 }
 #labelLocation{
-	font-size:10px;
+	font-size:11px;
 }
 #btnFlyStop{
 	border:1px solid #FF0000;
@@ -81,15 +80,14 @@ DeviceControl QLabel{
 	border-width:0px;
 }
 QLineEdit{
-	border:1px solid #000000;
+	border:1px solid #467FC1;
 	padding:4px;
 	padding-left:10px;
 	border-radius:3px;
-	color:#3B8CFF;
 	background:transparent;
 }
 QLineEdit:focus, QLineEdit:hover{
-	border:1px solid #3B8CFF;
+	border:1px solid #000000;
 }
 QLineEdit:disabled{
 	background:rgb(238,238,238);
@@ -102,8 +100,7 @@ QTableWidget QLineEdit{
 	background:#FFFFFF;
 }
 QTableWidget::item:selected{
-    background:#F0F0F0;
-	color:#000000;
+    background:#FFFFFF;
 }
 QHeaderView::section{
 	text-align:center;
@@ -132,7 +129,7 @@ QListWidget::item:hover{
 	border:2px solid #3B8CFF;
 }
 QListWidget::item:selected{
-	border:2px solid rgba(59,140,255,190);
+	border:1px solid #000000;
 }
 QProgressBar{
 	background:transparent;
@@ -245,7 +242,7 @@ AddDeviceDialog .QFrame, SpaceParam .QFrame{
 	background:transparent;
 }
 #widgetBackgroundMain, #widgetPreflightCheck, QTextBrowser, QTreeWidget{
-	background:#F0F0F0;
+	background:#FFFFFF;
 	border-radius:10px;
 }
 

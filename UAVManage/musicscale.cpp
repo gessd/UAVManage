@@ -30,11 +30,12 @@ void MusicScale::paintEvent(QPaintEvent* event)
 		QPainter painter(this);
 		QPen pen;
 		pen.setStyle(Qt::SolidLine);
-		pen.setColor("#0000FF");
+		pen.setColor("#467FC1");
 		pen.setWidth(1);
 		painter.setPen(pen);
 		int nHeight = this->height();
 		int nWidget = this->width();
+		painter.drawLine(0, nHeight / 2 + 1, nWidget, nHeight / 2 + 1);
 		//painter.drawRect(0, 0, nWidget-1, nHeight-1);
 		int nSecondSum = m_nduration / 1000;
 		int nMilli = m_nduration % 1000;
@@ -44,29 +45,36 @@ void MusicScale::paintEvent(QPaintEvent* event)
 		int maxwidget = clearance * nSecondSum + remainder;
 		emit updateMaxWidget(maxwidget);
 		for (int i = 0; i <= nSecondSum; i++) {
-			int h = nHeight;
-			int pw = 1;
-			if(0 == i){
-				//起始位置
-				pw = 1;
+			//int h = nHeight;
+			//int pw = 1;
+			//if(0 == i){
+			//	//起始位置
+			//	pw = 2;
+			//}
+			//else if (0 == i % 60) {
+			//	//分钟刻度
+			//	pw = 3;
+			//}
+			//else if (0 == i % 10) {
+			//	//10秒刻度
+			//	pw = 2;
+			//	h = nHeight / 2;
+			//}
+			//else {
+			//	//秒
+			//	pw = 1;
+			//	h = nHeight / 4;
+			//}
+			//pen.setWidth(pw);
+			//painter.setPen(pen);
+			//painter.drawLine(i * clearance, nHeight, i * clearance, nHeight-h);
+			if (0 == i || 0 == i % 10) {
+				//10秒刻度;
+				pen.setWidth(2);
+				painter.setPen(pen);
+				painter.setBrush(QBrush("#467FC1"));
+				painter.drawEllipse(i * clearance, nHeight / 2, 2, 2);
 			}
-			else if (0 == i % 60) {
-				//分钟刻度
-				pw = 3;
-			}
-			else if (0 == i % 10) {
-				//10秒刻度
-				pw = 2;
-				h = nHeight / 2;
-			}
-			else {
-				//秒
-				pw = 1;
-				h = nHeight / 4;
-			}
-			pen.setWidth(pw);
-			painter.setPen(pen);
-			painter.drawLine(i * clearance, nHeight, i * clearance, nHeight-h);
 		}
 		if (m_nCurrent > 0) {
 			int n = m_nCurrent % 1000;
