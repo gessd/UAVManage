@@ -201,5 +201,10 @@ private:
     StopFlyDialog* m_pStopDialog;
     //起飞检查展开窗口
     ManagerTopWidget* m_pTopWidget;
+    //起飞检查置顶窗口
     MyTooltip* m_pToopTip;
+    //自定义菜单栏
+    QWidget* m_pMenuWidget;
+    //最大化按钮
+    QToolButton* m_pBtnMax;
 };

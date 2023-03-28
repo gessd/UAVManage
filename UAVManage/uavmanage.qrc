@@ -23,6 +23,11 @@
         <file>res/images/uavgreen.png</file>
         <file>res/images/uavred.png</file>
         <file>res/images/uavyellow.png</file>
+		<file>res/images/close.png</file>
+		<file>res/images/max.png</file>
+		<file>res/images/min.png</file>
+		<file>res/images/normal.png</file>
+		<file>res/images/logo.png</file>
         <file>res/logo/qz_logo.ico</file>
         <file>res/menu/P01_file_open_btn_cli.png</file>
         <file>res/menu/P01_file_open_btn_hov.png</file>
@@ -38,7 +43,6 @@
         <file>res/images/musicload.png</file>
         <file>res/images/device.png</file>
         <file>res/images/newproject.png</file>
-        <file>res/images/windows_close.png</file>
         <file>res/images/networkerror.png</file>
         <file>res/images/waiting.gif</file>
         <file>res/images/app_loading.png</file>

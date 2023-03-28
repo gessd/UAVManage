@@ -148,24 +148,12 @@ QSlider::add-page:horizontal {
       </item>
       <item>
        <widget class="QToolButton" name="btnClose">
-        <property name="styleSheet">
-         <string notr="true">QPushButton,QToolButton{
-	border-radius:5px;
-    background:transparent;
-}
-QPushButton:hover,QToolButton:hover{
-	border:1px solid #FFFFFF;
-}
-QPushButton:pressed,QToolButton:pressed{
-    background:transparent;
-}</string>
-        </property>
         <property name="text">
          <string>X</string>
         </property>
         <property name="icon">
          <iconset resource="uavmanage.qrc">
-          <normaloff>:/res/images/windows_close.png</normaloff>:/res/images/windows_close.png</iconset>
+          <normaloff>:/res/images/close.png</normaloff>:/res/images/close.png</iconset>
         </property>
        </widget>
       </item>

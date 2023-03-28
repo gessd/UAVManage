@@ -38,6 +38,7 @@ UAVManage::UAVManage(QWidget* parent)
 	m_p3DProcess = nullptr;
 	m_pBackgrounMask = nullptr;
 	m_pToopTip = nullptr;
+	m_pMenuWidget = nullptr;
 	//注册事件过滤器，处理快捷键事件
 	installEventFilter(this);
 	setWindowFlags(Qt::FramelessWindowHint);
@@ -120,15 +121,15 @@ void UAVManage::initMenu()
 	bInit = true;
 	//添加菜单
 	ui.menuBar->setFixedHeight(30);
-	QWidget* pMenuWidget = new QWidget(ui.menuBar);
-	QHBoxLayout* pMenuLayout = new QHBoxLayout(pMenuWidget);
+	m_pMenuWidget = new QWidget(ui.menuBar);
+	QHBoxLayout* pMenuLayout = new QHBoxLayout(m_pMenuWidget);
 	pMenuLayout->setSpacing(10);
-	pMenuLayout->setContentsMargins(8, 0, 0, 0);
-	pMenuWidget->setLayout(pMenuLayout);
-	pMenuWidget->setGeometry(0, 0, ui.menuBar->width(), ui.menuBar->height());
+	pMenuLayout->setContentsMargins(10, 0, 10, 0);
+	m_pMenuWidget->setLayout(pMenuLayout);
+	m_pMenuWidget->setGeometry(0, 0, ui.menuBar->width(), ui.menuBar->height());
 	QLabel* pLableIcon = new QLabel(this);
-	pLableIcon->setFixedSize(22, 22);
-	pLableIcon->setPixmap(QPixmap(":/res/logo/qz_logo.ico"));
+	pLableIcon->setFixedSize(21, 19);
+	pLableIcon->setPixmap(QPixmap(":/res/images/logo.png"));
 	pLableIcon->setScaledContents(true);
 	pMenuLayout->addWidget(pLableIcon);
 
@@ -201,8 +202,8 @@ void UAVManage::initMenu()
 	ui.toolBar->setVisible(false);
 
 	//pMenuLayout->addWidget(initMenuButton(pMenuWidget, tr(""), ":/res/logo/qz_logo.ico", ":/res/logo/qz_logo.ico", pIconMenu));
-	pMenuLayout->addWidget(initMenuButton(pMenuWidget, tr("项目"), ":/res/menu/P01_file_open_btn_cli.png", ":/res/menu/P01_file_open_btn_cli.png", pProjectMenu));
-	m_pButtonFlyPrepare = initMenuButton(pMenuWidget, tr("起飞准备"), ":/res/menu/preparation.png", ":/res/menu/preparation.png", pMenuFlyPrepare);
+	pMenuLayout->addWidget(initMenuButton(m_pMenuWidget, tr("项目"), ":/res/menu/P01_file_open_btn_cli.png", ":/res/menu/P01_file_open_btn_cli.png", pProjectMenu));
+	m_pButtonFlyPrepare = initMenuButton(m_pMenuWidget, tr("起飞准备"), ":/res/menu/preparation.png", ":/res/menu/preparation.png", pMenuFlyPrepare);
 	m_pButtonFlyPrepare->setEnabled(false);
 	ui.toolBar->setEnabled(false);
 	m_pButtonFlyPrepare->close();
@@ -214,7 +215,7 @@ void UAVManage::initMenu()
 	pActionHelp->addAction(pActionAbout);
 	QAction* pActionFirmware = new QAction(QIcon(":/res/logo/qz_logo.ico"), tr("固件"));
 	pActionHelp->addAction(pActionFirmware);
-	pMenuLayout->addWidget(initMenuButton(pMenuWidget, tr("帮助"), ":/res/menu/P02_help_about_page_ic.png", ":/res/menu/P02_help_about_page_ic.png", pActionHelp));
+	pMenuLayout->addWidget(initMenuButton(m_pMenuWidget, tr("帮助"), ":/res/menu/P02_help_about_page_ic.png", ":/res/menu/P02_help_about_page_ic.png", pActionHelp));
 	connect(pActionAbout, &QAction::triggered, [this]() {m_pAbout->exec(); });
 	connect(pActionFirmware, &QAction::triggered, [this]() {
 		m_pDeviceManage->showFirmwareDialog();
@@ -275,11 +276,31 @@ void UAVManage::initMenu()
 		});
 
 	//无边框时程序增加最大化最小化按钮
-	pMenuLayout->addItem(new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum));
+	pMenuLayout->addItem(new QSpacerItem(40, 20));
+	QToolButton* pBtnMin = new QToolButton(this);
+	pBtnMin->setFixedSize(12, 12);
+	pBtnMin->setIcon(QIcon(":/res/images/min.png"));
+	pMenuLayout->addWidget(pBtnMin);
+	m_pBtnMax = new QToolButton(this);
+	m_pBtnMax->setFixedSize(12, 12);
+	m_pBtnMax->setIcon(QIcon(":/res/images/max.png"));
+	pMenuLayout->addWidget(m_pBtnMax);
 	QToolButton* pBtnClose = new QToolButton(this);
-	pBtnClose->setText("X");
+	pBtnClose->setFixedSize(12, 12);
+	pBtnClose->setIcon(QIcon(":/res/images/close.png"));
 	pMenuLayout->addWidget(pBtnClose);
+	connect(pBtnMin, &QAbstractButton::clicked, this, &UAVManage::showMinimized);
 	connect(pBtnClose, &QAbstractButton::clicked, this, &UAVManage::close);
+	connect(m_pBtnMax, &QAbstractButton::clicked, [this]() {
+		Qt::WindowStates state = windowState();
+		if (Qt::WindowState::WindowMaximized == state || Qt::WindowState::WindowFullScreen == state) {
+			showNormal();
+			m_pBtnMax->setIcon(QIcon(":/res/images/max.png"));
+			return;
+		}
+		showMaximized();
+		m_pBtnMax->setIcon(QIcon(":/res/images/normal.png"));
+		});
 }
 
 void UAVManage::updateStyle()
@@ -557,6 +578,7 @@ void UAVManage::closeEvent(QCloseEvent* event)
 
 void UAVManage::resizeEvent(QResizeEvent* event)
 {
+	if (m_pMenuWidget) m_pMenuWidget->setGeometry(0, 0, ui.menuBar->width(), ui.menuBar->height());
 	MessageListDialog::getInstance()->move((width() - MessageListDialog::getInstance()->width()) / 2, 0);
 	m_pHistory->resetWidget();
 	if(!m_pTopWidget->isHidden()) m_pTopWidget->setGeometry(0, 0, width(), height());
