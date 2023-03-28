@@ -16,7 +16,7 @@
   <property name="styleSheet">
    <string notr="true">QWidget{
 	background:#FFFFFF;
-	color:575E75;
+	color:#467FC1;
 }
 QLabel{
 	background:transparent;
@@ -27,12 +27,12 @@ QStackedWidget{
 QToolButton{
 	text-decoration:underline;
 	background:transparent;
-	color:#3B8CFF;
+	color:#467FC1;
 	border-width:0px;
 	border-radius:0px; 
 }
 QToolButton:hover{
-	border-bottom:1px solid #3B8CFF;
+	border-bottom:1px solid #467FC1;
 }
 QToolButton:pressed,QToolButton:pressed{
     background:transparent;
@@ -44,7 +44,7 @@ QProgressBar::chunk{
 	border-radius:10px;
 }
 QSlider::groove:horizontal {
-    border:0px solid #3B8CFF;
+    border:0px solid #467FC1;
 }
 QSlider::handle:horizontal {
     width:6px;
@@ -63,7 +63,7 @@ QSlider::add-page:horizontal {
 #dialogWidgetTitle{
 	border-top-left-radius:10px; 
 	border-top-right-radius:10px; 
-	background:#3B8CFF;
+	background:#467FC1;
 }
 #dialogLabelTitle{
 	color:#FFFFFF;
@@ -217,9 +217,6 @@ QPushButton:pressed,QToolButton:pressed{
          </item>
          <item>
           <widget class="QLabel" name="labelVersion">
-           <property name="styleSheet">
-            <string notr="true">color:#3B8CFF;</string>
-           </property>
            <property name="text">
             <string>版本号</string>
            </property>

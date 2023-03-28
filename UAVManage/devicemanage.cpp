@@ -959,6 +959,7 @@ void DeviceManage::onUpdateStatusTo3D()
 
 void DeviceManage::onRemoveDevice(QString name)
 {
+	//删除前提示确认
 	QMessageBox::StandardButton button = QMessageBox::question(this, tr("删除"), QString("确定删除%1设备，删除后无法恢复？").arg(name));
 	if (QMessageBox::Yes != button) return;
 	for (int i = 0; i < ui.listWidget->count(); i++) {
