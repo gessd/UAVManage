@@ -119,7 +119,7 @@ void UAVManage::initMenu()
 	static bool bInit = false;
 	if (bInit) return;
 	bInit = true;
-	//添加菜单
+	//添加自定义菜单
 	ui.menuBar->setFixedHeight(30);
 	m_pMenuWidget = new QWidget(ui.menuBar);
 	QHBoxLayout* pMenuLayout = new QHBoxLayout(m_pMenuWidget);
@@ -278,15 +278,18 @@ void UAVManage::initMenu()
 	//无边框时程序增加最大化最小化按钮
 	pMenuLayout->addItem(new QSpacerItem(40, 20));
 	QToolButton* pBtnMin = new QToolButton(this);
-	pBtnMin->setFixedSize(12, 12);
+	pBtnMin->setFixedSize(m_pMenuWidget->height(), m_pMenuWidget->height());
+	pBtnMin->setIconSize(QSize(12, 12));
 	pBtnMin->setIcon(QIcon(":/res/images/min.png"));
 	pMenuLayout->addWidget(pBtnMin);
 	m_pBtnMax = new QToolButton(this);
-	m_pBtnMax->setFixedSize(12, 12);
+	m_pBtnMax->setFixedSize(m_pMenuWidget->height(), m_pMenuWidget->height());
+	m_pBtnMax->setIconSize(QSize(12, 12));
 	m_pBtnMax->setIcon(QIcon(":/res/images/max.png"));
 	pMenuLayout->addWidget(m_pBtnMax);
 	QToolButton* pBtnClose = new QToolButton(this);
-	pBtnClose->setFixedSize(12, 12);
+	pBtnClose->setFixedSize(m_pMenuWidget->height(), m_pMenuWidget->height());
+	pBtnClose->setIconSize(QSize(12, 12));
 	pBtnClose->setIcon(QIcon(":/res/images/close.png"));
 	pMenuLayout->addWidget(pBtnClose);
 	connect(pBtnMin, &QAbstractButton::clicked, this, &UAVManage::showMinimized);

@@ -50,9 +50,6 @@ DeviceControl QToolButton{
 DeviceControl QToolButton:hover{
 	border-width:1px;
 }
-#pMenuWidget{
-	background:#467FC1;
-}
 #widgetMain{
 	background:#C2DDF0;
 }
@@ -190,7 +187,7 @@ QScrollBar::sub-line:vertical, QScrollBar::add-line:vertical{
 QToolBar, QMenuBar, QMenuBar QWidget{
 	border:0px;
 	border-radius:0px;
-	background:rgb(59,140,255);
+	background:#467FC1;
 }
 QToolBar{
 	background:#C2DDF0;

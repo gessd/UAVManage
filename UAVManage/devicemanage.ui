@@ -115,12 +115,19 @@ border-radius:0px;
            </property>
            <property name="maximumSize">
             <size>
-             <width>22</width>
-             <height>22</height>
+             <width>20</width>
+             <height>20</height>
             </size>
            </property>
+           <property name="styleSheet">
+            <string notr="true"/>
+           </property>
            <property name="text">
-            <string>X</string>
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="uavmanage.qrc">
+             <normaloff>:/res/images/closeproject.png</normaloff>:/res/images/closeproject.png</iconset>
            </property>
           </widget>
          </item>
@@ -458,11 +465,10 @@ border-radius:0px;
               </size>
              </property>
              <property name="styleSheet">
-              <string notr="true">border-image:url(&quot;res/images/add.png&quot;);
-border-radius:0px;</string>
+              <string notr="true"/>
              </property>
              <property name="text">
-              <string/>
+              <string>添加 +</string>
              </property>
             </widget>
            </item>
