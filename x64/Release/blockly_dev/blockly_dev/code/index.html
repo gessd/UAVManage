@@ -70,23 +70,33 @@
   <div style="width: 15rem; position: absolute; text-align: center; margin-left: 40% ; margin-right: 60% ; margin-top: 15px; padding-top: 0px;">
     <div id="deviceName">设备名称</div>
   </div>
+  <div id="writePython" style="display: none; width: 16.375rem; background: none; height: 50px;  z-index:886 !important; margin-left:20px; margin-top: 15px; position: absolute; padding-top: 0px;">
+    <li style="list-style: none; text-indent: 1.65rem; background: url(icons/tetle_ic_program.png) no-repeat scroll left 0.1rem; background-size:13px 17px;">Python代码编写</li>
+  </div>
   <div id="blocklyTitle">
     <div style="width: 6.375rem; background: none; height: 50px;  z-index:886 !important; margin-left:20px; margin-top: 15px; position: absolute; padding-top: 0px;">
 	  	<li style="height: 100%; list-style: none; text-indent: 1.65rem; background: url(icons/tetle_ic_piece.png) no-repeat scroll left 0.1rem; background-size:17px 17px;">控件</li>
 	  </div>
-	  <div style="width: 6.375rem; background: none; height: 50px;  z-index:886 !important; margin-top: 15px; margin-left: 150px; position: absolute; padding-top: 0px;">
+	  <div style="width: 6.375rem; background: none; height: 50px;  z-index:886 !important; margin-top: 15px; margin-left: 100px; position: absolute; padding-top: 0px;">
 	  	<li style="height: 100%; list-style: none; margin-left: 0.375rem;text-indent: 1.65rem; background: url(icons/tetle_ic_program.png) no-repeat scroll left 0.1rem; background-size:13px 17px;">主程序</li>
 	  </div>
     <div style="z-index: 26 !important; top:51px; width: 400px; position: absolute; text-align: center; margin-left: 35% ; margin-right: 65% ;" id="showButton">
       <div style="width: 100%; height: auto; background-color: #F3F3F3; border-radius: 0 0 0.625rem 0.625rem; box-shadow: 0rem 0.375rem 0.375rem  rgba(0,0,0,0.25); border-top: 0.0625rem solid #c7c7c7;">
-        <div class="tabmax">
-          <button id="backButton" class="notext" onclick="backButton()">
-            <img src="../static/images/undo2.png">
-          </button>
-          <button id="goButton" class="notext" onclick="goButton()">
-            <img src="../static/images/redo2.png">
-          </button>
-        </div>
+        <button id="backButton" class="notext" onclick="backButton()" style="width: 28px; height:24px">
+          <img src="../static/images/undo2.png" style="height: 100%; width: 100%;">
+        </button>
+        <button id="goButton" class="notext" onclick="goButton()" style="width: 28px; height:24px; margin-left:20px;">
+          <img src="../static/images/redo2.png" style="height: 100%; width: 100%;">
+        </button>
+        <button id="btnLocation" style="width: 28px; height:24px; margin-left:20px;">
+          <img src="../static/images/redo2.png" style="height: 100%; width: 100%;">
+        </button>
+        <button id="btnZoomIn" onclick="btnZoomInClicked()" style="width: 24px; height:24px; margin-left:20px;">
+          <img src="../static/images/zoomin.png" style="height: 100%; width: 100%;">
+        </button>
+        <button id="btnZoomout" onclick="btnZoomOutClicked()" style="width: 24px; height:24px; margin-left:20px;">
+          <img src="../static/images/zoomout.png" style="height: 100%; width: 100%;">
+        </button>
       </div>
     </div>
   </div>
@@ -315,6 +325,7 @@
       document.getElementById("tab_python").style.backgroundImage = "url(icons/workspace_button_python_nor.png)";
       document.getElementById("sidebar").style.display = "";
       document.getElementById("blocklyTitle").style.display = "";
+      document.getElementById("writePython").style.display = "none";
       if(!sidecodeDisplay){
         document.getElementById("show_content_python").style.display = "";
         document.getElementById("content_python_text").style.display = "";
@@ -349,6 +360,7 @@
       document.getElementById("content_python_text").style.display = "none";
       document.getElementById("partitionFlag").style.display = "none";
       document.getElementById("blocklyTitle").style.display = "none";
+      document.getElementById("writePython").style.display = "";
       //document.getElementById("tab_blocks").style.display = "none";
       Blockly.fireUiEvent(window, 'resize');
       console.log("点击编程按钮");
@@ -362,6 +374,17 @@
     //后退按钮
     function backButton(){
       Code.workspace.undo(false)
+    }
+
+    //放大
+    function btnZoomInClicked(){
+      Code.workspace.WorkspaceSvg.zoomCenter(1);
+    }
+    //缩小
+    function btnZoomOutClicked(){
+      //Code.workspace.zoomout()
+      Blockly.ZoomControls.zoomCenter(-1);
+      Blockly.WorkspaceSvg.zoomCenter(-1);
     }
   </script>
 </body>
