@@ -8,6 +8,8 @@ body {
 body {
 	background-color: #C2DDF0;
 	font-family: "Microsoft Yahei";
+	font-size: 14px;
+	color: #467FC1;
 	overflow: hidden;
 }
 
@@ -40,17 +42,17 @@ h1 {
 }
 #tab_blocks {
 	margin-right: 0.375rem !important;
-	background-image: url(icons/workspace_button_block_cli&hov.svg);
+	background-image: url(icons/workspace_button_block_cli&hov.png);
 	background-repeat: no-repeat;
 }
 
 #tab_python{
-	background-image: url(icons/workspace_button_python_nor.svg);
+	background-image: url(icons/workspace_button_python_nor.png);
 	background-repeat: no-repeat;
 }
 
 #tab_python + td.taboff :hover{
-	background-image: url(icons/workspace_button_python_nor.svg) !important;
+	background-image: url(icons/workspace_button_python_nor.png) !important;
 }
 .tabon,
 .taboff {

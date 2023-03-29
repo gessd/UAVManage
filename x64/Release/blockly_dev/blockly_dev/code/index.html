@@ -67,13 +67,13 @@
 
 <body>
   <button id="btnTest" class="notext" onclick="buttonTest()" style="width:60px; height:30px; display: none;">按钮</button>
-	<div style="width: 6.375rem; background: none; height: 2rem;  z-index:886 !important; margin-top: 0px; position: absolute; padding-top: 0px;">
-		<li style="list-style: none; font-size: 1.25rem; color:  #3B8CFF;margin-left: 0.375rem; text-indent: 1.65rem; background: url(icons/tetle_ic_piece.svg) no-repeat scroll center 0.3rem;">控件</li>
+  <div style="width: 6.375rem; background: none; height: 50px;  z-index:886 !important; margin-top: 0px; position: absolute; padding-top: 0px;">
+		<li style="height: 100%; list-style: none; margin-left: 0.375rem; text-indent: 1.65rem; background: url(icons/tetle_ic_piece.png) no-repeat scroll center 0.3rem; background-size:17px 17px;">控件</li>
 	</div>
-	<div style="width: 6.375rem; background: none; height: 2rem;  z-index:886 !important; margin-left: 6.375rem; position: absolute; padding-top: 0px;">
-		<li style="list-style: none; font-size: 1.25rem; color:  #3B8CFF;margin-left: 0.375rem;text-indent: 1.65rem; background: url(icons/tetle_ic_program.svg) no-repeat scroll center 0.3rem;">主程序</li>
+	<div style="width: 6.375rem; background: none; height: 50px;  z-index:886 !important; margin-left: 6.375rem; position: absolute; padding-top: 0px;">
+		<li style="height: 100%; list-style: none; margin-left: 0.375rem;text-indent: 1.65rem; background: url(icons/tetle_ic_program.png) no-repeat scroll center 0.3rem; background-size:13px 17px;">主程序</li>
 	</div>
-  <div style="font-size:1.5rem; color:#3B8CFF; width: 15rem; position:  absolute; text-align: center; margin-left: 40% ; margin-right: 60% ; margin-top: 0px; padding-top: 0px;">
+  <div style="width: 15rem; position: absolute; text-align: center; margin-left: 40% ; margin-right: 60% ; margin-top: 0px; padding-top: 0px;">
     <div id="deviceName"></div>
   </div>
   <div style="z-index: 26 !important; top:1.6rem;  width: 10rem; position:  absolute; text-align: center; margin-left: 41.6% ; margin-right: 58.4% ; padding-top: 18px;" id="showButton">
@@ -306,8 +306,8 @@
       Blockly.fireUiEvent(window, 'resize');
     }
     function tab_blocks() {
-      document.getElementById("tab_blocks").style.backgroundImage = "url(icons/workspace_button_block_cli&hov.svg)";
-      document.getElementById("tab_python").style.backgroundImage = "url(icons/workspace_button_python_nor.svg)";
+      document.getElementById("tab_blocks").style.backgroundImage = "url(icons/workspace_button_block_cli&hov.png)";
+      document.getElementById("tab_python").style.backgroundImage = "url(icons/workspace_button_python_nor.png)";
       document.getElementById("sidebar").style.display = "";
       document.getElementById("showButton").style.display = "";
       if(!sidecodeDisplay){
@@ -337,8 +337,8 @@
       ace.edit("content_python").setValue(currentDate, 1);
     }
     function tab_python() {
-      document.getElementById("tab_python").style.backgroundImage = "url(icons/workspace_button_python_cli&hov.svg)";
-      document.getElementById("tab_blocks").style.backgroundImage = "url(icons/workspace_button_block_nor.svg)";
+      document.getElementById("tab_python").style.backgroundImage = "url(icons/workspace_button_python_cli&hov.png)";
+      document.getElementById("tab_blocks").style.backgroundImage = "url(icons/workspace_button_block_nor.png)";
       document.getElementById("sidebar").style.display = "none";
       document.getElementById("show_content_python").style.display = "none";
       document.getElementById("content_python_text").style.display = "none";
