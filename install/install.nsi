@@ -63,6 +63,7 @@ SetCompressor lzma
 ;!define MUI_FINISHPAGE_SHOWREADME_Function installDrivers
 ;!define MUI_FINISHPAGE_SHOWREADME_TEXT "开机自动启动"
 !define MUI_FINISHPAGE_RUN "$INSTDIR\UAVManage.exe"
+!define MUI_FINISHPAGE_RUN_NOTCHECKED
 !insertmacro MUI_PAGE_FINISH
 
 ; 安装卸载过程页面
