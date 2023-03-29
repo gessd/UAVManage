@@ -236,7 +236,7 @@ Blockly.blockRendering.ConstantProvider = function() {
    * Point size of text.
    * @type {number}
    */
-  this.FIELD_TEXT_FONTSIZE = 11;
+  this.FIELD_TEXT_FONTSIZE = 10.5;
 
   /**
    * Text font weight.
@@ -248,7 +248,7 @@ Blockly.blockRendering.ConstantProvider = function() {
    * Text font family.
    * @type {string}
    */
-  this.FIELD_TEXT_FONTFAMILY = 'sans-serif';
+  this.FIELD_TEXT_FONTFAMILY = 'Microsoft Yahei';
 
   /**
    * Height of text.  This constant is dynamically set in ``setFontConstants_``

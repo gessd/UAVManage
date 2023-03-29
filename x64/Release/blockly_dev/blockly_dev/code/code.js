@@ -380,7 +380,7 @@ var editor_content_python_text;
  */
 Code.init = function() {
   Code.initLanguage();
-
+  
   var rtl = Code.isRtl();
   var container = document.getElementById('content_area');
   var onresize = function(e) {
@@ -402,6 +402,7 @@ Code.init = function() {
           (Code.workspace.getToolbox().width - 38) + 'px';
           // Account for the 19 pixel margin and on each side.
     }
+
   };
   window.addEventListener('resize', onresize, false);
 

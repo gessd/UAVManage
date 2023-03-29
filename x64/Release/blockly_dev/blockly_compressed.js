@@ -11725,8 +11725,8 @@ Blockly.Css.register([".blocklyToolboxDelete {", 'cursor: url("<<<PATH>>>/handde
     "background-position: -32px -17px;", "}", ".blocklyTreeSelected>.blocklyTreeIconClosedRtl {",
     "background-position: 0 -17px;", "}", ".blocklyTreeSelected>.blocklyTreeIconOpen {",
     "background-position: -16px -17px;", "}", ".blocklyTreeIconNone,", ".blocklyTreeSelected>.blocklyTreeIconNone {",
-    "background-position: -48px -1px;", "}", ".blocklyTreeLabel {", "cursor: default;", "font-family: sans-serif;",
-    "font-size: 16px;", "padding: 0 3px;", "vertical-align: middle;", "}", ".blocklyToolboxDelete .blocklyTreeLabel {",
+    "background-position: -48px -1px;", "}", ".blocklyTreeLabel {", "cursor: default;", "font-family: Microsoft Yahei;",
+    "font-size: 14px;", "padding: 0 3px;", "vertical-align: middle;", "}", ".blocklyToolboxDelete .blocklyTreeLabel {",
     'cursor: url("<<<PATH>>>/handdelete.cur"), auto;', "}", ".blocklyTreeSelected .blocklyTreeLabel {", "color: #000000;",
     "}"
 ]);
@@ -13592,9 +13592,9 @@ Blockly.blockRendering.ConstantProvider = function() {
     this.START_POINT = Blockly.utils.svgPaths.moveBy(0, 0);
     this.JAGGED_TEETH_HEIGHT = 12;
     this.JAGGED_TEETH_WIDTH = 6;
-    this.FIELD_TEXT_FONTSIZE = 11;
+    this.FIELD_TEXT_FONTSIZE = 10.5;
     this.FIELD_TEXT_FONTWEIGHT = "normal";
-    this.FIELD_TEXT_FONTFAMILY = "sans-serif";
+    this.FIELD_TEXT_FONTFAMILY = "Microsoft Yahei";
     this.FIELD_TEXT_BASELINE = this.FIELD_TEXT_HEIGHT = -1;
     this.FIELD_BORDER_RECT_RADIUS = 4;
     this.FIELD_BORDER_RECT_HEIGHT =
@@ -15747,7 +15747,7 @@ Blockly.zelos.ConstantProvider = function() {
     this.FULL_BLOCK_FIELDS = !0;
     this.FIELD_TEXT_FONTSIZE = 3 * this.GRID_UNIT;
     this.FIELD_TEXT_FONTWEIGHT = "bold";
-    this.FIELD_TEXT_FONTFAMILY = '"Helvetica Neue", "Segoe UI", Helvetica, sans-serif';
+    this.FIELD_TEXT_FONTFAMILY = '"Microsoft Yahei", "Helvetica Neue", "Segoe UI", Helvetica, sans-serif';
     this.FIELD_BORDER_RECT_RADIUS = this.CORNER_RADIUS;
     this.FIELD_BORDER_RECT_X_PADDING = 2 * this.GRID_UNIT;
     this.FIELD_BORDER_RECT_Y_PADDING = 1.625 * this.GRID_UNIT;

@@ -67,25 +67,26 @@
 
 <body>
   <button id="btnTest" class="notext" onclick="buttonTest()" style="width:60px; height:30px; display: none;">按钮</button>
-  <div style="width: 6.375rem; background: none; height: 50px;  z-index:886 !important; margin-top: 0px; position: absolute; padding-top: 0px;">
-		<li style="height: 100%; list-style: none; margin-left: 0.375rem; text-indent: 1.65rem; background: url(icons/tetle_ic_piece.png) no-repeat scroll center 0.3rem; background-size:17px 17px;">控件</li>
-	</div>
-	<div style="width: 6.375rem; background: none; height: 50px;  z-index:886 !important; margin-left: 6.375rem; position: absolute; padding-top: 0px;">
-		<li style="height: 100%; list-style: none; margin-left: 0.375rem;text-indent: 1.65rem; background: url(icons/tetle_ic_program.png) no-repeat scroll center 0.3rem; background-size:13px 17px;">主程序</li>
-	</div>
-  <div style="width: 15rem; position: absolute; text-align: center; margin-left: 40% ; margin-right: 60% ; margin-top: 0px; padding-top: 0px;">
-    <div id="deviceName"></div>
+  <div style="width: 15rem; position: absolute; text-align: center; margin-left: 40% ; margin-right: 60% ; margin-top: 15px; padding-top: 0px;">
+    <div id="deviceName">设备名称</div>
   </div>
-  <div style="z-index: 26 !important; top:1.6rem;  width: 10rem; position:  absolute; text-align: center; margin-left: 41.6% ; margin-right: 58.4% ; padding-top: 18px;" id="showButton">
-    <div
-      style="width: 100%; height: auto; background-color: #FFFFFF; border-radius: 0 0 0.625rem 0.625rem; box-shadow: 0rem 0.375rem 0.375rem  rgba(0,0,0,0.25); border-top: 0.0625rem solid #c7c7c7;">
-      <div class="tabmax">
-        <button id="backButton" class="notext" onclick="backButton()">
-          <img src="../static/images/undo2.png">
-        </button>
-        <button id="goButton" class="notext" onclick="goButton()">
-          <img src="../static/images/redo2.png">
-        </button>
+  <div id="blocklyTitle">
+    <div style="width: 6.375rem; background: none; height: 50px;  z-index:886 !important; margin-left:20px; margin-top: 15px; position: absolute; padding-top: 0px;">
+	  	<li style="height: 100%; list-style: none; text-indent: 1.65rem; background: url(icons/tetle_ic_piece.png) no-repeat scroll left 0.1rem; background-size:17px 17px;">控件</li>
+	  </div>
+	  <div style="width: 6.375rem; background: none; height: 50px;  z-index:886 !important; margin-top: 15px; margin-left: 150px; position: absolute; padding-top: 0px;">
+	  	<li style="height: 100%; list-style: none; margin-left: 0.375rem;text-indent: 1.65rem; background: url(icons/tetle_ic_program.png) no-repeat scroll left 0.1rem; background-size:13px 17px;">主程序</li>
+	  </div>
+    <div style="z-index: 26 !important; top:51px; width: 400px; position: absolute; text-align: center; margin-left: 35% ; margin-right: 65% ;" id="showButton">
+      <div style="width: 100%; height: auto; background-color: #F3F3F3; border-radius: 0 0 0.625rem 0.625rem; box-shadow: 0rem 0.375rem 0.375rem  rgba(0,0,0,0.25); border-top: 0.0625rem solid #c7c7c7;">
+        <div class="tabmax">
+          <button id="backButton" class="notext" onclick="backButton()">
+            <img src="../static/images/undo2.png">
+          </button>
+          <button id="goButton" class="notext" onclick="goButton()">
+            <img src="../static/images/redo2.png">
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -102,12 +103,16 @@
       </td>
     </tr>
     <tr>
-      <td colspan=3>
+      <td colspan=3 id="title" style="border-bottom: 2px solid #ACACAC;">
         <table id="tabRy" style="width: auto;">
-          <tr id="tabRow">
-            <td id="tab_blocks" class="tabon" onclick="tab_blocks();" title="图形编程区"></td>
+          <tr id="tabRow" style="height:50px;">
+            <td>
+              <button id="tab_blocks" class="tabon" style="width: 100px; height:35px;" onclick="tab_blocks();" title="图形编程区"></button>
+            </td>
             <td width="6px"></td>
-            <td id="tab_python" class="taboff tab_collapse" onclick="tab_python();" title="python编程区"></td>
+            <td>
+              <button id="tab_python" class="taboff tab_collapse" style="width: 100px; height:35px;" onclick="tab_python();" title="python编程区"></button>
+            </td>
             <td style="display: none; visibility: hidden;" id="tab_javascript" class="taboff tab_collapse"> </td>
             <td style="display: none;" id="tab_xml" class="taboff tab_collapse"> </td>
             <td style="" id="tab_code" class="taboff">
@@ -309,7 +314,7 @@
       document.getElementById("tab_blocks").style.backgroundImage = "url(icons/workspace_button_block_cli&hov.png)";
       document.getElementById("tab_python").style.backgroundImage = "url(icons/workspace_button_python_nor.png)";
       document.getElementById("sidebar").style.display = "";
-      document.getElementById("showButton").style.display = "";
+      document.getElementById("blocklyTitle").style.display = "";
       if(!sidecodeDisplay){
         document.getElementById("show_content_python").style.display = "";
         document.getElementById("content_python_text").style.display = "";
@@ -343,7 +348,7 @@
       document.getElementById("show_content_python").style.display = "none";
       document.getElementById("content_python_text").style.display = "none";
       document.getElementById("partitionFlag").style.display = "none";
-      document.getElementById("showButton").style.display = "none";
+      document.getElementById("blocklyTitle").style.display = "none";
       //document.getElementById("tab_blocks").style.display = "none";
       Blockly.fireUiEvent(window, 'resize');
       console.log("点击编程按钮");

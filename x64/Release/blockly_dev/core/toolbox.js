@@ -852,8 +852,8 @@ Blockly.Css.register([
 
   '.blocklyTreeLabel {',
     'cursor: default;',
-    'font-family: sans-serif;',
-    'font-size: 16px;',
+    'font-family: Microsoft Yahei',
+    'font-size: 14px;',
     'vertical-align: middle;',
   '}',
 

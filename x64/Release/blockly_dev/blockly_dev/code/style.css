@@ -23,7 +23,6 @@ html[dir="RTL"] .farSide {
 
 h1 {
 	font-weight: normal;
-	font-size: 140%;
 	margin-left: 5px;
 	margin-right: 5px;
 }
@@ -35,13 +34,13 @@ h1 {
 }
 #tab_blocks,
 #tab_python {
-	width: 5.375rem !important;
-	height: 2.25rem !important;
+	max-width: 100px !important;
+	max-height: 35px !important;
 	background-size: 100% 100% !important;
 	padding: 0 !important;
+	margin-top: 10px !important;
 }
 #tab_blocks {
-	margin-right: 0.375rem !important;
 	background-image: url(icons/workspace_button_block_cli&hov.png);
 	background-repeat: no-repeat;
 }
@@ -56,8 +55,8 @@ h1 {
 }
 .tabon,
 .taboff {
-	min-width: 0rem !important;
-	max-width: 80px !important;
+	max-width: 100px !important;
+	max-height: 35px !important;
 }
 
 #tabRow>td {
@@ -135,7 +134,7 @@ pre.content {
 	resize: none;
 	outline: none;
 	border: 10px solid #ccc;
-	font-family: monospace;
+	font-family: "Microsoft Yahei";
 	overflow: scroll;
 }
 
@@ -151,7 +150,7 @@ button {
 	padding: 0.02rem;
 	border-radius: 4px;
 	border: 1px solid #ddd;
-	font-size: 16px;
+	font-size: 14px;
 	background-color: #FFFFFF;
 	color: #000;
 	outline:0;
@@ -294,8 +293,8 @@ button.notext {
 	box-shadow: 4px 4px 20px 1px rgba(0, 0, 0, .15);
 	color: #000;
 	display: none;
-	font-family: sans-serif;
-	font-size: 9pt;
+	font-family: "Microsoft Yahei";
+	font-size: 14px;
 	opacity: .9;
 	padding: 2px;
 	position: absolute;
@@ -465,7 +464,7 @@ button.notext {
 }
 
 .blocklyMultilineText {
-	font-family: monospace;
+	font-family: "Microsoft Yahei";
 }
 
 .blocklyNonEditableText>text {
@@ -661,7 +660,8 @@ button.notext {
 	border-style: solid;
 	border-width: 1px;
 	cursor: default;
-	font: normal 13px Arial, sans-serif;
+	font: normal 14px Arial, sans-serif;
+	font-family: "Microsoft Yahei";
 	margin: 0;
 	outline: none;
 	padding: 4px 0;
@@ -680,7 +680,8 @@ button.notext {
 
 .blocklyDropDownDiv .goog-menu {
 	cursor: default;
-	font: normal 13px "Helvetica Neue", Helvetica, sans-serif;
+	font: normal 14px "Helvetica Neue", Helvetica, sans-serif;
+	font-family: "Microsoft Yahei";
 	outline: none;
 	z-index: 20000;
 	/* Arbitrary, but some apps depend on it... */
@@ -689,7 +690,8 @@ button.notext {
 .blocklyWidgetDiv .goog-menuitem,
 .blocklyDropDownDiv .goog-menuitem {
 	color: #000;
-	font: normal 13px Arial, sans-serif;
+	font: normal 14px Arial, sans-serif;
+	font-family: "Microsoft Yahei";
 	list-style: none;
 	margin: 0;
 	/* 7em on the right for shortcut. */
@@ -712,8 +714,8 @@ button.notext {
 
 .blocklyWidgetDiv .goog-menuitem-content,
 .blocklyDropDownDiv .goog-menuitem-content {
-	font-family: Arial, sans-serif;
-	font-size: 13px;
+	font-family: "Microsoft Yahei";
+	font-size: 14px;
 }
 
 .blocklyWidgetDiv .goog-menuitem-content {
@@ -820,8 +822,11 @@ button.notext {
 
 .blocklyTreeIcon {
 	z-index: 280;
+	float: left !important;
 }
 .blocklyTreeLabel{
 	float: right !important;
-	margin-right:-3rem ;
+	margin-right:-40px;
+	font-family: "Microsoft Yahei";
+	font-size: 14px;
 }
