@@ -20,7 +20,7 @@ SoundGrade::SoundGrade(QWidget *parent) :QWidget(parent)
 
 	//TODO暂时隐藏
 	//m_ui.m_pBtnPrev->setVisible(false);
-	m_ui.m_pPlayList->setVisible(false);
+	//m_ui.m_pPlayList->setVisible(false);
 	//m_ui.m_pBtnNext->setVisible(false);	
 	m_ui.m_pHslider->setVisible(false);
 

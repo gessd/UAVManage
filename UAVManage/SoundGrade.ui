@@ -263,19 +263,6 @@
         </item>
        </layout>
       </item>
-      <item row="0" column="0">
-       <widget class="QWChartView" name="m_pCuverPlot" native="true">
-        <property name="minimumSize">
-         <size>
-          <width>200</width>
-          <height>100</height>
-         </size>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">background:transparent;</string>
-        </property>
-       </widget>
-      </item>
       <item row="2" column="0" colspan="2">
        <widget class="QSlider" name="m_pHslider">
         <property name="enabled">
@@ -301,9 +288,6 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="1">
-       <widget class="QListWidget" name="m_pPlayList"/>
-      </item>
       <item row="1" column="0" colspan="2">
        <widget class="MusicScale" name="widgetScale" native="true">
         <property name="minimumSize">
@@ -317,6 +301,19 @@
           <width>16777215</width>
           <height>10</height>
          </size>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0" colspan="2">
+       <widget class="QWChartView" name="m_pCuverPlot" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>200</width>
+          <height>100</height>
+         </size>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background:transparent;</string>
         </property>
        </widget>
       </item>

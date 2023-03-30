@@ -407,6 +407,7 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 			if (!pWidget) continue;
 			DeviceControl* pDevice = dynamic_cast<DeviceControl*>(pWidget);
 			if (!pDevice) continue;
+			if(false == pDevice->isCheckDevice()) continue;
 			QString name = pDevice->getName();
 			listNames.append(name);
 			if (false == pDevice->isConnectDevice()) {
@@ -482,6 +483,7 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 		if (!pWidget) continue;
 		DeviceControl* pDevice = dynamic_cast<DeviceControl*>(pWidget);
 		if (!pDevice) continue;
+		if (false == pDevice->isCheckDevice()) continue;
 		QString qstrName = pDevice->getName();
 		int res = DeviceDataSucceed;
 		QString qstrText;
