@@ -442,10 +442,10 @@ Code.init = function() {
         scrollbars:true,
         zoom:{
             controls: true,
-            wheel: true,
+            wheel: false,
             startScale: 1.0,
-            maxScale: 1.5,
-            minScale: 0.8,
+            maxScale: 2,
+            minScale: 0.3,
             scaleSpeed: 1.2
           }
       });

@@ -80,22 +80,13 @@
 	  <div style="width: 6.375rem; background: none; height: 50px;  z-index:886 !important; margin-top: 15px; margin-left: 100px; position: absolute; padding-top: 0px;">
 	  	<li style="height: 100%; list-style: none; margin-left: 0.375rem;text-indent: 1.65rem; background: url(icons/tetle_ic_program.png) no-repeat scroll left 0.1rem; background-size:13px 17px;">主程序</li>
 	  </div>
-    <div style="z-index: 26 !important; top:51px; width: 400px; position: absolute; text-align: center; margin-left: 35% ; margin-right: 65% ;" id="showButton">
+    <div style="z-index: 26 !important; top:51px; width: 200px; position: absolute; text-align: center; margin-left: 41% ; margin-right: 59% ;" id="showButton">
       <div style="width: 100%; height: auto; background-color: #F3F3F3; border-radius: 0 0 0.625rem 0.625rem; box-shadow: 0rem 0.375rem 0.375rem  rgba(0,0,0,0.25); border-top: 0.0625rem solid #c7c7c7;">
         <button id="backButton" class="notext" onclick="backButton()" style="width: 28px; height:24px">
           <img src="../static/images/undo2.png" style="height: 100%; width: 100%;">
         </button>
         <button id="goButton" class="notext" onclick="goButton()" style="width: 28px; height:24px; margin-left:20px;">
           <img src="../static/images/redo2.png" style="height: 100%; width: 100%;">
-        </button>
-        <button id="btnLocation" style="width: 28px; height:24px; margin-left:20px;">
-          <img src="../static/images/redo2.png" style="height: 100%; width: 100%;">
-        </button>
-        <button id="btnZoomIn" onclick="btnZoomInClicked()" style="width: 24px; height:24px; margin-left:20px;">
-          <img src="../static/images/zoomin.png" style="height: 100%; width: 100%;">
-        </button>
-        <button id="btnZoomout" onclick="btnZoomOutClicked()" style="width: 24px; height:24px; margin-left:20px;">
-          <img src="../static/images/zoomout.png" style="height: 100%; width: 100%;">
         </button>
       </div>
     </div>
@@ -338,20 +329,6 @@
       console.log("点击图形按钮");
       Blockly.fireUiEvent(window, 'resize');
     }
-    function buttonTest(){
-      document.getElementById("deviceName").textContent="abc";
-      var date = new Date();
-			var year = date.getFullYear();        //年 ,从 Date 对象以四位数字返回年份
-			var month = date.getMonth() + 1;      //月 ,从 Date 对象返回月份 (0 ~ 11) ,date.getMonth()比实际月份少 1 个月
-			var day = date.getDate();             //日 ,从 Date 对象返回一个月中的某一天 (1 ~ 31)
-			var hours = date.getHours();          //小时 ,返回 Date 对象的小时 (0 ~ 23)
-			var minutes = date.getMinutes();      //分钟 ,返回 Date 对象的分钟 (0 ~ 59)
-			var seconds = date.getSeconds();      //秒 ,返回 Date 对象的秒数 (0 ~ 59)   
-      var ss = date.getMilliseconds();
-			var currentDate = year + "-" + month + "-" + day + " " + hours + ":" + minutes + ":" + seconds+"."+ss;
-      console.log(currentDate);
-      ace.edit("content_python").setValue(currentDate, 1);
-    }
     function tab_python() {
       document.getElementById("tab_python").style.backgroundImage = "url(icons/workspace_button_python_cli&hov.png)";
       document.getElementById("tab_blocks").style.backgroundImage = "url(icons/workspace_button_block_nor.png)";
@@ -374,17 +351,6 @@
     //后退按钮
     function backButton(){
       Code.workspace.undo(false)
-    }
-
-    //放大
-    function btnZoomInClicked(){
-      Code.workspace.WorkspaceSvg.zoomCenter(1);
-    }
-    //缩小
-    function btnZoomOutClicked(){
-      //Code.workspace.zoomout()
-      Blockly.ZoomControls.zoomCenter(-1);
-      Blockly.WorkspaceSvg.zoomCenter(-1);
     }
   </script>
 </body>

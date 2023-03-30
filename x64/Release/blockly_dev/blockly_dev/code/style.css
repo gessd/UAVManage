@@ -801,7 +801,6 @@ button.disabled {
 #block3> .blocklyTreeIcon{
 	background-image: url(icons/workspace_button_block_cli&hov.svg);
 }
-
 .blocklyTreeIcon {
 	z-index: 280;
 	float: left !important;
