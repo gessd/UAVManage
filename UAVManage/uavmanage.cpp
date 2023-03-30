@@ -1147,7 +1147,6 @@ bool UAVManage::newProjectFile(QString qstrFile, unsigned int X, unsigned int Y)
 	m_pDeviceManage->setCrrentProject(m_qstrCurrentProjectFile);
 	onDeviceAdd(QString(_DeviceNamePrefix_) + QString::number(1), "", 100, 100);
 	return true;
-	
 }
 
 QToolButton* UAVManage::initMenuButton(QWidget* parent, QString text, QString noramlicon, QString activeicon, QMenu* menu)

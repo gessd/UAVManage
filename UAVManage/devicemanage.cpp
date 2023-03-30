@@ -861,13 +861,13 @@ void DeviceManage::resizeEvent(QResizeEvent* event)
 {
 	if (width() > ui.widgetBackgroundMain->width()) {
 		ui.widgetPreflightCheck->setVisible(true);
-		ui.btnAddDevice->setEnabled(false);
-		ui.btnSerial->setEnabled(false);
+		ui.widgetAdd->setVisible(false);
+		ui.widgetButton->setVisible(false);
 	}
 	else {
 		ui.widgetPreflightCheck->setVisible(false);
-		ui.btnAddDevice->setEnabled(true);
-		ui.btnSerial->setEnabled(true);
+		ui.widgetAdd->setVisible(true);
+		ui.widgetButton->setVisible(true);
 	}
 	for (int i = 0; i < ui.listWidget->count(); i++) {
 		QListWidgetItem* pItem = ui.listWidget->item(i);
