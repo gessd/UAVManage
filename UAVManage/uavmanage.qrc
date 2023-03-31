@@ -7,12 +7,11 @@
         <file>res/images/flystop.png</file>
         <file>res/images/add.png</file>
         <file>res/images/delete.png</file>
-		<file>res/images/stop.png</file>
-		<file>res/images/openmusic.png</file>
+        <file>res/images/stop.png</file>
         <file>res/images/playmusic.png</file>
         <file>res/images/stopmusic.png</file>
         <file>res/images/pausemusic.png</file>
-		<file>res/images/checkout.png</file>
+        <file>res/images/checkout.png</file>
         <file>res/images/lighting.png</file>
         <file>res/images/inspection.png</file>
         <file>res/images/prepare.png</file>
@@ -23,11 +22,11 @@
         <file>res/images/uavgreen.png</file>
         <file>res/images/uavred.png</file>
         <file>res/images/uavyellow.png</file>
-		<file>res/images/close.png</file>
-		<file>res/images/max.png</file>
-		<file>res/images/min.png</file>
-		<file>res/images/normal.png</file>
-		<file>res/images/logo.png</file>
+        <file>res/images/close.png</file>
+        <file>res/images/max.png</file>
+        <file>res/images/min.png</file>
+        <file>res/images/normal.png</file>
+        <file>res/images/logo.png</file>
         <file>res/logo/qz_logo.ico</file>
         <file>res/menu/P01_file_open_btn_cli.png</file>
         <file>res/menu/P01_file_open_btn_hov.png</file>

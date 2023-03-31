@@ -589,6 +589,27 @@ void UAVManage::resizeEvent(QResizeEvent* event)
 
 bool UAVManage::eventFilter(QObject* watched, QEvent* event)
 {
+	//鼠标控制窗口移动
+	static bool bMove = false;
+	static QPoint reltvPos;
+	if (this == watched || ui.menuBar == watched) {
+		if (QEvent::MouseButtonPress == event->type()) {
+			QMouseEvent* mouse = dynamic_cast<QMouseEvent*>(event);
+			reltvPos = mouse->pos();
+			bMove = true;
+		}
+		else if (QEvent::MouseButtonRelease == event->type()) {
+			bMove = false;
+		}
+		else if (QEvent::MouseMove == event->type()) {
+			if (bMove) {
+				QMouseEvent* mouse = dynamic_cast<QMouseEvent*>(event);
+				move(mouse->globalPos() - reltvPos);
+			}
+		}
+	}
+
+	//自定义Tip用于永久显示
 	static QPoint mouseGloblePos;
 	if (event->type() == QEvent::MouseMove) {
 		mouseGloblePos = static_cast<QMouseEvent*>(event)->globalPos();
@@ -608,6 +629,8 @@ bool UAVManage::eventFilter(QObject* watched, QEvent* event)
 	if (event->type() == QEvent::Leave) {
 		m_pToopTip->onHide();
 	}
+
+	//使用快捷键控制
 	if (event->type() == QEvent::KeyRelease) {
 		QKeyEvent* keyEvent = dynamic_cast<QKeyEvent*>(event);
 		if (keyEvent) {

@@ -583,7 +583,7 @@ border-radius:0px;
                </size>
               </property>
               <property name="styleSheet">
-               <string notr="true">border-image:url(&quot;res/images/checkout.png&quot;);
+               <string notr="true">border-image:url(:/res/images/checkout.png);
 border-radius:0px;
 padding-left:20px;</string>
               </property>
@@ -607,7 +607,7 @@ padding-left:20px;</string>
                </size>
               </property>
               <property name="styleSheet">
-               <string notr="true">border-image:url(&quot;res/images/stereoscopic.png&quot;);
+               <string notr="true">border-image:url(:/res/images/stereoscopic.png);
 border-radius:0px;
 padding-left:20px;</string>
               </property>
@@ -621,7 +621,7 @@ padding-left:20px;</string>
               <property name="minimumSize">
                <size>
                 <width>210</width>
-                <height>40</height>
+                <height>42</height>
                </size>
               </property>
               <property name="maximumSize">
@@ -631,9 +631,10 @@ padding-left:20px;</string>
                </size>
               </property>
               <property name="styleSheet">
-               <string notr="true">border-image:url(&quot;res/images/inspection.png&quot;);
+               <string notr="true">border-image:url(:/res/images/inspection.png);
 border-radius:0px;
-padding-left:20px;</string>
+padding-left:20px;
+</string>
               </property>
               <property name="text">
                <string>起飞检查</string>
@@ -685,7 +686,7 @@ padding-left:20px;</string>
                  </size>
                 </property>
                 <property name="styleSheet">
-                 <string notr="true">border-image:url(&quot;res/images/flyQueue.png&quot;);
+                 <string notr="true">border-image:url(:/res/images/flyQueue.png);
 border-radius:0px;
 padding-left:10px;</string>
                 </property>
@@ -709,7 +710,7 @@ padding-left:10px;</string>
                  </size>
                 </property>
                 <property name="styleSheet">
-                 <string notr="true">border-image:url(&quot;res/images/flyRecover.png&quot;);
+                 <string notr="true">border-image:url(:/res/images/flyRecover.png);
 border-radius:0px;
 padding-left:10px;</string>
                 </property>
@@ -735,9 +736,8 @@ padding-left:10px;</string>
                </size>
               </property>
               <property name="styleSheet">
-               <string notr="true">border-image:url(&quot;res/images/flystop.png&quot;);
-border-radius:0px;
-padding-left:20px;</string>
+               <string notr="true">border-image:url(:/res/images/flystop.png);
+border-radius:0px;</string>
               </property>
               <property name="text">
                <string>急停(CTRL+空格)</string>
@@ -761,7 +761,7 @@ padding-left:20px;</string>
                  </size>
                 </property>
                 <property name="styleSheet">
-                 <string notr="true">border-image:url(&quot;res/images/flytakeoff.png&quot;);
+                 <string notr="true">border-image:url(:/res/images/flytakeoff.png);
 border-radius:0px;
 padding-left:10px;</string>
                 </property>
@@ -785,7 +785,7 @@ padding-left:10px;</string>
                  </size>
                 </property>
                 <property name="styleSheet">
-                 <string notr="true">border-image:url(&quot;res/images/flyland.png&quot;);
+                 <string notr="true">border-image:url(:/res/images/flyland.png);
 border-radius:0px;
 padding-left:10px;</string>
                 </property>

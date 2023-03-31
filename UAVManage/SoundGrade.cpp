@@ -152,19 +152,6 @@ void SoundGrade::on_m_pBtnLoad_clicked()
 	emit sigUpdateMusic(qstrFile);
 }
 
-void SoundGrade::on_m_pPlayList_currentRowChanged(int currentRow)
-{//单击播放列表
-	playlist->setCurrentIndex(currentRow);
-}
-
-void SoundGrade::on_m_pPlayList_doubleClicked(const QModelIndex &index)
-{//双击播放列表
-	if (player->state() != QMediaPlayer::State::StoppedState)
-		player->stop();
-	int rowNo = index.row();
-	playlist->setCurrentIndex(rowNo);
-}
-
 //void SoundGrade::on_m_pBtnPrev_clicked()
 //{//上一首
 //	if (player->state() != QMediaPlayer::State::StoppedState)
