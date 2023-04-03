@@ -173,6 +173,28 @@ DeviceManage::DeviceManage(QWidget *parent)
 			QMessageBox::warning(this, tr("错误"), qstrError);
 		}
 		});
+	connect(ui.btnSelectAll, &QAbstractButton::clicked, [this]() { 
+		for (int i = 0; i < ui.listWidget->count(); i++) {
+			QListWidgetItem* pItem = ui.listWidget->item(i);
+			if (!pItem) continue;
+			QWidget* pWidget = ui.listWidget->itemWidget(pItem);
+			if (!pWidget) continue;
+			DeviceControl* pDevice = dynamic_cast<DeviceControl*>(pWidget);
+			if (!pDevice) continue;
+			pDevice->setChcekStatus(true);
+		}
+		});
+	connect(ui.btnReverse, &QAbstractButton::clicked, [this]() { 
+		for (int i = 0; i < ui.listWidget->count(); i++) {
+			QListWidgetItem* pItem = ui.listWidget->item(i);
+			if (!pItem) continue;
+			QWidget* pWidget = ui.listWidget->itemWidget(pItem);
+			if (!pWidget) continue;
+			DeviceControl* pDevice = dynamic_cast<DeviceControl*>(pWidget);
+			if (!pDevice) continue;
+			pDevice->setChcekStatus(!pDevice->isCheckDevice());
+		}
+		});
 	connect(ui.btnCheckAction, &QAbstractButton::clicked, this, &DeviceManage::sigPrepareWidget);
 	connect(ui.btnClose, &QAbstractButton::clicked, this, &DeviceManage::sigPrepareWidget);
 	connect(ui.btnWaypointCheck, &QAbstractButton::clicked, [this]() { waypointComposeAndUpload(m_qstrCurrentProjectFile, false); });

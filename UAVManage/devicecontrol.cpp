@@ -152,6 +152,12 @@ bool DeviceControl::isCheckDevice()
 	return ui.checkBox->isChecked();
 }
 
+void DeviceControl::setChcekStatus(bool check)
+{
+	if(check) ui.checkBox->setCheckState(Qt::Checked);
+	else ui.checkBox->setCheckState(Qt::Unchecked);
+}
+
 //连接设备
 bool DeviceControl::connectDevice()
 {

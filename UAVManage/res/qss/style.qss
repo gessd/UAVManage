@@ -73,6 +73,9 @@ DeviceControl QToolButton:hover, #m_pBtnPlay:hover, #m_pbtnStop:hover{
 #btnFlyStop{
 	padding-left:10px;
 }
+#btnBaseStation,#btnWaypointUpload,#btnConsistent,#btnDevicePrepare{
+	padding-left:60px;
+}
 QLineEdit{
 	border:1px solid #467FC1;
 	padding:4px;

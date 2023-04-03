@@ -59,6 +59,10 @@ public:
 	 */
 	bool isCheckDevice();
 	/**
+	 * @brief 设置勾选状态
+	 */
+	void setChcekStatus(bool check);
+	/**
 	 * @brief 连接设备
 	 */
 	bool connectDevice();
