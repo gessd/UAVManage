@@ -12,6 +12,7 @@
 #include <QFileInfo>
 #include <QTextCodec>
 #include <QMessageBox>
+#include <QDesktopWidget>
 #include "definesetting.h"
 #include "tinyxml2/tinyxml2.h"
 #include "messagelistdialog.h"
@@ -41,7 +42,7 @@ UAVManage::UAVManage(QWidget* parent)
 	m_pMenuWidget = nullptr;
 	//注册事件过滤器，处理快捷键事件
 	installEventFilter(this);
-	setWindowFlags(Qt::FramelessWindowHint);
+	//setWindowFlags(Qt::FramelessWindowHint);
 	MessageListDialog::getInstance()->setParent(this);
 	m_pHistory = new HistoryMessage(this);
 	connect(MessageListDialog::getInstance(), SIGNAL(sigMessage(QString, _Messagelevel, bool)), m_pHistory, SLOT(onMessageData(QString, _Messagelevel, bool)));
@@ -292,17 +293,25 @@ void UAVManage::initMenu()
 	pBtnClose->setIconSize(QSize(12, 12));
 	pBtnClose->setIcon(QIcon(":/res/images/close.png"));
 	pMenuLayout->addWidget(pBtnClose);
+	m_pBtnMax->setVisible(false);
+	pBtnMin->setVisible(false);
+	pBtnClose->setVisible(false);
 	connect(pBtnMin, &QAbstractButton::clicked, this, &UAVManage::showMinimized);
 	connect(pBtnClose, &QAbstractButton::clicked, this, &UAVManage::close);
 	connect(m_pBtnMax, &QAbstractButton::clicked, [this]() {
-		Qt::WindowStates state = windowState();
-		if (Qt::WindowState::WindowMaximized == state || Qt::WindowState::WindowFullScreen == state) {
+		if (Qt::WindowNoState == windowState()) {
+			showMaximized();
+			QDesktopWidget* desktopWidget = QApplication::desktop();
+			QRect screenRect = desktopWidget->screenGeometry();
+			//不能完全全屏，需要减去任务栏位置
+			setFixedSize(screenRect.width(), screenRect.height() - 40);
+			move(0, 0);
+			m_pBtnMax->setIcon(QIcon(":/res/images/normal.png"));
+		}
+		else {
 			showNormal();
 			m_pBtnMax->setIcon(QIcon(":/res/images/max.png"));
-			return;
 		}
-		showMaximized();
-		m_pBtnMax->setIcon(QIcon(":/res/images/normal.png"));
 		});
 }
 
@@ -596,7 +605,7 @@ bool UAVManage::eventFilter(QObject* watched, QEvent* event)
 		if (QEvent::MouseButtonPress == event->type()) {
 			QMouseEvent* mouse = dynamic_cast<QMouseEvent*>(event);
 			reltvPos = mouse->pos();
-			bMove = true;
+			//bMove = true;
 		}
 		else if (QEvent::MouseButtonRelease == event->type()) {
 			bMove = false;
