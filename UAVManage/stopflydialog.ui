@@ -53,9 +53,6 @@ font-size:24px;
      <property name="focusPolicy">
       <enum>Qt::NoFocus</enum>
      </property>
-     <property name="styleSheet">
-      <string notr="true"/>
-     </property>
      <property name="text">
       <string>紧急停止</string>
      </property>
@@ -65,12 +62,12 @@ font-size:24px;
      </property>
      <property name="iconSize">
       <size>
-       <width>140</width>
-       <height>140</height>
+       <width>200</width>
+       <height>200</height>
       </size>
      </property>
      <property name="toolButtonStyle">
-      <enum>Qt::ToolButtonTextUnderIcon</enum>
+      <enum>Qt::ToolButtonIconOnly</enum>
      </property>
     </widget>
    </item>
@@ -94,12 +91,12 @@ font-size:24px;
      </property>
      <property name="iconSize">
       <size>
-       <width>140</width>
-       <height>140</height>
+       <width>200</width>
+       <height>200</height>
       </size>
      </property>
      <property name="toolButtonStyle">
-      <enum>Qt::ToolButtonTextUnderIcon</enum>
+      <enum>Qt::ToolButtonIconOnly</enum>
      </property>
     </widget>
    </item>

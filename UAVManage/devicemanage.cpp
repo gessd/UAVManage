@@ -473,15 +473,18 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 		
 		if (_DeviceTakeoffLocal == comand) {
 			//起飞前增加倒计时
-			QLabel label(dynamic_cast<QWidget*>(parent()));
+			QWidget* pWidget = this;
+			while (true) {
+				QWidget* pTemp = dynamic_cast<QWidget*>(pWidget->parent());
+				if (!pTemp) break;
+				pWidget = pTemp;
+			}
+			QLabel label(pWidget);
 			//设置窗体的背景色,这里的百分比就是透明度
-			label.setStyleSheet(QString("background-color: rgba(0, 0, 0, 50%);color:#FF0000;border:1px solid blue;font-size:100px;"));
-			label.setFixedSize(dynamic_cast<QWidget*>(parent())->size());
+			label.setStyleSheet(QString("background-color: rgba(0, 0, 0, 50%);color:#FF0000;font-size:100px;"));
+			label.setFixedSize(pWidget->size());
 			label.show();
 			label.setAlignment(Qt::AlignCenter);
-			QFont font = label.font();
-			font.setPixelSize(font.pixelSize() * 4);
-			//label.setFont(font);
 			label.setText("3");
 			QTimer timer;
 			timer.start(1000);

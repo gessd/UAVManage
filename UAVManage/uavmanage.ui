@@ -16,8 +16,18 @@
   <property name="windowTitle">
    <string>无人机编程软件</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="uavmanage.qrc">
+    <normaloff>:/res/images/logo.png</normaloff>:/res/images/logo.png</iconset>
+  </property>
   <property name="styleSheet">
    <string notr="true"/>
+  </property>
+  <property name="iconSize">
+   <size>
+    <width>24</width>
+    <height>28</height>
+   </size>
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayoutMain">

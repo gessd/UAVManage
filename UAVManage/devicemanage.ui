@@ -606,12 +606,23 @@ border-radius:0px;
                </size>
               </property>
               <property name="styleSheet">
-               <string notr="true">border-image:url(:/res/images/checkout.png);
-border-radius:0px;
-padding-left:20px;</string>
+               <string notr="true"/>
               </property>
               <property name="text">
                <string>检查舞步</string>
+              </property>
+              <property name="icon">
+               <iconset resource="uavmanage.qrc">
+                <normaloff>:/res/images/checkout.png</normaloff>:/res/images/checkout.png</iconset>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>22</width>
+                <height>22</height>
+               </size>
+              </property>
+              <property name="toolButtonStyle">
+               <enum>Qt::ToolButtonTextBesideIcon</enum>
               </property>
              </widget>
             </item>
@@ -629,13 +640,21 @@ padding-left:20px;</string>
                 <height>42</height>
                </size>
               </property>
-              <property name="styleSheet">
-               <string notr="true">border-image:url(:/res/images/stereoscopic.png);
-border-radius:0px;
-padding-left:20px;</string>
-              </property>
               <property name="text">
                <string>三维仿真</string>
+              </property>
+              <property name="icon">
+               <iconset resource="uavmanage.qrc">
+                <normaloff>:/res/images/stereoscopic.png</normaloff>:/res/images/stereoscopic.png</iconset>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>22</width>
+                <height>22</height>
+               </size>
+              </property>
+              <property name="toolButtonStyle">
+               <enum>Qt::ToolButtonTextBesideIcon</enum>
               </property>
              </widget>
             </item>
@@ -653,14 +672,21 @@ padding-left:20px;</string>
                 <height>42</height>
                </size>
               </property>
-              <property name="styleSheet">
-               <string notr="true">border-image:url(:/res/images/inspection.png);
-border-radius:0px;
-padding-left:20px;
-</string>
-              </property>
               <property name="text">
                <string>起飞检查</string>
+              </property>
+              <property name="icon">
+               <iconset resource="uavmanage.qrc">
+                <normaloff>:/res/images/inspection.png</normaloff>:/res/images/inspection.png</iconset>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>22</width>
+                <height>22</height>
+               </size>
+              </property>
+              <property name="toolButtonStyle">
+               <enum>Qt::ToolButtonTextBesideIcon</enum>
               </property>
              </widget>
             </item>
@@ -708,13 +734,21 @@ padding-left:20px;
                   <height>42</height>
                  </size>
                 </property>
-                <property name="styleSheet">
-                 <string notr="true">border-image:url(:/res/images/flyQueue.png);
-border-radius:0px;
-padding-left:10px;</string>
-                </property>
                 <property name="text">
                  <string>列队</string>
+                </property>
+                <property name="icon">
+                 <iconset resource="uavmanage.qrc">
+                  <normaloff>:/res/images/flyQueue.png</normaloff>:/res/images/flyQueue.png</iconset>
+                </property>
+                <property name="iconSize">
+                 <size>
+                  <width>22</width>
+                  <height>22</height>
+                 </size>
+                </property>
+                <property name="toolButtonStyle">
+                 <enum>Qt::ToolButtonTextBesideIcon</enum>
                 </property>
                </widget>
               </item>
@@ -732,13 +766,21 @@ padding-left:10px;</string>
                   <height>42</height>
                  </size>
                 </property>
-                <property name="styleSheet">
-                 <string notr="true">border-image:url(:/res/images/flyRecover.png);
-border-radius:0px;
-padding-left:10px;</string>
-                </property>
                 <property name="text">
                  <string>回收</string>
+                </property>
+                <property name="icon">
+                 <iconset resource="uavmanage.qrc">
+                  <normaloff>:/res/images/flyRecover.png</normaloff>:/res/images/flyRecover.png</iconset>
+                </property>
+                <property name="iconSize">
+                 <size>
+                  <width>22</width>
+                  <height>22</height>
+                 </size>
+                </property>
+                <property name="toolButtonStyle">
+                 <enum>Qt::ToolButtonTextBesideIcon</enum>
                 </property>
                </widget>
               </item>
@@ -749,21 +791,30 @@ padding-left:10px;</string>
               <property name="minimumSize">
                <size>
                 <width>210</width>
-                <height>62</height>
+                <height>42</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
                 <width>210</width>
-                <height>62</height>
+                <height>42</height>
                </size>
-              </property>
-              <property name="styleSheet">
-               <string notr="true">border-image:url(:/res/images/flystop.png);
-border-radius:0px;</string>
               </property>
               <property name="text">
                <string>急停(CTRL+空格)</string>
+              </property>
+              <property name="icon">
+               <iconset resource="uavmanage.qrc">
+                <normaloff>:/res/images/flystop.png</normaloff>:/res/images/flystop.png</iconset>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>22</width>
+                <height>22</height>
+               </size>
+              </property>
+              <property name="toolButtonStyle">
+               <enum>Qt::ToolButtonTextBesideIcon</enum>
               </property>
              </widget>
             </item>
@@ -783,13 +834,21 @@ border-radius:0px;</string>
                   <height>42</height>
                  </size>
                 </property>
-                <property name="styleSheet">
-                 <string notr="true">border-image:url(:/res/images/flytakeoff.png);
-border-radius:0px;
-padding-left:10px;</string>
-                </property>
                 <property name="text">
                  <string>起飞</string>
+                </property>
+                <property name="icon">
+                 <iconset resource="uavmanage.qrc">
+                  <normaloff>:/res/images/flytakeoff.png</normaloff>:/res/images/flytakeoff.png</iconset>
+                </property>
+                <property name="iconSize">
+                 <size>
+                  <width>22</width>
+                  <height>22</height>
+                 </size>
+                </property>
+                <property name="toolButtonStyle">
+                 <enum>Qt::ToolButtonTextBesideIcon</enum>
                 </property>
                </widget>
               </item>
@@ -807,13 +866,21 @@ padding-left:10px;</string>
                   <height>42</height>
                  </size>
                 </property>
-                <property name="styleSheet">
-                 <string notr="true">border-image:url(:/res/images/flyland.png);
-border-radius:0px;
-padding-left:10px;</string>
-                </property>
                 <property name="text">
                  <string>降落</string>
+                </property>
+                <property name="icon">
+                 <iconset resource="uavmanage.qrc">
+                  <normaloff>:/res/images/flyland.png</normaloff>:/res/images/flyland.png</iconset>
+                </property>
+                <property name="iconSize">
+                 <size>
+                  <width>22</width>
+                  <height>22</height>
+                 </size>
+                </property>
+                <property name="toolButtonStyle">
+                 <enum>Qt::ToolButtonTextBesideIcon</enum>
                 </property>
                </widget>
               </item>
