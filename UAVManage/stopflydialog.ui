@@ -27,47 +27,22 @@ font-size:24px;
 }</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <property name="leftMargin">
-    <number>0</number>
-   </property>
-   <property name="topMargin">
-    <number>0</number>
-   </property>
-   <property name="rightMargin">
-    <number>0</number>
-   </property>
-   <property name="bottomMargin">
-    <number>0</number>
-   </property>
-   <property name="spacing">
-    <number>0</number>
-   </property>
    <item row="0" column="0">
     <widget class="QToolButton" name="btnStopFly">
      <property name="minimumSize">
       <size>
-       <width>200</width>
-       <height>200</height>
+       <width>150</width>
+       <height>150</height>
       </size>
      </property>
      <property name="focusPolicy">
       <enum>Qt::NoFocus</enum>
      </property>
+     <property name="styleSheet">
+      <string notr="true">border-image:url(:/res/images/stop.png);</string>
+     </property>
      <property name="text">
       <string>紧急停止</string>
-     </property>
-     <property name="icon">
-      <iconset resource="uavmanage.qrc">
-       <normaloff>:/res/images/flystop.png</normaloff>:/res/images/flystop.png</iconset>
-     </property>
-     <property name="iconSize">
-      <size>
-       <width>200</width>
-       <height>200</height>
-      </size>
-     </property>
-     <property name="toolButtonStyle">
-      <enum>Qt::ToolButtonIconOnly</enum>
      </property>
     </widget>
    </item>
@@ -75,28 +50,18 @@ font-size:24px;
     <widget class="QToolButton" name="btnFlyLandCont">
      <property name="minimumSize">
       <size>
-       <width>200</width>
-       <height>200</height>
+       <width>150</width>
+       <height>150</height>
       </size>
      </property>
      <property name="focusPolicy">
       <enum>Qt::NoFocus</enum>
      </property>
+     <property name="styleSheet">
+      <string notr="true">border-image:url(:/res/images/flyland.png);</string>
+     </property>
      <property name="text">
       <string>降落</string>
-     </property>
-     <property name="icon">
-      <iconset resource="uavmanage.qrc">
-       <normaloff>:/res/images/flyland.png</normaloff>:/res/images/flyland.png</iconset>
-     </property>
-     <property name="iconSize">
-      <size>
-       <width>200</width>
-       <height>200</height>
-      </size>
-     </property>
-     <property name="toolButtonStyle">
-      <enum>Qt::ToolButtonIconOnly</enum>
      </property>
     </widget>
    </item>
