@@ -80,7 +80,7 @@ void PlaceInfoDialog::showEvent(QShowEvent* event)
 	foreach(QSerialPortInfo info, QSerialPortInfo::availablePorts()) {
 		quint16 pid = info.productIdentifier();
 		//基站设备PID值
-		if (60000 != pid) continue;
+		if (21972 != pid && 60000 != pid) continue;
 		ui.comboBoxCom->addItem(info.portName());
 	}
 	if (1 == ui.comboBoxCom->count()) {
@@ -223,6 +223,7 @@ void PlaceInfoDialog::onParseSettingFrame(QByteArray arrNLINKData)
 	}
 	else {
 		//更新界面设置
+		//qDebug() << "界面更新" << QThread::currentThreadId();
 		int role = QByteArray(1, arrData[_role]).toHex().toInt(0, 16);
 		int id = QByteArray(1, arrData[_id]).toHex().toInt(0, 16);
 		int fre = QByteArray(1, arrData[_reserved2]).toHex().toInt(0, 16);
@@ -240,6 +241,8 @@ void PlaceInfoDialog::onParseSettingFrame(QByteArray arrNLINKData)
 				double number = NLINK_ParseInt24(temp);
 				int n = column / 3;
 				ui.tableWidget->setItem(row, n, new QTableWidgetItem(QString::number(number)));
+				QString text = QString("第%1行 第%2列 ").arg(row).arg(n).arg(number);
+				//qDebug() << "更新数据" << text;
 				if (1 == n) xmax = qMax(xmax, number);
 				if (0 == n) ymax = qMax(ymax, number);
 				if (0 == row && 0 != number) {
@@ -309,6 +312,7 @@ void PlaceInfoDialog::onParseSettingFrame(QByteArray arrNLINKData)
 		emit serialDataSend(_OneKey_Set_Next_);
 		m_nOnekeySetIndex++;
 		ui.progressBar->setValue(m_nOnekeySetIndex);
+		//qDebug() << "标定进度" << m_nOnekeySetIndex;
 	}
 }
 
