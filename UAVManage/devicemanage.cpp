@@ -700,13 +700,13 @@ void DeviceManage::setCurrentMusicPath(QString filePath, QPixmap pixmap)
 {
 	m_qstrMusicFile = filePath;
 	m_pixmapMusic = pixmap;
-	//if (!QFile::exists(filePath)) return;
-	//QFileInfo info(filePath);
-	//QString qstrPixmapPath = info.path() + "/music.png";
-	//if (false == pixmap.save(qstrPixmapPath)) {
-	//	qDebug() << "保存音乐波形图片失败";
-	//	return;
-	//}
+	if (!QFile::exists(filePath)) return;
+	QFileInfo info(filePath);
+	QString qstrPixmapPath = info.path() + "/music.png";
+	if (false == pixmap.save(qstrPixmapPath)) {
+		qDebug() << "保存音乐波形图片失败";
+		return;
+	}
 	//QJsonObject obj3dmsg;
 	//obj3dmsg.insert(_Ver_, _VerNum_);
 	//obj3dmsg.insert(_Tag_, _TabName_);

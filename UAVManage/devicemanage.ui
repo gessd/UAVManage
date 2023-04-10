@@ -791,13 +791,13 @@ border-radius:0px;
               <property name="minimumSize">
                <size>
                 <width>210</width>
-                <height>42</height>
+                <height>45</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
                 <width>210</width>
-                <height>42</height>
+                <height>45</height>
                </size>
               </property>
               <property name="text">

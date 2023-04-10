@@ -18,8 +18,8 @@ class FirmwareDialog;
 class StopFlyDialog;
 class HistoryMessage;
 class WaitingWidget;
-class SoundGrade;
 class RegisterDialog;
+class MusicPlayer;
 class UAVManage : public QMainWindow
 {
     Q_OBJECT
@@ -182,7 +182,7 @@ private:
     //当前工程文件
     QString m_qstrCurrentProjectFile;
     //底部音乐窗口
-    SoundGrade* m_pSoundWidget;
+    MusicPlayer* m_pMusicPlayer;
     //启动外部三维程序使用
     QProcess* m_p3DProcess;
     //起飞准备按钮，没有打开项目前禁止点击

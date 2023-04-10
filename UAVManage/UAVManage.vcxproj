@@ -116,6 +116,8 @@
     <ClCompile Include="firstdialog.cpp" />
     <ClCompile Include="historymessage.cpp" />
     <ClCompile Include="managertopwidget.cpp" />
+    <ClCompile Include="musicplayer.cpp" />
+    <ClCompile Include="musicspectrum.cpp" />
     <ClCompile Include="mytooltip.cpp" />
     <ClCompile Include="qxtglobalshortcut5\core\qxtglobal.cpp" />
     <ClCompile Include="qxtglobalshortcut5\gui\qxtglobalshortcut.cpp" />
@@ -138,6 +140,7 @@
     <QtUic Include="historymessage.ui" />
     <QtUic Include="managertopwidget.ui" />
     <QtUic Include="messagelistdialog.ui" />
+    <QtUic Include="musicplayer.ui" />
     <QtUic Include="placeinfodialog.ui" />
     <QtUic Include="registerdialog.ui" />
     <QtUic Include="SoundGrade.ui" />
@@ -205,6 +208,8 @@
     <QtMoc Include="threadpython.h" />
     <QtMoc Include="messagelistdialog.h" />
     <QtMoc Include="musicscale.h" />
+    <QtMoc Include="musicplayer.h" />
+    <QtMoc Include="musicspectrum.h" />
     <ClInclude Include="mypythondefine.h" />
     <QtMoc Include="qtsingleapplication\qtlocalpeer.h" />
     <QtMoc Include="qtsingleapplication\qtsingleapplication.h" />

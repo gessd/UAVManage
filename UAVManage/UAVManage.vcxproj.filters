@@ -166,6 +166,12 @@
     <ClCompile Include="mytooltip.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="musicplayer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="musicspectrum.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="devicemanage.h">
@@ -258,6 +264,12 @@
     <QtMoc Include="mytooltip.h">
       <Filter>Header Files</Filter>
     </QtMoc>
+    <QtMoc Include="musicplayer.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="musicspectrum.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="devicemanage.ui">
@@ -312,6 +324,9 @@
       <Filter>Form Files</Filter>
     </QtUic>
     <QtUic Include="managertopwidget.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="musicplayer.ui">
       <Filter>Form Files</Filter>
     </QtUic>
   </ItemGroup>

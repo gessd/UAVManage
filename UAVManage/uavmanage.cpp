@@ -13,11 +13,12 @@
 #include <QTextCodec>
 #include <QMessageBox>
 #include <QDesktopWidget>
+#include <QStandardPaths>
 #include "definesetting.h"
 #include "tinyxml2/tinyxml2.h"
 #include "messagelistdialog.h"
 #include "placeinfodialog.h"
-#include "SoundGrade.h"
+#include "musicplayer.h"
 #include "paramreadwrite.h"
 #include "spaceparam.h"
 #include "waitingwidget.h"
@@ -74,13 +75,13 @@ UAVManage::UAVManage(QWidget* parent)
 	connect(m_pDeviceManage, &DeviceManage::sigPrepareWidget, this, &UAVManage::onPrepareWidget);
 
 	m_pAbout = new AboutDialog(this);
-	m_pSoundWidget = new SoundGrade(this);
-	m_pSoundWidget->setEnabled(false);
-	ui.horizontalLayoutSound->addWidget(m_pSoundWidget);
-	connect(m_pSoundWidget, &SoundGrade::sigUpdateMusic, this, &UAVManage::onUpdateMusic);
-	connect(m_pSoundWidget, &SoundGrade::sigMsuicTime, this, &UAVManage::onCurrentMusicTime);
-	connect(m_pSoundWidget, &SoundGrade::playeState, this, &UAVManage::onCurrentPlayeState);
-	connect(m_pSoundWidget, &SoundGrade::updateMusicWaveFinished, this, &UAVManage::onMusicWaveFinished);
+	m_pMusicPlayer = new MusicPlayer(this);
+	m_pMusicPlayer->setEnabled(false);
+	connect(m_pMusicPlayer, &MusicPlayer::sigUpdateMusic, this, &UAVManage::onUpdateMusic);
+	connect(m_pMusicPlayer, &MusicPlayer::sigMsuicTime, this, &UAVManage::onCurrentMusicTime);
+	connect(m_pMusicPlayer, &MusicPlayer::playeState, this, &UAVManage::onCurrentPlayeState);
+	connect(m_pMusicPlayer, &MusicPlayer::updateMusicWaveFinished, this, &UAVManage::onMusicWaveFinished);
+	ui.horizontalLayoutSound->addWidget(m_pMusicPlayer);
 	
 	m_pToopTip = new MyTooltip(this);
 	initMenu();
@@ -94,9 +95,9 @@ UAVManage::~UAVManage()
 		m_p3DProcess->deleteLater();
 		m_p3DProcess = nullptr;
 	}
-	if (m_pSoundWidget) {
-		delete m_pSoundWidget;
-		m_pSoundWidget = nullptr;
+	if (m_pMusicPlayer) {
+		delete m_pMusicPlayer;
+		m_pMusicPlayer = nullptr;
 	}
 	if (m_pSocketServer) {
 		m_pSocketServer->close();
@@ -469,9 +470,9 @@ void UAVManage::onOpenProject(QString qstrFile)
 	QFileInfo info(m_qstrCurrentProjectFile);
 	QString name = info.baseName();
 	m_pDeviceManage->setCurrentDevice(qstrCurrnetName);
-	m_pSoundWidget->updateLoadMusic(qstrMusicFilePath);
+	m_pMusicPlayer->updateLoadMusic(qstrMusicFilePath);
 	m_pDeviceManage->setEnabled(true);
-	m_pSoundWidget->setEnabled(true);
+	m_pMusicPlayer->setEnabled(true);
 	m_pButtonFlyPrepare->setEnabled(true);
 	ui.toolBar->setEnabled(true);
 	ParamReadWrite::writeParam(_Path_, m_qstrCurrentProjectFile);
@@ -544,13 +545,12 @@ void UAVManage::onSaveasProject()
 void UAVManage::onCloseProject()
 {
 	//清空项目信息
-	m_pSoundWidget->stopPlayMusic();
-	m_pSoundWidget->clearSound();
+	m_pMusicPlayer->clearSound();
 	if (m_pDeviceManage) m_pDeviceManage->clearDevice();
 	onWebClear();
 	m_pActionAttribute->setEnabled(false);
 	m_pDeviceManage->setEnabled(false);
-	m_pSoundWidget->setEnabled(false);
+	m_pMusicPlayer->setEnabled(false);
 	m_pButtonFlyPrepare->setEnabled(false);
 	ui.toolBar->setEnabled(false);
 	//先清空数据
@@ -980,13 +980,13 @@ void UAVManage::onDeviceResetLocation(QString name, long x, long y)
 void UAVManage::onDeviceTakeoffFinished(bool takeoff)
 {
 	if (takeoff) {
-		m_pSoundWidget->startPlayMusic();
+		m_pMusicPlayer->startPlayMusic();
 		//TODO 定时查询飞机状态，如果都飞完则关闭此窗口，同时关闭音乐
 		m_pStopDialog->exec();
 	}
 	else {
 		m_pStopDialog->close();
-		m_pSoundWidget->stopPlayMusic();
+		m_pMusicPlayer->stopPlayMusic();
 	}
 }
 
@@ -1038,7 +1038,7 @@ void UAVManage::onUpdateMusic(QString qstrFilePath)
 	place->SetAttribute(_ElementMusic_, fileName.toUtf8().data());
 	error = doc.SaveFile(filename.c_str());
 	//音乐文件复制完成后添加音乐
-	m_pSoundWidget->updateLoadMusic(qstrNewFile);
+	m_pMusicPlayer->updateLoadMusic(qstrNewFile);
 }
 
 void UAVManage::onCurrentMusicTime(unsigned int second)
@@ -1067,7 +1067,7 @@ void UAVManage::on3DDialogStauts(bool connect)
 
 void UAVManage::onMusicWaveFinished()
 {
-	m_pDeviceManage->setCurrentMusicPath(m_pSoundWidget->getCurrentMusic(), m_pSoundWidget->getMusicPixmap());
+	m_pDeviceManage->setCurrentMusicPath(m_pMusicPlayer->getCurrentMusic(), m_pMusicPlayer->getMusicPixmap());
 }
 
 void UAVManage::onProjectAttribute()
@@ -1116,7 +1116,7 @@ void UAVManage::onPrepareWidget()
 void UAVManage::onStart3DDialog()
 {
 	//没有添加音乐不能启动三维窗口
-	QString qstrFilePath = m_pSoundWidget->getCurrentMusic();
+	QString qstrFilePath = m_pMusicPlayer->getCurrentMusic();
 	if (qstrFilePath.isEmpty()) {
 		QMessageBox::warning(this, tr("警告"), tr("未添加音乐文件无法使用三维仿真窗口"));
 		return;
