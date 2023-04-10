@@ -422,6 +422,7 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 		_MessageListClear;
 		//记录出错设备名称
 		QStringList listNames;
+		QStringList listCheck;
 		for (int i = 0; i < ui.listWidget->count(); i++) {
 			QListWidgetItem* pItem = ui.listWidget->item(i);
 			if (!pItem) continue;
@@ -431,6 +432,7 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 			if (!pDevice) continue;
 			if(false == pDevice->isCheckDevice()) continue;
 			QString name = pDevice->getName();
+			listCheck.append(name);
 			listNames.append(name);
 			if (false == pDevice->isConnectDevice()) {
 				_ShowErrorMessage(name + tr("设备未连接无法起飞"));
@@ -470,7 +472,10 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 			QMessageBox::warning(this, tr("警告"), error);
 			return;
 		}
-		
+		if (listCheck.isEmpty()) {
+			_ShowInfoMessage(tr("未选中无人机"));
+			return;
+		}
 		if (_DeviceTakeoffLocal == comand) {
 			//起飞前增加倒计时
 			QWidget* pWidget = this;
@@ -501,6 +506,7 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 	}
 	int x = 0;
 	int y = 0;
+	QStringList listCheck;
 	for (int i = 0; i < ui.listWidget->count(); i++) {
 		QListWidgetItem* pItem = ui.listWidget->item(i);
 		if (!pItem) continue;
@@ -510,6 +516,7 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 		if (!pDevice) continue;
 		if (false == pDevice->isCheckDevice()) continue;
 		QString qstrName = pDevice->getName();
+		listCheck.append(qstrName);
 		int res = DeviceDataSucceed;
 		QString qstrText;
 		switch (comand)
@@ -555,6 +562,10 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 		if (_DeviceStatus::DeviceDataSucceed != res) {
 			_ShowErrorMessage(qstrName+qstrText+tr("出错:")+ Utility::waypointMessgeFromStatus(comand, res));
 		}
+	}
+	if (listCheck.isEmpty()) {
+		_ShowInfoMessage(tr("未选中无人机"));
+		return;
 	}
 	if (_DeviceTakeoffLocal == comand) emit sigTakeoffFinished(true);
 	else emit sigTakeoffFinished(false);
