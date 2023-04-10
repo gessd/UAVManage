@@ -38,6 +38,13 @@ PyObject* QZAPI::examineWaypoint()
 	switch (data.commandID)
 	{
 	case _WaypointFly:
+		//判断飞行高度
+		if (data.z > 800) {
+			QString error = QString(data.message + tr("飞出限制高度，设定值[%1]厘米，最大高度[%2]厘米")
+				.arg(data.z).arg(800));
+			showWaypointError(error);
+			return nullptr;
+		}
 		//判断是否飞出场地范围
 		if (data.x < 100 || data.y < 100 || data.x >(g_nSpaceX - 100) || data.y >(g_nSpaceY - 100)) {
 			QString error = QString(data.message + tr("飞出限制区域，设定值[X:%1 Y:%2]厘米，限制区域[X:100--%3 Y:100--%4]厘米")
@@ -48,9 +55,9 @@ PyObject* QZAPI::examineWaypoint()
 		break;
 	case _WaypointSpeed:
 		//飞行速度范围
-		if (data.param1 > 100 || data.param1 < 10) {
+		if (data.param1 > 200 || data.param1 < 10) {
 			showWaypointError(QString(tr("飞行速度设定超出范围，设定值:[%1]，最小最大值[%2-%3]")
-				.arg(data.param1).arg(10).arg(100)));
+				.arg(data.param1).arg(10).arg(200)));
 			return nullptr;
 		}
 		break;
@@ -63,9 +70,9 @@ PyObject* QZAPI::examineWaypoint()
 		break;
 	case _WaypointHover:
 		//悬停时间
-		if (data.param1 >= 100 || data.param1 < 0.1) {
+		if (data.param1 > 200 || data.param1 < 0.1) {
 			showWaypointError(QString(tr("悬停时间设定超出范围，设定值:[%1]秒，最小最大值[%2-%3]秒")
-				.arg(data.param1).arg(0).arg(100)));
+				.arg(data.param1).arg(0).arg(200)));
 			return nullptr;
 		}
 		break;

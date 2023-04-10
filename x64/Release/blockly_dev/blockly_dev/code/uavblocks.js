@@ -242,13 +242,13 @@ Blockly.Blocks['Fly_SetSpeed'] = {
     init: function() {
         this.appendDummyInput()
             .appendField("飞行速度每秒")
-            .appendField(new Blockly.FieldNumber(60, 10, 100, 1), "speed")
+            .appendField(new Blockly.FieldNumber(60, 10, 200, 1), "speed")
             .appendField("厘米")
         this.setPreviousStatement(true, ["action", "notReachAction", "ReachAction"]);
         this.setNextStatement(true, ["action", "notReachAction", "ReachAction"]);
         this.setColour('#3B8CFF');
         this.setInputsInline(true);
-        this.setTooltip('取值范围:10~100');
+        this.setTooltip('取值范围:10~200');
         this.setHelpUrl("");
     }
 };
@@ -356,13 +356,11 @@ Blockly.Blocks['Fly_SetLedMode'] = {
         this.appendDummyInput()
             .appendField("设置LED灯闪烁模式为")
 			.appendField(new Blockly.FieldDropdown([
-				["模式1", "1"],
-				["模式2", "2"],
-                ["模式3", "3"],
-                ["模式4", "4"],
-                ["模式5", "5"],
-                ["模式6", "6"],
-                ["模式7", "7"],
+				["闪烁", "1"],
+				["呼吸灯", "2"],
+                ["全亮", "3"],
+                ["全灭", "4"],
+                ["跑马灯", "5"],
              ]), "mode");
         this.setPreviousStatement(true,["action", "notReachAction", "ReachAction"]);
         this.setNextStatement(true,["action", "notReachAction", "ReachAction"]);

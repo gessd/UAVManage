@@ -3,7 +3,7 @@ goog.require('Blockly.JavaScript');
 var url = "ws://127.0.0.1:25252";
 window.spaceX = 9000;
 window.spaceY = 9000;
-window.spaceZ = 10000;
+window.spaceZ = 800;
 //兼容 FireFox
 if ("WebSocket" in window) {
    var socket = new WebSocket(url);

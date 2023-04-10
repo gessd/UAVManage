@@ -439,7 +439,7 @@ void UAVManage::onOpenProject(QString qstrFile)
 		jsonObj.insert(_WMID, _WIDSet);
 		jsonObj.insert("x", space.x());
 		jsonObj.insert("y", space.y());
-		jsonObj.insert("z", 10000);
+		jsonObj.insert("z", 800);
 		QJsonDocument jsonDoc(jsonObj);
 		m_pWebBlocklySocket->sendTextMessage(jsonDoc.toJson());
 	}
