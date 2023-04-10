@@ -1130,8 +1130,14 @@ void UAVManage::onStart3DDialog()
 		QMessageBox::warning(this, tr("警告"), tr("音乐文件无法使用无法使用三维仿真窗口"));
 		return;
 	}
+	QFileInfo infoUe4Cache(QStandardPaths::writableLocation(QStandardPaths::DataLocation));
+	QString qstrUe4Path = infoUe4Cache.path() + "/UAV_Program_UE4/";
+	deleteDir(qstrUe4Path);
 	//UE4依赖文件判断
-	if (false == QFile::exists("C:/Windows/System32/D3DX9_43.dll") && false == QFile::exists("C:/Windows/SysWOW64/D3DX9_43.dll")) {
+	if (false == QFile::exists("C:/WINDOWS/system32/xapofx1_5.dll") 
+		|| false == QFile::exists("C:/WINDOWS/system32/x3daudio1_7.dll")
+		|| false == QFile::exists("C:/WINDOWS/system32/D3DCOMPILER_43.dll")
+		|| false == QFile::exists("C:/WINDOWS/system32/OPENGL32.dll")) {
 		QProcess::startDetached(QApplication::applicationDirPath() + "/3D/Engine/Extras/Redist/en-us/UE4PrereqSetup_x64.exe");
 		_ShowErrorMessage("三维仿真必要文件缺失，请安装后重试");
 		return;
