@@ -129,11 +129,11 @@ void UAVManage::initMenu()
 	pMenuLayout->setContentsMargins(10, 0, 10, 0);
 	m_pMenuWidget->setLayout(pMenuLayout);
 	m_pMenuWidget->setGeometry(0, 0, ui.menuBar->width(), ui.menuBar->height());
-	QLabel* pLableIcon = new QLabel(this);
-	pLableIcon->setFixedSize(21, 19);
-	pLableIcon->setPixmap(QPixmap(":/res/images/logo.png"));
-	pLableIcon->setScaledContents(true);
-	pMenuLayout->addWidget(pLableIcon);
+	//QLabel* pLableIcon = new QLabel(this);
+	//pLableIcon->setFixedSize(22, 22);
+	//pLableIcon->setPixmap(QPixmap(":/res/images/logo.png"));
+	//pLableIcon->setScaledContents(true);
+	//pMenuLayout->addWidget(pLableIcon);
 
 	QMenu* pIconMenu = new QMenu(tr("奇正数元"));
 	pIconMenu->setIcon(QIcon(":/res/logo/qz_logo.ico"));
