@@ -558,7 +558,7 @@ int DeviceControl::MavSendCommandLongMessage(QString name, int commandID, QByteA
 	return res;
 }
 
-QByteArray DeviceControl::getWaypointData(float param1, float param2, float param3, float param4, int32_t x, int32_t y, float z, uint16_t seq, unsigned int again)
+QByteArray DeviceControl::getWaypointData(float param1, float param2, float param3, float param4, int32_t x, int32_t y, float z, uint16_t seq, unsigned int commandID, unsigned int again)
 {
 	mavlink_message_t msg;
 	mavlink_mission_item_int_t mission;
@@ -570,7 +570,8 @@ QByteArray DeviceControl::getWaypointData(float param1, float param2, float para
 	mission.y = y;
 	mission.z = z;
 	mission.seq = seq;
-	mission.command = MAV_CMD_NAV_WAYPOINT;
+	//mission.command = MAV_CMD_NAV_WAYPOINT;
+	mission.command = commandID;
 	mission.target_system = _DeviceSYS_ID_;
 	mission.target_component = _DeviceCOMP_ID_;
 	mission.current = again;
@@ -589,8 +590,8 @@ void DeviceControl::DeviceMavWaypointSend(QVector<NavWayPointData> data)
 	}
 	qDebug() << "0号航点" << ui.labelDeviceName->text() << _CurrentTime_;
 	//先发送0号全零航点，验证是否可以上传航点
-	QByteArray arrData = getWaypointData(0, 0, 0, 0, 0, 0, 0, 0, 0);
-	QByteArray arrAgainData = getWaypointData(0, 0, 0, 0, 0, 0, 0, 0, 1);
+	QByteArray arrData = getWaypointData(0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+	QByteArray arrAgainData = getWaypointData(0, 0, 0, 0, 0, 0, 0, 0, 0, 1);
 	ResendMessage* pMessageThread = new ResendMessage(tr("上传预制舞步"), ui.labelDeviceName->text(), _MavWaypointRetryNum_, _MavWaypointTimeout_, arrData, arrAgainData, MAVLINK_MSG_ID_MISSION_ACK);
 	//接收设备回复的消息响应
 	connect(this, SIGNAL(sigCommandResult(QString, int, int)), pMessageThread, SLOT(onResult(QString, int, int)));
@@ -627,8 +628,8 @@ void DeviceControl::DeviceMavWaypointSend(QVector<NavWayPointData> data)
 		//}
 		
 		//与设备通讯协议中规定X与Y值需要*1000
-		QByteArray arrData = getWaypointData(temp.param1, temp.param2, temp.param3, temp.param4, temp.x * 1000, temp.y * 1000, temp.z, i + 1, 0);
-		QByteArray arrAgainData = getWaypointData(temp.param1, temp.param2, temp.param3, temp.param4, temp.x * 1000, temp.y * 1000, temp.z, i + 1, 1);
+		QByteArray arrData = getWaypointData(temp.param1, temp.param2, temp.param3, temp.param4, temp.x * 1000, temp.y * 1000, temp.z, i + 1, temp.commandID, 0);
+		QByteArray arrAgainData = getWaypointData(temp.param1, temp.param2, temp.param3, temp.param4, temp.x * 1000, temp.y * 1000, temp.z, i + 1, temp.commandID, 1);
 		ResendMessage* pWaypointThread = new ResendMessage(tr("上传舞步"), ui.labelDeviceName->text(), _MavWaypointRetryNum_, _MavWaypointTimeout_, arrData, arrAgainData, MAVLINK_MSG_ID_MISSION_ACK);
 		connect(this, SIGNAL(sigCommandResult(QString, int, int)), pWaypointThread, SLOT(onResult(QString, int, int)));
 		//阻塞发送

@@ -241,7 +241,7 @@ private:
 	int MavSendCommandLongMessage(QString name, int commandID, QByteArray arrData, QByteArray arrAgainData="", bool bWait = false
 		, unsigned int againNum = _MavLinkResendNum_, unsigned int againInterval = _NkCommandResendInterval_);
 	QByteArray getWaypointData(float param1, float param2, float param3, float param4
-		, int32_t x, int32_t y, float z, uint16_t seq, unsigned int again);
+		, int32_t x, int32_t y, float z, uint16_t seq, unsigned int commandID, unsigned int again);
 	/**
 	 * @brief 开始发送航点
 	 */
