@@ -25,6 +25,7 @@
         <file>res/images/max.png</file>
         <file>res/images/min.png</file>
         <file>res/images/normal.png</file>
+		<file>res/images/battery.png</file>
         <file>res/images/logo.png</file>
         <file>res/logo/qz_logo.ico</file>
         <file>res/menu/P01_file_open_btn_cli.png</file>

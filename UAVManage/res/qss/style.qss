@@ -97,6 +97,7 @@ QTableWidget QLineEdit{
 }
 QTableWidget::item:selected{
     background:#FFFFFF;
+	color:#000000;
 }
 QHeaderView::section{
 	text-align:center;

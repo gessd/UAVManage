@@ -259,14 +259,32 @@
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
+        <property name="minimumSize">
+         <size>
+          <width>30</width>
+          <height>20</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>30</width>
+          <height>20</height>
+         </size>
+        </property>
         <property name="toolTip">
          <string>电量</string>
         </property>
         <property name="styleSheet">
-         <string notr="true">color:#FF0000;</string>
+         <string notr="true">color:#FF0000;
+font-size:11px;
+border-image:url(:/res/images/battery.png);
+padding-left:2px;</string>
         </property>
         <property name="text">
-         <string>0 %</string>
+         <string>0%</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
         </property>
        </widget>
       </item>
