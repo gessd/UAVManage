@@ -32,7 +32,7 @@ ShowUnInstDetails hide
 
 ; 安装程序初始定义常量
 !define PRODUCT_NAME "无人机炫舞编程"											
-!define PRODUCT_VERSION "1.0.5"
+!define PRODUCT_VERSION "1.0.6"
 !define PRODUCT_PUBLISHER "奇正数元"
 !define PRODUCT_WEB_SITE ""
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
@@ -140,10 +140,10 @@ SectionEnd
 
 Section -AdditionalIcons
   ;WriteIniStr "$INSTDIR\${PRODUCT_NAME}.url" "InternetShortcut" "URL" "${PRODUCT_WEB_SITE}"
-  CreateDirectory "$SMPROGRAMS\UAVManage"
-  CreateShortCut "$SMPROGRAMS\UAVManage\无人机炫舞编程.lnk" "$INSTDIR\UAVManage.exe"
-  ;CreateShortCut "$SMPROGRAMS\UAVManage\Website.lnk" "$INSTDIR\${PRODUCT_NAME}.url"
-  CreateShortCut "$SMPROGRAMS\UAVManage\Uninstall.lnk" "$INSTDIR\uninst.exe"
+  ;开始菜单
+  CreateDirectory "$SMPROGRAMS\无人机炫舞编程"
+  CreateShortCut "$SMPROGRAMS\无人机炫舞编程\无人机炫舞编程.lnk" "$INSTDIR\UAVManage.exe"
+  CreateShortCut "$SMPROGRAMS\无人机炫舞编程\Uninstall.lnk" "$INSTDIR\uninst.exe"
 SectionEnd
 
 Section -Post
@@ -216,13 +216,36 @@ Function un.onInit
   Abort
 FunctionEnd
 
+;卸载完成
 Function un.onUninstSuccess
   HideWindow
   ;MessageBox MB_ICONINFORMATION|MB_OK "$(^Name) 已成功地从您的计算机移除。"
 FunctionEnd
 
+;安装三维依赖库
+Var File3DCount
+Function Install3D
+	ExecWait "$INSTDIR\3D\Engine\Extras\Redist\en-us\UE4PrereqSetup_x64.exe"
+FunctionEnd
+
 #安装完成
 Function .onInstSuccess
+  StrCpy $File3DCount 0
+  ;三维仿真依赖库
+  IfFileExists "C:\WINDOWS\system32\xapofx1_5.dll" 0 +2
+        StrCpy $File3DCount $File3DCount+1
+  IfFileExists "C:\WINDOWS\system32\x3daudio1_7.dll" 0 +2
+        StrCpy $File3DCount $File3DCount+2
+  IfFileExists "C:\WINDOWS\system32\D3DCOMPILER_43.dll" 0 +2
+        StrCpy $File3DCount $File3DCount+3
+  IfFileExists "C:\WINDOWS\system32\OPENGL32.dll" 0 +2
+        StrCpy $File3DCount $File3DCount+4
+  IfFileExists "C:\WINDOWS\system32\VCRUNTIME140.dll" 0 +2
+        StrCpy $File3DCount $File3DCount+5
+  ${If} $File3DCount != "0+1+2+3+4+5"
+        Call Install3D      
+  ${EndIf}
+  ;安装驱动
   ExecWait "$INSTDIR\CP2102驱动\CP210xVCPInstaller_x64.exe"
   ExecWait "$INSTDIR\CH340驱动\CH343SER.EXE"
 FunctionEnd
