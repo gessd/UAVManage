@@ -338,16 +338,17 @@ int DeviceControl::Fun_MAV_LED_MODE()
 
 void DeviceControl::onUpdateBatteryStatus(float voltages, float battery, unsigned short electric)
 {
-	ui.labelBattery->setText(QString(tr("%1%")).arg(electric));
+	QString text = "<font color=%1>";
 	if (electric > 80) {
-		ui.labelBattery->setStyleSheet("color:#467FC1;");
+		text = text.arg("#467FC1");
 	}
 	else if (electric > 60) {
-		ui.labelBattery->setStyleSheet("color:#DAA520;");
+		text = text.arg("#DAA520");
 	}
 	else {
-		ui.labelBattery->setStyleSheet("color:#FF0000;");
+		text = text.arg("#FF0000");
 	}
+	ui.labelBattery->setText(QString(text+tr("%1%</font>")).arg(electric));
 	m_pDebugDialog->onSetBatteryStatus(voltages, battery, electric);
 }
 
