@@ -438,7 +438,7 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 				_ShowErrorMessage(name + tr("设备未连接无法起飞"));
 				continue;
 			}
-			if (false == pDevice->getCurrentStatus().battery < 60) {
+			if (pDevice->getCurrentStatus().battery < 60) {
 				_ShowErrorMessage(name + tr("设备电量过低无法起飞"));
 				continue;
 			}
