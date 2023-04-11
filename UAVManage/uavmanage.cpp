@@ -1027,12 +1027,16 @@ void UAVManage::onUpdateMusic(QString qstrFilePath)
 	if (!place) return;
 	//删除旧的音乐文件，先删除旧文件再复制新文件到工程目录，防止因文件名重复无法复制
 	QString qstrOldMusic = infoProject.path() + _ProjectDirName_ + place->Attribute(_ElementMusic_);
+	if (qstrOldMusic == qstrFilePath) {
+		QMessageBox::warning(this, tr("错误"), tr("音乐文件相同，无法添加"));
+		return;
+	}
 	QFile::remove(qstrOldMusic);
 	//复制音乐文件到工程目录
 	QString qstrNewFile = infoProject.path() + _ProjectDirName_ + fileName;
 	if (qstrFilePath == qstrNewFile) return;
 	if (false == QFile::copy(qstrFilePath, qstrNewFile)) {
-		QMessageBox::warning(this, tr("提示"), tr("音乐使用失败"));
+		QMessageBox::warning(this, tr("提示"), tr("音乐文件添加失败"));
 		return;
 	}
 	place->SetAttribute(_ElementMusic_, fileName.toUtf8().data());

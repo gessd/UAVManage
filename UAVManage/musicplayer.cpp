@@ -19,6 +19,7 @@ MusicPlayer::MusicPlayer(QWidget *parent)
 	connect(&m_mediaPlayer, &QMediaPlayer::stateChanged, this, &MusicPlayer::onMediaStateChanged);
 	connect(&m_mediaPlayer, &QMediaPlayer::durationChanged, this, &MusicPlayer::onMediaDurationChanged);
 	connect(&m_mediaPlayer, SIGNAL(error(QMediaPlayer::Error)), this, SLOT(onMediaError(QMediaPlayer::Error)));
+	connect(&m_mediaPlayer, SIGNAL(mediaStatusChanged(QMediaPlayer::MediaStatus)), this, SLOT(onMediaStatusChanged(QMediaPlayer::MediaStatus)));
 	connect(ui.sliderMusic, &QSlider::sliderPressed, this, &MusicPlayer::onSliderPressed);
 	connect(ui.sliderMusic, &QSlider::sliderReleased, this, &MusicPlayer::onSliderReleased);
 	connect(ui.widgetSpectrum, SIGNAL(updateMusicWaveFinished()), this, SIGNAL(updateMusicWaveFinished()));
@@ -40,9 +41,8 @@ void MusicPlayer::clearSound()
 
 void MusicPlayer::updateLoadMusic(QString filePath)
 {
+	clearSound();
 	m_qstrMusicFile = filePath;
-	ui.labelSumTime->setText("00:00");
-	ui.labelCurrenSlider->setText("00:00");
 	m_mediaPlayer.setMedia(QMediaContent(QUrl(filePath)));
 }
 
@@ -90,6 +90,16 @@ void MusicPlayer::onBtnStopMusic()
 {
 	m_mediaPlayer.stop();
 	emit sigMsuicTime(0);
+}
+
+void MusicPlayer::onMediaStatusChanged(QMediaPlayer::MediaStatus status)
+{
+	if (QMediaPlayer::LoadedMedia == status) {
+		if (false == m_mediaPlayer.isAudioAvailable()) {
+			QMessageBox::warning(this, tr("错误"), tr("音乐文件无法使用"));
+			return;
+		}
+	}
 }
 
 void MusicPlayer::onMediaStateChanged(QMediaPlayer::State state)

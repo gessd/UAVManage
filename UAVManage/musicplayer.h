@@ -46,6 +46,10 @@ private slots:
 	 */
 	void onBtnStopMusic();
 	/**
+	 * @brief 音乐文件加载状态
+	 */
+	void onMediaStatusChanged(QMediaPlayer::MediaStatus status);
+	/**
 	 * @brief 音乐播放状态
 	 */
 	void onMediaStateChanged(QMediaPlayer::State state);
