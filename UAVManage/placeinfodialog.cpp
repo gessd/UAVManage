@@ -241,7 +241,7 @@ void PlaceInfoDialog::onParseSettingFrame(QByteArray arrNLINKData)
 				double number = NLINK_ParseInt24(temp);
 				int n = column / 3;
 				ui.tableWidget->setItem(row, n, new QTableWidgetItem(QString::number(number)));
-				QString text = QString("第%1行 第%2列 ").arg(row).arg(n).arg(number);
+				QString text = QString("第%1行 第%2列 %3").arg(row).arg(n).arg(number);
 				//qDebug() << "更新数据" << text;
 				if (1 == n) xmax = qMax(xmax, number);
 				if (0 == n) ymax = qMax(ymax, number);
@@ -265,7 +265,7 @@ void PlaceInfoDialog::onParseSettingFrame(QByteArray arrNLINKData)
 	if (m_nOnekeySetIndex > 0) {
 		if (m_nOnekeySetIndex > 300) {
 			//一键标定完成
-			qDebug() << "标定完成";
+			qDebug() << "一键标定完成";
 			m_nOnekeySetIndex = 0;
 			//检查标定基站位置 -8388为无效值
 			double xmax = 0;
@@ -298,11 +298,11 @@ void PlaceInfoDialog::onParseSettingFrame(QByteArray arrNLINKData)
 				return;
 			}
 			if (xmax < m_pointPlace.x()) {
-				QMessageBox::warning(this, tr("提示"), tr("X轴方向比项目设定场地小"));
+				QMessageBox::warning(this, tr("提示"), tr("X轴方向距离比项目设定场地小"));
 				return;
 			}
 			if (ymax < m_pointPlace.y()) {
-				QMessageBox::warning(this, tr("提示"), tr("Y轴方向比项目设定场地小"));
+				QMessageBox::warning(this, tr("提示"), tr("Y轴方向距离比项目设定场地小"));
 				return;
 			}
 			onComparePlace(QPoint(xmax * 100, ymax * 100));
