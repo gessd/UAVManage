@@ -28,6 +28,8 @@
 		<file>res/images/battery.png</file>
         <file>res/images/logo.png</file>
         <file>res/logo/qz_logo.ico</file>
+		<file>res/menu/authority.png</file>
+		<file>res/menu/firmware.png</file>
         <file>res/menu/P01_file_open_btn_cli.png</file>
         <file>res/menu/P01_file_open_btn_hov.png</file>
         <file>res/menu/P01_file_open_btn_nor.png</file>
