@@ -274,10 +274,6 @@ int DeviceControl::DeviceMavWaypointStart(QVector<NavWayPointData> data)
 //无人机起飞
 int DeviceControl::Fun_MAV_CMD_NAV_TAKEOFF_LOCAL(float Pitch, float Empty, float AscendRate, float Yaw, float X, float Y, float Z, bool wait, bool again)
 {
-	if (isConnectDevice()) {
-		_stDeviceCurrentStatus status = getCurrentStatus();
-		if (status.battery < 60) return DeviceLowBattery;
-	}
 	//参数1无效
 	//参数2用了标记是否为重发的消息
 	QByteArray arrData = mavCommandLongToBuffer(0, 0, AscendRate, Yaw, X, Y, Z, MAV_CMD_NAV_TAKEOFF_LOCAL);
@@ -472,10 +468,10 @@ void DeviceControl::hvcbReceiveMessage(const hv::SocketChannelPtr& channel, hv::
 			mavlink_local_position_ned_t t;
 			mavlink_msg_local_position_ned_decode(&msg, &t);
 			//单位转换成cm
-			m_deviceStatus.x = QString::number(t.x * 100, 'f', 2).toInt();
-			m_deviceStatus.y = QString::number(t.y * 100, 'f', 2).toInt();
-			m_deviceStatus.z = QString::number(t.z * 100, 'f', 2).toInt();
-			emit sigLocalPosition(t.time_boot_ms, m_deviceStatus.x, m_deviceStatus.y, m_deviceStatus.y);
+			m_deviceStatus.x = QString::number(t.x * 100, 'f', 0).toInt();
+			m_deviceStatus.y = QString::number(t.y * 100, 'f', 0).toInt();
+			m_deviceStatus.z = QString::number(t.z * 100, 'f', 0).toInt();
+			emit sigLocalPosition(t.time_boot_ms, m_deviceStatus.x, m_deviceStatus.y, m_deviceStatus.z);
 			break;
 		}
 		case MAVLINK_MSG_ID_HIGHRES_IMU:	//IMU数据
