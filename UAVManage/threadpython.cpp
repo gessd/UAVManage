@@ -63,7 +63,7 @@ PyObject* QZAPI::examineWaypoint()
 		break;
 	case _WaypointRevolve:
 		//旋转角度
-		if (data.param1 >= 360 || data.param1 <= -360) {
+		if (data.param1 > 360 || data.param1 < -360) {
 			showWaypointError(tr("旋转角度设定超出范围"));
 			return nullptr;
 		}
