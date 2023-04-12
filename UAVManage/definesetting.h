@@ -3,12 +3,12 @@
 //程序版本号
 #define _MajorNumber_ 1
 #define _MinorNumber_ 0
-#define _BuildNumber_ 6
+#define _BuildNumber_ 7
 //新程序下载存放文件夹
 #define _NewVersionPath_	"/update"
 #define _VersionFile_		"version.ini"
 //服务器地址
-#define _ServerUrl_ "http://192.168.40.222:16868/"
+#define _ServerUrl_ "http://123.127.240.26:8086/downloads/software/UAVManage/"
 
 //blockly交互端口
 #define _WebSocketPort_ 25252
