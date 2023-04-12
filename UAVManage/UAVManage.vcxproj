@@ -77,7 +77,7 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <PreprocessorDefinitions>BUILD_QXT_CORE;BUILD_QXT_GUI;HV_STATICLIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>.\qxtglobalshortcut5\core;.\qxtglobalshortcut5\gui;.\qtsingleapplication;.\python395-64\include;.\mavlink1-c\common;.\mavlink1-c\;.\libhv\include;.\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Qt\Tools\OpenSSL\Win_x64\include;.\qxtglobalshortcut5\core;.\qxtglobalshortcut5\gui;.\qtsingleapplication;.\python395-64\include;.\mavlink1-c\common;.\mavlink1-c\;.\libhv\include;.\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies>Setupapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -125,6 +125,7 @@
     <ClCompile Include="qxtglobalshortcut5\gui\qxtwindowsystem.cpp" />
     <ClCompile Include="qxtglobalshortcut5\gui\qxtwindowsystem_win.cpp" />
     <ClCompile Include="registerdialog.cpp" />
+    <ClCompile Include="sm4\sm4.c" />
     <ClCompile Include="stopflydialog.cpp" />
     <ClCompile Include="waitingwidget.cpp" />
     <QtRcc Include="uavmanage.qrc" />

@@ -17,6 +17,8 @@ protected:
 	void closeEvent(QCloseEvent* event);
 	void keyPressEvent(QKeyEvent* event);
 private:
+	QString DecipherKey(QString text, QString& id);
+private:
 	Ui::RegisterDialog ui;
 	QLabel* m_pLabelBackground;
 	bool m_bClose;

@@ -2,6 +2,9 @@
 #include <QCloseEvent>
 #include <QSettings>
 #include <QMessageBox>
+#include <QDateTime>
+#include <QDebug>
+#include "sm4/sm4.h"
 
 #define _KeyPath_ "HKEY_CLASSES_ROOT\\QZ\\UAV"
 void getCpuInfo(unsigned int* CPUInfo, unsigned int InfoType)
@@ -27,6 +30,11 @@ QString getCpuId()
 	return QString(pCpuId);
 }
 
+unsigned char key[16] = {
+	0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,
+	0x01,0xf2,0x03,0x04,0x05,0x06,0x07,0x08,
+};
+
 RegisterDialog::RegisterDialog(QWidget *parent):QDialog(parent)
 	//: QDialog(parent, Qt::WindowTitleHint | Qt::CustomizeWindowHint)
 {
@@ -35,15 +43,25 @@ RegisterDialog::RegisterDialog(QWidget *parent):QDialog(parent)
 	m_pLabelBackground = nullptr;
 	ui.lineEditID->setText(getCpuId());
 	connect(ui.btnRegister, &QAbstractButton::clicked, [this]() {
-		QSettings set(_KeyPath_, QSettings::NativeFormat);
+		ui.labelError->clear();
 		QString key = ui.lineEditKey->text().trimmed();
-		set.setValue("key", key);
 		if (key.isEmpty()) {
 			QMessageBox::warning(this, tr("提示"), tr("授权码不能为空！"));
 			return;
 		}
-		QMessageBox::information(this, tr("提示"), tr("软件授权成功"));
-		close();
+		//QMessageBox::information(this, tr("提示"), tr("软件授权成功"));
+		//close();
+		QString id = ui.lineEditID->text().trimmed();
+		QString error = DecipherKey(key, id);
+		if (error.isEmpty()) {
+			QSettings set(_KeyPath_, QSettings::NativeFormat);
+			set.setValue("key", key);
+			close();
+			return;
+		}
+		qDebug() << error;
+		ui.labelError->setText(error);
+		QMessageBox::warning(this, tr("提示"), error);
 		});
 }
 
@@ -57,9 +75,15 @@ RegisterDialog::~RegisterDialog()
 
 bool RegisterDialog::isRegister()
 {
+	ui.labelError->clear();
 	QSettings set(_KeyPath_, QSettings::NativeFormat);
 	QString key = set.value("key").toString();
-	return !key.isEmpty();
+	QString id = ui.lineEditID->text().trimmed();
+	QString error = DecipherKey(key, id);
+	if (error.isEmpty())  return true;
+	qDebug() << error;
+	ui.labelError->setText(error);
+	return false;
 }
 
 void RegisterDialog::showEvent(QShowEvent* event)
@@ -93,3 +117,44 @@ void RegisterDialog::keyPressEvent(QKeyEvent* event)
 	if (Qt::Key_Escape == event->key()) return;
 	QDialog::keyPressEvent(event);
 }
+
+QString RegisterDialog::DecipherKey(QString text, QString& id)
+{
+	if (text.isEmpty()) {
+		return tr("授权码为空无法解码");
+	}
+	QByteArray arrData = QByteArray::fromHex(text.toLatin1());
+	if (arrData.length() != 16 * 2) {
+		return tr("授权码长度错误");
+	}
+	qDebug() << "验证授权码" << text;
+	SM4_KEY sm4_key;
+	SM4_set_key(key, &sm4_key);
+	uint8_t cbuf[16] = { 0 };
+	uint8_t pbuf[16] = { 0 };
+	QByteArray temp = arrData.left(16);
+	strcpy((char*)cbuf, temp.data());
+	SM4_decrypt(cbuf, pbuf, &sm4_key);
+	QString tt = QByteArray((char*)pbuf, sizeof(pbuf));
+	if (tt != id) {
+		return tr("授权码与本机不匹配");
+	}
+	//qDebug() << pass;
+	memset(cbuf, 0, sizeof(cbuf));
+	memset(pbuf, 0, sizeof(pbuf));
+	temp = arrData.right(16);
+	strcpy((char*)cbuf, temp.data());
+	SM4_decrypt(cbuf, pbuf, &sm4_key);
+	QString date = QByteArray((char*)pbuf, sizeof(pbuf));
+	QDateTime t = QDateTime::fromString(date, "yyyy-MM-dd"); 
+	qDebug() << date << t;
+	unsigned int current = QDateTime::currentDateTime().toTime_t();
+	unsigned int v = t.toTime_t();
+	qDebug() << "授权码到期时间" << v << current;
+	int n = current - v;
+	if (n > 0) {
+		return tr("授权码已过期");
+	}
+	return "";
+}
+
