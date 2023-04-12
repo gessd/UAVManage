@@ -53,5 +53,6 @@ build*
 /x64
 /UAVManage/x64
 /AppUpgrade/x64
+/UAVEmpower/x64
 /.vs
 *.aps
