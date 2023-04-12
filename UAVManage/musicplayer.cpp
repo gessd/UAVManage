@@ -41,6 +41,8 @@ void MusicPlayer::clearSound()
 
 void MusicPlayer::updateLoadMusic(QString filePath)
 {
+	QFileInfo music(filePath);
+	if (false == music.isFile()) return;
 	clearSound();
 	m_qstrMusicFile = filePath;
 	m_mediaPlayer.setMedia(QMediaContent(QUrl(filePath)));
