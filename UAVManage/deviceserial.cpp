@@ -94,9 +94,6 @@ void DeviceSerial::updateSerial()
 		ui.comboBoxCom->addItem(info.portName());
 	}
 	emit sigDeviceEnabled(ui.comboBoxCom->count());
-	if (ui.comboBoxCom->count() > 0 && false == m_serialPort.isOpen()) {
-		ui.btnSerial->clicked();
-	}
 }
 
 bool DeviceSerial::isSerialEnabled()
@@ -231,7 +228,12 @@ void DeviceSerial::showEvent(QShowEvent* event)
 	m_pLabelBackground->show();
 	if (false == m_serialPort.isOpen()) {
 		ui.btnSerial->setText(tr("连接中"));
-		QTimer::singleShot(1000, [this]() { updateSerial(); });
+		QTimer::singleShot(1000, [this]() { 
+			updateSerial(); 
+			if (ui.comboBoxCom->count() > 0 && false == m_serialPort.isOpen()) {
+				ui.btnSerial->clicked();
+			}
+			});
 	}
 }
 
