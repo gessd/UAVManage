@@ -103,6 +103,8 @@ PyObject* QZAPI::examineWaypoint()
 			}
 		}
 		break;
+	case _WaypointFlyLand:
+		break;
 	default:
 		showWaypointError(tr("舞步编程中有无法解析内容"));
 		return nullptr;
@@ -297,6 +299,8 @@ PyObject* QZAPI::FlyLand(PyObject* self, PyObject* args)
 	qDebug() << "降落";
 	NavWayPointData lastWaypoint = g_waypointData.back();
 	NavWayPointData data;
+	data.commandID = _WaypointFlyLand;
+	data.param3 = 0.5;
 	data.x = lastWaypoint.x;
 	data.y = lastWaypoint.y;
 	data.z = 0;

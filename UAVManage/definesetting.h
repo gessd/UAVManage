@@ -54,7 +54,8 @@ enum _WaypointType {
 	_WaypointHover		= 31002,	//悬停信息
 	_WaypointLed		= 31003,    //LED灯状态信息
 	_WaypointStart		= 31004,	//初始位置信息
-	_WaypointTime		= 31005		//时间信息
+	_WaypointTime		= 31005,	//时间信息
+	_WaypointFlyLand	= 23		//降落
 };
 
 enum _CalibrationEnum {
@@ -191,6 +192,7 @@ public:
 		case _WaypointLed: qstrText = QObject::tr("LED灯"); break;
 		case _WaypointStart: qstrText = QObject::tr("初始位置"); break;
 		case _WaypointTime: qstrText = QObject::tr("时间信息"); break;
+		case _WaypointFlyLand: qstrText = QObject::tr("降落"); break;
 		}
 		return qstrText;
 	}

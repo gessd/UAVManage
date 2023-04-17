@@ -239,10 +239,6 @@ int DeviceControl::Fun_MAV_CMD_DO_SET_MODE(float Mode, bool wait, bool again)
 
 int DeviceControl::DeviceMavWaypointStart(QVector<NavWayPointData> data)
 {
-	//TODO 飞控没有处理起飞位置，暂时去掉
-	//data.removeFirst();
-
-	qDebug() << "准备发送航点" << ui.labelDeviceName->text() << _CurrentTime_;
 	if (!isConnectDevice()) return DeviceUnConnect;
 	int count = data.count();
 	if (count <= 0) return DeviceDataError;
@@ -250,7 +246,7 @@ int DeviceControl::DeviceMavWaypointStart(QVector<NavWayPointData> data)
 	//标记航点下发是否进行中
 	if (m_bWaypointSending) return DeviceMessageSending;
 	m_bWaypointSending = true;
-	qDebug() << "航点数量" << ui.labelDeviceName->text() << count << _CurrentTime_;
+	qDebug() << "准备发送航点" << ui.labelDeviceName->text() << count << _CurrentTime_;
 	//先发送航点总数，消息响应成功后才能上传航点
 	mavlink_message_t msg;
 	mavlink_mission_count_t mission_count;
@@ -571,11 +567,11 @@ QByteArray DeviceControl::getWaypointData(float param1, float param2, float para
 	mission.y = y;
 	mission.z = z;
 	mission.seq = seq;
-	//mission.command = MAV_CMD_NAV_WAYPOINT;
 	mission.command = commandID;
 	mission.target_system = _DeviceSYS_ID_;
 	mission.target_component = _DeviceCOMP_ID_;
 	mission.current = again;
+	if(0 == again) qDebug() << "上传航点到无人机" << getName() << seq << param1 << param2 << param3 << param4 << x << y << z << commandID;
 	int len = mavlink_msg_mission_item_int_encode(_DeviceSYS_ID_, _DeviceCOMP_ID_, &msg, &mission);
 	return mavMessageToBuffer(msg);
 }
@@ -616,18 +612,7 @@ void DeviceControl::DeviceMavWaypointSend(QVector<NavWayPointData> data)
 	qDebug() << "循环发送航点" << ui.labelDeviceName->text() << _CurrentTime_;
 	//开始上传航点,循环发送航点数据
 	for (int i = 0; i < count; i++) {
-		qDebug() << "舞步序号" << ui.labelDeviceName->text() << i + 1<< _CurrentTime_;
-		NavWayPointData temp = data.at(i);
-		//TODO 飞行测试使用，起飞XY位置为0，其他非飞行数据XY位置为0
-		//if (i == 0) {
-		//	temp.x = 0;
-		//	temp.y = 0;
-		//}
-		//if (temp.commandID != 16) {
-		//	temp.x = 0;
-		//	temp.y = 0;
-		//}
-		
+		NavWayPointData temp = data.at(i);		
 		//与设备通讯协议中规定X与Y值需要*1000
 		QByteArray arrData = getWaypointData(temp.param1, temp.param2, temp.param3, temp.param4, temp.x * 1000, temp.y * 1000, temp.z, i + 1, temp.commandID, 0);
 		QByteArray arrAgainData = getWaypointData(temp.param1, temp.param2, temp.param3, temp.param4, temp.x * 1000, temp.y * 1000, temp.z, i + 1, temp.commandID, 1);
