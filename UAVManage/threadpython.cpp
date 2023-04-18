@@ -351,7 +351,7 @@ PyObject* QZAPI::FlyRevolve(PyObject* self, PyObject* args)
 	data.param1 = angle;
 	data.commandID = _WaypointRevolve;
 	//旋转使用飞行航点加旋转信息
-	data.param1 = 3;	//暂时使用固定旋转时间
+	data.param1 = 3;	//TODO 暂时使用固定旋转时间
 	data.param4 = angle;
 	data.commandID = _WaypointFly;
 	g_waypointData.append(data);

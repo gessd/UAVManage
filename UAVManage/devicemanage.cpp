@@ -749,13 +749,43 @@ void DeviceManage::sendWaypointTo3D(QMap<QString, QVector<NavWayPointData>> map)
 	obj3dmsg.insert(_Data_, jsonArr);
 	//基站坐标
 	QJsonArray arrStation;
-	QStringList keys = m_stationMap.keys();
-	foreach(QString name, keys) {
+	if (m_stationMap.isEmpty()) {
+		//没连接基站时使用默认位置
 		QJsonObject obj;
-		obj.insert("name", name);
-		obj.insert("x", m_stationMap.value(name).x());
-		obj.insert("y", m_stationMap.value(name).y());
+		obj.insert("name", "A0");
+		obj.insert("x", 0);
+		obj.insert("y", 0);
 		arrStation.append(obj);
+		obj.insert("name", "A1");
+		obj.insert("x", getSpaceSize().x());
+		obj.insert("y", 0);
+		arrStation.append(obj);
+		obj.insert("name", "A2");
+		obj.insert("x", getSpaceSize().x());
+		obj.insert("y", getSpaceSize().y());
+		arrStation.append(obj);
+		obj.insert("name", "A3");
+		obj.insert("x", 0);
+		obj.insert("y", getSpaceSize().y());
+		arrStation.append(obj);
+		obj.insert("name", "A4");
+		obj.insert("x", getSpaceSize().x() / 2);
+		obj.insert("y", 0);
+		arrStation.append(obj);
+		obj.insert("name", "A5");
+		obj.insert("x", getSpaceSize().x() / 2);
+		obj.insert("y", getSpaceSize().y());
+		arrStation.append(obj);
+	}
+	else {
+		QStringList keys = m_stationMap.keys();
+		foreach(QString name, keys) {
+			QJsonObject obj;
+			obj.insert("name", name);
+			obj.insert("x", m_stationMap.value(name).x());
+			obj.insert("y", m_stationMap.value(name).y());
+			arrStation.append(obj);
+		}
 	}
 	obj3dmsg.insert("station", arrStation);
 	//音乐文件
