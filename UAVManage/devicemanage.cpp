@@ -811,6 +811,7 @@ void DeviceManage::sendWaypointTo3D(QMap<QString, QVector<NavWayPointData>> map)
 			else if (_WaypointRevolve == waypoint.commandID) {
 				angle += waypoint.param1;
 				if (angle >= 360) angle = angle % 360;
+				//旋转用时1秒
 				waypoint.param1 = 1;
 				waypoint.x = lastX;
 				waypoint.y = lastY;
@@ -827,6 +828,8 @@ void DeviceManage::sendWaypointTo3D(QMap<QString, QVector<NavWayPointData>> map)
 			int x = waypoint.x;
 			int y = waypoint.y;
 			int z = waypoint.z;
+			angle += waypoint.param4;
+			if (angle >= 360) angle = angle % 360;
 			if (i == 0) {
 				//第一个航点需要使用默认起飞位置
 				DeviceControl* pDevcie = getDeviceFromName(name);

@@ -269,6 +269,8 @@ PyObject* QZAPI::FlyHover(PyObject* self, PyObject* args)
 	data.z = last.z;
 	data.param1 = n / 1000.0;
 	data.commandID = _WaypointHover;
+	//悬停使用飞行航点
+	data.commandID = _WaypointFly;
 	g_waypointData.append(data);
 	return QZAPI::Instance()->examineWaypoint();
 }
@@ -289,7 +291,7 @@ PyObject* QZAPI::FlyTakeoff(PyObject* self, PyObject* args)
 	NavWayPointData data;
 	data.x = lastWaypoint.x;
 	data.y = lastWaypoint.y;
-	data.z = lastWaypoint.z + n;
+	data.z = n;
 	g_waypointData.append(data);
 	return QZAPI::Instance()->examineWaypoint();
 }
@@ -348,6 +350,10 @@ PyObject* QZAPI::FlyRevolve(PyObject* self, PyObject* args)
 	data.z = last.z;
 	data.param1 = angle;
 	data.commandID = _WaypointRevolve;
+	//旋转使用飞行航点加旋转信息
+	data.param1 = 3;	//暂时使用固定旋转时间
+	data.param4 = angle;
+	data.commandID = _WaypointFly;
 	g_waypointData.append(data);
 	return QZAPI::Instance()->examineWaypoint();
 }
@@ -387,8 +393,8 @@ PyObject* QZAPI::FlyMove(PyObject* self, PyObject* args)
 	int angle = 0;
 	for (int i = 0; i < g_waypointData.count(); i++) {
 		NavWayPointData way = g_waypointData.at(i);
-		if(_WaypointRevolve != way.commandID) continue;
-		angle += way.param1;
+		if(_WaypointRevolve == way.commandID) angle += way.param1;
+		if (_WaypointFly == way.commandID) angle += way.param4;
 	}
 	if (0 == angle) {
 		switch (direction){
