@@ -799,6 +799,7 @@ void DeviceManage::sendWaypointTo3D(QMap<QString, QVector<NavWayPointData>> map)
 				lastZ = data.at(i).z;
 			}
 			NavWayPointData waypoint = data.at(i);
+			//非航点信息转换航点数据
 			if (_WaypointSpeed == waypoint.commandID) {
 				//设置飞行速度
 				speed = waypoint.param1;
@@ -823,7 +824,8 @@ void DeviceManage::sendWaypointTo3D(QMap<QString, QVector<NavWayPointData>> map)
 				waypoint.commandID = _WaypointFly;
 				waypoint.param1 = waypoint.param2 = waypoint.param3 = waypoint.param4 = 0;
 			}
-			//TODO 非航点信息暂时不处理
+			else if (_WaypointFlyLand == waypoint.commandID) waypoint.commandID = _WaypointFly;
+
 			if(_WaypointFly != waypoint.commandID) continue;
 			int x = waypoint.x;
 			int y = waypoint.y;
