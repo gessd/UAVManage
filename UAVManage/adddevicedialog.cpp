@@ -2,6 +2,7 @@
 #include "qlineedit.h"
 #include <QRegExpValidator>
 #include <QMessageBox>
+#include "definesetting.h"
 
 AddDeviceDialog::AddDeviceDialog(QString qstrName, unsigned int maxX, unsigned int maxY, QWidget *parent)
 	: QDialog(parent)
@@ -28,6 +29,7 @@ AddDeviceDialog::AddDeviceDialog(QString qstrName, unsigned int maxX, unsigned i
 			QMessageBox::warning(this, tr("提示"), tr("请输入设备名称"));
 			return;
 		}
+#ifndef _DebugApp_
 		int number = ui.lineEditX->text().toInt();
 		if (number < 100 || number >(m_maxX - 100)) {
 			QMessageBox::warning(this, tr("提示"), tr("X轴位置距离场地边界太近，最小100厘米"));
@@ -38,6 +40,7 @@ AddDeviceDialog::AddDeviceDialog(QString qstrName, unsigned int maxX, unsigned i
 			QMessageBox::warning(this, tr("提示"), tr("Y轴位置距离场地边界太近，最小100厘米"));
 			return;
 		}
+#endif
 		accept();
 		});
 	connect(ui.btnCancel, &QAbstractButton::clicked, [this]() {  reject(); });

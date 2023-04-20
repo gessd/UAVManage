@@ -438,6 +438,7 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 				_ShowErrorMessage(name + tr("设备未连接无法起飞"));
 				continue;
 			}
+#ifndef _DebugApp_
 			if (pDevice->getCurrentStatus().battery < 60) {
 				_ShowErrorMessage(name + tr("设备电量过低无法起飞"));
 				continue;
@@ -450,7 +451,6 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 				_ShowErrorMessage(name + tr("设备未上传舞步无法起飞"));
 				continue;
 			}
-#ifndef _DebugApp_
 			if (qAbs(pDevice->getX() - pDevice->getCurrentStatus().x) > 50) {
 				_ShowErrorMessage(name + tr("设备X轴方向距离初始位置超过50厘米"));
 				continue;

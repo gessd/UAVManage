@@ -4,6 +4,7 @@
 #include <QDebug>
 #include <QThread>
 #include <QTimer>
+#include "definesetting.h"
 
 PlaceInfoDialog::PlaceInfoDialog(QPoint place, QWidget *parent)
 	: QDialog(parent)

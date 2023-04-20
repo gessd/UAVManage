@@ -75,6 +75,7 @@ void ResendMessage::run()
 	QTime time;
 	time.start();
 	unsigned int index = 0;
+	qDebug() << m_qstrName << "准备发送消息" << m_arrData.toHex().toUpper();
 	emit sigSendMessage(m_arrData);
 	while (!m_bStop) {
 		//超时重发
@@ -89,6 +90,7 @@ void ResendMessage::run()
 			m_mutexResult.unlock();
 			return;
 		}
+		qDebug() << m_qstrName << "准备重发消息" << m_arrData.toHex().toUpper();
 		emit sigSendMessage(m_arrAgainData);
 		time.restart();
 	}
