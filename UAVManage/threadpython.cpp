@@ -45,6 +45,7 @@ PyObject* QZAPI::examineWaypoint()
 			showWaypointError(error);
 			return nullptr;
 		}
+#ifndef _DebugApp_
 		//判断是否飞出场地范围
 		if (data.x < 100 || data.y < 100 || data.x >(g_nSpaceX - 100) || data.y >(g_nSpaceY - 100)) {
 			QString error = QString(data.message + tr("飞出限制区域，设定值[X:%1 Y:%2]厘米，限制区域[X:100--%3 Y:100--%4]厘米")
@@ -52,6 +53,7 @@ PyObject* QZAPI::examineWaypoint()
 			showWaypointError(error);
 			return nullptr;
 		}
+#endif
 		break;
 	case _WaypointSpeed:
 		//飞行速度范围
