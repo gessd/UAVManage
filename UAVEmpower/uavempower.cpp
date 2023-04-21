@@ -72,10 +72,11 @@ void UAVEmpower::on_btnEncryption_clicked()
 	uint8_t cbuf[16] = { 0 };
 	uint8_t pbuf[16] = { 0 };
 	uint8_t mbuf[16] = { 0 };
-	strcpy((char*)mbuf, id.toStdString().c_str());
+	//strncpy((char*)mbuf, id.toStdString().c_str(), id.length());
+	memcpy(mbuf, id.toLatin1(), id.toLatin1().length());
 	//加密
 	SM4_encrypt(mbuf, cbuf, &sm4_key);
-	QByteArray pass((char*)cbuf, sizeof(cbuf));
+	QByteArray pass((char*)cbuf, 16);
 	pass = pass.toHex().toUpper();
 	//qDebug()  << pass;
 
@@ -84,12 +85,13 @@ void UAVEmpower::on_btnEncryption_clicked()
 	//QByteArray tt((char*)pbuf, sizeof(pbuf));
 	//qDebug() << tt;
 
-	memset(cbuf, 0, sizeof(cbuf));
-	memset(pbuf, 0, sizeof(pbuf));
-	memset(mbuf, 0, sizeof(mbuf));
-	strcpy((char*)mbuf, date.toStdString().c_str());
+	memset(cbuf, 0, 16);
+	memset(pbuf, 0, 16);
+	memset(mbuf, 0, 16);
+	//strncpy((char*)mbuf, date.toStdString().c_str(), date.length());
+	memcpy(mbuf, date.toLatin1(), date.toLatin1().length());
 	SM4_encrypt(mbuf, cbuf, &sm4_key);
-	QByteArray validity((char*)cbuf, sizeof(cbuf));
+	QByteArray validity((char*)cbuf, 16);
 	validity = validity.toHex().toUpper();
 	//qDebug() << validity;
 	ui.lineEditKey->setText(pass + validity);
@@ -114,16 +116,18 @@ void UAVEmpower::on_btnDeciphering_clicked()
 	uint8_t cbuf[16] = { 0 };
 	uint8_t pbuf[16] = { 0 };
 	QByteArray temp = arrData.left(16);
-	strcpy((char*)cbuf, temp.data());
+	//strncpy((char*)cbuf, temp.toStdString().c_str(), temp.length());
+	memcpy(cbuf, temp, temp.length());
 	SM4_decrypt(cbuf, pbuf, &sm4_key);
-	QString pass = QByteArray((char*)pbuf, sizeof(pbuf)); ;
+	QString pass = QByteArray((char*)pbuf, 16); ;
 	//qDebug() << pass;
-	memset(cbuf, 0, sizeof(cbuf));
-	memset(pbuf, 0, sizeof(pbuf));
+	memset(cbuf, 0, 16);
+	memset(pbuf, 0, 16);
 	temp = arrData.right(16);
-	strcpy((char*)cbuf, temp.data());
+	//strncpy((char*)cbuf, temp.toStdString().c_str(), temp.length());
+	memcpy(cbuf, temp, temp.length());
 	SM4_decrypt(cbuf, pbuf, &sm4_key);
-	QString validity = QByteArray((char*)pbuf, sizeof(pbuf));
+	QString validity = QByteArray((char*)pbuf, 16);
 	//qDebug() << validity;
 	QString t = pass + " " + validity;
 	ui.lineEditText->setText(t);

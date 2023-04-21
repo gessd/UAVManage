@@ -135,7 +135,7 @@ QString RegisterDialog::DecipherKey(QString text, QString& id)
 	uint8_t cbuf[16] = { 0 };
 	uint8_t pbuf[16] = { 0 };
 	QByteArray temp = arrData.left(16);
-	strcpy((char*)cbuf, temp.data());
+	memcpy(cbuf, temp, temp.length());
 	SM4_decrypt(cbuf, pbuf, &sm4_key);
 	QString tt = QByteArray((char*)pbuf, sizeof(pbuf));
 	if (tt != id) {
@@ -145,7 +145,7 @@ QString RegisterDialog::DecipherKey(QString text, QString& id)
 	memset(cbuf, 0, sizeof(cbuf));
 	memset(pbuf, 0, sizeof(pbuf));
 	temp = arrData.right(16);
-	strcpy((char*)cbuf, temp.data());
+	memcpy(cbuf, temp, temp.length());
 	SM4_decrypt(cbuf, pbuf, &sm4_key);
 	QString date = QByteArray((char*)pbuf, sizeof(pbuf));
 	QDateTime t = QDateTime::fromString(date, "yyyy-MM-dd"); 
