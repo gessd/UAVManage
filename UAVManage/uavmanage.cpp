@@ -29,6 +29,7 @@
 #include "firmwaredialog.h"
 #include "managertopwidget.h"
 #include "mytooltip.h"
+#include "define3d.h"
 
 UAVManage::UAVManage(QWidget* parent)
 	: QMainWindow(parent)
@@ -52,7 +53,7 @@ UAVManage::UAVManage(QWidget* parent)
 	connect(ui.webEngineView, SIGNAL(loadFinished(bool)), this, SLOT(onWebLoadFinished(bool)));
 	//初始化web
 	m_pSocketServer = new QWebSocketServer(QStringLiteral("Socket Server"), QWebSocketServer::NonSecureMode, this);
-	m_pSocketServer->listen(QHostAddress::Any, _WebSocketPort_);
+	//m_pSocketServer->listen(QHostAddress::Any, _WebSocketPort_);
 	connect(m_pSocketServer, SIGNAL(newConnection()), this, SLOT(onSocketNewConnection()));
 
 	m_pTopWidget = new ManagerTopWidget(this);
@@ -577,6 +578,24 @@ void UAVManage::showEvent(QShowEvent* event)
 	qInfo() << "显示主窗口";
 	MessageListDialog::getInstance()->setParent(this);
 	if (!m_pWebBlocklySocket) {
+		bool temp = m_pSocketServer->listen(QHostAddress::Any, _WebSocketPort_);
+		if (false == temp) {
+			emit sigWindowFinished();
+			QString error = QString::number(_WebSocketPort_) + tr("电脑端口被占，无法正常使用");
+			qWarning() << error;
+			QMessageBox::warning(this, tr("错误"), error);
+			qApp->quit();
+			return;
+		}
+		temp = m_pDeviceManage->start3DTcp();
+		if (false == temp) {
+			emit sigWindowFinished();
+			QString error = QString::number(_TcpPort_) + tr("电脑端口被占，无法正常使用");
+			qWarning() << error;
+			QMessageBox::warning(this, tr("错误"), error);
+			qApp->quit();
+			return;
+		}
 		initGlobalShortcut("Ctrl+Space");
 		loadWeb();
 	}
