@@ -494,7 +494,6 @@ ThreadPython::~ThreadPython()
 void ThreadPython::initParam(unsigned int nSpaceX, unsigned int nSapaceY, QString name, unsigned int nStartX, unsigned int nStartY)
 {
 	//因为是全局变量，使用前清空内容
-	qDebug() << "建立航点数据" << name;
 	g_waypointData.clear();
 	g_mapMarkPoint.clear();
 	g_nSpaceX = nSpaceX;
@@ -504,6 +503,7 @@ void ThreadPython::initParam(unsigned int nSpaceX, unsigned int nSapaceY, QStrin
 	NavWayPointData startLocation;
 	startLocation.x = nStartX;
 	startLocation.y = nStartY;
+	startLocation.z = 0;
 	startLocation.commandID = _WaypointStart;
 	g_waypointData.append(startLocation);
 }

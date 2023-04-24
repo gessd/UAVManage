@@ -17,9 +17,9 @@ ResendMessage::ResendMessage(QString comName, QString qstrName, unsigned int aga
 	m_nMessageID = messageid;
 	m_qstrComName = comName;
 	setAutoDelete(bauto);
-	//qDebug() << "----新建线程" << qstrName << this;
+	qDebug() << "----新建线程" << qstrName << this;
 	connect(this, &QThread::finished, [this]() {
-		//qDebug() << "----线程执行完成" << this;
+		qDebug() << "----线程执行完成" << this;
 		if (false == m_bAutoDelete) return;
 		deleteLater();
 		});
@@ -30,7 +30,9 @@ ResendMessage::~ResendMessage()
 	if (isRunning()) {
 		stopThread();
 	}
-	//qDebug() << "----线程释放" << this;
+	//等待线程停止
+	while (isRunning());
+	qDebug() << "----线程释放" << this;
 }
 
 QString ResendMessage::getCommandName()
@@ -40,12 +42,10 @@ QString ResendMessage::getCommandName()
 
 void ResendMessage::stopThread()
 {
-	//qDebug() << "----停止线程" << m_qstrName << this;
-	m_mutexStop.lock();
+	qDebug() << "----停止线程" << m_qstrName << this;
+	//m_mutexStop.lock();
 	m_bStop = true;
-	m_mutexStop.unlock();
-	//等待线程停止
-	while (isRunning());
+	//m_mutexStop.unlock();
 }
 
 int ResendMessage::getResult()
@@ -62,7 +62,7 @@ void ResendMessage::setAutoDelete(bool bauto)
 void ResendMessage::onResult(QString name, int res, int id)
 {
 	if (m_nMessageID != id) return;
-	//qDebug() << "----收到结果" << m_qstrName << res << id << this;
+	qDebug() << "----收到结果" << m_qstrName << res << id << this;
 	m_mutexResult.lock();
 	m_nResult = res;
 	m_mutexResult.unlock();
@@ -77,9 +77,10 @@ void ResendMessage::run()
 	unsigned int index = 0;
 	qDebug() << m_qstrName << "准备发送消息" << m_arrData.toHex().toUpper();
 	emit sigSendMessage(m_arrData);
-	while (!m_bStop) {
+	while (true) {
 		//超时重发
 		msleep(10);
+		if (m_bStop) return;
 		if (m_unTimeout > time.elapsed()) continue;	
 		index++;
 		if (index > m_unAgainNumber) {
@@ -90,7 +91,9 @@ void ResendMessage::run()
 			m_mutexResult.unlock();
 			return;
 		}
-		qDebug() << m_qstrName << "准备重发消息" << m_arrData.toHex().toUpper();
+		QString temp = QString("%1 准备第%2次重发消息 %3 原始消息 %4")
+			.arg(m_qstrName).arg(index).arg(m_arrAgainData.toHex().toUpper().data()).arg(m_arrData.toHex().toUpper().data());
+		qWarning() << temp;
 		emit sigSendMessage(m_arrAgainData);
 		time.restart();
 	}

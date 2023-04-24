@@ -32,7 +32,7 @@ public:
 	
 	DeviceManage(QWidget *parent = Q_NULLPTR);
 	~DeviceManage();
-
+	bool start3DTcp();
 	/**
 	 * @brief 设定场地大小
 	 */

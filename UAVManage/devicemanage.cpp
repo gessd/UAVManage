@@ -22,7 +22,6 @@ DeviceManage::DeviceManage(QWidget *parent)
 	m_pFirmwareDialog = nullptr;
 	m_p3dTcpSocket = nullptr;
 	m_p3dTcpServer = new QTcpServer(this);
-	m_p3dTcpServer->listen(QHostAddress::Any, _TcpPort_);
 	ui.widgetPreflightCheck->setVisible(false);
 	connect(m_p3dTcpServer, SIGNAL(newConnection()), this, SLOT(on3dNewConnection()));
 	//设置设备列表
@@ -240,6 +239,11 @@ DeviceManage::~DeviceManage()
 		m_pDeviceNetwork->deleteLater();
 		m_pDeviceNetwork = nullptr;
 	}
+}
+
+bool DeviceManage::start3DTcp()
+{
+	return m_p3dTcpServer->listen(QHostAddress::Any, _TcpPort_);
 }
 
 void DeviceManage::setSpaceSize(unsigned int x, unsigned int y)

@@ -342,4 +342,5 @@ private:
 	bool m_bUploadFinished;
 	//是否在准备起飞状态
 	bool m_bPrepareTakeoff;
+	int m_nMavChan;
 };
