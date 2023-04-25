@@ -28,6 +28,9 @@
 //无人机默认起飞高度 厘米
 #define _TakeoffLocalHeight_ 100
 
+//航点增加时间
+#define _WaypointUseTime_
+
 //XML文件
 // <?xml version="1.0" encoding="UTF-8"?>
 // <root>

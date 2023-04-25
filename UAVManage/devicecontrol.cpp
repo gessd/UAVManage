@@ -409,7 +409,7 @@ void DeviceControl::hvcbReceiveMessage(const hv::SocketChannelPtr& channel, hv::
 	QString qstrStart(_DeviceLogPrefix_);
 	QString qstrEnd(_DeviceLogEnd_);
 	QString qstrData = QString::fromLocal8Bit(arrData);
-	//qDebug() << getName()<< "收到消息" << arrData.toHex().toUpper();
+	qDebug() << getName()<< "收到消息" << arrData.toHex().toUpper();
 	if (qstrData.contains(qstrStart)) {
 		QString qstrLog = qstrData;
 		while (qstrLog.contains(qstrStart)){
@@ -639,17 +639,19 @@ void DeviceControl::DeviceMavWaypointSend(QVector<NavWayPointData> data)
 	connect(this, SIGNAL(sigCommandResult(QString, int, int)), pMessageThread, SLOT(onResult(QString, int, int)));
 	connect(pMessageThread, SIGNAL(sigSendMessage(QByteArray)), this, SLOT(sendMessage(QByteArray)));
 	pMessageThread->start();
-	////阻塞等待结果
-	//while (!pMessageThread->isFinished()) {
-	//	QApplication::processEvents();
-	//}
-	//线程结果后查询返回结果
-	int res = pMessageThread->getResult();
-	while (DeviceWaiting == res){
-		res = pMessageThread->getResult();
+	//阻塞等待结果
+	while (!pMessageThread->isFinished()) {
 		QApplication::processEvents();
 	}
-	pMessageThread->deleteLater();
+	//线程结果后查询返回结果
+	int res = pMessageThread->getResult();
+	//while (DeviceWaiting == res){
+	//	res = pMessageThread->getResult();
+	//	QApplication::processEvents();
+	//}
+	pMessageThread->disconnect();
+	delete pMessageThread;
+	pMessageThread = nullptr;
 	if (DeviceDataSucceed != res) {
 		//上传航点失败或超时，整个过程结束
 		m_bWaypointSending = false;
@@ -672,15 +674,17 @@ void DeviceControl::DeviceMavWaypointSend(QVector<NavWayPointData> data)
 		connect(this, SIGNAL(sigCommandResult(QString, int, int)), pWaypointThread, SLOT(onResult(QString, int, int)));
 		connect(pWaypointThread, SIGNAL(sigSendMessage(QByteArray)), this, SLOT(sendMessage(QByteArray)));
 		pWaypointThread->start();
-		//while (!pWaypointThread->isFinished()) {
-		//	QApplication::processEvents();
-		//}
-		int res = pMessageThread->getResult();
-		while (DeviceWaiting == res) {
-			res = pMessageThread->getResult();
+		while (!pWaypointThread->isFinished()) {
 			QApplication::processEvents();
 		}
-		pWaypointThread->deleteLater();
+		int res = pWaypointThread->getResult();
+		//while (DeviceWaiting == res) {
+		//	res = pWaypointThread->getResult();
+		//	QApplication::processEvents();
+		//}
+		pWaypointThread->disconnect();
+		delete pWaypointThread;
+		pWaypointThread = nullptr;
 		if (DeviceDataSucceed != res) {
 			//上传航点失败或超时，整个过程结束
 			m_bWaypointSending = false;
@@ -712,16 +716,16 @@ void DeviceControl::DeviceMavWaypointEnd(unsigned int count)
 	connect(this, SIGNAL(sigCommandResult(QString, int, int)), pMessageThread, SLOT(onResult(QString, int, int)));
 	connect(pMessageThread, SIGNAL(sigSendMessage(QByteArray)), this, SLOT(sendMessage(QByteArray)));
 	pMessageThread->start();
-	////阻塞等待结果
-	//while (!pMessageThread->isFinished()) {
-	//	QApplication::processEvents();
-	//}
-	//线程结果后查询返回结果
-	int res = pMessageThread->getResult();
-	while (DeviceWaiting == res) {
-		res = pMessageThread->getResult();
+	//阻塞等待结果
+	while (!pMessageThread->isFinished()) {
 		QApplication::processEvents();
 	}
+	//线程结果后查询返回结果
+	int res = pMessageThread->getResult();
+	//while (DeviceWaiting == res) {
+	//	res = pMessageThread->getResult();
+	//	QApplication::processEvents();
+	//}
 	pMessageThread->deleteLater();
 	//整个上传航点过程结束
 	m_bWaypointSending = false;

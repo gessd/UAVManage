@@ -270,6 +270,9 @@ PyObject* QZAPI::FlyHover(PyObject* self, PyObject* args)
 	data.y = last.y;
 	data.z = last.z;
 	data.param1 = n / 1000.0;
+#ifdef _WaypointUseTime_
+	data.param3 = data.param1;
+#endif
 	data.commandID = _WaypointHover;
 	//悬停使用飞行航点
 	data.commandID = _WaypointFly;
@@ -294,6 +297,10 @@ PyObject* QZAPI::FlyTakeoff(PyObject* self, PyObject* args)
 	data.x = lastWaypoint.x;
 	data.y = lastWaypoint.y;
 	data.z = n;
+#ifdef _WaypointUseTime_
+	//1秒内起飞到指定高度
+	data.param3 = 2;
+#endif
 	g_waypointData.append(data);
 	return QZAPI::Instance()->examineWaypoint();
 }
@@ -340,20 +347,28 @@ PyObject* QZAPI::FlyTimeGroup(PyObject* self, PyObject* args)
 PyObject* QZAPI::FlyRevolve(PyObject* self, PyObject* args)
 {
 	float angle = 0.0;
+	NavWayPointData data;
+#ifdef _WaypointUseTime_
+	int millisecond = 0;
+	if (!PyArg_ParseTuple(args, "f|i", &angle, &millisecond)) {
+		QZAPI::Instance()->showWaypointError(tr("旋转参数值错误"));
+		return nullptr;
+	}
+	data.param3 = millisecond / 1000.0;
+#else
 	if (!PyArg_ParseTuple(args, "f", &angle)) {
 		QZAPI::Instance()->showWaypointError(tr("旋转参数值错误"));
 		return nullptr;
 	}
+#endif
 	qDebug() << "无人机旋转" << angle;
 	NavWayPointData last = g_waypointData.back();
-	NavWayPointData data;
 	data.x = last.x;
 	data.y = last.y;
 	data.z = last.z;
-	data.param1 = angle;
-	data.commandID = _WaypointRevolve;
-	//旋转使用飞行航点加旋转信息
-	data.param1 = 3;	//TODO 暂时使用固定旋转时间
+	//data.param1 = angle;
+	//data.commandID = _WaypointRevolve;
+	////旋转使用飞行航点加旋转信息
 	data.param4 = angle;
 	data.commandID = _WaypointFly;
 	g_waypointData.append(data);
@@ -364,12 +379,21 @@ PyObject* QZAPI::FlyTo(PyObject* self, PyObject* args)
 {
 	int x, y, z;
 	x = y = z = 0;
+	NavWayPointData data;
+#ifdef _WaypointUseTime_
+	int millisecond = 0;
+	if (!PyArg_ParseTuple(args, "i|i|i|i", &x, &y, &z, &millisecond)) {
+		QZAPI::Instance()->showWaypointError(tr("飞行到参数值错误"));
+		return nullptr;
+	}
+	data.param3 = millisecond / 1000.0;
+#else
 	if (!PyArg_ParseTuple(args, "i|i|i", &x, &y, &z)) {
 		QZAPI::Instance()->showWaypointError(tr("飞行到参数值错误"));
 		return nullptr;
 	}
+#endif
 	qDebug() << "飞行到绝对位置" << x << y << z;
-	NavWayPointData data;
 	data.x = x;
 	data.y = y;
 	data.z = z;
@@ -381,13 +405,22 @@ PyObject* QZAPI::FlyMove(PyObject* self, PyObject* args)
 {
 	int direction, n;
 	direction = n = 0;
+	NavWayPointData data;
+#ifdef _WaypointUseTime_
+	int millisecond = 0;
+	if (!PyArg_ParseTuple(args, "i|i|i", &direction, &n, &millisecond)) {
+		QZAPI::Instance()->showWaypointError(tr("向固定方向飞行参数值错误"));
+		return nullptr;
+	}
+	data.param3 = millisecond / 1000.0;
+#else
 	if (!PyArg_ParseTuple(args, "i|i", &direction, &n)) {
 		QZAPI::Instance()->showWaypointError(tr("向固定方向飞行参数值错误"));
 		return nullptr;
 	}
+#endif
 	qDebug() << "相对移动" << direction << n;
 	NavWayPointData lastWaypoint = g_waypointData.back();
-	NavWayPointData data;
 	data.x = lastWaypoint.x;
 	data.y = lastWaypoint.y;
 	data.z = lastWaypoint.z;
@@ -446,10 +479,20 @@ PyObject* QZAPI::FlyMove(PyObject* self, PyObject* args)
 PyObject* QZAPI::FlyToMarkPoint(PyObject* self, PyObject* args)
 {
 	char* name = NULL;
+	NavWayPointData data;
+#ifdef _WaypointUseTime_
+	int millisecond = 0;
+	if (!PyArg_ParseTuple(args, "s|u", &name, &millisecond)) {
+		QZAPI::Instance()->showWaypointError(tr("飞到标定点参数值错误"));
+		return nullptr;
+	}
+	data.param3 = millisecond / 1000.0;
+#else
 	if (!PyArg_ParseTuple(args, "s", &name)) {
 		QZAPI::Instance()->showWaypointError(tr("飞到标定点参数值错误"));
 		return nullptr;
 	}
+#endif
 	if (NULL == name) {
 		QZAPI::Instance()->showWaypointError(tr("飞到标定点名称错误"));
 		return nullptr;
@@ -461,7 +504,6 @@ PyObject* QZAPI::FlyToMarkPoint(PyObject* self, PyObject* args)
 	}
 	_MarkPoint point = g_mapMarkPoint[qstrName];
 	qDebug() << "飞行到标定点" << qstrName << point.x << point.y << point.z;
-	NavWayPointData data;
 	data.x = point.x;
 	data.y = point.y;
 	data.z = point.z;
