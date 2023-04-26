@@ -275,7 +275,7 @@ QString DeviceManage::addDevice(QString qstrName, QString ip, long x, long y)
 	ui.listWidget->addItem(item);
 	//此处会耗时
 	DeviceControl* pControl = new DeviceControl(qstrName, x, y, ip);
-	connect(pControl, &DeviceControl::sigWaypointProcess, this, &DeviceManage::sigWaypointProcess);
+	connect(pControl, &DeviceControl::sigWaypointFinished, this, &DeviceManage::sigWaypointFinished);
 	connect(pControl, &DeviceControl::sigConrolFinished, this, &DeviceManage::onDeviceConrolFinished);
 	connect(pControl, &DeviceControl::sigRemoveDevice, this, &DeviceManage::onRemoveDevice);
 	//需要先发送添加设备信息，用于创建默认blockly布局，当ui.listWidget->setCurrentItem触发设备切换时可以显示有布局的WEB界面
@@ -682,7 +682,7 @@ QString DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upl
 			int status = pDevice->DeviceMavWaypointStart(data);
 			if (_DeviceStatus::DeviceDataSucceed != status) {
 				qstrErrorNames.append("," + pDevice->getName());
-				_ShowErrorMessage(name + Utility::waypointMessgeFromStatus(_DeviceWaypoint, status));
+				_ShowErrorMessage(name + "上传舞步失败"+ Utility::waypointMessgeFromStatus(_DeviceWaypoint, status));
 			}
 		}
 		map.insert(name, data);
@@ -879,9 +879,13 @@ void DeviceManage::sendWaypointTo3D(QMap<QString, QVector<NavWayPointData>> map)
 			int d = getDistance(lastX, lastY, lastZ, x, y, z);
 			//计算飞行时间 时间使用毫秒单位
 			int time = d * 1000 / speed;
+#ifdef _WaypointUseTime_
+			time = waypoint.param3 * 1000;
+#else
 			if (waypoint.param1 > 0) {
 				time = time + waypoint.param1 * 1000;
 			}
+#endif
 			timesum += time;
 			QList<QVariant> value;
 			value << timesum << 20 << 0 << angle << x << y << z << 16;

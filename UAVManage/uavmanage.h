@@ -121,9 +121,12 @@ private slots:
      */
     void onAppMessage(const QString& message);
     /**
-     * @brief 航点上传进度
+     * @brief 舞步上传完成
+     * @param 无人机名称
+     * @param 成功/失败
+     * @param 说明
      */
-    void onWaypointProcess(QString name, unsigned int index, unsigned int count, int res, bool finish, QString text);
+    void onWaypointFinished(QString name, bool success, QString text);
     /**
     * @brief 更新加载音乐文件
     */

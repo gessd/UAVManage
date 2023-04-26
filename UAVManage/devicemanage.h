@@ -177,15 +177,12 @@ signals:
 	 */
 	void currentDeviceNameChanged(QString currentName, QString previousName);
 	/**
-	 * @brief 舞步上传进度
-	 * @param name 设备名称
-	 * @param index 舞步序号
-	 * @param count 舞步总数
-	 * @param res 上传舞步响应结果
-	 * @param finish 整个过程是否完成
-	 * @param text 当前进行的过程
+	 * @brief 舞步上传完成
+	 * @param 无人机名称
+	 * @param 成功/失败
+	 * @param 说明
 	 */
-	void sigWaypointProcess(QString name, unsigned int index, unsigned int count, int res, bool finish, QString text);
+	void sigWaypointFinished(QString name, bool success, QString text);
 	/**
 	* @brief 设备起飞指令下发完成
 	* @param 起飞|降落

@@ -51,8 +51,8 @@ void DeviceDebug::onDeviceMessage(QByteArray arrData, bool bReceive, int msgID)
 	}
 	//不显示心跳数据
 	if (bHeartbeat) return;
-	if (44 != msgID && 47 != msgID && 77 != msgID) return;
-	if (Qt::Checked != ui.checkWaypoint->checkState() && (44 == msgID || 47 == msgID)) {
+	if (44 != msgID && 47 != msgID && 77 != msgID && 73 != msgID) return;
+	if (Qt::Checked != ui.checkWaypoint->checkState() && (44 == msgID || 47 == msgID || 73 == msgID)) {
 		return;
 	}
 	else if (Qt::Checked != ui.checkCommand->checkState() && 77 == msgID) {
@@ -76,6 +76,7 @@ void DeviceDebug::onMessageData(QString qstrData)
 	if (qstrData.isEmpty()) return;
 	if (Qt::Checked != ui.checkLog->checkState()) return;
 	QString qstrText = QDateTime::currentDateTime().toString("[hh:mm:ss.zzz]");
+	qDebug() << ui.lineEditName->text() << qstrData;
 	ui.textBrowser->append(QString("<font color=#000000>%1</font>").arg(qstrText));
 	ui.textBrowser->append(QString("<font color=#FF6347>%1</font>").arg(qstrData));
 }

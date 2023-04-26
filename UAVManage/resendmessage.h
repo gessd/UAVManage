@@ -24,7 +24,7 @@ private slots:
 protected:
 	void run();
 signals:
-	void sigSendMessage(QByteArray data);
+	void sigSendMessage(bool again, QByteArray data);
 private:
 	unsigned int m_unAgainNumber;
 	unsigned int m_unTimeout;

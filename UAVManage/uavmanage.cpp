@@ -69,7 +69,7 @@ UAVManage::UAVManage(QWidget* parent)
 	connect(m_pDeviceManage, &DeviceManage::deviceRenameFinished, this, &UAVManage::onDeviceRename);
 	connect(m_pDeviceManage, &DeviceManage::deviceResetIp, this, &UAVManage::onDeviceResetIp);
 	connect(m_pDeviceManage, &DeviceManage::deviceResetLocation, this, &UAVManage::onDeviceResetLocation);
-	connect(m_pDeviceManage, &DeviceManage::sigWaypointProcess, this, &UAVManage::onWaypointProcess);
+	connect(m_pDeviceManage, &DeviceManage::sigWaypointFinished, this, &UAVManage::onWaypointFinished);
 	connect(m_pDeviceManage, &DeviceManage::sigTakeoffFinished, this, &UAVManage::onDeviceTakeoffFinished);
 	connect(m_pDeviceManage, &DeviceManage::sig3DDialogStatus, this, &UAVManage::on3DDialogStauts);
 	connect(m_pDeviceManage, &DeviceManage::sigStart3D, this, &UAVManage::onStart3DDialog);
@@ -1014,18 +1014,12 @@ void UAVManage::onAppMessage(const QString& message)
 	
 }
 
-void UAVManage::onWaypointProcess(QString name, unsigned int index, unsigned int count, int res, bool finish, QString text)
+void UAVManage::onWaypointFinished(QString name, bool success, QString text)
 {
-	if (finish) {
-		m_pDeviceManage->setEnabled(true);
-	}
+	m_pDeviceManage->setEnabled(true);
 	if (text.isEmpty()) return;
-	if (_DeviceStatus::DeviceDataSucceed == res) {
-		//舞步上传完成并成功
-		_ShowInfoMessage(name + ": " + text + Utility::waypointMessgeFromStatus(_DeviceWaypoint, res));
-	} else{
-		_ShowErrorMessage(name + ": " + text + Utility::waypointMessgeFromStatus(_DeviceWaypoint, res));
-	}
+	if (success) _ShowInfoMessage(name + ": " + text);
+	else _ShowErrorMessage(name + ": " + text);
 }
 
 void UAVManage::onUpdateMusic(QString qstrFilePath)

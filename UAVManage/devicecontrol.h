@@ -92,7 +92,7 @@ public:
 	bool isPrepareTakeoff();
 
 	/**
-	 * @brief 准备上传航点数据，根据信号sigWaypointProcess处理进度
+	 * @brief 准备上传航点数据
 	 * @param data 航点结构
 	 * @return 返回消息错误值，0成功，根据舞步上传进度信号判断是否完成
 	 */
@@ -181,10 +181,11 @@ public:
 private slots:
 	/**
 	* @brief 发送数据
+	* @param 是否为重发消息
 	* @param data [in] 二进制数据
 	* @return 发送成功
 	*/
-	bool sendMessage(QByteArray data);
+	bool sendMessage(bool again, QByteArray data);
 	/**
 	 * @brief 更新界面电量
 	 * @param 电压
@@ -243,10 +244,6 @@ private:
 	QByteArray getWaypointData(float param1, float param2, float param3, float param4
 		, int32_t x, int32_t y, float z, uint16_t seq, unsigned int commandID, unsigned int again);
 	/**
-	 * @brief 开始发送航点
-	 */
-	void DeviceMavWaypointSend(QVector<NavWayPointData> data);
-	/**
 	 * @brief 发送航点结束指令
 	 */
 	void DeviceMavWaypointEnd(unsigned int count);
@@ -285,15 +282,12 @@ signals:
 	 */
 	void sigCommandResult(QString name, int result, int commandid);
 	/**
-	 * @brief 航点下发进度
-	 * @param 设备名称
-	 * @param 当前航点序号
-	 * @param 航点总数
-	 * @param 下发过程中指令响应值
-	 * @param 整个下发过程是否完成，完成并不代表成功[0=res&&true=finish]才成功
-	 * @param 文字描述信息
+	 * @brief 舞步上传完成
+	 * @param 无人机名称
+	 * @param 成功/失败
+	 * @param 说明
 	 */
-	void sigWaypointProcess(QString name, unsigned int index, unsigned int count, int res, bool finish, QString text);
+	void sigWaypointFinished(QString name, bool success, QString text);
 	/**
 	 * @brief 电池信息
 	 * @param 电压
@@ -317,7 +311,7 @@ signals:
 	*/
 	void sigRemoveDevice(QString name);
 private slots:
-	void onWaypointProcess(QString name, unsigned int index, unsigned int count, int res, bool finish, QString text);
+	void onWaypointStart();
 	void onWaypointNext();
 	void onMessageThreadFinished();
 private:
@@ -331,7 +325,10 @@ private:
 	long m_nStartY;
 	//航点下发中
 	bool m_bWaypointSending;
+	//航点数据
 	QVector<NavWayPointData> m_currentWaypointData;
+	//当前上传航点进度
+	int m_nCurrentWaypontIndex;
 	DeviceDebug* m_pDebugDialog;
 	//检测心跳定时器
 	QTimer m_timerHeartbeat;

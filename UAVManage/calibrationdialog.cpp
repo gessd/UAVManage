@@ -56,6 +56,7 @@ void CalibrationDialog::addLogToBrowser(QString text)
 
 void CalibrationDialog::onDeviceMessage(QString data)
 {
+	if (data.isEmpty()) return;
 	addLogToBrowser(data);
 	if (m_pMovieAcc) m_pMovieAcc->stop();
 	if (data.contains(_AccIng_)) {
