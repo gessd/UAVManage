@@ -229,6 +229,11 @@ Blockly.Blocks['Fly_ToNumber'] = {
         this.appendValueInput('Z')
             .setCheck('Number')
             .appendField('Z');
+        this.appendValueInput('time')
+            .setCheck('Number')
+            .appendField('用时');
+        this.appendDummyInput()
+            .appendField('毫秒');
         this.setInputsInline(true);
         this.setPreviousStatement(true, ["action", "notReachAction", "ReachAction"]);
         this.setNextStatement(true, ["action", "notReachAction", "ReachAction"]);
@@ -242,7 +247,8 @@ Blockly.Python['Fly_ToNumber'] = function(block) {
     var px = Blockly.Python.valueToCode(block, 'X', Blockly.Python.ORDER_NONE);
 	var py = Blockly.Python.valueToCode(block, 'Y', Blockly.Python.ORDER_NONE);
 	var pz = Blockly.Python.valueToCode(block, 'Z', Blockly.Python.ORDER_NONE);
-    var code = 'Fly_To(' + px + ',' + py + ',' + pz +')' + '\n';
+    var t = Blockly.Python.valueToCode(block, 'time', Blockly.Python.ORDER_NONE);
+    var code = 'Fly_To(' + px + ',' + py + ',' + pz + ',' + t +')' + '\n';
     return code;
 };
 
