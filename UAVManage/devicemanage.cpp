@@ -42,6 +42,7 @@ DeviceManage::DeviceManage(QWidget *parent)
 		});
 
 	//添加右键菜单
+	m_bDebug = false;
 	m_pMenu = new QMenu(this);
 	m_pMenu->setWindowFlags(m_pMenu->windowFlags() | Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint);
 	m_pMenu->setAttribute(Qt::WA_TranslucentBackground);
@@ -54,7 +55,7 @@ DeviceManage::DeviceManage(QWidget *parent)
 	QAction* pActionMagnetism = new QAction(tr("磁罗盘校准"), this);
 	QAction* pActionAccelerometer = new QAction(tr("加计校准"), this);
 	QAction* pActionBaro = new QAction(tr("电调校准"), this);
-	QAction* pDebug = new QAction(tr("调试"), this);
+	m_pActionDebug = new QAction(tr("调试"), this);
 	m_pMenu->addAction(pActionParam);
 	m_pMenu->addAction(pActionDicconnect);
 	m_pMenu->addSeparator();
@@ -67,7 +68,6 @@ DeviceManage::DeviceManage(QWidget *parent)
 	m_pMenu->addAction(pActionAccelerometer);
 	m_pMenu->addAction(pActionBaro);
 	m_pMenu->addSeparator();
-	m_pMenu->addAction(pDebug);
 	pActionGyro->setProperty("Calibration", _Gyro);
 	pActionMagnetism->setProperty("Calibration", _Magnetometer);
 	pActionAccelerometer->setProperty("Calibration", _Accelerometer);
@@ -152,7 +152,7 @@ DeviceManage::DeviceManage(QWidget *parent)
 		if (res == _DeviceStatus::DeviceDataSucceed) return;
 		_ShowErrorMessage(pControl->getName() + tr("急停") + Utility::waypointMessgeFromStatus(_DeviceQuickStop, res));
 		});
-	connect(pDebug, &QAction::triggered, [this](bool checked) {
+	connect(m_pActionDebug, &QAction::triggered, [this](bool checked) {
 		DeviceControl* pControl = getCurrentDevice();
 		if (!pControl) return;
 		DeviceDebug* pDebug = pControl->getDeviceDebug();
@@ -935,6 +935,8 @@ bool DeviceManage::eventFilter(QObject* watched, QEvent* event)
 		//设备列表菜单
 		if (QEvent::ContextMenu != event->type()) return false;
 		if (!ui.listWidget->itemAt(ui.listWidget->mapFromGlobal(QCursor::pos()))) return false;
+		if (m_bDebug) m_pMenu->addAction(m_pActionDebug);
+		else m_pMenu->removeAction(m_pActionDebug);
 		m_pMenu->exec(QCursor::pos());
 	} 
 	return false;
@@ -960,6 +962,14 @@ void DeviceManage::resizeEvent(QResizeEvent* event)
 		DeviceControl* pDevice = dynamic_cast<DeviceControl*>(pWidget);
 		if (!pDevice) continue;
 		pDevice->enableControl(ui.btnAddDevice->isEnabled());
+	}
+}
+
+void DeviceManage::keyReleaseEvent(QKeyEvent* keyEvent)
+{
+	if (!keyEvent) return;
+	if (keyEvent->key() == Qt::Key_Q) {
+		m_bDebug = !m_bDebug;
 	}
 }
 

@@ -121,6 +121,7 @@ int main(int argc, char *argv[])
 	QObject::connect(&a, SIGNAL(messageReceived(const QString&)), &w, SLOT(onAppMessage(const QString&)));
 	QObject::connect(&w, &UAVManage::sigWindowFinished, [&]() { a.setActivationWindow(&w); first.close(); });
 	QObject::connect(&first, &FirstDialog::sigStartApp, [&]() { 
+		//提示框Tip消息使用
 		a.installEventFilter(&w);
 		w.show(); });
 	int n = a.exec();

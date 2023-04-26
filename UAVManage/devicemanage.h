@@ -203,6 +203,7 @@ signals:
 protected:
 	virtual bool eventFilter(QObject* watched, QEvent* event);
 	virtual void resizeEvent(QResizeEvent* event);
+	virtual void keyReleaseEvent(QKeyEvent* keyEvent);
 private slots:
 	void onDeviceConrolFinished(QString text, int res, QString explain);
 	/**
@@ -250,6 +251,8 @@ private:
 	Ui::DeviceManage ui;
 	//设备菜单
 	QMenu* m_pMenu;
+	QAction* m_pActionDebug;
+	bool m_bDebug;
 	//三维模拟通讯使用
 	QTcpServer* m_p3dTcpServer;
 	QTcpSocket* m_p3dTcpSocket;
