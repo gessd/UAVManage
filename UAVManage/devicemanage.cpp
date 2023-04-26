@@ -473,7 +473,7 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 		}
 		if (false == listNames.isEmpty()) {
 			QString qstrError = listNames.join("、");
-			QString error = tr("部分设备检查出错，请重试") + qstrError;
+			QString error = tr("检查出错，请重试") + qstrError;
 			_ShowErrorMessage(error);
 			QMessageBox::warning(this, tr("警告"), error);
 			return;

@@ -14,7 +14,7 @@
 #define _WebSocketPort_ 25252
 
 //调试版本
-//#define _DebugApp_
+#define _DebugApp_
 
 //项目后缀名
 #define _ProjectSuffix       ".qz"

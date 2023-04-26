@@ -56,3 +56,4 @@ build*
 /UAVEmpower/x64
 /.vs
 *.aps
+install/*.exe

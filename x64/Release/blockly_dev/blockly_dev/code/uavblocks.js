@@ -164,9 +164,12 @@ Blockly.Blocks['Fly_ToMarkPoint'] = {
         this.appendDummyInput()
             .appendField("飞至标定点")
             .appendField(field, "mark")
-            .appendField(" 用时")
-            .appendField(new Blockly.FieldNumber(1000, 100, 10000, 1), "time")
-            .appendField("毫秒");
+            .appendField("用时")
+            .appendField(new Blockly.FieldNumber(1, 1, 1000, 1), "time")
+            .appendField(new Blockly.FieldDropdown([
+                 ["秒", "1"],
+                 ["毫秒", "2"]
+              ]), "unit");
         this.setInputsInline(true);
         this.setPreviousStatement(true, ["action", "notReachAction", "ReachAction"]);
         this.setNextStatement(true, ["action", "notReachAction", "ReachAction", "time"]);
@@ -186,7 +189,7 @@ Blockly.Blocks['Fly_To'] = {
     init: function() {
         this.appendDummyInput()
             .appendField("飞行到")
-            .appendField(" X")
+            .appendField("X")
             .appendField(new Blockly.FieldNumber(100, 100, getMaxX(), 1), "coordinateX")
             .appendField("厘米")
             .appendField("Y")
@@ -195,9 +198,12 @@ Blockly.Blocks['Fly_To'] = {
             .appendField("Z")
             .appendField(new Blockly.FieldNumber(100, 100, getMaxZ(), 1), "coordinateZ")
             .appendField("厘米")
-            .appendField(" 用时")
-            .appendField(new Blockly.FieldNumber(1000, 100, 10000, 1), "time")
-            .appendField("毫秒");
+            .appendField("用时")
+            .appendField(new Blockly.FieldNumber(1, 1, 1000, 1), "time")
+            .appendField(new Blockly.FieldDropdown([
+                 ["秒", "1"],
+                 ["毫秒", "2"]
+              ]), "unit");
         this.setPreviousStatement(true, ["action", "notReachAction", "ReachAction"]);
         this.setNextStatement(true, ["action", "notReachAction", "ReachAction"]);
         this.setColour('#3B8CFF');
@@ -212,6 +218,10 @@ Blockly.Python['Fly_To'] = function(block) {
     var py = block.getFieldValue("coordinateY");
     var pz = block.getFieldValue("coordinateZ");
     var t = block.getFieldValue("time");
+    var u = block.getFieldValue('unit');
+    if(1 == u){
+        t = t*1000;
+    }
     var code = 'Fly_To(' + px + ',' + py + ',' + pz +',' + t +')' + '\n';
     return code;
 };
@@ -233,7 +243,10 @@ Blockly.Blocks['Fly_ToNumber'] = {
             .setCheck('Number')
             .appendField('用时');
         this.appendDummyInput()
-            .appendField('毫秒');
+             .appendField(new Blockly.FieldDropdown([
+                 ["秒", "1"],
+                 ["毫秒", "2"]
+              ]), "unit");
         this.setInputsInline(true);
         this.setPreviousStatement(true, ["action", "notReachAction", "ReachAction"]);
         this.setNextStatement(true, ["action", "notReachAction", "ReachAction"]);
@@ -248,6 +261,10 @@ Blockly.Python['Fly_ToNumber'] = function(block) {
 	var py = Blockly.Python.valueToCode(block, 'Y', Blockly.Python.ORDER_NONE);
 	var pz = Blockly.Python.valueToCode(block, 'Z', Blockly.Python.ORDER_NONE);
     var t = Blockly.Python.valueToCode(block, 'time', Blockly.Python.ORDER_NONE);
+    var u = block.getFieldValue('unit');
+    if(1 == u){
+        t = t*1000;
+    }
     var code = 'Fly_To(' + px + ',' + py + ',' + pz + ',' + t +')' + '\n';
     return code;
 };
@@ -315,8 +332,12 @@ Blockly.Blocks['Fly_Revolve'] = {
              .appendField('角度:')
              .appendField(new Blockly.FieldAngle(90), 'revolve')
              .appendField(" 用时")
-             .appendField(new Blockly.FieldNumber(1000, 100, 10000, 1), "time")
-             .appendField("毫秒");
+             .appendField(new Blockly.FieldNumber(1, 1, 1000, 1), "time");
+        this.appendDummyInput()
+             .appendField(new Blockly.FieldDropdown([
+                 ["秒", "1"],
+                 ["毫秒", "2"]
+              ]), "unit");
         this.setPreviousStatement(true,["action", "notReachAction", "ReachAction"]);
         this.setNextStatement(true,["action", "notReachAction", "ReachAction"]);
         this.setColour('#3B8CFF');
@@ -330,10 +351,15 @@ Blockly.Python['Fly_Revolve'] = function(block) {
     addHead();
     var r = block.getFieldValue('revolve');
     var d = block.getFieldValue('direction');
+    var t = block.getFieldValue('time');
+    var u = block.getFieldValue('unit');
+    if(1 == u){
+        t = t*1000;
+    }
     if("right" == d){
-        return 'Fly_Revolve('+r+')' + '\n';
+        return 'Fly_Revolve('+r+','+t+')' + '\n';
     } else if("left" == d){
-        return 'Fly_Revolve('+-r+')' + '\n';
+        return 'Fly_Revolve('+-r+','+t+')' + '\n';
     }
 };
 
@@ -353,8 +379,12 @@ Blockly.Blocks['Fly_Move'] = {
              .appendField(new Blockly.FieldNumber(100, 10, getMaxX(), 1), "distance")
              .appendField("厘米")
              .appendField(" 用时")
-             .appendField(new Blockly.FieldNumber(1000, 100, 10000, 1), "time")
-             .appendField("毫秒")
+             .appendField(new Blockly.FieldNumber(1, 1, 1000, 1), "time");
+        this.appendDummyInput()
+             .appendField(new Blockly.FieldDropdown([
+                 ["秒", "1"],
+                 ["毫秒", "2"]
+              ]), "unit");
         this.setPreviousStatement(true,["action", "notReachAction", "ReachAction"]);
         this.setNextStatement(true,["action", "notReachAction", "ReachAction"]);
         this.setColour('#3B8CFF');
@@ -369,6 +399,10 @@ Blockly.Python['Fly_Move'] = function(block) {
     var d = block.getFieldValue('direction');
     var s = block.getFieldValue('distance');
     var t = block.getFieldValue('time');
+    var u = block.getFieldValue('unit');
+    if(1 == u){
+        t = t*1000;
+    }
     return 'Fly_Move('+d+','+s+','+t+')\n';
 };
 

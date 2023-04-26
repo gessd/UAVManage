@@ -339,5 +339,6 @@ private:
 	bool m_bUploadFinished;
 	//是否在准备起飞状态
 	bool m_bPrepareTakeoff;
+	//mavlink解包参数，区分不同设备数据
 	int m_nMavChan;
 };
