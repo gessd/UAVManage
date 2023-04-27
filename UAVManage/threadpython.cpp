@@ -482,7 +482,7 @@ PyObject* QZAPI::FlyToMarkPoint(PyObject* self, PyObject* args)
 	NavWayPointData data;
 #ifdef _WaypointUseTime_
 	int millisecond = 0;
-	if (!PyArg_ParseTuple(args, "s|u", &name, &millisecond)) {
+	if (!PyArg_ParseTuple(args, "s|i", &name, &millisecond)) {
 		QZAPI::Instance()->showWaypointError(tr("飞到标定点参数值错误"));
 		return nullptr;
 	}

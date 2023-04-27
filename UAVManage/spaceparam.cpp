@@ -11,10 +11,10 @@ SpaceParam::SpaceParam(bool create, QWidget *parent)
 	m_pLabelBackground = nullptr;
 	setWindowFlags(windowFlags() | Qt::FramelessWindowHint | Qt::Dialog);
 	this->setAttribute(Qt::WA_TranslucentBackground);
-	ui.lineEditX->setValidator(new QDoubleValidator(5.0, 100.0, 0, this));
-	ui.lineEditY->setValidator(new QDoubleValidator(5.0, 100.0, 0, this));
-	ui.lineEditX->setMaxLength(3);
-	ui.lineEditY->setMaxLength(3);
+	ui.lineEditX->setValidator(new QIntValidator(5, 50, this));
+	ui.lineEditY->setValidator(new QIntValidator(5, 50, this));
+	ui.lineEditX->setMaxLength(2);
+	ui.lineEditY->setMaxLength(2);
 	if (create) {
 		ui.dialogLabelTitle->setText(tr("新建项目"));
 	}
@@ -101,8 +101,8 @@ void SpaceParam::setProjectPath(QString path)
 
 void SpaceParam::setSpaceSize(unsigned int x, unsigned int y)
 {
-	ui.lineEditX->setText(QString::number(x / 100.0, 'f', 2));
-	ui.lineEditY->setText(QString::number(y / 100.0, 'f', 2));
+	ui.lineEditX->setText(QString::number(x / 100));
+	ui.lineEditY->setText(QString::number(y / 100));
 }
 
 void SpaceParam::showEvent(QShowEvent* event)
