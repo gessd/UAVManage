@@ -54,8 +54,12 @@ Blockly.Blocks['Fly_Takeoff'] = {
         this.appendDummyInput()
             .appendField("起飞至")
             .appendField(new Blockly.FieldNumber(100, 100, 100, 1), "height")
-            .appendField("厘米");
+            .appendField("厘米")
+            .appendField("用时")
+            .appendField(new Blockly.FieldNumber(2, 2, 2, 1), "time")
+            .appendField("秒");
         this.setNextStatement(true, ["time"]);
+        //this.setNextStatement(true, ["action", "notReachAction", "ReachAction", "time"]);
         this.setColour('#FF6680');
         this.setTooltip('值必须为100');
     }
@@ -411,10 +415,10 @@ Blockly.Blocks['Fly_SetLedMode'] = {
         this.appendDummyInput()
             .appendField("设置LED灯闪烁模式为")
 			.appendField(new Blockly.FieldDropdown([
-				["闪烁", "1"],
+				["七彩灯", "1"],
 				["呼吸灯", "2"],
-                ["全亮", "3"],
-                ["全灭", "4"],
+                ["点亮",   "3"],
+                ["熄灭",   "4"],
                 ["跑马灯", "5"],
              ]), "mode");
         this.setPreviousStatement(true,["action", "notReachAction", "ReachAction"]);

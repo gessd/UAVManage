@@ -38,8 +38,8 @@ void DeviceDebug::setIp(QString ip)
 void DeviceDebug::onConnectStatus(QString name, QString ip, bool connect)
 {
 	QString qstrText = QDateTime::currentDateTime().toString("[hh:mm:ss.zzz]:");
-	if (connect) ui.textBrowser->append(qstrText + tr("连接成功"));
-	else ui.textBrowser->append(qstrText + tr("连接断开"));
+	if (connect) ui.textBrowser->append("<font color=#0000FF>" + qstrText + tr("连接成功") + "</font>");
+	else ui.textBrowser->append("<font color=#FF0000>"+qstrText + tr("连接断开")+"</font>");
 }
 
 void DeviceDebug::onDeviceMessage(QByteArray arrData, bool bReceive, int msgID)
@@ -77,8 +77,7 @@ void DeviceDebug::onMessageData(QString qstrData)
 	if (Qt::Checked != ui.checkLog->checkState()) return;
 	QString qstrText = QDateTime::currentDateTime().toString("[hh:mm:ss.zzz]");
 	qDebug() << ui.lineEditName->text() << qstrData;
-	ui.textBrowser->append(QString("<font color=#000000>%1</font>").arg(qstrText));
-	ui.textBrowser->append(QString("<font color=#FF6347>%1</font>").arg(qstrData));
+	ui.textBrowser->append(QString("<font color=#000000>%1:%2</font>").arg(qstrText).arg(qstrData));
 }
 
 void DeviceDebug::onSetBatteryStatus(float voltages, float battery, unsigned short electric)

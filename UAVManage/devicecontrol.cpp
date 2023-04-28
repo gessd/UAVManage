@@ -42,9 +42,11 @@ DeviceControl::DeviceControl(QString name, float x, float y, QString ip, QWidget
 	connect(&m_timerHeartbeat, &QTimer::timeout, [this]() {
 		unsigned int nLastTime = m_timerHeartbeat.property("time").toUInt();
 		if ((QDateTime::currentDateTime().toTime_t() - nLastTime) > 10) {
-			//TODO 校准时没有数据信息
-			//qInfo()<< getName() << "设备心跳超时无响应重新连接";
-			//connectDevice();
+			if (isConnectDevice()) {
+				m_timerHeartbeat.setProperty("time", QDateTime::currentDateTime().toTime_t());
+				emit sigLogMessage("无人机无响应主动断开连接");
+				connectDevice();
+			}
 		}
 		});
 	connect(ui.btnRemove, &QToolButton::clicked, [this]() {
@@ -380,8 +382,8 @@ void DeviceControl::hvcbConnectionStatus(const hv::SocketChannelPtr& channel)
 			heard.base_mode = 151;
 			heard.system_status = 218;
 			if (mavlink_msg_heartbeat_encode(_DeviceSYS_ID_, _DeviceCOMP_ID_, &message, &heard) > 0) {
-				//QByteArray arrData = mavMessageToBuffer(message);
-				//m_pHvTcpClient->send(arrData.data(), arrData.length());
+				QByteArray arrData = mavMessageToBuffer(message);
+				m_pHvTcpClient->send(arrData.data(), arrData.length());
 				//qDebug() << time<<"心跳消息" << arrData;
 			}
 			});
@@ -456,6 +458,7 @@ void DeviceControl::hvcbReceiveMessage(const hv::SocketChannelPtr& channel, hv::
 		}
 		case MAVLINK_MSG_ID_COMMAND_ACK:	//命令应答
 		{	//起飞降落等实时控制指令应答
+			emit sigUpdateHeartbeat();
 			mavlink_command_ack_t ack;
 			mavlink_msg_command_ack_decode(&msg, &ack);
 			uint8_t buffer[MAVLINK_MAX_PACKET_LEN] = { 0 };
