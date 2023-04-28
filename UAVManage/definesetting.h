@@ -265,11 +265,11 @@ typedef struct __NavWayPointData
 {
 	float param1;       //停留时间 秒
 	float param2;       //接受半径
-	float param3;       //轨迹控制
+	float param3;       //飞行时间 秒
 	float param4;       //偏转角度
-	int x;
-	int y;
-	float z;
+	int x;				//厘米
+	int y;				//厘米
+	float z;			//厘米	
 	unsigned int commandID;
 	QString message;
 	__NavWayPointData() {

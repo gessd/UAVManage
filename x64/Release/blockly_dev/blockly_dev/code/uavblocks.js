@@ -185,6 +185,10 @@ Blockly.Python['Fly_ToMarkPoint'] = function(block) {
     addHead();
     var point = block.getFieldValue('mark');
     var t = block.getFieldValue('time');
+    var u = block.getFieldValue('unit');
+    if(1 == u){
+        t = t*1000;
+    }
     var code = 'Fly_ToMarkPoint(\'' + point + '\',' + t+ ')' + '\n';
     return code;
 };

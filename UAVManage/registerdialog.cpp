@@ -101,7 +101,7 @@ void RegisterDialog::showEvent(QShowEvent* event)
 	m_pLabelBackground->setStyleSheet(QString("background-color: rgba(0, 0, 0, 80%);font:60px;color:#FFFFFF;"));
 	m_pLabelBackground->setFixedSize(dynamic_cast<QWidget*>(parent())->size());
 	m_pLabelBackground->setAlignment(Qt::AlignHCenter | Qt::AlignBottom);
-	m_pLabelBackground->setText(tr("请授权注册后使用"));
+	m_pLabelBackground->setText(tr("请授权后使用"));
 	m_pLabelBackground->show();
 }
 

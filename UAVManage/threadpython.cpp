@@ -3,8 +3,8 @@
 #include <QDebug>
 #include <QFile>
 #include <QDir>
+#include <QtMath>
 #include <QMessageBox>
-#include <QtCore/qmath.h>
 #include "messagelistdialog.h"
 
 struct _MarkPoint
@@ -32,6 +32,12 @@ QVector<NavWayPointData> g_waypointData;
 //标定点名称，空间坐标
 QMap<QString, _MarkPoint> g_mapMarkPoint;
 
+//计算两点间距离
+int getDistance(int x1, int y1, int z1, int x2, int y2, int z2)
+{
+	int d = qSqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2) + (z1 - z2) * (z1 - z2));
+	return d;
+}
 PyObject* QZAPI::examineWaypoint()
 {
 	NavWayPointData data = g_waypointData.back();
@@ -54,6 +60,22 @@ PyObject* QZAPI::examineWaypoint()
 			return nullptr;
 		}
 #endif
+		//判断飞行速度 最大飞行速度200厘米/秒
+		if (g_waypointData.count() > 1) {
+			for (int i = g_waypointData.count() - 2; i >= 0; i--) {
+				NavWayPointData last = g_waypointData.at(i);
+				if (_WaypointFly != last.commandID) continue;
+				int d = getDistance(last.x, last.y, last.z, data.x, data.y, data.z);
+				if (qAbs(d) > 0 && qAbs(data.param3) > 0) {
+					float speed = qAbs(d) / data.param3;
+					if (speed > 200.0) {
+						showWaypointError(tr("超出最大飞行速度每秒2米"));
+						return nullptr;
+					}
+				}
+				break;
+			}
+		}
 		break;
 	case _WaypointSpeed:
 		//飞行速度范围
