@@ -14,7 +14,7 @@
 #define _WebSocketPort_ 25252
 
 //调试版本
-//#define _DebugApp_
+#define _DebugApp_
 
 //项目后缀名
 #define _ProjectSuffix       ".qz"
@@ -58,10 +58,12 @@ enum _WaypointType {
 	_WaypointSpeed		= 31000,	//设置飞行速度
 	_WaypointRevolve	= 31001,	//旋转信息
 	_WaypointHover		= 31002,	//悬停信息
-	_WaypointLed		= 31003,    //LED灯状态信息
+	_WaypointLedStatus	= 31003,    //LED灯状态信息
 	_WaypointStart		= 31004,	//初始位置信息
 	_WaypointTime		= 31005,	//时间信息
+	_WaypointLedColor	= 31006,	//LED灯颜色
 	_WaypointFlyLand	= 23		//降落
+
 };
 
 enum _CalibrationEnum {
@@ -195,10 +197,11 @@ public:
 		case _WaypointSpeed: qstrText = QObject::tr("设置速度"); break;
 		case _WaypointRevolve: qstrText = QObject::tr("旋转"); break;
 		case _WaypointHover: qstrText = QObject::tr("悬停"); break;
-		case _WaypointLed: qstrText = QObject::tr("LED灯"); break;
+		case _WaypointLedStatus: qstrText = QObject::tr("LED灯模式"); break;
 		case _WaypointStart: qstrText = QObject::tr("初始位置"); break;
 		case _WaypointTime: qstrText = QObject::tr("时间信息"); break;
 		case _WaypointFlyLand: qstrText = QObject::tr("降落"); break;
+		case _WaypointLedColor: qstrText = QObject::tr("LED灯颜色"); break;
 		}
 		return qstrText;
 	}

@@ -100,9 +100,9 @@ PyObject* QZAPI::examineWaypoint()
 			return nullptr;
 		}
 		break;
-	case _WaypointLed:
+	case _WaypointLedStatus:
 		//LED灯模式
-		if (data.param1 > 7 || data.param1 <= 0) {
+		if (data.param1 > 5 || data.param1 <= 0) {
 			showWaypointError(tr("LED模式选择超出范围"));
 			return nullptr;
 		}
@@ -128,9 +128,10 @@ PyObject* QZAPI::examineWaypoint()
 		}
 		break;
 	case _WaypointFlyLand:
+	case _WaypointLedColor:
 		break;
 	default:
-		showWaypointError(tr("舞步编程中有无法解析内容"));
+		showWaypointError(tr("内部错误舞步中存在无法使用积木块"));
 		return nullptr;
 		break;
 	}
@@ -252,7 +253,7 @@ PyObject* QZAPI::FlySetLedMode(PyObject* self, PyObject* args)
 	data.y = last.y;
 	data.z = last.z;
 	data.param1 = n;
-	data.commandID = _WaypointLed;
+	data.commandID = _WaypointLedStatus;
 	g_waypointData.append(data);
 	return QZAPI::Instance()->examineWaypoint();
 }
@@ -268,8 +269,19 @@ PyObject* QZAPI::FlySetLedColor(PyObject* self, PyObject* args)
 		QZAPI::Instance()->showWaypointError(tr("LED颜色值无法使用"));
 		return nullptr;
 	}
-	qDebug() << "设置LED灯颜色" << color;
+	QColor qc(color);
 	//TODO 暂时未定义LED灯颜色使用方式
+	NavWayPointData data;
+	data.param1 = qc.red();
+	data.param2 = qc.green();
+	data.param3 = qc.blue();
+	qDebug() << "设置LED灯颜色" << color << data.param1 << data.param2 << data.param3;
+	NavWayPointData last = g_waypointData.back();
+	data.x = last.x;
+	data.y = last.y;
+	data.z = last.z;
+	data.commandID = _WaypointLedColor;
+	g_waypointData.append(data);
 	return QZAPI::Instance()->examineWaypoint();
 }
 
