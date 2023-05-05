@@ -828,7 +828,10 @@ void DeviceManage::sendWaypointTo3D(QMap<QString, QVector<NavWayPointData>> map)
 		int lastY = 0;
 		int lastZ = 0;
 		int angle = 0;
-		int color = 0;
+		//int color = 0;
+		int red = 0;
+		int green = 0; 
+		int blue = 0;
 		int status = 0;
 		for (int i = 0; i < data.count(); i++) {
 			if (0 == i) {
@@ -861,9 +864,14 @@ void DeviceManage::sendWaypointTo3D(QMap<QString, QVector<NavWayPointData>> map)
 				//三维中需要第0秒为初始位置
 				waypoint.commandID = _WaypointFly;
 				waypoint.param1 = waypoint.param2 = waypoint.param3 = waypoint.param4 = 0;
+				red = green = 0;
+				blue = 255;
 			}
 			else if (_WaypointLedColor == waypoint.commandID) {
-				color = waypoint.param1 * 1000 * 1000 + waypoint.param2 * 1000 + waypoint.param3;
+				//color = QString::number(waypoint.param1).toInt() * 1000 * 1000 + QString::number(waypoint.param2).toInt() * 1000 + QString::number(waypoint.param3).toInt();
+				red = waypoint.param1;
+				green = waypoint.param2;
+				blue = waypoint.param3;
 				waypoint.param1 = waypoint.param2 = waypoint.param3 = waypoint.param4 = 0;
 				waypoint.x = lastX;
 				waypoint.y = lastY;
@@ -878,7 +886,10 @@ void DeviceManage::sendWaypointTo3D(QMap<QString, QVector<NavWayPointData>> map)
 				waypoint.z = lastZ;
 				waypoint.commandID = _WaypointFly;
 			}
-			else if (_WaypointFlyLand == waypoint.commandID) waypoint.commandID = _WaypointFly;
+			else if (_WaypointFlyLand == waypoint.commandID) {
+				red = green = blue = 0;
+				waypoint.commandID = _WaypointFly;
+			}
 
 			if(_WaypointFly != waypoint.commandID) continue;
 			int x = waypoint.x;
@@ -906,7 +917,7 @@ void DeviceManage::sendWaypointTo3D(QMap<QString, QVector<NavWayPointData>> map)
 #endif
 			timesum += time;
 			QList<QVariant> value;
-			value << timesum << color << status << angle << x << y << z << 16;
+			value << timesum << red << green << blue << status << angle << x << y << z << 16;
 			arrWaypoint.append(QJsonArray::fromVariantList(value));
 			lastX = x;
 			lastY = y;
