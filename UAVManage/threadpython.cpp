@@ -317,24 +317,30 @@ PyObject* QZAPI::FlyHover(PyObject* self, PyObject* args)
 PyObject* QZAPI::FlyTakeoff(PyObject* self, PyObject* args)
 {
 	int n = 0;
+	NavWayPointData data;
+#ifdef _WaypointUseTime_
+	int millisecond = 0;
+	if (!PyArg_ParseTuple(args, "i|i", &n, &millisecond)) {
+		QZAPI::Instance()->showWaypointError(tr("起飞参数值错误"));
+		return nullptr;
+	}
+	data.param3 = millisecond;
+#else
 	if (!PyArg_ParseTuple(args, "i", &n)) {
 		QZAPI::Instance()->showWaypointError(tr("起飞参数值错误"));
 		return nullptr;
 	}
+#endif
 	qDebug() << "起飞高度" << n;
 	NavWayPointData lastWaypoint = g_waypointData.back();
 	if (_WaypointStart != lastWaypoint.commandID) {
 		QZAPI::Instance()->showWaypointError(tr("起飞必须是第一步"));
 		return nullptr;
 	}
-	NavWayPointData data;
+	
 	data.x = lastWaypoint.x;
 	data.y = lastWaypoint.y;
 	data.z = n;
-#ifdef _WaypointUseTime_
-	//1秒内起飞到指定高度
-	data.param3 = 2;
-#endif
 	g_waypointData.append(data);
 	return QZAPI::Instance()->examineWaypoint();
 }
