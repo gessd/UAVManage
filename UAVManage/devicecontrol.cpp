@@ -39,7 +39,12 @@ DeviceControl::DeviceControl(QString name, float x, float y, QString ip, QWidget
 	connect(this, &DeviceControl::sigLogMessage, m_pDebugDialog, &DeviceDebug::onMessageData);
 	connect(this, &DeviceControl::sigLocalPosition, m_pDebugDialog, &DeviceDebug::onUpdateLocalPosition);
 
+	m_heartbeatStatus.bNoHeartbeatIng = false;
 	connect(&m_timerHeartbeat, &QTimer::timeout, [this]() {
+		//未启用心跳判断
+		if (false == m_bHeartbeatEnable) return;
+		//无人机校准中无心跳数据
+		if (m_heartbeatStatus.bNoHeartbeatIng) return;
 		unsigned int nLastTime = m_timerHeartbeat.property("time").toUInt();
 		if ((QDateTime::currentDateTime().toTime_t() - nLastTime) > 10) {
 			if (isConnectDevice()) {
@@ -173,7 +178,7 @@ bool DeviceControl::connectDevice()
 	if (nullptr == m_pHvTcpClient) return false;
 	int connfd = m_pHvTcpClient->createsocket(_DevicePort_, m_qstrIP.toLatin1());
 	if (connfd < 0)  return false;
-
+	m_heartbeatStatus.bNoHeartbeatIng = false;
 	//绑定回调函数
 	m_pHvTcpClient->onConnection = std::bind(&DeviceControl::hvcbConnectionStatus, this, std::placeholders::_1);
 	m_pHvTcpClient->onMessage = std::bind(&DeviceControl::hvcbReceiveMessage, this, std::placeholders::_1, std::placeholders::_2);
@@ -318,7 +323,12 @@ int DeviceControl::Fun_MAV_CMD_NAV_WAYPOINT(float Hold, float AcceptRadius, floa
 int DeviceControl::Fun_MAV_CALIBRATION(float p1, float p2, float p3, float p4, float p5, float p6, float p7, bool wait, bool again)
 {
 	QByteArray arrData = mavCommandLongToBuffer(p1, p2, p3, p4, p5, p6, p7, MAV_CMD_PREFLIGHT_CALIBRATION);
-	return MavSendCommandLongMessage(tr("校准"), MAV_CMD_PREFLIGHT_CALIBRATION, arrData, again ? arrData : "", wait);
+	int res = MavSendCommandLongMessage(tr("校准"), MAV_CMD_PREFLIGHT_CALIBRATION, arrData, again ? arrData : "", wait);
+	if (DeviceDataSucceed == res) {
+		m_heartbeatStatus.nLastTime = QDateTime::currentDateTime().toTime_t();
+		m_heartbeatStatus.bNoHeartbeatIng = true;
+	}
+	return res;
 }
 
 //无人机列队
@@ -423,6 +433,12 @@ void DeviceControl::hvcbReceiveMessage(const hv::SocketChannelPtr& channel, hv::
 		uint8_t par = mavlink_parse_char(m_nMavChan, arrData[i], &msg, &status);
 		if (0 == par) continue;
 		//qDebug() << getName() << "解包后消息ID" << msg.msgid;
+		if (m_heartbeatStatus.bNoHeartbeatIng) {
+			//长时间无心跳时则恢复心跳超时判断
+			if ((QDateTime::currentDateTime().toTime_t() - m_heartbeatStatus.nLastTime) > 60) {
+				m_heartbeatStatus.bNoHeartbeatIng = false;
+			}
+		}
 		switch (msg.msgid)
 		{
 		case MAVLINK_MSG_ID_HEARTBEAT://心跳

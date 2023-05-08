@@ -34,7 +34,17 @@ class DeviceControl : public QWidget
 {
 	Q_OBJECT
 public:
-	
+	struct _NoHeartbeatStatus
+	{
+		//校准及上传舞步时没有心跳数据
+		bool bNoHeartbeatIng;
+		//关闭心跳时的UTC时间
+		unsigned int nLastTime;
+		_NoHeartbeatStatus() {
+			bNoHeartbeatIng = false;
+			nLastTime = 0;
+		}
+	};
 public:
 	DeviceControl(QString name, float x, float y, QString ip = "", QWidget *parent = Q_NULLPTR);
 	~DeviceControl();
@@ -329,9 +339,13 @@ private:
 	QVector<NavWayPointData> m_currentWaypointData;
 	//当前上传航点进度
 	int m_nCurrentWaypontIndex;
+	//调试窗口s
 	DeviceDebug* m_pDebugDialog;
 	//检测心跳定时器
 	QTimer m_timerHeartbeat;
+	//校准操作时不判断心跳超时
+	_NoHeartbeatStatus m_heartbeatStatus;
+	//设备状态 电量位置及姿态
 	_stDeviceCurrentStatus m_deviceStatus;
 	//当前音乐播放进度
 	unsigned int m_nCurrentMusicTime;

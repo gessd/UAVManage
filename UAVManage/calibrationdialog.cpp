@@ -22,6 +22,9 @@ CalibrationDialog::CalibrationDialog(int calib, DeviceControl* device, QWidget* 
 	ui.labelAcc_5->setProperty(_GifPro, ":/res/acc/left.gif");
 	ui.labelAcc_6->setProperty(_GifPro, ":/res/acc/right.gif");
 	connect(device, &DeviceControl::sigLogMessage, this, &CalibrationDialog::onDeviceMessage);
+	connect(device, &DeviceControl::sigConnectStatus, [this](QString name, QString ip, bool connect) {
+		addLogToBrowser(connect ? "连接成功" : "<font color=red>连接断开</font>");
+		});
 	connect(ui.btnAccFinished, &QAbstractButton::clicked, this, &CalibrationDialog::close);
 	ui.stackedWidgetProgress->setCurrentIndex(calib);
 	if (_Accelerometer == calib) {
@@ -50,8 +53,7 @@ CalibrationDialog::~CalibrationDialog()
 void CalibrationDialog::addLogToBrowser(QString text)
 {
 	qDebug() << text;
-	ui.textBrowser->append(QDateTime::currentDateTime().toString("[hh:mm:ss.zzz]:"));
-	ui.textBrowser->append(text);
+	ui.textBrowser->append(QDateTime::currentDateTime().toString("[hh:mm:ss.zzz]:")+ text);
 }
 
 void CalibrationDialog::onDeviceMessage(QString data)
