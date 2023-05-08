@@ -402,6 +402,8 @@ void DeviceControl::hvcbReceiveMessage(const hv::SocketChannelPtr& channel, hv::
 	QString qstrData = QString::fromLocal8Bit(arrData);
 	//qDebug() << getName()<< "收到消息" << arrData.toHex().toUpper();
 	if (qstrData.contains(qstrStart)) {
+		//校准时没有心跳数据
+		emit sigUpdateHeartbeat();
 		QString qstrLog = qstrData;
 		while (qstrLog.contains(qstrStart)){
 			int nStart = qstrLog.indexOf(qstrStart);

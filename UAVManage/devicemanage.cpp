@@ -53,6 +53,8 @@ DeviceManage::DeviceManage(QWidget *parent)
 	QAction* pStop = new QAction(tr("急停"), this);
 	QAction* pActionGyro = new QAction(tr("陀螺校准"), this);
 	QAction* pActionMagnetism = new QAction(tr("磁罗盘校准"), this);
+	QAction* pActionMagnetismOpen = new QAction(tr("磁罗盘开启"), this);
+	QAction* pActionMagnetismClose = new QAction(tr("磁罗盘关闭"), this);
 	QAction* pActionAccelerometer = new QAction(tr("加计校准"), this);
 	QAction* pActionBaro = new QAction(tr("电调校准"), this);
 	m_pActionDebug = new QAction(tr("调试"), this);
@@ -65,6 +67,8 @@ DeviceManage::DeviceManage(QWidget *parent)
 	m_pMenu->addSeparator();
 	m_pMenu->addAction(pActionGyro);
 	m_pMenu->addAction(pActionMagnetism);
+	m_pMenu->addAction(pActionMagnetismOpen);
+	m_pMenu->addAction(pActionMagnetismClose);
 	m_pMenu->addAction(pActionAccelerometer);
 	m_pMenu->addAction(pActionBaro);
 	m_pMenu->addSeparator();
@@ -76,6 +80,26 @@ DeviceManage::DeviceManage(QWidget *parent)
 	connect(pActionMagnetism, &QAction::triggered, this, &DeviceManage::deviceCalibration);
 	connect(pActionAccelerometer, &QAction::triggered, this, &DeviceManage::deviceCalibration);
 	connect(pActionBaro, &QAction::triggered, this, &DeviceManage::deviceCalibration);
+	connect(pActionMagnetismOpen, &QAction::triggered, [this]() {
+		DeviceControl* pDevice = getCurrentDevice();
+		if (nullptr == pDevice) return;
+		int res = pDevice->Fun_MAV_CALIBRATION(0, 0, 1, 0, 0, 0, 0);
+		if (DeviceDataSucceed != res) {
+			_ShowErrorMessage(pDevice->getName() + tr("磁罗盘开启") + Utility::waypointMessgeFromStatus(_DeviceCalibration, res));
+			return;
+		}
+		_ShowInfoMessage(pDevice->getName() + tr("磁罗盘开启成功"));
+		});
+	connect(pActionMagnetismClose, &QAction::triggered, [this]() {
+		DeviceControl* pDevice = getCurrentDevice();
+		if (nullptr == pDevice) return;
+		int res = pDevice->Fun_MAV_CALIBRATION(0, 0, 0, 0, 0, 0, 0);
+		if (DeviceDataSucceed != res) {
+			_ShowErrorMessage(pDevice->getName() + tr("磁罗盘关闭") + Utility::waypointMessgeFromStatus(_DeviceCalibration, res));
+			return;
+		}
+		_ShowInfoMessage(pDevice->getName() + tr("磁罗盘关闭成功"));
+		});
 	//菜单响应处理
 	connect(pActionParam, &QAction::triggered, [this](bool checked) {
 		DeviceControl* pControl = getCurrentDevice();
@@ -1189,7 +1213,7 @@ void DeviceManage::deviceCalibration()
 	int res = DeviceDataSucceed;
 	switch (n) {
 	case _Gyro: res = pDevice->Fun_MAV_CALIBRATION(1, 0, 0, 0, 0, 0, 0); break;
-	case _Magnetometer: res = pDevice->Fun_MAV_CALIBRATION(1, 1, 0, 0, 0, 0, 0); break;
+	case _Magnetometer: res = pDevice->Fun_MAV_CALIBRATION(0, 1, 0, 0, 0, 0, 0); break;
 	case _Accelerometer: res = pDevice->Fun_MAV_CALIBRATION(0, 0, 0, 0, 1, 0, 0); break;
 	case _Baro: res = pDevice->Fun_MAV_CALIBRATION(0, 0, 0, 0, 0, 0, 1); break;
 	}
