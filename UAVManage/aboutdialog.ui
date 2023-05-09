@@ -594,7 +594,7 @@ QSlider::add-page:horizontal {
          <item>
           <widget class="QLabel" name="label_2">
            <property name="text">
-            <string>北京奇正数元教育科技有限公司</string>
+            <string>北京奇正数元科技股份有限公司</string>
            </property>
           </widget>
          </item>
