@@ -51,12 +51,12 @@ DeviceManage::DeviceManage(QWidget *parent)
 	QAction* pFlyTo = new QAction(tr("起飞"), this);
 	QAction* pLand = new QAction(tr("降落"), this);
 	QAction* pStop = new QAction(tr("急停"), this);
-	QAction* pActionGyro = new QAction(tr("陀螺校准"), this);
 	QAction* pActionMagnetism = new QAction(tr("磁罗盘校准"), this);
 	QAction* pActionMagnetismOpen = new QAction(tr("磁罗盘开启"), this);
 	QAction* pActionMagnetismClose = new QAction(tr("磁罗盘关闭"), this);
 	QAction* pActionAccelerometer = new QAction(tr("加计校准"), this);
-	QAction* pActionBaro = new QAction(tr("电调校准"), this);
+	m_pActionGyro = new QAction(tr("陀螺校准"), this);
+	m_pActionBaro = new QAction(tr("电调校准"), this);
 	m_pActionDebug = new QAction(tr("调试"), this);
 	m_pMenu->addAction(pActionParam);
 	m_pMenu->addAction(pActionDicconnect);
@@ -65,21 +65,19 @@ DeviceManage::DeviceManage(QWidget *parent)
 	m_pMenu->addAction(pLand);
 	m_pMenu->addAction(pStop);
 	m_pMenu->addSeparator();
-	m_pMenu->addAction(pActionGyro);
 	m_pMenu->addAction(pActionMagnetism);
 	m_pMenu->addAction(pActionMagnetismOpen);
 	m_pMenu->addAction(pActionMagnetismClose);
 	m_pMenu->addAction(pActionAccelerometer);
-	m_pMenu->addAction(pActionBaro);
 	m_pMenu->addSeparator();
-	pActionGyro->setProperty("Calibration", _Gyro);
+	m_pActionGyro->setProperty("Calibration", _Gyro);
 	pActionMagnetism->setProperty("Calibration", _Magnetometer);
 	pActionAccelerometer->setProperty("Calibration", _Accelerometer);
-	pActionBaro->setProperty("Calibration", _Baro);
-	connect(pActionGyro, &QAction::triggered, this, &DeviceManage::deviceCalibration);
+	m_pActionBaro->setProperty("Calibration", _Baro);
+	connect(m_pActionGyro, &QAction::triggered, this, &DeviceManage::deviceCalibration);
 	connect(pActionMagnetism, &QAction::triggered, this, &DeviceManage::deviceCalibration);
 	connect(pActionAccelerometer, &QAction::triggered, this, &DeviceManage::deviceCalibration);
-	connect(pActionBaro, &QAction::triggered, this, &DeviceManage::deviceCalibration);
+	connect(m_pActionBaro, &QAction::triggered, this, &DeviceManage::deviceCalibration);
 	connect(pActionMagnetismOpen, &QAction::triggered, [this]() {
 		DeviceControl* pDevice = getCurrentDevice();
 		if (nullptr == pDevice) return;
@@ -988,8 +986,16 @@ bool DeviceManage::eventFilter(QObject* watched, QEvent* event)
 		//设备列表菜单
 		if (QEvent::ContextMenu != event->type()) return false;
 		if (!ui.listWidget->itemAt(ui.listWidget->mapFromGlobal(QCursor::pos()))) return false;
-		if (m_bDebug) m_pMenu->addAction(m_pActionDebug);
-		else m_pMenu->removeAction(m_pActionDebug);
+		if (m_bDebug) {
+			m_pMenu->addAction(m_pActionGyro);
+			m_pMenu->addAction(m_pActionBaro);
+			m_pMenu->addAction(m_pActionDebug);
+		}
+		else {
+			m_pMenu->removeAction(m_pActionGyro);
+			m_pMenu->removeAction(m_pActionBaro);
+			m_pMenu->removeAction(m_pActionDebug);
+		}
 		m_pMenu->exec(QCursor::pos());
 	} 
 	return false;
@@ -1208,7 +1214,7 @@ void DeviceManage::deviceCalibration()
 	}
 	QMessageBox::StandardButton button = QMessageBox::question(this, tr("询问"), tr("校准开始后无法操控无人机，是否现在开始校准?"));
 	if (QMessageBox::StandardButton::Yes != button) return;
-	CalibrationDialog* pDialog = new CalibrationDialog(n, pDevice, dynamic_cast<QWidget*>(parent()));
+	CalibrationDialog* pDialog = new CalibrationDialog(n, pDevice, this);
 	pDialog->addLogToBrowser(pDevice->getName() + tr("：校准开始"));
 	int res = DeviceDataSucceed;
 	switch (n) {

@@ -251,6 +251,8 @@ private:
 	Ui::DeviceManage ui;
 	//设备菜单
 	QMenu* m_pMenu;
+	QAction* m_pActionGyro;
+	QAction* m_pActionBaro;
 	QAction* m_pActionDebug;
 	bool m_bDebug;
 	//三维模拟通讯使用
