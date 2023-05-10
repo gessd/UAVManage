@@ -338,7 +338,7 @@ Blockly.Blocks['Fly_Revolve'] = {
 				["左", "left"],
              ]), "direction");
         this.appendDummyInput()
-             .appendField('角度:')
+             .appendField('旋转 角度:')
              .appendField(new Blockly.FieldAngle(90), 'revolve')
              .appendField(" 用时")
              .appendField(new Blockly.FieldNumber(1, 1, 1000, 1), "time");
