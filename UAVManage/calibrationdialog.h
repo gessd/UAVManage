@@ -18,6 +18,7 @@ public:
 	void addLogToBrowser(QString text);
 public slots:
 	void onDeviceMessage(QString data);
+	void onDeviceStatus(QString name, QString ip, bool connect);
 protected:
 	void showEvent(QShowEvent* event);
 	void hideEvent(QHideEvent* event);

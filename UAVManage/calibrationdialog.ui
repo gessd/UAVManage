@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>655</width>
-    <height>500</height>
+    <width>558</width>
+    <height>584</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -22,15 +22,40 @@
   <property name="styleSheet">
    <string notr="true"/>
   </property>
-  <layout class="QGridLayout" name="gridLayout" rowstretch="3,7">
-   <item row="0" column="0">
-    <widget class="QTextBrowser" name="textBrowser"/>
+  <layout class="QGridLayout" name="gridLayout">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <property name="spacing">
+    <number>0</number>
+   </property>
+   <item row="0" column="0" colspan="2">
+    <widget class="QTextBrowser" name="textBrowser">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>160</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>160</height>
+      </size>
+     </property>
+    </widget>
    </item>
    <item row="1" column="0" colspan="2">
     <widget class="QStackedWidget" name="stackedWidgetProgress">
-     <property name="styleSheet">
-      <string notr="true"/>
-     </property>
      <property name="currentIndex">
       <number>4</number>
      </property>
@@ -38,218 +63,249 @@
      <widget class="QWidget" name="page_1"/>
      <widget class="QWidget" name="page_2"/>
      <widget class="QWidget" name="page_3"/>
-     <widget class="QWidget" name="page_4">
-      <property name="styleSheet">
-       <string notr="true"/>
-      </property>
-      <widget class="QLabel" name="label_7">
-       <property name="geometry">
-        <rect>
-         <x>260</x>
-         <y>40</y>
-         <width>361</width>
-         <height>91</height>
-        </rect>
+     <widget class="QWidget" name="pageAcc">
+      <layout class="QVBoxLayout" name="verticalLayout" stretch="8,1,1">
+       <property name="spacing">
+        <number>0</number>
        </property>
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
+       <property name="leftMargin">
+        <number>0</number>
        </property>
-       <property name="text">
-        <string>请按图示放置无人机，保持静止直到接收到校准数据</string>
+       <property name="topMargin">
+        <number>0</number>
        </property>
-       <property name="wordWrap">
-        <bool>true</bool>
+       <property name="rightMargin">
+        <number>0</number>
        </property>
-      </widget>
-      <widget class="QLabel" name="labelAccGif">
-       <property name="geometry">
-        <rect>
-         <x>0</x>
-         <y>0</y>
-         <width>258</width>
-         <height>258</height>
-        </rect>
+       <property name="bottomMargin">
+        <number>0</number>
        </property>
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="btnAccFinished">
-       <property name="geometry">
-        <rect>
-         <x>520</x>
-         <y>200</y>
-         <width>101</width>
-         <height>31</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>完成</string>
-       </property>
-      </widget>
-      <widget class="QWidget" name="widgetAccProgress" native="true">
-       <property name="geometry">
-        <rect>
-         <x>0</x>
-         <y>260</y>
-         <width>631</width>
-         <height>71</height>
-        </rect>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">QLabel{background:&quot;#0000FF&quot;;}
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="5,90,5">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <item>
+          <spacer name="horizontalSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QLabel" name="labelAccGif">
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_2">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QLabel" name="labelAccText">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>50</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>50</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>请按上方图示放置无人机，然后保持静止直到接收到校准数据并点亮下图所示小图标</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QWidget" name="widgetAccProgress" native="true">
+         <property name="styleSheet">
+          <string notr="true">QLabel{background:&quot;#0000FF&quot;;}
 QLabel:disabled{background:&quot;#666666&quot;;}</string>
-       </property>
-       <layout class="QHBoxLayout" name="horizontalLayout">
-        <property name="topMargin">
-         <number>4</number>
-        </property>
-        <property name="bottomMargin">
-         <number>4</number>
-        </property>
-        <item>
-         <widget class="QLabel" name="labelAcc_1">
-          <property name="enabled">
-           <bool>false</bool>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <property name="topMargin">
+           <number>4</number>
           </property>
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
+          <property name="bottomMargin">
+           <number>4</number>
           </property>
-          <property name="maximumSize">
-           <size>
-            <width>64</width>
-            <height>64</height>
-           </size>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-          <property name="pixmap">
-           <pixmap resource="uavmanage.qrc">:/res/acc/top.gif</pixmap>
-          </property>
-          <property name="scaledContents">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLabel" name="labelAcc_2">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>64</width>
-            <height>64</height>
-           </size>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-          <property name="pixmap">
-           <pixmap resource="uavmanage.qrc">:/res/acc/bottom.png</pixmap>
-          </property>
-          <property name="scaledContents">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLabel" name="labelAcc_3">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>64</width>
-            <height>64</height>
-           </size>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-          <property name="pixmap">
-           <pixmap resource="uavmanage.qrc">:/res/acc/behind.png</pixmap>
-          </property>
-          <property name="scaledContents">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLabel" name="labelAcc_4">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>64</width>
-            <height>64</height>
-           </size>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-          <property name="pixmap">
-           <pixmap resource="uavmanage.qrc">:/res/acc/front.png</pixmap>
-          </property>
-          <property name="scaledContents">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLabel" name="labelAcc_5">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>64</width>
-            <height>64</height>
-           </size>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-          <property name="pixmap">
-           <pixmap resource="uavmanage.qrc">:/res/acc/left.png</pixmap>
-          </property>
-          <property name="scaledContents">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLabel" name="labelAcc_6">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>64</width>
-            <height>64</height>
-           </size>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-          <property name="pixmap">
-           <pixmap resource="uavmanage.qrc">:/res/acc/right.png</pixmap>
-          </property>
-          <property name="scaledContents">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
+          <item>
+           <widget class="QLabel" name="labelAcc_1">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>64</width>
+              <height>64</height>
+             </size>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="pixmap">
+             <pixmap resource="uavmanage.qrc">:/res/acc/behind.png</pixmap>
+            </property>
+            <property name="scaledContents">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="labelAcc_2">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>64</width>
+              <height>64</height>
+             </size>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="pixmap">
+             <pixmap resource="uavmanage.qrc">:/res/acc/front.png</pixmap>
+            </property>
+            <property name="scaledContents">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="labelAcc_3">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>64</width>
+              <height>64</height>
+             </size>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="pixmap">
+             <pixmap resource="uavmanage.qrc">:/res/acc/left.png</pixmap>
+            </property>
+            <property name="scaledContents">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="labelAcc_4">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>64</width>
+              <height>64</height>
+             </size>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="pixmap">
+             <pixmap resource="uavmanage.qrc">:/res/acc/right.png</pixmap>
+            </property>
+            <property name="scaledContents">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="labelAcc_5">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>64</width>
+              <height>64</height>
+             </size>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="pixmap">
+             <pixmap resource="uavmanage.qrc">:/res/acc/bottom.png</pixmap>
+            </property>
+            <property name="scaledContents">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="labelAcc_6">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>64</width>
+              <height>64</height>
+             </size>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="pixmap">
+             <pixmap resource="uavmanage.qrc">:/res/acc/top.gif</pixmap>
+            </property>
+            <property name="scaledContents">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
      </widget>
      <widget class="QWidget" name="page_5"/>
      <widget class="QWidget" name="page_6"/>

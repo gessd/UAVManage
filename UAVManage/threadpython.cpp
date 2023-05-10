@@ -460,6 +460,10 @@ PyObject* QZAPI::FlyMove(PyObject* self, PyObject* args)
 	}
 #endif
 	qDebug() << "相对移动" << direction << n;
+	if (direction > 6) {
+		QZAPI::Instance()->showWaypointError(tr("飞行方向参数错误"));
+		return nullptr;
+	}
 	NavWayPointData lastWaypoint = g_waypointData.back();
 	data.x = lastWaypoint.x;
 	data.y = lastWaypoint.y;
