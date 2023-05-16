@@ -251,6 +251,8 @@ private:
 	Ui::DeviceManage ui;
 	//设备菜单
 	QMenu* m_pMenu;
+	QAction* m_pActionMagnetismOpen;
+	QAction* m_pActionMagnetismClose;
 	QAction* m_pActionGyro;
 	QAction* m_pActionBaro;
 	QAction* m_pActionDebug;

@@ -50,11 +50,10 @@ DeviceManage::DeviceManage(QWidget *parent)
 	QAction* pActionDicconnect = new QAction(tr("连接/断开"), this);
 	QAction* pFlyTo = new QAction(tr("起飞"), this);
 	QAction* pLand = new QAction(tr("降落"), this);
-	QAction* pStop = new QAction(tr("急停"), this);
 	QAction* pActionMagnetism = new QAction(tr("磁罗盘校准"), this);
-	QAction* pActionMagnetismOpen = new QAction(tr("磁罗盘开启"), this);
-	QAction* pActionMagnetismClose = new QAction(tr("磁罗盘关闭"), this);
 	QAction* pActionAccelerometer = new QAction(tr("加计校准"), this);
+	m_pActionMagnetismOpen = new QAction(tr("磁罗盘开启"), this);
+	m_pActionMagnetismClose = new QAction(tr("磁罗盘关闭"), this);
 	m_pActionGyro = new QAction(tr("陀螺校准"), this);
 	m_pActionBaro = new QAction(tr("电调校准"), this);
 	m_pActionDebug = new QAction(tr("调试"), this);
@@ -63,11 +62,8 @@ DeviceManage::DeviceManage(QWidget *parent)
 	m_pMenu->addSeparator();
 	m_pMenu->addAction(pFlyTo);
 	m_pMenu->addAction(pLand);
-	m_pMenu->addAction(pStop);
 	m_pMenu->addSeparator();
 	m_pMenu->addAction(pActionMagnetism);
-	m_pMenu->addAction(pActionMagnetismOpen);
-	m_pMenu->addAction(pActionMagnetismClose);
 	m_pMenu->addAction(pActionAccelerometer);
 	m_pMenu->addSeparator();
 	m_pActionGyro->setProperty("Calibration", _Gyro);
@@ -78,7 +74,7 @@ DeviceManage::DeviceManage(QWidget *parent)
 	connect(pActionMagnetism, &QAction::triggered, this, &DeviceManage::deviceCalibration);
 	connect(pActionAccelerometer, &QAction::triggered, this, &DeviceManage::deviceCalibration);
 	connect(m_pActionBaro, &QAction::triggered, this, &DeviceManage::deviceCalibration);
-	connect(pActionMagnetismOpen, &QAction::triggered, [this]() {
+	connect(m_pActionMagnetismOpen, &QAction::triggered, [this]() {
 		DeviceControl* pDevice = getCurrentDevice();
 		if (nullptr == pDevice) return;
 		int res = pDevice->Fun_MAV_CALIBRATION(0, 0, 1, 0, 0, 0, 0);
@@ -88,7 +84,7 @@ DeviceManage::DeviceManage(QWidget *parent)
 		}
 		_ShowInfoMessage(pDevice->getName() + tr("磁罗盘开启成功"));
 		});
-	connect(pActionMagnetismClose, &QAction::triggered, [this]() {
+	connect(m_pActionMagnetismClose, &QAction::triggered, [this]() {
 		DeviceControl* pDevice = getCurrentDevice();
 		if (nullptr == pDevice) return;
 		int res = pDevice->Fun_MAV_CALIBRATION(0, 0, 0, 0, 0, 0, 0);
@@ -166,13 +162,6 @@ DeviceManage::DeviceManage(QWidget *parent)
 		int res = pControl->Fun_MAV_CMD_NAV_LAND_LOCAL(0, 0, 0, 0, 0, 0, 0);
 		if (res == _DeviceStatus::DeviceDataSucceed) return;
 		_ShowErrorMessage(pControl->getName() + tr("降落") + Utility::waypointMessgeFromStatus(_DeviceLandLocal, res));
-		});
-	connect(pStop, &QAction::triggered, [this](bool checked) {
-		DeviceControl* pControl = getCurrentDevice();
-		if (!pControl) return;
-		int res = pControl->Fun_MAV_QUICK_STOP();
-		if (res == _DeviceStatus::DeviceDataSucceed) return;
-		_ShowErrorMessage(pControl->getName() + tr("急停") + Utility::waypointMessgeFromStatus(_DeviceQuickStop, res));
 		});
 	connect(m_pActionDebug, &QAction::triggered, [this](bool checked) {
 		DeviceControl* pControl = getCurrentDevice();
@@ -465,7 +454,7 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 				continue;
 			}
 #ifndef _DebugApp_
-			if (pDevice->getCurrentStatus().battery < 60) {
+			if (pDevice->getCurrentStatus().battery < 50) {
 				_ShowErrorMessage(name + tr("设备电量过低无法起飞"));
 				continue;
 			}
@@ -987,11 +976,15 @@ bool DeviceManage::eventFilter(QObject* watched, QEvent* event)
 		if (QEvent::ContextMenu != event->type()) return false;
 		if (!ui.listWidget->itemAt(ui.listWidget->mapFromGlobal(QCursor::pos()))) return false;
 		if (m_bDebug) {
+			m_pMenu->addAction(m_pActionMagnetismOpen);
+			m_pMenu->addAction(m_pActionMagnetismClose);
 			m_pMenu->addAction(m_pActionGyro);
 			m_pMenu->addAction(m_pActionBaro);
 			m_pMenu->addAction(m_pActionDebug);
 		}
 		else {
+			m_pMenu->removeAction(m_pActionMagnetismOpen);
+			m_pMenu->removeAction(m_pActionMagnetismClose);
 			m_pMenu->removeAction(m_pActionGyro);
 			m_pMenu->removeAction(m_pActionBaro);
 			m_pMenu->removeAction(m_pActionDebug);
