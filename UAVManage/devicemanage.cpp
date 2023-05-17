@@ -214,8 +214,14 @@ DeviceManage::DeviceManage(QWidget *parent)
 	connect(ui.btnFlyTakeoff, &QAbstractButton::clicked, [this]() { allDeviceControl(_DeviceTakeoffLocal); });
 	connect(ui.btnFlyLand, &QAbstractButton::clicked, [this]() { allDeviceControl(_DeviceLandLocal); });
 	connect(ui.btnFlyStop, &QAbstractButton::clicked, [this]() { allDeviceControl(_DeviceQuickStop); });
-	connect(ui.btnQueue, &QAbstractButton::clicked, [this]() { allDeviceControl(_DeviceQueue); });
-	connect(ui.btnRegain, &QAbstractButton::clicked, [this]() { allDeviceControl(_DeviceRegain); });
+	connect(ui.btnQueue, &QAbstractButton::clicked, [this]() { 
+		QMessageBox::information(this, "提示", "此功能正在功能开发中......");
+		return;
+		allDeviceControl(_DeviceQueue); });
+	connect(ui.btnRegain, &QAbstractButton::clicked, [this]() { 
+		QMessageBox::information(this, "提示", "此功能正在功能开发中......");
+		return;
+		allDeviceControl(_DeviceRegain); });
 	connect(&m_timerUpdateStatus, &QTimer::timeout, this, &DeviceManage::onUpdateStatusTo3D);
 	connect(&m_timerMessage3D, &QTimer::timeout, this, &DeviceManage::onTimeout3DMessage);
 	connect(ui.btnBaseStation, &QAbstractButton::clicked, [this]() { 
