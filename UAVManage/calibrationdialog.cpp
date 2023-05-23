@@ -23,6 +23,7 @@ CalibrationDialog::CalibrationDialog(int calib, DeviceControl* device, QWidget* 
 		//加计或磁罗盘校准校准
 		ui.stackedWidgetProgress->setCurrentIndex(_Accelerometer);
 		if (_Accelerometer == calib) {
+			setWindowTitle("加计校准");
 			ui.labelAccText->setText("请按上方图示放置无人机，然后保持静止直到接收到校准数据并点亮下图中的小图标");
 			ui.labelAcc_1->setProperty(_GifPro, ":/res/acc/behind.gif");
 			ui.labelAcc_2->setProperty(_GifPro, ":/res/acc/front.gif");
@@ -33,6 +34,7 @@ CalibrationDialog::CalibrationDialog(int calib, DeviceControl* device, QWidget* 
 			ui.labelAccGif->setFixedSize(300, 300);
 		}
 		else if (_Magnetometer == calib){
+			setWindowTitle("磁罗盘校准");
 			ui.labelAccText->setText("请按图示旋转无人机，直到接收到校准数据并点亮下图中的小图标");
 			ui.labelAcc_1->setProperty(_GifPro, ":/res/magnet/z+.gif");
 			ui.labelAcc_2->setProperty(_GifPro, ":/res/magnet/z-.gif");
