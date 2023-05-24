@@ -222,6 +222,8 @@ PyObject* QZAPI::FlyAddMarkPoint(PyObject* self, PyObject* args)
 
 PyObject* QZAPI::FlySetSpeed(PyObject* self, PyObject* args)
 {
+	//设置飞行速度废弃
+	return Py_BuildValue("i", 0);
 	int n = 0;
 	if (!PyArg_ParseTuple(args, "i", &n)) {
 		QZAPI::Instance()->showWaypointError(tr("速度参数值错误"));

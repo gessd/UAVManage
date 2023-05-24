@@ -61,7 +61,7 @@ Blockly.Blocks['Fly_Takeoff'] = {
         this.setNextStatement(true, ["time"]);
         //this.setNextStatement(true, ["action", "notReachAction", "ReachAction", "time"]);
         this.setColour('#FF6680');
-        this.setTooltip('值必须为100');
+        this.setTooltip('起飞至高度固定为100厘米，用时范围5~10秒');
     }
 };
 

@@ -41,12 +41,6 @@ def FlyMove(direction, distance, millisecond):
   :param millisecond: 飞行用时(毫秒)，正整数
 """
 
-def FlySetSpeed(speed):
-"""
-  设置飞行速度
-  :param speed: 飞行速度(每秒speed厘米)，正整数
-"""
-
 def FlyHover(millisecond):
 """
   悬停，在当前位置停留
