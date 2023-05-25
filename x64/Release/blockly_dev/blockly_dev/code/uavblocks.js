@@ -196,9 +196,6 @@ Blockly.Python['Fly_ToMarkPoint'] = function(block) {
     var point = block.getFieldValue('mark');
     var t = block.getFieldValue('time');
     var u = block.getFieldValue('unit');
-    if(1 == u){
-        t = t*1000;
-    }
     var code = 'Fly_ToMarkPoint(\'' + point + '\',' + t+ ')' + '\n';
     return code;
 };
@@ -236,9 +233,6 @@ Blockly.Python['Fly_To'] = function(block) {
     var pz = block.getFieldValue("coordinateZ");
     var t = block.getFieldValue("time");
     var u = block.getFieldValue('unit');
-    if(1 == u){
-        t = t*1000;
-    }
     var code = 'Fly_To(' + px + ',' + py + ',' + pz +',' + t +')' + '\n';
     return code;
 };
@@ -278,9 +272,6 @@ Blockly.Python['Fly_ToNumber'] = function(block) {
 	var pz = Blockly.Python.valueToCode(block, 'Z', Blockly.Python.ORDER_NONE);
     var t = Blockly.Python.valueToCode(block, 'time', Blockly.Python.ORDER_NONE);
     var u = block.getFieldValue('unit');
-    if(1 == u){
-        t = t*1000;
-    }
     var code = 'Fly_To(' + px + ',' + py + ',' + pz + ',' + t +')' + '\n';
     return code;
 };
@@ -328,9 +319,6 @@ Blockly.Python['Fly_Hover'] = function(block) {
     addHead();
     var t = block.getFieldValue('hover');
     var u = block.getFieldValue('unit');
-    if(1 == u){
-        t = t*1000;
-    }
     var code = 'Fly_Hover('+t+')' + '\n';
     return code; 
 };
@@ -367,9 +355,6 @@ Blockly.Python['Fly_Revolve'] = function(block) {
     var d = block.getFieldValue('direction');
     var t = block.getFieldValue('time');
     var u = block.getFieldValue('unit');
-    if(1 == u){
-        t = t*1000;
-    }
     if("right" == d){
         return 'Fly_Revolve('+r+','+t+')' + '\n';
     } else if("left" == d){
@@ -413,9 +398,6 @@ Blockly.Python['Fly_Move'] = function(block) {
     var s = block.getFieldValue('distance');
     var t = block.getFieldValue('time');
     var u = block.getFieldValue('unit');
-    if(1 == u){
-        t = t*1000;
-    }
     return 'Fly_Move('+d+','+s+','+t+')\n';
 };
 

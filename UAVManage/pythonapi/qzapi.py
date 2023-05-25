@@ -27,32 +27,32 @@ def FlyAddMarkPoint(name, x, y, z):
   :param z:    Z轴坐标位置(厘米)，正整数
 """
 
-def FlyToMarkPoint(name, millisecond):
+def FlyToMarkPoint(name, second):
 """
   飞行至标定点，配合添加标定点使用，控制无人机飞行到预设的位置
   :param name:        标定点名称，字符串，必须已经添加标定点
-  :param millisecond: 飞行到此标定点用时(毫秒)，正整数
+  :param second:      飞行到此标定点用时(秒)，正整数
 """
 
-def FlyMove(direction, distance, millisecond):
+def FlyMove(direction, distance, second):
 """
   向设置方向飞行
   :param direction:   飞行方向，取值范围1-6正整数，[1向前/2向后/3向右/4向左/5向上/6向下]
   :param distance:    飞行距离(厘米)，正整数 
-  :param millisecond: 飞行用时(毫秒)，正整数
+  :param second:      飞行用时(秒)，正整数
 """
 
-def FlyHover(millisecond):
+def FlyHover(second):
 """
   悬停，在当前位置停留
-  :param millisecond: 悬停时间(毫秒)，正整数
+  :param second: 悬停时间(秒)，正整数
 """
 
-def FlyRevolve(angle, millisecond):
+def FlyRevolve(angle, second):
 """
   旋转，无人机旋转设定角度
   :param angle:       旋转角度，取值范围-360°--360°，正直为顺时针旋转，负值为逆时针旋转
-  :param millisecond: 旋转用时(毫秒)，正整数
+  :param second:      旋转用时(秒)，正整数
 """
 
 def FlySetLedMode(mode):
@@ -67,11 +67,11 @@ def FlySetLedColor(color):
   :param color: 颜色，字符串，十六进制颜色值，例：红色#FF0000
 """
 
-def FlyTo(x, y, z, millisecond):
+def FlyTo(x, y, z, second):
 """
   飞行到设定位置
   :param x:           X轴坐标位置(厘米)，正整数
   :param y:           Y轴坐标位置(厘米)，正整数
   :param z:           Z轴坐标位置(厘米)，正整数
-  :param millisecond: 飞行用时(毫秒)，正整数
+  :param second:      飞行用时(秒)，正整数
 """
