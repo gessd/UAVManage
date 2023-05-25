@@ -130,27 +130,6 @@ PyObject* QZAPI::examineWaypoint()
 		g_nTimeTotal += data.param3;
 		break;
 	case _WaypointTime:
-		//时间范围,需要检查是否为递进关系
-		//for (int i = g_waypointData.count() - 2; i >= 0; i--) {
-		//	NavWayPointData last = g_waypointData.at(i);
-		//	if (_WaypointTime != last.commandID) continue;
-		//	if (last.param1 >= data.param1) {
-		//		//航点中存在比当前时间小的记录
-		//		showWaypointError(data.message + tr(" 时间设定顺序错误"));
-		//		return nullptr;
-		//	}
-		//}
-		if (g_mapTimeGroup.contains(data.groupname)) {
-			showWaypointError(data.message + tr("，名称重复"));
-			return nullptr;
-		}
-		//if (g_nTimeTotal != data.param1) {
-		//	unsigned int minute = g_nTimeTotal / 60;
-		//	unsigned int second = g_nTimeTotal % 60;
-		//	showWaypointError(data.message + tr("，时间值设定错误") + QString("，应设置为第%1分%2秒").arg(minute).arg(second));
-		//	return nullptr;
-		//}
-		g_mapTimeGroup.insert(data.groupname, g_nTimeTotal);
 		break;
 	case _WaypointFlyLand:
 		g_bLand = true;
@@ -323,11 +302,6 @@ PyObject* QZAPI::FlyHover(PyObject* self, PyObject* args)
 	}
 	qDebug() << "悬停时间" << n << "毫秒";
 	NavWayPointData last = g_waypointData.back();
-	if (last.z <= 0.0) {
-		//判断是否已经飞离地面
-		QZAPI::Instance()->showWaypointError(tr("没有起飞无法悬停"));
-		return nullptr;
-	}
 	NavWayPointData data;
 	data.x = last.x;
 	data.y = last.y;
@@ -412,10 +386,14 @@ PyObject* QZAPI::FlyTimeGroup(PyObject* self, PyObject* args)
 		QZAPI::Instance()->showWaypointError(tr("动作组名称必须输入"));
 		return nullptr;
 	}
+	if (g_mapTimeGroup.contains(qstrName)) {
+		QZAPI::Instance()->showWaypointError(QString("动作%1 开始时间第%2分%3秒，名称重复").arg(qstrName).arg(m).arg(s));
+		return nullptr;
+	}
+	g_mapTimeGroup.insert(qstrName, g_nTimeTotal);
 	NavWayPointData last = g_waypointData.back();
 	NavWayPointData data;
 	data.groupname = qstrName;
-	data.message = QString("动作%1 开始时间第%2分%3秒").arg(qstrName).arg(m).arg(s);
 	data.x = last.x;
 	data.y = last.y;
 	data.z = last.z;
@@ -630,7 +608,6 @@ void ThreadPython::initParam(unsigned int nSpaceX, unsigned int nSapaceY, QStrin
 	g_mapTimeGroup.clear();
 	g_nTimeTotal = 0;
 	g_bLand = false;
-
 	g_nSpaceX = nSpaceX;
 	g_nSpaceY = nSapaceY;
 	g_deviceName = name;
@@ -688,6 +665,11 @@ PythonRunState ThreadPython::getLastState()
 QMap<QString, unsigned int> ThreadPython::getTimeGroup()
 {
 	return g_mapTimeGroup;
+}
+
+unsigned int ThreadPython::getFlyTotalTime()
+{
+	return g_nTimeTotal;
 }
 
 QString ThreadPython::getErrorString(int state)

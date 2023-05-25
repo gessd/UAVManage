@@ -222,6 +222,11 @@ private slots:
 	* @brief 删除设备
 	*/
 	void onRemoveDevice(QString name);
+public slots:
+	/**
+	 * @brief 更新音乐播放总时长 秒
+	 */
+	void onUpdateMusicMaxTime(unsigned int time);
 private:
 	/**
 	 * @brief 当前选中的设备
@@ -278,7 +283,7 @@ private:
 	QMap<QString, QPoint> m_stationMap;
 	//无人机网络设置
 	DeviceSerial* m_pDeviceNetwork;
-	//音乐文件及波形图形
+	//音乐文件
 	QString m_qstrMusicFile;
 	//音乐波形图片
 	QPixmap m_pixmapMusic;
@@ -286,4 +291,6 @@ private:
 	FirmwareDialog* m_pFirmwareDialog;
 	//当前工程文件
 	QString m_qstrCurrentProjectFile;
+	//音乐总时间 秒
+	unsigned int m_nMusicMaxTime;
 };

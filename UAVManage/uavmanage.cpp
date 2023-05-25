@@ -82,6 +82,7 @@ UAVManage::UAVManage(QWidget* parent)
 	connect(m_pMusicPlayer, &MusicPlayer::sigMsuicTime, this, &UAVManage::onCurrentMusicTime);
 	connect(m_pMusicPlayer, &MusicPlayer::playeState, this, &UAVManage::onCurrentPlayeState);
 	connect(m_pMusicPlayer, &MusicPlayer::updateMusicWaveFinished, this, &UAVManage::onMusicWaveFinished);
+	connect(m_pMusicPlayer, &MusicPlayer::sigUpdateMusicTime, m_pDeviceManage, &DeviceManage::onUpdateMusicMaxTime);
 	ui.horizontalLayoutSound->addWidget(m_pMusicPlayer);
 	
 	m_pToopTip = new MyTooltip(this);

@@ -117,6 +117,10 @@ public:
 	 */
 	QMap<QString, unsigned int> getTimeGroup();
 	/**
+	 * @brief 获取飞行总时长
+	 */
+	unsigned int getFlyTotalTime();
+	/**
 	 * @brief 获取错误信息
 	 * @return 错误信息
 	 */

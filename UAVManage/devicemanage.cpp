@@ -691,6 +691,14 @@ QString DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upl
 				continue;
 			}
 		}
+		//判断飞行动作是否超出音乐时长，在更新动作时间组以后判断，便于展示总耗时
+		if (pythonThread.getFlyTotalTime() > m_nMusicMaxTime) {
+			unsigned int minute = m_nMusicMaxTime / 60;
+			unsigned int second = m_nMusicMaxTime % 60;
+			_ShowErrorMessage(name + QString("飞行动作超出音乐时长，音乐总时长%1分%2秒").arg(minute).arg(second));
+			qstrErrorNames.append("," + pDevice->getName());
+			continue;
+		}
 		//保存航点数据到本地，便于查看
 		QFile fileSvg(QApplication::applicationDirPath() + "/waypoint/" + name + ".csv");
 		if (fileSvg.open(QIODevice::ReadWrite | QIODevice::Truncate)) {
@@ -1145,6 +1153,11 @@ void DeviceManage::onRemoveDevice(QString name)
 		return;
 	}
 	
+}
+
+void DeviceManage::onUpdateMusicMaxTime(unsigned int time)
+{
+	m_nMusicMaxTime = time;
 }
 
 DeviceControl* DeviceManage::getCurrentDevice()

@@ -78,6 +78,10 @@ signals:
 	void sigMsuicTime(unsigned int second);
 	void playeState(qint8 state);
 	void updateMusicWaveFinished();
+	/**
+	 * @brief 音乐播放总时长变化 秒
+	 */
+	void sigUpdateMusicTime(unsigned int second);
 private:
 	Ui::MusicPlayer ui;
 	//当前音乐文件
