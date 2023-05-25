@@ -31,6 +31,12 @@ QVector<NavWayPointData> g_waypointData;
 //预设标定点
 //标定点名称，空间坐标
 QMap<QString, _MarkPoint> g_mapMarkPoint;
+//时间组
+QMap<QString, unsigned int> g_mapTimeGroup;
+//动作累计时间 秒
+unsigned int g_nTimeTotal;
+//标记是否降落
+bool g_bLand;
 
 //计算两点间距离
 int getDistance(int x1, int y1, int z1, int x2, int y2, int z2)
@@ -40,14 +46,18 @@ int getDistance(int x1, int y1, int z1, int x2, int y2, int z2)
 }
 PyObject* QZAPI::examineWaypoint()
 {
+	if (g_bLand) {
+		showWaypointError("降落后不能有其他动作");
+		return nullptr;
+	}
 	NavWayPointData data = g_waypointData.back();
 	switch (data.commandID)
 	{
 	case _WaypointFly:
 		//判断飞行高度
-		if (data.z > 800) {
+		if (data.z > _MaxFlyHeight_) {
 			QString error = QString(data.message + tr("飞出限制高度，设定值[%1]厘米，最大高度[%2]厘米")
-				.arg(data.z).arg(800));
+				.arg(data.z).arg(_MaxFlyHeight_));
 			showWaypointError(error);
 			return nullptr;
 		}
@@ -69,13 +79,14 @@ PyObject* QZAPI::examineWaypoint()
 				if (qAbs(d) > 0 && qAbs(data.param3) > 0) {
 					float speed = qAbs(d) / data.param3;
 					if (speed > 200.0) {
-						showWaypointError(tr("超出最大飞行速度每秒2米"));
+						showWaypointError(data.message+tr("，超出最大飞行速度每秒2米"));
 						return nullptr;
 					}
 				}
 				break;
 			}
 		}
+		g_nTimeTotal += data.param3;
 		break;
 	case _WaypointSpeed:
 		//飞行速度范围
@@ -91,6 +102,7 @@ PyObject* QZAPI::examineWaypoint()
 			showWaypointError(tr("旋转角度设定超出范围"));
 			return nullptr;
 		}
+		g_nTimeTotal += data.param3;
 		break;
 	case _WaypointHover:
 		//悬停时间
@@ -99,6 +111,7 @@ PyObject* QZAPI::examineWaypoint()
 				.arg(data.param1).arg(0).arg(200)));
 			return nullptr;
 		}
+		g_nTimeTotal += data.param3;
 		break;
 	case _WaypointLedStatus:
 		//LED灯模式
@@ -114,20 +127,34 @@ PyObject* QZAPI::examineWaypoint()
 			showWaypointError(tr("起飞位置放置错误"));
 			return nullptr;
 		}
+		g_nTimeTotal += data.param3;
 		break;
 	case _WaypointTime:
 		//时间范围,需要检查是否为递进关系
-		for (int i = g_waypointData.count() - 2; i >= 0; i--) {
-			NavWayPointData last = g_waypointData.at(i);
-			if (_WaypointTime != last.commandID) continue;
-			if (last.param1 >= data.param1) {
-				//航点中存在比当前时间小的记录
-				showWaypointError(tr("时间范围设定顺序错误"));
-				return nullptr;
-			}
+		//for (int i = g_waypointData.count() - 2; i >= 0; i--) {
+		//	NavWayPointData last = g_waypointData.at(i);
+		//	if (_WaypointTime != last.commandID) continue;
+		//	if (last.param1 >= data.param1) {
+		//		//航点中存在比当前时间小的记录
+		//		showWaypointError(data.message + tr(" 时间设定顺序错误"));
+		//		return nullptr;
+		//	}
+		//}
+		if (g_mapTimeGroup.contains(data.groupname)) {
+			showWaypointError(data.message + tr("，名称重复"));
+			return nullptr;
 		}
+		//if (g_nTimeTotal != data.param1) {
+		//	unsigned int minute = g_nTimeTotal / 60;
+		//	unsigned int second = g_nTimeTotal % 60;
+		//	showWaypointError(data.message + tr("，时间值设定错误") + QString("，应设置为第%1分%2秒").arg(minute).arg(second));
+		//	return nullptr;
+		//}
+		g_mapTimeGroup.insert(data.groupname, g_nTimeTotal);
 		break;
 	case _WaypointFlyLand:
+		g_bLand = true;
+		break;
 	case _WaypointLedColor:
 		break;
 	default:
@@ -364,19 +391,31 @@ PyObject* QZAPI::FlyLand(PyObject* self, PyObject* args)
 PyObject* QZAPI::FlyTimeGroup(PyObject* self, PyObject* args)
 {
 	self;
+	char* name = NULL;
 	int m, s;
 	m = s = 0;
-	if (!PyArg_ParseTuple(args, "i|i", &m, &s)) {
-		QZAPI::Instance()->showWaypointError(tr("时间参数值错误"));
+	if (!PyArg_ParseTuple(args, "s|i|i", &name, &m, &s)) {
+		QZAPI::Instance()->showWaypointError(tr("动作组参数错误"));
 		return nullptr;
 	}
-	qDebug() << "时间组范围" << m << s;
+	qDebug() << "动作组" << name << m << s;
 	if (s >= 60 || m < 0) {
-		QZAPI::Instance()->showWaypointError(tr("时间范围设定错误"));
+		QZAPI::Instance()->showWaypointError(tr("动作组时间范围设定错误"));
+		return nullptr;
+	}
+	if (NULL == name) {
+		QZAPI::Instance()->showWaypointError(tr("动作组名称设置错误"));
+		return nullptr;
+	}
+	QString qstrName(name);
+	if (qstrName.isEmpty()) {
+		QZAPI::Instance()->showWaypointError(tr("动作组名称必须输入"));
 		return nullptr;
 	}
 	NavWayPointData last = g_waypointData.back();
 	NavWayPointData data;
+	data.groupname = qstrName;
+	data.message = QString("动作%1 开始时间第%2分%3秒").arg(qstrName).arg(m).arg(s);
 	data.x = last.x;
 	data.y = last.y;
 	data.z = last.z;
@@ -517,7 +556,7 @@ PyObject* QZAPI::FlyMove(PyObject* self, PyObject* args)
 		case 6: data.z -= n; data.message = tr("向下飞行"); break;
 		}
 	}
-	data.message.append(QString("%1厘米后").arg(n));
+	data.message.append(QString("%1厘米用时%2秒动作").arg(n).arg(data.param3));
 	g_waypointData.append(data);
 	return QZAPI::Instance()->examineWaypoint();
 }
@@ -544,6 +583,10 @@ PyObject* QZAPI::FlyToMarkPoint(PyObject* self, PyObject* args)
 		return nullptr;
 	}
 	QString qstrName(name);
+	if (qstrName.isEmpty()) {
+		QZAPI::Instance()->showWaypointError(tr("飞到标定点名称必须输入"));
+		return nullptr;
+	}
 	if (false == g_mapMarkPoint.contains(qstrName)) {
 		QZAPI::Instance()->showWaypointError(qstrName + tr("标定点未添加"));
 		return nullptr;
@@ -584,6 +627,10 @@ void ThreadPython::initParam(unsigned int nSpaceX, unsigned int nSapaceY, QStrin
 	//因为是全局变量，使用前清空内容
 	g_waypointData.clear();
 	g_mapMarkPoint.clear();
+	g_mapTimeGroup.clear();
+	g_nTimeTotal = 0;
+	g_bLand = false;
+
 	g_nSpaceX = nSpaceX;
 	g_nSpaceY = nSapaceY;
 	g_deviceName = name;
@@ -636,6 +683,11 @@ bool ThreadPython::compilePythonCode(QByteArray arrCode)
 PythonRunState ThreadPython::getLastState()
 {
 	return m_pythonState;
+}
+
+QMap<QString, unsigned int> ThreadPython::getTimeGroup()
+{
+	return g_mapTimeGroup;
 }
 
 QString ThreadPython::getErrorString(int state)

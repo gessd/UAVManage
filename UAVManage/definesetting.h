@@ -3,7 +3,7 @@
 //程序版本号
 #define _MajorNumber_ 1
 #define _MinorNumber_ 0
-#define _BuildNumber_ 9
+#define _BuildNumber_ 10
 //新程序下载存放文件夹
 #define _NewVersionPath_	"/update"
 #define _VersionFile_		"version.ini"
@@ -27,6 +27,8 @@
 #define _DeviceNamePrefix_ "无人机"
 //无人机默认起飞高度 厘米
 #define _TakeoffLocalHeight_ 100
+//无人机最大飞行高度 厘米
+#define _MaxFlyHeight_       500
 
 //航点增加时间
 #define _WaypointUseTime_
@@ -275,6 +277,7 @@ typedef struct __NavWayPointData
 	float z;			//厘米	
 	unsigned int commandID;
 	QString message;
+	QString groupname;
 	__NavWayPointData() {
 		param2 = 0.20;   //接受半径需要有默认值 TODO 参数单位
 		param1 = param3 = param4 = z = 0.0;

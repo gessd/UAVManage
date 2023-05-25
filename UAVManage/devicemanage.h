@@ -247,6 +247,11 @@ private:
 	 * @brief 设备校准
 	 */
 	void deviceCalibration();
+	/*
+	* @brief 更新代码中动作时间组的值
+	*/
+	QString updateBlocklyData(QString name, QMap<QString, unsigned int> mapTime);
+	bool XMLBlocklyNode(void *pNode, QMap<QString, unsigned int> mapTime);
 private:
 	Ui::DeviceManage ui;
 	//设备菜单

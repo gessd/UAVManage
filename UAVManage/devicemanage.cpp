@@ -11,6 +11,7 @@
 #include "deviceserial.h"
 #include "firmwaredialog.h"
 #include "placeinfodialog.h"
+#include "tinyxml2/tinyxml2.h"
 
 #define _ItemHeight_ 70
 DeviceManage::DeviceManage(QWidget *parent)
@@ -673,6 +674,23 @@ QString DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upl
 			qstrErrorNames.append("," + pDevice->getName());
 			continue;
 		}
+		//使用API编写时不处理动作时间组
+		if (false == bMauanl) {
+			//判断动作时间组是否存在
+			QMap<QString, unsigned int> mapTimeGroup = pythonThread.getTimeGroup();
+			if (mapTimeGroup.isEmpty()) {
+				_ShowErrorMessage(name + tr("错误，没有使用动作时间组"));
+				qstrErrorNames.append("," + pDevice->getName());
+				continue;
+			}
+			//更新积木块文件里动作组中时间值
+			QString qstrError = updateBlocklyData(name, mapTimeGroup);
+			if (false == qstrError.isEmpty()) {
+				_ShowErrorMessage(name + qstrError);
+				qstrErrorNames.append("," + pDevice->getName());
+				continue;
+			}
+		}
 		//保存航点数据到本地，便于查看
 		QFile fileSvg(QApplication::applicationDirPath() + "/waypoint/" + name + ".csv");
 		if (fileSvg.open(QIODevice::ReadWrite | QIODevice::Truncate)) {
@@ -1227,6 +1245,68 @@ void DeviceManage::deviceCalibration()
 		return;
 	}
 	pDialog->exec();
+}
+
+QString DeviceManage::updateBlocklyData(QString name, QMap<QString, unsigned int> mapTime)
+{
+	if (m_qstrCurrentProjectFile.isEmpty() || name.isEmpty()) return QString();
+	QFileInfo info(m_qstrCurrentProjectFile);
+	QString path = info.path();
+	QString filepath = QString("%1%2%3.blockly").arg(path).arg(_ProjectDirName_).arg(name);
+
+	QTextCodec* code = QTextCodec::codecForName(_XMLNameCoding_);
+	std::string filename = code->fromUnicode(filepath).data();
+	tinyxml2::XMLDocument doc;
+	tinyxml2::XMLError error = doc.LoadFile(filename.c_str());
+	if (error != tinyxml2::XMLError::XML_SUCCESS) {
+		return "内部错误，无法更新动作组时间";
+	}
+	tinyxml2::XMLElement* root = doc.RootElement();
+	if (!root) return "内部错误，无法更新动作组时间";
+	if (XMLBlocklyNode(root, mapTime)) {
+		error = doc.SaveFile(filename.c_str());
+		emit currentDeviceNameChanged(name, name);
+	}
+	return "";
+}
+
+bool DeviceManage::XMLBlocklyNode(void* pNode, QMap<QString, unsigned int> mapTime)
+{
+	if (!pNode) return false;
+	static bool bUpdate = false;
+	tinyxml2::XMLElement* element = (tinyxml2::XMLElement*)pNode;
+	for (tinyxml2::XMLElement* currentele = element->FirstChildElement(); currentele; currentele = currentele->NextSiblingElement())
+	{
+		tinyxml2::XMLElement* tmpele = currentele;
+		qDebug() << "xml" << tmpele->Name();
+		QString qstrBlock = tmpele->Attribute("type");
+		if ("Fly_TimeGroup" == qstrBlock) {
+			tinyxml2::XMLElement* field = tmpele->FirstChildElement("field");
+			QString qstrField = field->Attribute("name");
+			if (field && "GroupName" == qstrField) {
+				QString qstrText = field->GetText();
+				unsigned int time = mapTime.value(qstrText);
+				if (0 != time) {
+					bUpdate = true;
+					unsigned int minute = time / 60;
+					unsigned int second = time % 60;
+					field = field->NextSiblingElement("field");
+					QString temp = field->Attribute("name");
+					if (field && "minute" == QString(field->Attribute("name"))) {
+						field->SetText(minute);
+					}
+					field = field->NextSiblingElement("field");
+					temp = field->Attribute("name");
+					if (field && "second" == QString(field->Attribute("name"))) {
+						field->SetText(second);
+					}
+				}
+			}
+		}
+		if (!tmpele->NoChildren())
+			XMLBlocklyNode(tmpele, mapTime);
+	}
+	return bUpdate;
 }
 
 void DeviceManage::onDeviceConrolFinished(QString text, int res, QString explain)

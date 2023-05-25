@@ -61,7 +61,7 @@ Blockly.Blocks['Fly_Takeoff'] = {
         this.setNextStatement(true, ["time"]);
         //this.setNextStatement(true, ["action", "notReachAction", "ReachAction", "time"]);
         this.setColour('#FF6680');
-        this.setTooltip('起飞至高度固定为100厘米，用时范围5~10秒');
+        this.setTooltip('起飞至高度固定为100厘米，用时范围2~10秒');
     }
 };
 
@@ -75,26 +75,36 @@ Blockly.Python['Fly_Takeoff'] = function(block) {
 
 Blockly.Blocks['Fly_TimeGroup'] = {
     init: function() {
+        var validator = function(newValue) {
+            //限制字符串长度
+            if(newValue.length>10) return newValue.substring(0,10);
+            return newValue;
+        };
+        var field = new Blockly.FieldTextInput("1");
+        field.setValidator(validator);
         this.appendDummyInput()
+            .appendField("动作")
+            .appendField(field, "GroupName")
             .appendField("开始时间 第")
             .appendField(new Blockly.FieldNumber(0, 0, 100, 1), "minute")
             .appendField("分")
-            .appendField(new Blockly.FieldNumber(2, 0, 59, 1), "second")
-            .appendField("秒")
+            .appendField(new Blockly.FieldNumber(5, 0, 59, 1), "second")
+            .appendField("秒", "test")
         this.appendStatementInput("interiorfunction").setCheck(null);
         this.setPreviousStatement(true, "time");
         this.setNextStatement(true, "time");
         this.setColour('#FF6680');
-        this.setTooltip('取值范围:分0~100 秒1~59');
+        this.setTooltip('动作名称最长10个汉字，不可以重复，时间取值范围:0~100分 0~59秒');
     }
 };
 
 Blockly.Python['Fly_TimeGroup'] = function(block) {
     addHead();
+    var name = block.getFieldValue("GroupName");
     var m = block.getFieldValue("minute");
     var s = block.getFieldValue("second");
     var ff = Blockly.Python.statementToCode(block, 'interiorfunction');
-    var code = "Fly_TimeGroup("+m+","+s+")\n";
+    var code = 'Fly_TimeGroup(\'' + name + '\',' +m+','+s+')\n';
     if(false == isEmpty(ff)) {
         code = code + "if True:\n"+ff;
     }
@@ -143,7 +153,7 @@ Blockly.Blocks['Fly_AddMarkPoint'] = {
         this.setPreviousStatement(true, ["action", "notReachAction", "ReachAction"]);
         this.setNextStatement(true, ["action", "notReachAction", "ReachAction", "time"]);
         this.setColour('#3B8CFF');
-        this.setTooltip('标定点名称不可以重复,最长10个字符');
+        this.setTooltip("名称不可以重复，最长10个汉字，位置范围"+"[100<X<"+getMaxX()+"] [100<Y<"+getMaxY()+"] [100<Z<"+getMaxZ()+"]");
     }
 };
 
@@ -170,16 +180,15 @@ Blockly.Blocks['Fly_ToMarkPoint'] = {
             .appendField("飞至标定点")
             .appendField(field, "mark")
             .appendField("用时")
-            .appendField(new Blockly.FieldNumber(1, 1, 1000, 1), "time")
+            .appendField(new Blockly.FieldNumber(1, 1, 60, 1), "time")
             .appendField(new Blockly.FieldDropdown([
-                 ["秒", "1"],
-                 ["毫秒", "2"]
+                 ["秒", "1"]
               ]), "unit");
         this.setInputsInline(true);
         this.setPreviousStatement(true, ["action", "notReachAction", "ReachAction"]);
         this.setNextStatement(true, ["action", "notReachAction", "ReachAction", "time"]);
         this.setColour('#3B8CFF');
-        this.setTooltip("使用前需要提前添加标定点");
+        this.setTooltip("使用前需要提前添加标定点，用时范围1~60秒");
     }
 };
 Blockly.Python['Fly_ToMarkPoint'] = function(block) {
@@ -208,15 +217,14 @@ Blockly.Blocks['Fly_To'] = {
             .appendField(new Blockly.FieldNumber(100, 100, getMaxZ(), 1), "coordinateZ")
             .appendField("厘米")
             .appendField("用时")
-            .appendField(new Blockly.FieldNumber(1, 1, 1000, 1), "time")
+            .appendField(new Blockly.FieldNumber(1, 1, 60, 1), "time")
             .appendField(new Blockly.FieldDropdown([
-                 ["秒", "1"],
-                 ["毫秒", "2"]
+                 ["秒", "1"]
               ]), "unit");
         this.setPreviousStatement(true, ["action", "notReachAction", "ReachAction"]);
         this.setNextStatement(true, ["action", "notReachAction", "ReachAction"]);
         this.setColour('#3B8CFF');
-        this.setTooltip("[100<X<"+getMaxX()+"] [100<Y<"+getMaxY()+"] [100<Z<"+getMaxZ()+"]");
+        this.setTooltip("位置范围[100<X<"+getMaxX()+"] [100<Y<"+getMaxY()+"] [100<Z<"+getMaxZ()+"]，用时范围1~60秒");
         this.setHelpUrl("");
     }
 };
@@ -253,8 +261,7 @@ Blockly.Blocks['Fly_ToNumber'] = {
             .appendField('用时');
         this.appendDummyInput()
              .appendField(new Blockly.FieldDropdown([
-                 ["秒", "1"],
-                 ["毫秒", "2"]
+                 ["秒", "1"]
               ]), "unit");
         this.setInputsInline(true);
         this.setPreviousStatement(true, ["action", "notReachAction", "ReachAction"]);
@@ -304,16 +311,15 @@ Blockly.Blocks['Fly_Hover'] = {
     init: function() {
         this.appendDummyInput()
             .appendField("悬停")
-            .appendField(new Blockly.FieldNumber(1, 1, 1000, 1), "hover")
+            .appendField(new Blockly.FieldNumber(1, 1, 60, 1), "hover")
         this.appendDummyInput()
 			.appendField(new Blockly.FieldDropdown([
-				["秒", "1"],
-                ["毫秒", "2"]
+				["秒", "1"]
              ]), "unit");
         this.setPreviousStatement(true,["action", "notReachAction", "ReachAction"]);
         this.setNextStatement(true,["action", "notReachAction", "ReachAction"]);
         this.setColour('#3B8CFF');
-        this.setTooltip('取值范围:1~1000');
+        this.setTooltip('悬停时间范围:1~60秒');
         this.setHelpUrl('');
         this.setInputsInline(true);
     }
@@ -341,16 +347,15 @@ Blockly.Blocks['Fly_Revolve'] = {
              .appendField('旋转 角度:')
              .appendField(new Blockly.FieldAngle(90), 'revolve')
              .appendField(" 用时")
-             .appendField(new Blockly.FieldNumber(1, 1, 1000, 1), "time");
+             .appendField(new Blockly.FieldNumber(1, 1, 60, 1), "time");
         this.appendDummyInput()
              .appendField(new Blockly.FieldDropdown([
-                 ["秒", "1"],
-                 ["毫秒", "2"]
+                 ["秒", "1"]
               ]), "unit");
         this.setPreviousStatement(true,["action", "notReachAction", "ReachAction"]);
         this.setNextStatement(true,["action", "notReachAction", "ReachAction"]);
         this.setColour('#3B8CFF');
-        this.setTooltip('');
+        this.setTooltip('旋转角度0~360度，用时范围1~60秒');
         this.setHelpUrl('');
         this.setInputsInline(true);
     }
@@ -379,25 +384,24 @@ Blockly.Blocks['Fly_Move'] = {
 			.appendField(new Blockly.FieldDropdown([
 				["前", "1"],
 				["后", "2"],
-                ["右", "3"],
                 ["左", "4"],
+                ["右", "3"],
                 ["上", "5"],
 				["下", "6"],
              ]), "direction")
              .appendField("飞")
-             .appendField(new Blockly.FieldNumber(100, 10, getMaxX(), 1), "distance")
+             .appendField(new Blockly.FieldNumber(100, 10, getMaxZ(), 1), "distance")
              .appendField("厘米")
              .appendField(" 用时")
-             .appendField(new Blockly.FieldNumber(1, 1, 1000, 1), "time");
+             .appendField(new Blockly.FieldNumber(1, 1, 60, 1), "time");
         this.appendDummyInput()
              .appendField(new Blockly.FieldDropdown([
-                 ["秒", "1"],
-                 ["毫秒", "2"]
+                 ["秒", "1"]
               ]), "unit");
         this.setPreviousStatement(true,["action", "notReachAction", "ReachAction"]);
         this.setNextStatement(true,["action", "notReachAction", "ReachAction"]);
         this.setColour('#3B8CFF');
-        this.setTooltip("取值范围:10~"+getMaxX());
+        this.setTooltip("位置范围10~"+getMaxZ()+"厘米，用时范围1~60秒");
         this.setHelpUrl('');
         this.setInputsInline(true);
     }

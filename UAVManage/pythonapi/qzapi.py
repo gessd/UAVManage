@@ -1,4 +1,4 @@
-def FlyTakeoff(height, second)
+def FlyTakeoff(height, second):
 """
   控制无人机起飞，只有起飞后才能执行后续动作
   :param height: 起飞高度(厘米)，正整数
@@ -10,9 +10,10 @@ def FlyLand():
   控制无人机降落，降落后无人机桨叶停止，后续不能有飞行动作
 """
 
-def FlyTimeGroup(minute,second):
+def FlyTimeGroup(name, minute,second):
 """
   无人机在此时开始执行所包含的动作，计时从起飞开始
+  :param name:   时间组名称，字符串，不可以重复
   :param minute: 第N分钟，正整数
   :param second: 第N秒钟，0-60以内的正整数，
 """
