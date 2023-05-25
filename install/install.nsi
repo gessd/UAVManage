@@ -7,6 +7,7 @@
 
 !include "MUI2.nsh"
 !include "x64.nsh"
+!include "WordFunc.nsh"
 
 ; 该脚本使用 HM VNISEdit 脚本编辑器向导产生
 /*** 安装界面 ***/
@@ -55,6 +56,7 @@ SetCompressor lzma
 ; 许可协议页面!insertmacro MUI_PAGE_LICENSE "c:\path\to\licence\YourSoftwareLicence.txt"
 ; 组件选择页面!insertmacro MUI_PAGE_COMPONENTS
 ; 安装目录选择页面
+!define MUI_PAGE_CUSTOMFUNCTION_SHOW mulu
 !insertmacro MUI_PAGE_DIRECTORY
 ; 安装过程页面
 !insertmacro MUI_PAGE_INSTFILES
@@ -88,6 +90,20 @@ ShowUnInstDetails show
 !define appDir "..\x64\Release"
 
 Section "MainSection" SEC01
+	;获取路径最后文件夹名称
+    ;StrCpy $0 "$INSTDIR"
+    ;StrCpy $1 0
+    ;loop:
+    ;    IntOp $1 $1 - 1 ; Character offset, from end of string
+    ;    StrCpy $2 $0 1 $1 ; Read 1 character into $2, -$1 offset from end
+    ;    StrCmp $2 '\' found
+    ;    StrCmp $2 '' stop loop ; No more characters or try again
+    ;found:
+    ;    IntOp $1 $1 + 1 ; Don't include / in extracted string
+    ;stop:
+    ;StrCpy $2 $0 "" $1 ; We know the length, extract final string part
+    ;MessageBox MB_OK|MB_ICONEXCLAMATION "$2"
+
 	; 安全认证
 	SetOutPath "$INSTDIR"
 	SetOverwrite on
@@ -246,6 +262,17 @@ Function .onInstSuccess
         Call Install3D      
   ${EndIf}
   ;安装驱动
-  ExecWait "$INSTDIR\CP2102驱动\CP210xVCPInstaller_x64.exe"
-  ExecWait "$INSTDIR\CH340驱动\CH343SER.EXE"
+  ;ExecWait "$INSTDIR\CP2102驱动\CP210xVCPInstaller_x64.exe"
+  ;ExecWait "$INSTDIR\CH340驱动\CH343SER.EXE"
+FunctionEnd
+
+Function mulu
+  ;禁用浏览按钮
+  ;FindWindow $0 "#32770" "" $HWNDPARENT
+  ;GetDlgItem $0 $0 1001
+  ;EnableWindow $0 0
+  ;禁止编辑目录，防止因修改目录造成卸载时删除文件夹
+  FindWindow $0 "#32770" "" $HWNDPARENT
+  GetDlgItem $0 $0 1019
+  EnableWindow $0 0
 FunctionEnd
