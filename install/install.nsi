@@ -89,6 +89,9 @@ ShowUnInstDetails show
 
 !define appDir "..\x64\Release"
 
+Var File3DCount
+Var CP2102
+Var CH340
 Section "MainSection" SEC01
 	;获取路径最后文件夹名称
     ;StrCpy $0 "$INSTDIR"
@@ -151,6 +154,38 @@ Section "MainSection" SEC01
 	CreateShortCut "$DESKTOP\无人机炫舞编程.lnk" "$INSTDIR\UAVManage.exe"
 	CreateDirectory "$INSTDIR\Log"
 	CreateDirectory "$INSTDIR\waypoint"
+	
+  StrCpy $File3DCount 0
+  ;三维仿真依赖库
+  IfFileExists "C:\WINDOWS\system32\x3daudio1_7.dll" 0 +2
+        StrCpy $File3DCount $File3DCount+1
+  IfFileExists "C:\WINDOWS\system32\D3DCOMPILER_43.dll" 0 +2
+        StrCpy $File3DCount $File3DCount+2
+  IfFileExists "C:\WINDOWS\system32\OPENGL32.dll" 0 +2
+        StrCpy $File3DCount $File3DCount+3
+  IfFileExists "C:\WINDOWS\system32\VCRUNTIME140.dll" 0 +2
+        StrCpy $File3DCount $File3DCount+4
+  ${If} $File3DCount != "0+1+2+3+4"
+		;MessageBox MB_OK "安装三维依赖库"
+        ExecWait "$INSTDIR\3D\Engine\Extras\Redist\en-us\UE4PrereqSetup_x64.exe"
+  ${EndIf}
+  
+  ;禁用系统目录重定向，否则IfFileExists会自动跑到SysWOW64目录寻找文件
+  ${DisableX64FSRedirection}
+  ;驱动安装
+  StrCpy $CP2102 0
+  StrCpy $CH340 0
+  IfFileExists "C:\WINDOWS\system32\drivers\silabenm.sys" 0 +2
+	StrCpy $CP2102 1
+  IfFileExists "C:\WINDOWS\system32\drivers\CH343S64.SYS" 0 +2
+	StrCpy $CH340 1
+  ;MessageBox MB_OK "$CP2102$CH340"
+  ${If} $CP2102 == "0"
+	ExecWait "$INSTDIR\CP2102驱动\CP210xVCPInstaller_x64.exe"
+  ${EndIf}
+  ${If} $CH340 == "0"
+	ExecWait "$INSTDIR\CH340驱动\CH343SER.exe"
+  ${EndIf}
 SectionEnd
 
 
@@ -200,7 +235,7 @@ Section Uninstall
 	;Delete "$SMPROGRAMS\UAVManage\Website.lnk"
     Delete "$DESKTOP\无人机炫舞编程.lnk"
 	Delete "C:\Users\Public\Desktop\无人机炫舞编程.lnk"
-	RMDir /r "$SMPROGRAMS\UAVManage"
+	RMDir /r "$SMPROGRAMS\无人机炫舞编程"
 
   DeleteRegValue HKLM "Software\Microsoft\Windows\CurrentVersion\Run" "SysSafeAddKey"
   DeleteRegKey HKLM "${PRODUCT_DIR_REGKEY}"
@@ -239,33 +274,16 @@ Function un.onUninstSuccess
 FunctionEnd
 
 ;安装三维依赖库
-Var File3DCount
 Function Install3D
 	ExecWait "$INSTDIR\3D\Engine\Extras\Redist\en-us\UE4PrereqSetup_x64.exe"
 FunctionEnd
 
 #安装完成
 Function .onInstSuccess
-  StrCpy $File3DCount 0
-  ;三维仿真依赖库
-  IfFileExists "C:\WINDOWS\system32\xapofx1_5.dll" 0 +2
-        StrCpy $File3DCount $File3DCount+1
-  IfFileExists "C:\WINDOWS\system32\x3daudio1_7.dll" 0 +2
-        StrCpy $File3DCount $File3DCount+2
-  IfFileExists "C:\WINDOWS\system32\D3DCOMPILER_43.dll" 0 +2
-        StrCpy $File3DCount $File3DCount+3
-  IfFileExists "C:\WINDOWS\system32\OPENGL32.dll" 0 +2
-        StrCpy $File3DCount $File3DCount+4
-  IfFileExists "C:\WINDOWS\system32\VCRUNTIME140.dll" 0 +2
-        StrCpy $File3DCount $File3DCount+5
-  ${If} $File3DCount != "0+1+2+3+4+5"
-        Call Install3D      
-  ${EndIf}
-  ;安装驱动
-  ;ExecWait "$INSTDIR\CP2102驱动\CP210xVCPInstaller_x64.exe"
-  ;ExecWait "$INSTDIR\CH340驱动\CH343SER.EXE"
+  
 FunctionEnd
 
+;选择安装目录页
 Function mulu
   ;禁用浏览按钮
   ;FindWindow $0 "#32770" "" $HWNDPARENT
