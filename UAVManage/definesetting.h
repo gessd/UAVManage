@@ -278,6 +278,7 @@ typedef struct __NavWayPointData
 	unsigned int commandID;
 	QString message;
 	QString groupname;
+	bool bTakeoff;
 	__NavWayPointData() {
 		param2 = 0.20;   //接受半径需要有默认值 TODO 参数单位
 		param1 = param3 = param4 = z = 0.0;
@@ -285,6 +286,7 @@ typedef struct __NavWayPointData
 		//[16=航点信息||31000=速度信息||31001= 转向信息||31002=延时停留时间||31003=LED状态灯||31004=初始位置||31005=时间信息]
 		//根据ID不同参数对应不同意义
 		commandID = 16; 
+		bTakeoff = false;
 	}
 }NavWayPointData;
 

@@ -667,6 +667,12 @@ QString DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upl
 			qstrErrorNames.append("," + pDevice->getName());
 			continue;
 		}
+		NavWayPointData waypoint = data.back();
+		if (_WaypointFlyLand != waypoint.commandID) {
+			_ShowErrorMessage(name + tr("降落动作缺少或顺序错误"));
+			qstrErrorNames.append("," + pDevice->getName());
+			continue;
+		}
 		qDebug() << name << "航点数据" << data.count();
 		//TODO 判断最低起飞高度 暂定为0
 		if (0 > data.at(1).z) {
@@ -1291,7 +1297,6 @@ bool DeviceManage::XMLBlocklyNode(void* pNode, QMap<QString, unsigned int> mapTi
 	for (tinyxml2::XMLElement* currentele = element->FirstChildElement(); currentele; currentele = currentele->NextSiblingElement())
 	{
 		tinyxml2::XMLElement* tmpele = currentele;
-		qDebug() << "xml" << tmpele->Name();
 		QString qstrBlock = tmpele->Attribute("type");
 		if ("Fly_TimeGroup" == qstrBlock) {
 			tinyxml2::XMLElement* field = tmpele->FirstChildElement("field");

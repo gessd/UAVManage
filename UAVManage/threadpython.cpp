@@ -141,6 +141,13 @@ PyObject* QZAPI::examineWaypoint()
 		return nullptr;
 		break;
 	}
+	if (g_waypointData.count() >= 2) {
+		NavWayPointData second = g_waypointData.at(1);
+		if (false == second.bTakeoff) {
+			showWaypointError("起飞动作缺少或顺序错误");
+			return nullptr;
+		}
+	}
 	return Py_BuildValue("i", 0);
 }
 
@@ -334,16 +341,16 @@ PyObject* QZAPI::FlyTakeoff(PyObject* self, PyObject* args)
 		return nullptr;
 	}
 #endif
-	qDebug() << "起飞高度" << n;
+	qDebug() << "起飞" << n << millisecond;
 	NavWayPointData lastWaypoint = g_waypointData.back();
 	if (_WaypointStart != lastWaypoint.commandID) {
 		QZAPI::Instance()->showWaypointError(tr("起飞必须是第一步"));
 		return nullptr;
 	}
-	
 	data.x = lastWaypoint.x;
 	data.y = lastWaypoint.y;
 	data.z = n;
+	data.bTakeoff = true;
 	g_waypointData.append(data);
 	return QZAPI::Instance()->examineWaypoint();
 }
