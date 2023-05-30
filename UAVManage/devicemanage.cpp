@@ -777,8 +777,8 @@ void DeviceManage::setCurrentMusicPath(QString filePath, QPixmap pixmap)
 
 void DeviceManage::sendWaypointTo3D(QMap<QString, QVector<NavWayPointData>> map)
 {
-	qDebug() << "发送初始化信息到三维";
 	if (!m_p3dTcpSocket) return;
+	qDebug() << "准备发送初始化信息到三维";
 	QJsonObject obj3dmsg;
 	obj3dmsg.insert(_Ver_, _VerNum_);
 	obj3dmsg.insert(_Tag_, _TabName_);
@@ -944,8 +944,8 @@ void DeviceManage::sendWaypointTo3D(QMap<QString, QVector<NavWayPointData>> map)
 			int x = waypoint.x;
 			int y = waypoint.y;
 			int z = waypoint.z;
+			//旋转角度累加
 			angle += waypoint.param4;
-			if (angle >= 360) angle = angle % 360;
 			if (i == 0) {
 				//第一个航点需要使用默认起飞位置
 				DeviceControl* pDevcie = getDeviceFromName(name);
