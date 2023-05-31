@@ -3,7 +3,7 @@
 //程序版本号
 #define _MajorNumber_ 1
 #define _MinorNumber_ 0
-#define _BuildNumber_ 11
+#define _BuildNumber_ 12
 //新程序下载存放文件夹
 #define _NewVersionPath_	"/update"
 #define _VersionFile_		"version.ini"
@@ -14,7 +14,7 @@
 #define _WebSocketPort_ 25252
 
 //调试版本
-//#define _DebugApp_
+#define _DebugApp_
 
 //项目后缀名
 #define _ProjectSuffix       ".qz"

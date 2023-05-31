@@ -251,7 +251,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="lineEdit">
+          <widget class="QLineEdit" name="lineEditFirmwareVersion">
            <property name="readOnly">
             <bool>true</bool>
            </property>
@@ -302,7 +302,7 @@
   <tabstop>btnUpdate</tabstop>
   <tabstop>btnCheckFirmware</tabstop>
   <tabstop>btnManualFirmware</tabstop>
-  <tabstop>lineEdit</tabstop>
+  <tabstop>lineEditFirmwareVersion</tabstop>
  </tabstops>
  <resources/>
  <connections/>

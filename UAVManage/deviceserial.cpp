@@ -156,6 +156,7 @@ void DeviceSerial::onSerialData(QByteArray data)
 			}
 			else if (key.contains("qz+v")) {
 				//固件版本
+				ui.lineEditFirmwareVersion->setText(msg);
 			}
 		}
 	}
@@ -205,6 +206,7 @@ void DeviceSerial::onBtnSerial()
 	ui.lineEditIP->clear();
 	ui.lineEditName->clear();
 	ui.lineEditPass->clear();
+	ui.lineEditFirmwareVersion->clear();
 	if (m_serialPort.isOpen()) {
 		ui.btnSerial->setText(tr("连接"));
 		m_serialPort.close();
@@ -224,6 +226,7 @@ void DeviceSerial::onBtnSerial()
 		ui.widgetDeviceParam->setEnabled(true);
 		//串口连接成功后读取配置内容
 		onBtnRead();
+		QTimer::singleShot(500, [this]() {onBtnCheckFirmware(); });
 	}
 }
 
@@ -246,7 +249,9 @@ void DeviceSerial::onDeviceRemoved(const QextPortInfo& info)
 void DeviceSerial::onBtnCheckFirmware()
 {
 	//通过网络获取最新版本固件
-	QMessageBox::information(this, tr("提示"), tr("功能开发中"));
+	//QMessageBox::information(this, tr("提示"), tr("功能开发中"));
+	ui.lineEditFirmwareVersion->clear();
+	emit serialDataSend("qz+v:" + QByteArray(_SerialEnd_));
 }
 
 void DeviceSerial::onBtnManualFirmware()
