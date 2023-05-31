@@ -158,6 +158,9 @@
                <height>34</height>
               </size>
              </property>
+             <property name="toolTip">
+              <string>最长20个字符</string>
+             </property>
             </widget>
            </item>
            <item>
@@ -167,6 +170,9 @@
                <width>0</width>
                <height>34</height>
               </size>
+             </property>
+             <property name="toolTip">
+              <string>最长20个字符</string>
              </property>
             </widget>
            </item>

@@ -11,6 +11,7 @@ class SerialThread : public QObject
 	Q_OBJECT
 public:
 	explicit SerialThread(QSerialPort* ser, QObject* parent = nullptr);
+	void clear();
 signals:
 	void sendResultToGui(QByteArray result);
 public slots:
@@ -39,6 +40,7 @@ public slots:
 	void onDeviceRemoved(const QextPortInfo& info);
 	void onBtnCheckFirmware();
 	void onBtnManualFirmware();
+	void onLineEditChanged(QString text);
 protected:
 	void showEvent(QShowEvent* event);
 	void closeEvent(QCloseEvent* event);
@@ -52,4 +54,5 @@ private:
 	QSerialPort m_serialPort;
 	QThread m_thread;
 	QextSerialEnumerator m_qextSerial;
+	SerialThread* m_pSerial;
 };

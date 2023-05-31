@@ -13,8 +13,14 @@ SerialThread::SerialThread(QSerialPort* ser, QObject* parent /*= nullptr*/)
 	m_pSerial = ser;
 }
 
+void SerialThread::clear()
+{
+	m_pSerial = nullptr;
+}
+
 void SerialThread::onDataSendWork(const QByteArray data)
 {
+	if (!m_pSerial) return;
 	m_pSerial->write(data);
 	m_pSerial->waitForBytesWritten(3000);
 }
@@ -22,6 +28,7 @@ void SerialThread::onDataSendWork(const QByteArray data)
 void SerialThread::onDataReciveWork()
 {
 	//有可能含有中文字符
+	if (!m_pSerial) return;
 	QString data = QString::fromLocal8Bit(m_pSerial->readAll());
 	m_qstrData.append(data);
 	QString qstrEnd = _SerialEnd_;
@@ -42,17 +49,19 @@ DeviceSerial::DeviceSerial(QWidget *parent)
 	QRegExp regExp1("\\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\b");
 	ui.lineEditIP->setValidator(new QRegExpValidator(regExp1, this));
 
-	SerialThread* pSerial = new SerialThread(&m_serialPort);
+	m_pSerial = new SerialThread(&m_serialPort);
 	(&m_serialPort)->moveToThread(&m_thread);
-	pSerial->moveToThread(&m_thread);
-	connect(&m_thread, &QThread::finished, pSerial, &QObject::deleteLater);           // 线程结束，自动删除对象
-	connect(this, &DeviceSerial::serialDataSend, pSerial, &SerialThread::onDataSendWork);   // 主线程串口数据发送的信号
-	connect(&m_serialPort, &QSerialPort::readyRead, pSerial, &SerialThread::onDataReciveWork); // 主线程通知子线程接收数据的信号
-	connect(pSerial, &SerialThread::sendResultToGui, this, &DeviceSerial::onSerialData);              // 主线程收到数据结果的信号
+	m_pSerial->moveToThread(&m_thread);
+	connect(&m_thread, &QThread::finished, m_pSerial, &QObject::deleteLater);           // 线程结束，自动删除对象
+	connect(this, &DeviceSerial::serialDataSend, m_pSerial, &SerialThread::onDataSendWork);   // 主线程串口数据发送的信号
+	connect(&m_serialPort, &QSerialPort::readyRead, m_pSerial, &SerialThread::onDataReciveWork); // 主线程通知子线程接收数据的信号
+	connect(m_pSerial, &SerialThread::sendResultToGui, this, &DeviceSerial::onSerialData);              // 主线程收到数据结果的信号
 	m_thread.start();
 	connect(ui.btnSet, &QAbstractButton::clicked, this, &DeviceSerial::onBtnWrite);
 	connect(ui.btnUpdate, &QAbstractButton::clicked, this, &DeviceSerial::onBtnRead);
 	connect(ui.btnSerial, &QAbstractButton::clicked, this, &DeviceSerial::onBtnSerial);
+	connect(ui.lineEditName, &QLineEdit::textEdited, this, &DeviceSerial::onLineEditChanged);
+	connect(ui.lineEditPass, &QLineEdit::textEdited, this, &DeviceSerial::onLineEditChanged);
 
 	connect(ui.btnCheckFirmware, &QAbstractButton::clicked, this, &DeviceSerial::onBtnCheckFirmware);
 	connect(ui.btnManualFirmware, &QAbstractButton::clicked, this, &DeviceSerial::onBtnManualFirmware);
@@ -74,6 +83,11 @@ DeviceSerial::DeviceSerial(QWidget *parent)
 
 DeviceSerial::~DeviceSerial()
 {
+	if (m_pSerial) {
+		m_pSerial->clear();
+		m_pSerial->deleteLater();
+		m_pSerial = nullptr;
+	}
 	if (m_thread.isRunning()) {
 		m_thread.exit();
 		m_thread.wait();
@@ -112,20 +126,25 @@ void DeviceSerial::onSerialData(QByteArray data)
 			if (list.count() < 2) continue;
 			QString key = list.at(0);
 			QString msg = list.at(1);
-			if (key.contains("qz+w+ip:") || key.contains("qz+w+name:") || key.contains("qz+w+password:")){
-				if (_SerialOk_ != msg) {
-					QMessageBox::warning(this, tr("警告"), tr("设置失败")+msg);
+			if (key.contains("qz+w")){
+				if (_SerialOk_ == msg) {
+					QMessageBox::warning(this, tr("警告"), tr("设置完成"));
+					return;
+				}
+				else {
+					QMessageBox::warning(this, tr("警告"), tr("设置失败") + msg);
 					return;
 				}
 			}
-			else if (key.contains("qz+r+ip:")) {
-				ui.lineEditIP->setText(msg);
-			}
-			else if (key.contains("qz+r+name:")) {
-				ui.lineEditName->setText(msg);
-			}
-			else if (key.contains("qz+r+password:")) {
-				ui.lineEditPass->setText(msg);
+			else if (key.contains("qz+r")) {
+				QStringList list = msg.split("+");
+				if (list.count() < 3) {
+					QMessageBox::warning(this, tr("警告"), tr("内容错误无法刷新") + msg);
+					return;
+				}
+				ui.lineEditIP->setText(list.at(0));
+				ui.lineEditName->setText(list.at(1));
+				ui.lineEditPass->setText(list.at(2));
 			}
 		}
 	}
@@ -145,16 +164,18 @@ void DeviceSerial::onBtnWrite()
 		QMessageBox::warning(this, tr("警告"), tr("IP地址输入错误"));
 		return;
 	}
-	emit serialDataSend("qz+w+ip:" + ip.toLocal8Bit() + QByteArray(_SerialEnd_));
-	emit serialDataSend("qz+w+name:" + name.toLocal8Bit() + QByteArray(_SerialEnd_));
-	emit serialDataSend("qz+w+password:" + password.toLocal8Bit() + QByteArray(_SerialEnd_));
+	QString text = QString("qz+w:%1+%2+%3%4").arg(ip).arg(name).arg(password).arg(_SerialEnd_);
+	emit serialDataSend(text.toLocal8Bit());
+	//emit serialDataSend("qz+w+name:" + name.toLocal8Bit() + QByteArray(_SerialEnd_));
+	//emit serialDataSend("qz+w+password:" + password.toLocal8Bit() + QByteArray(_SerialEnd_));
 }
 
 void DeviceSerial::onBtnRead()
 {
-	emit serialDataSend("qz+r+ip:" + QByteArray(_SerialEnd_));
-	emit serialDataSend("qz+r+name:" + QByteArray(_SerialEnd_));
-	emit serialDataSend("qz+r+password:" + QByteArray(_SerialEnd_));
+	ui.lineEditIP->clear();
+	ui.lineEditName->clear();
+	ui.lineEditPass->clear();
+	emit serialDataSend("qz+r:" + QByteArray(_SerialEnd_));
 }
 
 void DeviceSerial::onBtnSerial()
@@ -171,7 +192,7 @@ void DeviceSerial::onBtnSerial()
 	else {
 		QString qstrCom = ui.comboBoxCom->currentText();
 		m_serialPort.setPortName(qstrCom);
-		m_serialPort.setBaudRate(921600, QSerialPort::AllDirections);//设置波特率和读写方向
+		m_serialPort.setBaudRate(QSerialPort::Baud115200, QSerialPort::AllDirections);//设置波特率和读写方向
 		if (!m_serialPort.open(QIODevice::ReadWrite)) {
 			QMessageBox::warning(this, tr("提示"), tr("设备无法连接，请重试"));
 			return;
@@ -208,6 +229,26 @@ void DeviceSerial::onBtnManualFirmware()
 {
 	//选择本地已存在固件文件
 	QMessageBox::information(this, tr("提示"), tr("功能开发中"));
+}
+
+void DeviceSerial::onLineEditChanged(QString text)
+{
+	//最长20个英文字符
+	int max = 20;
+	QLineEdit* pLine = dynamic_cast<QLineEdit*>(sender());
+	if (!pLine) return;
+	QByteArray data = text.toLocal8Bit();
+	int len = data.length();
+	if (len > max){
+		QByteArray temp = data.left(max);
+		pLine->setText(QString::fromLocal8Bit(temp));
+		return;
+	}
+	//+在传输协议中使用
+	if (text.contains("+")) {
+		text = text.remove("+");
+		pLine->setText(text);
+	}
 }
 
 void DeviceSerial::showEvent(QShowEvent* event)

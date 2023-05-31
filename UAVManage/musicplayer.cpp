@@ -168,10 +168,10 @@ void MusicPlayer::onMediaDurationChanged(qint64 duration)
 	QFileInfo info(m_qstrMusicFile);
 	ui.labelMusicName->setText(info.fileName());
 	ui.sliderMusic->setMaximum(duration);
-	QString strSec, strMin;					//豪秒，秒，分钟字符串
-	unsigned int sum = duration / 1000;	//秒
-	unsigned int mins = sum / 60;			//分钟
-	unsigned int secs = sum % 60;						//余数秒
+	QString strSec, strMin;
+	unsigned int sum = qRound(duration / 1000.0);	//秒
+	unsigned int mins = sum / 60;					//分钟
+	unsigned int secs = sum % 60;					//余数秒
 	strMin = mins < 10 ? QString::asprintf("0%1").arg(QString::number(mins)) : QString::number(mins);
 	strSec = secs < 10 ? QString::asprintf("0%1").arg(QString::number(secs)) : QString::number(secs);
 	QString durationTime = QString::asprintf("%1:%2").arg(strMin).arg(strSec);

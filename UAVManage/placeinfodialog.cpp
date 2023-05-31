@@ -29,7 +29,7 @@ PlaceInfoDialog::PlaceInfoDialog(QPoint place, QWidget *parent)
 	connect(&m_serialPort, &QSerialPort::readyRead, pSerialWorker, &SerialWorker::onDataReciveWork); // 主线程通知子线程接收数据的信号
 	connect(pSerialWorker, &SerialWorker::sendResultToGui,this, &PlaceInfoDialog::onParseSettingFrame);              // 主线程收到数据结果的信号
 	m_threadSerial.start();                   // 线程开始运行
-	ui.labelSpace->setText(QString("场地大小:%1 X %2米").arg(place.x() / 100).arg(place.y() / 100));
+	ui.labelSpace->setText(QString("场地大小:%1米 X %2米").arg(place.x() / 100).arg(place.y() / 100));
 }
 
 PlaceInfoDialog::~PlaceInfoDialog()
