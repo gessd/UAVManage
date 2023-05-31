@@ -3,6 +3,7 @@
 #include <QDialog>
 #include <QSerialPort>
 #include <QThread>
+#include <QTimer>
 #include "ui_deviceserial.h"
 #include "serial/qextserialenumerator.h"
 
@@ -41,6 +42,7 @@ public slots:
 	void onBtnCheckFirmware();
 	void onBtnManualFirmware();
 	void onLineEditChanged(QString text);
+	void onTimeoutWrite();
 protected:
 	void showEvent(QShowEvent* event);
 	void closeEvent(QCloseEvent* event);
@@ -55,4 +57,6 @@ private:
 	QThread m_thread;
 	QextSerialEnumerator m_qextSerial;
 	SerialThread* m_pSerial;
+	bool m_bWriteFinished;
+	QTimer m_timeoutWrite;
 };

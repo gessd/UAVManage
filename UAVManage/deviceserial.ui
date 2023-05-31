@@ -293,13 +293,16 @@
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <tabstops>
-  <tabstop>lineEditIP</tabstop>
-  <tabstop>lineEditPass</tabstop>
-  <tabstop>lineEditName</tabstop>
-  <tabstop>btnSet</tabstop>
-  <tabstop>btnSerial</tabstop>
-  <tabstop>btnUpdate</tabstop>
   <tabstop>comboBoxCom</tabstop>
+  <tabstop>btnSerial</tabstop>
+  <tabstop>lineEditIP</tabstop>
+  <tabstop>lineEditName</tabstop>
+  <tabstop>lineEditPass</tabstop>
+  <tabstop>btnSet</tabstop>
+  <tabstop>btnUpdate</tabstop>
+  <tabstop>btnCheckFirmware</tabstop>
+  <tabstop>btnManualFirmware</tabstop>
+  <tabstop>lineEdit</tabstop>
  </tabstops>
  <resources/>
  <connections/>
