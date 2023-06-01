@@ -406,11 +406,11 @@ Blockly.Blocks['Fly_SetLedMode'] = {
         this.appendDummyInput()
             .appendField("设置LED灯闪烁模式为")
 			.appendField(new Blockly.FieldDropdown([
-				["七彩灯", "1"],
-				["呼吸灯", "2"],
-                ["点亮",   "3"],
-                ["熄灭",   "4"],
-                ["跑马灯", "5"],
+				["七彩灯", "6"],
+				["呼吸灯", "7"],
+                ["点亮",   "8"],
+                ["熄灭",   "9"],
+                ["跑马灯", "10"],
              ]), "mode");
         this.setPreviousStatement(true,["action", "notReachAction", "ReachAction"]);
         this.setNextStatement(true,["action", "notReachAction", "ReachAction"]);

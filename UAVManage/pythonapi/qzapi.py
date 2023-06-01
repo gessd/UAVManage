@@ -58,7 +58,7 @@ def FlyRevolve(angle, second):
 def FlySetLedMode(mode):
 """
   设置LED灯闪烁模式
-  :param mode: 模式，取值范围1-5，[1七彩灯/2呼吸灯/3点亮/4熄灭/5跑马灯]
+  :param mode: 模式，取值范围6-10，[6七彩灯/7呼吸灯/8点亮/9熄灭/10跑马灯]
 """
 
 def FlySetLedColor(color):

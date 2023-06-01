@@ -115,7 +115,7 @@ PyObject* QZAPI::examineWaypoint()
 		break;
 	case _WaypointLedStatus:
 		//LED灯模式
-		if (data.param1 > 5 || data.param1 <= 0) {
+		if (data.param1 > 10 || data.param1 < 6) {
 			showWaypointError(tr("LED模式选择超出范围"));
 			return nullptr;
 		}
