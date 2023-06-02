@@ -731,21 +731,31 @@ void UAVManage::onSocketTextMessageReceived(QString message)
 	QString pythonFileName = getCurrentPythonFile();	
 	if (blocklyFileName.isEmpty() || pythonFileName.isEmpty()) return;
 	if (_WIDUpdate == id) {
-		qDebug() << "编程区域变动,自动保存文件" << blocklyFileName;
 		QFile blocklyFile(blocklyFileName);
+		qInfo() << "积木块区域变动，自动保存文件" << blocklyFileName;
 		if (blocklyFile.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
 			blocklyFile.write(xml.toUtf8());
 			blocklyFile.close();
 		}
-	}
-	if (_WIDManual == id) {
+	} else if (_WIDManual == id) {
 		pythonFileName = getCurrentPythonFile(true);
-		qDebug() << "编码区域变动,自动保存文件" << pythonFileName;
+		//qDebug() << "编码区域变动,自动保存文件" << pythonFileName;
 	}
 	QFile pythonFile(pythonFileName);
-	if (pythonFile.open(QIODevice::ReadWrite | QIODevice::Truncate)) {
-		pythonFile.write(python.toUtf8());
+	QByteArray temp;
+	QByteArray data = python.toUtf8();
+	if (pythonFile.open(QIODevice::ReadOnly)) {
+		temp = pythonFile.readAll();
 		pythonFile.close();
+	}
+	if (data != temp) {
+		qInfo() << "编程区域变动，自动保存文件" << pythonFileName;
+		//编程区域变动重置三维仿真记录数据
+		m_pDeviceManage->reset3DStatus();
+		if (pythonFile.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+			pythonFile.write(python.toUtf8());
+			pythonFile.close();
+		}
 	}
 	//如果手动编写python内容为空则删除本地中的文件
 	//因切换无人机设备是会清空上一次记录造成手动编写python传回空内容
@@ -848,7 +858,7 @@ void UAVManage::onDeviceAdd(QString name, QString ip, float x, float y)
     <next>\
       <block type=\"Fly_TimeGroup\" id=\"W5WBWFi9LI[Xy{I/4OG3\">\
         <field name=\"minute\">0</field>\
-        <field name=\"second\">2</field>\
+        <field name=\"second\">5</field>\
         <next>\
           <block type=\"Fly_Land\" id=\"4X4;~Xwrm@Qa53W;3T2.\"></block>\
         </next>\

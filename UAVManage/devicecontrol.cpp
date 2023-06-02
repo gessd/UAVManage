@@ -532,6 +532,13 @@ void DeviceControl::hvcbReceiveMessage(const hv::SocketChannelPtr& channel, hv::
 			//qDebug() << getName() << "IMU数据" << msg.msgid;
 			break;
 		}
+		case MAVLINK_MSG_ID_SYS_STATUS:
+		{
+			//包含固件版本信息
+			mavlink_sys_status_t t;
+			mavlink_msg_sys_status_decode(&msg, &t);
+			unsigned int nVersionFirmware = t.onboard_control_sensors_present;
+		}
 		default:
 			//qWarning() << getName() << "未知消息" << msg.msgid;
 			break;

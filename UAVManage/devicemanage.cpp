@@ -20,6 +20,7 @@ DeviceManage::DeviceManage(QWidget *parent)
 	ui.setupUi(this);
 	m_pointSpace.setX(0);
 	m_pointSpace.setY(0);
+	m_b3DFinished = false;
 	m_pFirmwareDialog = nullptr;
 	m_p3dTcpSocket = nullptr;
 	m_p3dTcpServer = new QTcpServer(this);
@@ -583,6 +584,7 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 		default:
 			break;
 		}
+		qDebug() << QString("%1%2错误码%3").arg(qstrName).arg(qstrText).arg(res);
 		if (_DeviceStatus::DeviceDataSucceed != res) {
 			_ShowErrorMessage(qstrName+qstrText+tr("出错:")+ Utility::waypointMessgeFromStatus(comand, res));
 		}
@@ -724,10 +726,33 @@ QString DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upl
 			fileSvg.close();
 		}
 		if (false == upload) {
+			//清空三维仿真碰撞信息
+			reset3DStatus();
 			_ShowInfoMessage(name + tr("生成舞步完成"));
 		}
 		else {
+#ifndef _DebugApp_
+			//上次舞步到飞控之前检查是否进行三维仿真
+			qInfo() << QString("三维仿真是否完成:%1").arg(m_b3DFinished);
+			if (false == m_b3DFinished) {
+				QMessageBox::warning(this, "警告", "三维仿真未完成，无法上传舞步到无人机");
+				return false;
+			}
+			qInfo() << "三维仿真中碰撞设备" << m_map3DCollision;
+			if (false == m_map3DCollision.isEmpty()) {
+				QString text;
+				QStringList list = m_map3DCollision.keys();
+				foreach(QString name, list) {
+					text.append(name + "，");
+				}
+				text.append("舞步存在碰撞风险，请检查后重试");
+				_ShowErrorMessage(text);
+				QMessageBox::warning(this, "警告", text);
+				return false;
+			}
+#endif
 			//上传航点到飞控
+			qInfo() << "准备上次舞步到飞控";
 			int status = pDevice->DeviceMavWaypointStart(data);
 			if (_DeviceStatus::DeviceDataSucceed != status) {
 				qstrErrorNames.append("," + pDevice->getName());
@@ -936,7 +961,13 @@ void DeviceManage::sendWaypointTo3D(QMap<QString, QVector<NavWayPointData>> map)
 				waypoint.commandID = _WaypointFly;
 			}
 			else if (_WaypointFlyLand == waypoint.commandID) {
+				//降落速度每秒0.5米，计算降落时间
 				red = green = blue = 0;
+				int x = waypoint.x;
+				int y = waypoint.y;
+				int z = waypoint.z;
+				int d = getDistance(lastX, lastY, lastZ, x, y, z);
+				waypoint.param3 = d  / 50;
 				waypoint.commandID = _WaypointFly;
 			}
 
@@ -1004,6 +1035,13 @@ void DeviceManage::showFirmwareDialog()
 void DeviceManage::setCrrentProject(QString path)
 {
 	m_qstrCurrentProjectFile = path;
+}
+
+void DeviceManage::reset3DStatus()
+{
+	qInfo() << "清空三维仿真记录";
+	m_b3DFinished = false;
+	m_map3DCollision.clear();
 }
 
 bool DeviceManage::eventFilter(QObject* watched, QEvent* event)
@@ -1077,7 +1115,7 @@ void DeviceManage::on3dNewConnection()
 		qDebug() << "收到3D消息:" << arrData;
 		//解析三维消息并把发送记录中的消息删除
 		QList<QByteArray> list = arrData.split(_MsgTail);
-		foreach (QByteArray data, list){
+		foreach(QByteArray data, list) {
 			data = data.replace(_MsgHead, "");
 			analyzeMessageFrom3D(data);
 		}
@@ -1199,7 +1237,8 @@ void DeviceManage::sendMessageTo3D(QJsonObject json3d)
 	if (id != _3dDeviceLocation) {
 		//使用MAP模式，相同消息只保留最后一条
 		if (!m_timerMessage3D.isActive()) m_timerMessage3D.start(30 * 1000);
-		m_map3DMsgRecord.insert(id, json3d);
+		//TODO 调试暂时去掉三维消息重发
+		//m_map3DMsgRecord.insert(id, json3d);
 	}
 	QJsonDocument document(json3d);
 	QByteArray msg3d = document.toJson(QJsonDocument::Compact);
@@ -1225,8 +1264,22 @@ void DeviceManage::analyzeMessageFrom3D(QByteArray data)
 		if (m_map3DMsgRecord.isEmpty()) m_timerMessage3D.stop();
 	}
 	if (id == _3dDeviceInit) {
+		reset3DStatus();
 		//收到初始化回应后启动实时位置定时
 		if (!m_timerUpdateStatus.isActive()) m_timerUpdateStatus.start(1000);
+	}
+	else if (_3dDeviceCollision == id) {
+		//三维仿真中发生无人机碰撞
+		qDebug() << "三维仿真中发生无人机碰撞" << jsonObj;
+		QString name = jsonObj.value("name").toString();
+		QStringList list = getDeviceNameList();
+		if (list.contains(name)) {
+			m_map3DCollision.insert(name, true);
+		}
+	}
+	else if (_3dDeviceFinished == id) {
+		qDebug() << "三维仿真结束" << jsonObj;
+		m_b3DFinished = true;
 	}
 }
 

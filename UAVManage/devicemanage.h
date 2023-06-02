@@ -139,6 +139,10 @@ public:
 	 * @brief 设置当前工程文件路径
 	 */
 	void setCrrentProject(QString path);
+	/**
+	 * @brief 重置三维仿真数据
+	 */
+	void reset3DStatus();
 signals:
 	/**
 	 * @brief 设备添加完成
@@ -272,6 +276,11 @@ private:
 	QTcpSocket* m_p3dTcpSocket;
 	//三维消息记录，用于发送失败重发
 	QMap<int, QJsonObject> m_map3DMsgRecord;
+	//三维仿真中碰撞设备记录
+	QMap<QString, bool> m_map3DCollision;
+	//三维仿真过程是否完成
+	bool m_b3DFinished;
+	//三维仿真消息定时重复
 	QTimer m_timerMessage3D;
 	//定时发送无人机姿态数据到三维
 	QTimer m_timerUpdateStatus;

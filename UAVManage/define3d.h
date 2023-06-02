@@ -11,7 +11,9 @@
 
 enum _MsgID {
 	_3dDeviceInit = 101,
-	_3dDeviceLocation = 102
+	_3dDeviceLocation = 102,
+	_3dDeviceCollision = 103,
+	_3dDeviceFinished = 104
 };
 
 //三维消息头部尾部字符
