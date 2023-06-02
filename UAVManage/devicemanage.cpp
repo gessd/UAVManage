@@ -940,6 +940,7 @@ void DeviceManage::sendWaypointTo3D(QMap<QString, QVector<NavWayPointData>> map)
 				waypoint.param1 = waypoint.param2 = waypoint.param3 = waypoint.param4 = 0;
 				red = green = 0;
 				blue = 255;
+				status = 8;	//开始时点亮LED
 			}
 			else if (_WaypointLedColor == waypoint.commandID) {
 				//color = QString::number(waypoint.param1).toInt() * 1000 * 1000 + QString::number(waypoint.param2).toInt() * 1000 + QString::number(waypoint.param3).toInt();
@@ -962,6 +963,7 @@ void DeviceManage::sendWaypointTo3D(QMap<QString, QVector<NavWayPointData>> map)
 			}
 			else if (_WaypointFlyLand == waypoint.commandID) {
 				//降落速度每秒0.5米，计算降落时间
+				status = 9; //降落熄灭LED
 				red = green = blue = 0;
 				int x = waypoint.x;
 				int y = waypoint.y;
