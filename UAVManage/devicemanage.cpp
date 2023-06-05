@@ -614,6 +614,16 @@ QString DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upl
 		QString name = pDevice->getName();
 		if (name.isEmpty()) continue;
 		if(false == pDevice->isCheckDevice()) continue;
+#ifndef _DebugApp_
+		if (qAbs(pDevice->getX() - pDevice->getCurrentStatus().x) > 50) {
+			_ShowErrorMessage(name + tr("设备X轴方向距离初始位置超过50厘米，无法上传舞步"));
+			continue;
+		}
+		if (qAbs(pDevice->getY() - pDevice->getCurrentStatus().y) > 50) {
+			_ShowErrorMessage(name + tr("设备Y轴方向距离初始位置超过50厘米，无法上传舞步"));
+			continue;
+		}
+#endif
 		QFileInfo infoProject(qstrProjectFile);
 		QString qstrDevicePyFile = infoProject.path() + _ProjectDirName_ + name + _PyFileSuffix_;
 		if (false == QFile::exists(qstrDevicePyFile)) continue;
