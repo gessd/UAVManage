@@ -615,13 +615,19 @@ QString DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upl
 		if (name.isEmpty()) continue;
 		if(false == pDevice->isCheckDevice()) continue;
 #ifndef _DebugApp_
-		if (qAbs(pDevice->getX() - pDevice->getCurrentStatus().x) > 50) {
-			_ShowErrorMessage(name + tr("设备X轴方向距离初始位置超过50厘米，无法上传舞步"));
-			continue;
-		}
-		if (qAbs(pDevice->getY() - pDevice->getCurrentStatus().y) > 50) {
-			_ShowErrorMessage(name + tr("设备Y轴方向距离初始位置超过50厘米，无法上传舞步"));
-			continue;
+		if (upload) {
+			if (false == pDevice->isConnectDevice()) {
+				_ShowErrorMessage(name + tr("设备没有连接无法上传舞步"));
+				continue;
+			}
+			if (qAbs(pDevice->getX() - pDevice->getCurrentStatus().x) > 50) {
+				_ShowErrorMessage(name + tr("设备X轴方向距离初始位置超过50厘米，无法上传舞步"));
+				continue;
+			}
+			if (qAbs(pDevice->getY() - pDevice->getCurrentStatus().y) > 50) {
+				_ShowErrorMessage(name + tr("设备Y轴方向距离初始位置超过50厘米，无法上传舞步"));
+				continue;
+			}
 		}
 #endif
 		QFileInfo infoProject(qstrProjectFile);
@@ -745,6 +751,7 @@ QString DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upl
 			//上次舞步到飞控之前检查是否进行三维仿真
 			qInfo() << QString("三维仿真是否完成:%1").arg(m_b3DFinished);
 			if (false == m_b3DFinished) {
+				_ShowErrorMessage("三维仿真未完成，无法上传舞步到无人机");
 				QMessageBox::warning(this, "警告", "三维仿真未完成，无法上传舞步到无人机");
 				return false;
 			}
