@@ -310,6 +310,7 @@ void PlaceInfoDialog::onParseSettingFrame(QByteArray arrNLINKData)
 #endif
 			onComparePlace(QPoint(xmax * 100, ymax * 100));
 			m_stationStatus = 1;
+			QMessageBox::information(this, tr("完成"), tr("一键标定完成"));
 			return;
 		}
 		emit serialDataSend(_OneKey_Set_Next_);

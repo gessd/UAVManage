@@ -553,7 +553,7 @@ void DeviceControl::hvcbWriteComplete(const hv::SocketChannelPtr& channel, hv::B
 	if (buf->size() <= 0) return;
 	QByteArray arrBuf((char*)buf->data(), buf->size());
 	if (arrBuf.isEmpty()) return;
-	qDebug() << getName() << "已发送消息" << arrBuf.toHex().toUpper();
+	//qDebug() << getName() << "已发送消息" << arrBuf.toHex().toUpper();
 }
 
 QByteArray DeviceControl::mavMessageToBuffer(mavlink_message_t mesage)
@@ -669,7 +669,7 @@ void DeviceControl::DeviceMavWaypointEnd(unsigned int count)
 	ui.checkBox->setEnabled(true);
 	m_nCurrentWaypontIndex = -1;
 	ui.stackedWidgetStatus->setCurrentIndex(0);	
-	QString text = "结束上传航点完成" + Utility::getControlError(res);
+	QString text = "舞步上传" + Utility::getControlError(res);
 	emit sigLogMessage(text);
 	emit sigWaypointFinished(getName(), DeviceDataSucceed == res, text);
 }
