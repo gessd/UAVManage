@@ -1200,6 +1200,8 @@ bool UAVManage::newProjectFile(QString qstrFile, unsigned int X, unsigned int Y)
 	tinyxml2::XMLElement* user = doc.NewElement(_ElementPlace_);
 	user->SetAttribute(_AttributeX_, X);
 	user->SetAttribute(_AttributeY_, Y);
+	QString version = QString("%1.%2.%3").arg(_MajorNumber_).arg(_MinorNumber_).arg(_BuildNumber_);
+	user->SetAttribute(_QZVersion_, version.toUtf8().data());
 	root->InsertEndChild(user);
 	QTextCodec* code = QTextCodec::codecForName(_XMLNameCoding_);
 	std::string name = code->fromUnicode(qstrFile).data();

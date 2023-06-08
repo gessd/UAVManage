@@ -51,6 +51,7 @@
 #define _AttributeX_       "x"
 #define _AttributeY_       "y"
 #define _AttributeZ_       "z"
+#define _QZVersion_		   "version"
 #define _AttributeName_    "name"
 #define _AttributeIP_      "ip"
 
