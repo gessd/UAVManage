@@ -30,6 +30,7 @@ PlaceInfoDialog::PlaceInfoDialog(QPoint place, QWidget *parent)
 	connect(pSerialWorker, &SerialWorker::sendResultToGui,this, &PlaceInfoDialog::onParseSettingFrame);              // 主线程收到数据结果的信号
 	m_threadSerial.start();                   // 线程开始运行
 	ui.labelSpace->setText(QString("场地大小:%1米 X %2米").arg(place.x() / 100).arg(place.y() / 100));
+	ui.btnWrite->setVisible(false);
 }
 
 PlaceInfoDialog::~PlaceInfoDialog()
@@ -65,7 +66,7 @@ bool PlaceInfoDialog::isValidStation()
 void PlaceInfoDialog::showEvent(QShowEvent* event) 
 {
 	ui.btnComOpen->setText(tr("连接"));
-	ui.comboBox_role->setCurrentIndex(1);
+	ui.comboBox_role->setCurrentIndex(2);
 	ui.lineEdit_ID->clear();
 	int row = ui.tableWidget->rowCount();
 	int column = ui.tableWidget->columnCount();
@@ -220,7 +221,7 @@ void PlaceInfoDialog::onParseSettingFrame(QByteArray arrNLINKData)
 		QByteArray arrNew = arrData.left(arrData.length() - 1);
 		arrNew.append(getCheckSum(arrNew));
 		emit serialDataSend(arrNew);
-		QMessageBox::information(this, tr("提示"), tr("数据写入完成"));
+		//QMessageBox::information(this, tr("提示"), tr("数据写入完成"));
 	}
 	else {
 		//更新界面设置
@@ -241,11 +242,20 @@ void PlaceInfoDialog::onParseSettingFrame(QByteArray arrNLINKData)
 				unsigned char temp[3] = { arrData[index], arrData[index + 1], arrData[index + 2] };
 				double number = NLINK_ParseInt24(temp);
 				int n = column / 3;
-				ui.tableWidget->setItem(row, n, new QTableWidgetItem(QString::number(number)));
-				QString text = QString("第%1行 第%2列 %3").arg(row).arg(n).arg(number);
-				//qDebug() << "更新数据" << text;
-				if (1 == n) xmax = qMax(xmax, number);
-				if (0 == n) ymax = qMax(ymax, number);
+				if (0 == n) {
+					ui.tableWidget->setItem(row, 1, new QTableWidgetItem(QString::number(number)));
+					xmax = qMax(xmax, number);
+					QString text = QString("第%1行 第0列 %2").arg(row).arg(number);
+				}
+				else if (1 == n) {
+					ui.tableWidget->setItem(row, 0, new QTableWidgetItem(QString::number(number)));
+					ymax = qMax(ymax, number);
+					QString text = QString("第%1行 第1列 %2").arg(row).arg(number);
+				}
+				else if (2 == n) {
+					ui.tableWidget->setItem(row, 2, new QTableWidgetItem(QString::number(number)));
+					QString text = QString("第%1行 第2列 %2").arg(row).arg(number);
+				}
 				if (0 == row && 0 != number) {
 					bUsable = false;
 				}
@@ -272,11 +282,11 @@ void PlaceInfoDialog::onParseSettingFrame(QByteArray arrNLINKData)
 			double xmax = 0;
 			double ymax = 0;
 			for (int row = 0; row < 6; row++) {
-				//暂时检查前6行数值
+				//检查前6行数值，对应6个基站
 				for (int column = 0; column < 2; column ++) {
 					double value = ui.tableWidget->item(row, column)->text().toDouble();
 					if (0 == row && 0 != value) {
-						//第一行必须全为0
+						//第一行A0基站必须全为0
 						QMessageBox::warning(this, tr("提示"), tr("A0基站标定失败，请重试"));
 						return;
 					}
@@ -284,8 +294,8 @@ void PlaceInfoDialog::onParseSettingFrame(QByteArray arrNLINKData)
 						QMessageBox::warning(this, tr("提示"), QString("A%1基站标定失败，请重试").arg(row));
 						return;
 					}
-					if (1 == column) xmax = qMax(xmax, value);
-					if (0 == column) ymax = qMax(ymax, value);
+					if (0 == column) xmax = qMax(xmax, value);
+					if (1 == column) ymax = qMax(ymax, value);
 				}
 			}
 			ui.labelStationSpace->setText(QString("基站范围:%1米 X %2米").arg(xmax).arg(ymax));
@@ -310,6 +320,7 @@ void PlaceInfoDialog::onParseSettingFrame(QByteArray arrNLINKData)
 #endif
 			onComparePlace(QPoint(xmax * 100, ymax * 100));
 			m_stationStatus = 1;
+			onBtnWriteClicked();
 			QMessageBox::information(this, tr("完成"), tr("一键标定完成"));
 			return;
 		}

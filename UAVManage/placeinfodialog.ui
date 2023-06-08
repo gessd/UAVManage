@@ -42,9 +42,9 @@
   <widget class="QToolButton" name="btnRead">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>160</y>
-     <width>61</width>
+     <x>30</x>
+     <y>170</y>
+     <width>141</width>
      <height>41</height>
     </rect>
    </property>
@@ -55,9 +55,9 @@
   <widget class="QToolButton" name="btnWrite">
    <property name="geometry">
     <rect>
-     <x>100</x>
-     <y>160</y>
-     <width>61</width>
+     <x>30</x>
+     <y>220</y>
+     <width>141</width>
      <height>41</height>
     </rect>
    </property>
@@ -68,9 +68,9 @@
   <widget class="QToolButton" name="btnOnekey">
    <property name="geometry">
     <rect>
-     <x>20</x>
+     <x>30</x>
      <y>300</y>
-     <width>131</width>
+     <width>141</width>
      <height>41</height>
     </rect>
    </property>
@@ -79,13 +79,19 @@
    </property>
   </widget>
   <widget class="QComboBox" name="comboBox_role">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="geometry">
     <rect>
-     <x>60</x>
+     <x>50</x>
      <y>60</y>
      <width>121</width>
      <height>31</height>
     </rect>
+   </property>
+   <property name="currentIndex">
+    <number>2</number>
    </property>
    <item>
     <property name="text">
@@ -106,7 +112,7 @@
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>10</x>
+     <x>0</x>
      <y>60</y>
      <width>41</width>
      <height>31</height>
@@ -133,6 +139,9 @@
    </property>
    <property name="horizontalScrollBarPolicy">
     <enum>Qt::ScrollBarAlwaysOff</enum>
+   </property>
+   <property name="editTriggers">
+    <set>QAbstractItemView::NoEditTriggers</set>
    </property>
    <row>
     <property name="text">
@@ -201,9 +210,12 @@
    </column>
   </widget>
   <widget class="QLineEdit" name="lineEdit_ID">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="geometry">
     <rect>
-     <x>60</x>
+     <x>50</x>
      <y>110</y>
      <width>121</width>
      <height>31</height>
@@ -213,7 +225,7 @@
   <widget class="QLabel" name="label_2">
    <property name="geometry">
     <rect>
-     <x>10</x>
+     <x>0</x>
      <y>110</y>
      <width>41</width>
      <height>31</height>
