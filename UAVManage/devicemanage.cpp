@@ -212,6 +212,7 @@ DeviceManage::DeviceManage(QWidget *parent)
 	connect(ui.btnWaypointCheck, &QAbstractButton::clicked, [this]() { waypointComposeAndUpload(m_qstrCurrentProjectFile, false); });
 	connect(ui.btn3DFly, &QAbstractButton::clicked, [this]() { emit sigStart3D(); });
 	connect(ui.btnWaypointUpload, &QAbstractButton::clicked, [this]() { waypointComposeAndUpload(m_qstrCurrentProjectFile, true); });
+	connect(ui.btnConsistent, &QAbstractButton::clicked, [this]() { allDeviceControl(_DeviceTimeSync); });
 	connect(ui.btnDevicePrepare, &QAbstractButton::clicked, [this]() { allDeviceControl(_DevicePrepare); });
 	connect(ui.btnFlyTakeoff, &QAbstractButton::clicked, [this]() { allDeviceControl(_DeviceTakeoffLocal); });
 	connect(ui.btnFlyLand, &QAbstractButton::clicked, [this]() { allDeviceControl(_DeviceLandLocal); });
@@ -482,6 +483,10 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 				_ShowErrorMessage(name + tr("设备Y轴方向距离初始位置超过50厘米"));
 				continue;
 			}
+			if (false == pDevice->isTimeSync()) {
+				_ShowErrorMessage(name + tr("未成功定桩授时"));
+				continue;
+			}
 #endif
 			if (_DeviceTakeoffLocal == comand && false == pDevice->isPrepareTakeoff()) {
 				_ShowErrorMessage(name + tr("设备未准备起飞"));
@@ -490,9 +495,10 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 			//所有判断检查通过
 			listNames.removeOne(name);
 		}
+		
 		if (false == listNames.isEmpty()) {
 			QString qstrError = listNames.join("、");
-			QString error = tr("检查出错，请重试") + qstrError;
+			QString error = qstrError + tr("检查出错，请重试");
 			_ShowErrorMessage(error);
 			QMessageBox::warning(this, tr("警告"), error);
 			return;
@@ -501,6 +507,7 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 			_ShowInfoMessage(tr("未选中无人机"));
 			return;
 		}
+		
 		if (_DeviceTakeoffLocal == comand) {
 			//起飞前增加倒计时
 			QWidget* pWidget = this;
@@ -532,6 +539,7 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 	int x = 0;
 	int y = 0;
 	QStringList listCheck;
+	QStringList listErrorDevice;
 	for (int i = 0; i < ui.listWidget->count(); i++) {
 		QListWidgetItem* pItem = ui.listWidget->item(i);
 		if (!pItem) continue;
@@ -558,6 +566,10 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 			res = pDevice->Fun_MAV_QUICK_STOP(false);
 			qstrText = tr("急停");
 			break;
+		case _DeviceTimeSync:
+			qstrText = tr("定桩授时");
+			res = pDevice->Fun_MAV_TimeSync();
+			break;
 		case _DevicePrepare:
 			res = pDevice->Fun_MAV_CMD_DO_SET_MODE(3, false);
 			qstrText = tr("准备起飞");
@@ -570,6 +582,7 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 		case _DeviceRegain:
 		{
 			//按顺序排列
+			qstrText = tr("回收");
 			int nInterval = 50;			//无人机间隔
 			int c = getSpaceSize().x() / nInterval;
 			if (i > 0) {
@@ -578,7 +591,6 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 				if (0 == r) y += nInterval;
 			}
 			res = pDevice->Fun_MAV_Defined_Regain(x, y);
-			qstrText = tr("回收");
 			break;
 		}
 		default:
@@ -586,15 +598,31 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 		}
 		qDebug() << QString("%1%2错误码%3").arg(qstrName).arg(qstrText).arg(res);
 		if (_DeviceStatus::DeviceDataSucceed != res) {
-			_ShowErrorMessage(qstrName+qstrText+tr("出错:")+ Utility::waypointMessgeFromStatus(comand, res));
+			listErrorDevice.append(qstrName);
+			_ShowErrorMessage(qstrName + qstrText + tr("出错:") + Utility::waypointMessgeFromStatus(comand, res));
+		}
+		if (_DevicePrepare == comand && _DeviceStatus::DeviceDataSucceed == res) {
+			_ShowInfoMessage(qstrName + "起飞前准备完毕");
 		}
 	}
+	
 	if (listCheck.isEmpty()) {
 		_ShowInfoMessage(tr("未选中无人机"));
 		return;
 	}
+	//其他情况停止音乐播放
 	if (_DeviceTakeoffLocal == comand) emit sigTakeoffFinished(true);
 	else emit sigTakeoffFinished(false);
+	if (_DeviceTimeSync == comand) {
+		//定桩授时必须全部成功
+		if (listErrorDevice.isEmpty()) {
+			QMessageBox::information(this, tr("完成"), tr("无人机定桩授时成功"));
+		}
+		else {
+			QString error = listErrorDevice.join("、") + tr("定桩授时失败");
+			QMessageBox::warning(this, tr("完成"), error);
+		}
+	}
 }
 
 QString DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upload)
@@ -769,9 +797,12 @@ QString DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upl
 			}
 #endif
 			//上传航点到飞控
-			qInfo() << "准备上次舞步到飞控";
+			qInfo() << "准备上传舞步到飞控";
 			int status = pDevice->DeviceMavWaypointStart(data);
-			if (_DeviceStatus::DeviceDataSucceed != status) {
+			if (_DeviceStatus::DeviceDataSucceed == status) {
+				_ShowInfoMessage(name + "上传舞步成功");
+			}
+			else {
 				qstrErrorNames.append("," + pDevice->getName());
 				_ShowErrorMessage(name + "上传舞步失败"+ Utility::waypointMessgeFromStatus(_DeviceWaypoint, status));
 			}

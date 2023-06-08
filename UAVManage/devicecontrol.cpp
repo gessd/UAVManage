@@ -21,6 +21,7 @@ DeviceControl::DeviceControl(QString name, float x, float y, QString ip, QWidget
 	m_nCurrentMusicTime = 0;
 	m_bUploadFinished = false;
 	m_bPrepareTakeoff = false;
+	m_bTimeSync = false;
 	ui.stackedWidgetStatus->setCurrentIndex(0);
 	QPixmap pixmap(":/res/images/uavred.png");
 	ui.labelStatus->setPixmap(pixmap.scaled(ui.labelStatus->size()));
@@ -185,6 +186,10 @@ bool DeviceControl::connectDevice()
 	m_pHvTcpClient->onWriteComplete = std::bind(&DeviceControl::hvcbWriteComplete, this, std::placeholders::_1, std::placeholders::_2);
 	m_pHvTcpClient->setConnectTimeout(2 * 1000);
 
+	m_bUploadFinished = false;
+	m_bTimeSync = false;
+	m_bPrepareTakeoff = false;
+
 	//配置自动重连模式
 	hv::ReconnectInfo reconn;
 	reconn.min_delay = 2 * 1000;
@@ -199,6 +204,8 @@ bool DeviceControl::connectDevice()
 void DeviceControl::disconnectDevice()
 {
 	m_bUploadFinished = false;
+	m_bTimeSync = false;
+	m_bPrepareTakeoff = false;
 	if (isConnectDevice()) 
 		m_pHvTcpClient->stop();
 	SAFE_DELETE(m_pHvTcpClient);
@@ -232,6 +239,11 @@ void DeviceControl::setHeartbeatEnable(bool enable)
 bool DeviceControl::isUploadWaypoint()
 {
 	return m_bUploadFinished;
+}
+
+bool DeviceControl::isTimeSync()
+{
+	return m_bTimeSync;
 }
 
 bool DeviceControl::isPrepareTakeoff()
@@ -293,6 +305,7 @@ int DeviceControl::Fun_MAV_CMD_NAV_TAKEOFF_LOCAL(float Pitch, float Empty, float
 	if (DeviceDataSucceed == res) {
 		m_bPrepareTakeoff = false;
 		m_bUploadFinished = false;
+		m_bTimeSync = false;
 	}
 	return res;
 }
@@ -350,6 +363,17 @@ int DeviceControl::Fun_MAV_LED_MODE()
 {
 	QByteArray arrData = mavCommandLongToBuffer(0, 0, 0, 0, 0, 0, 0, MAV_CMD_WAYPOINT_USER_4);
 	return MavSendCommandLongMessage(tr("灯光"), MAV_CMD_WAYPOINT_USER_4, arrData, arrData, false);
+}
+
+int DeviceControl::Fun_MAV_TimeSync()
+{
+	//不可以重发，发送后立刻返回
+	m_bTimeSync = false;
+	QByteArray arrData = mavCommandLongToBuffer(0, 0, 0, 0, 0, 0, 0, MAV_CMD_WAYPOINT_USER_5);
+	int res = MavSendCommandLongMessage(tr("定桩授时"), MAV_CMD_WAYPOINT_USER_5, arrData, arrData, false);
+	//记录定桩授时状态
+	if (DeviceDataSucceed == res) m_bTimeSync = true;
+	return res;
 }
 
 void DeviceControl::onUpdateBatteryStatus(float voltages, float battery, unsigned short electric)

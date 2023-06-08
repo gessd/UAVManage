@@ -97,6 +97,10 @@ public:
 	 */
 	bool isUploadWaypoint();
 	/**
+	 * @brief 设备是否已经定桩授时
+	 */
+	bool isTimeSync();
+	/**
 	 * @brief 设备是否在准备起飞状态
 	 */
 	bool isPrepareTakeoff();
@@ -188,6 +192,11 @@ public:
 	 * @brief 无人机灯光
 	 */
 	int Fun_MAV_LED_MODE();
+
+	/**
+	 * @brief 定桩授时
+	 */
+	int Fun_MAV_TimeSync();
 private slots:
 	/**
 	* @brief 发送数据
@@ -351,6 +360,8 @@ private:
 	unsigned int m_nCurrentMusicTime;
 	//已上传航点
 	bool m_bUploadFinished;
+	//已定桩授时
+	bool m_bTimeSync;
 	//是否在准备起飞状态
 	bool m_bPrepareTakeoff;
 	//mavlink解包参数，区分不同设备数据

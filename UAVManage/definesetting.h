@@ -110,6 +110,7 @@ enum _AllDeviceCommand {
 	_DeviceTakeoffLocal = 1, //起飞
 	_DeviceLandLocal,		 //降落
 	_DeviceQuickStop,		 //急停
+	_DeviceTimeSync,		 //定桩授时
 	_DevicePrepare,			 //准备起飞
 	_DeviceQueue,			 //列队
 	_DeviceRegain,			 //回收
@@ -159,6 +160,7 @@ public:
 		case _DeviceRegain: return getRegainError(status); break;
 		case _DeviceLed: return getLedError(status); break;
 		case _DeviceWaypoint: return getWaypointError(status); break;
+		case _DeviceTimeSync: return getTimeAlignedError(status); break;
 		}
 		return tr("控制出错");
 	}
@@ -247,6 +249,10 @@ public:
 	static QString getWaypointError(int type) {
 		QString qstrText = "操作出错";
 		return qstrText;
+	}
+	//定桩授时
+	static QString getTimeAlignedError(int type) {
+		return "授时失败";
 	}
 	//列队
 	static QString getQueueError(int type) {
