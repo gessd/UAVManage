@@ -694,6 +694,10 @@ void UAVManage::dropEvent(QDropEvent* event)
 				onOpenProject(path);
 				return;
 			}
+			else if ("mp3" == suffix || "wav" == suffix) {
+				onUpdateMusic(path);
+				return;
+			}
 		}
 		else if (info.isDir()) {
 			QDir dir(path);
