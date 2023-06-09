@@ -318,6 +318,7 @@ void PlaceInfoDialog::onParseSettingFrame(QByteArray arrNLINKData)
 				return;
 			}
 #endif
+			m_bOnekeySetNLINK = false;
 			onComparePlace(QPoint(xmax * 100, ymax * 100));
 			m_stationStatus = 1;
 			onBtnWriteClicked();
