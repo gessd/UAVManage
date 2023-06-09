@@ -17,7 +17,7 @@
 //#define _DebugApp_
 
 //项目后缀名
-#define _ProjectSuffix       ".qz"
+#define _ProjectSuffix       "qz"
 #define _PyFileSuffix_       ".py"
 #define _PyManualSuffix_     ".mp"
 #define _BlcoklyFileSuffix_  ".blockly"

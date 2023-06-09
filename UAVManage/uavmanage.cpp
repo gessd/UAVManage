@@ -14,6 +14,7 @@
 #include <QMessageBox>
 #include <QDesktopWidget>
 #include <QStandardPaths>
+#include <QMimeData>
 #include "definesetting.h"
 #include "tinyxml2/tinyxml2.h"
 #include "messagelistdialog.h"
@@ -391,7 +392,7 @@ void UAVManage::onNewProject()
 	//新建项目文件夹
 	QFileInfo info(qstrName);
 	QString qstrDir = info.path() + "/" + info.baseName();
-	QString qstrFile = qstrDir + "/" + info.fileName() + ".qz";
+	QString qstrFile = qstrDir + "/" + info.fileName() + "." + _ProjectSuffix;
 	QDir dir;
 	if (!dir.mkdir(qstrDir)) {
 		_ShowErrorMessage(info.baseName() + tr("项目创建失败"));
@@ -671,6 +672,41 @@ bool UAVManage::eventFilter(QObject* watched, QEvent* event)
 		}
 	}
 	return __super::eventFilter(watched, event);
+}
+
+void UAVManage::dragEnterEvent(QDragEnterEvent* event)
+{
+	if (event->mimeData()->hasUrls())
+		event->acceptProposedAction();
+}
+
+void UAVManage::dropEvent(QDropEvent* event)
+{
+	QList<QUrl> urls = event->mimeData()->urls();
+	qDebug() << "拖放文件" << urls;
+	foreach(QUrl url, urls) {
+		QString path = url.path().remove(0, 1);
+		qDebug() << path;
+		QFileInfo info(path);
+		if (info.isFile()) {
+			QString suffix = info.suffix();
+			if (_ProjectSuffix == suffix) {
+				onOpenProject(path);
+				return;
+			}
+		}
+		else if (info.isDir()) {
+			QDir dir(path);
+			QFileInfoList fileInfoList = dir.entryInfoList();
+			foreach(QFileInfo fileInfo, fileInfoList) {
+				if (fileInfo.fileName() == "." || fileInfo.fileName() == "..") continue;
+				if (_ProjectSuffix == fileInfo.suffix()) {
+					onOpenProject(fileInfo.filePath());
+					return;
+				}
+			}
+		}
+	}
 }
 
 void UAVManage::onWebLoadProgress(int progress)
