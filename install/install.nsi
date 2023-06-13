@@ -150,6 +150,7 @@ Section "MainSection" SEC01
 	File    "${appDir}\Qt5Widgets.dll"
 	File    "${appDir}\QtWebEngineProcess.exe"
 	File    "${appDir}\UAVManage.exe"
+	File /r "..\UAVManage\pythonapi"
 	SetShellVarContext all
 	CreateShortCut "$DESKTOP\无人机炫舞编程.lnk" "$INSTDIR\UAVManage.exe"
 	CreateDirectory "$INSTDIR\Log"

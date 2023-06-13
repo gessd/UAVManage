@@ -3,7 +3,7 @@
 //程序版本号
 #define _MajorNumber_ 1
 #define _MinorNumber_ 0
-#define _BuildNumber_ 12
+#define _BuildNumber_ 13
 //新程序下载存放文件夹
 #define _NewVersionPath_	"/update"
 #define _VersionFile_		"version.ini"
@@ -55,6 +55,10 @@
 #define _AttributeName_    "name"
 #define _AttributeIP_      "ip"
 
+//无人机降落速度 厘米/秒
+#define _WaypointLanding_ 50
+//无人机碰撞检测距离 厘米
+#define _UAVMinDistance_  50
 
 enum _WaypointType {
 	_WaypointFly		= 16,		//飞行动作航点
@@ -65,8 +69,7 @@ enum _WaypointType {
 	_WaypointStart		= 31004,	//初始位置信息
 	_WaypointTime		= 31005,	//时间信息
 	_WaypointLedColor	= 31006,	//LED灯颜色
-	_WaypointFlyLand	= 23		//降落
-
+	_WaypointFlyLand	= 23		//降落 //降落时使用固定速度_WaypointLanding_
 };
 
 enum _CalibrationEnum {
@@ -296,6 +299,19 @@ typedef struct __NavWayPointData
 		bTakeoff = false;
 	}
 }NavWayPointData;
+
+struct _MidwayPosition {
+	QString name;
+	int x;
+	int y;
+	int z;
+	_MidwayPosition(QString n, int n1, int n2, int n3) {
+		name = n;
+		x = n1;
+		y = n2;
+		z = n3;
+	}
+};
 
 #define _name2str(name) (#name)
 //结构体属性转换成字符串, 必须以.分割,否则因列表越界造成崩溃

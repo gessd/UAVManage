@@ -642,22 +642,6 @@ QString DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upl
 		QString name = pDevice->getName();
 		if (name.isEmpty()) continue;
 		if(false == pDevice->isCheckDevice()) continue;
-#ifndef _DebugApp_
-		if (upload) {
-			if (false == pDevice->isConnectDevice()) {
-				_ShowErrorMessage(name + tr("设备没有连接无法上传舞步"));
-				continue;
-			}
-			if (qAbs(pDevice->getX() - pDevice->getCurrentStatus().x) > 50) {
-				_ShowErrorMessage(name + tr("设备X轴方向距离初始位置超过50厘米，无法上传舞步"));
-				continue;
-			}
-			if (qAbs(pDevice->getY() - pDevice->getCurrentStatus().y) > 50) {
-				_ShowErrorMessage(name + tr("设备Y轴方向距离初始位置超过50厘米，无法上传舞步"));
-				continue;
-			}
-		}
-#endif
 		QFileInfo infoProject(qstrProjectFile);
 		QString qstrDevicePyFile = infoProject.path() + _ProjectDirName_ + name + _PyFileSuffix_;
 		if (false == QFile::exists(qstrDevicePyFile)) continue;
@@ -774,8 +758,99 @@ QString DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upl
 			reset3DStatus();
 			_ShowInfoMessage(name + tr("生成舞步完成"));
 		}
-		else {
+		map.insert(name, data);
+	}
+
+	//根据航点检查碰撞，把总时以固定间隔分片，计算所有无人机所在位置，然后判断是否有无人机距离过近
+	//当前毫秒时间，无人机位置
+	QMap<unsigned int, QList<_MidwayPosition>> mapTime;
+	//分片时间间隔，毫秒
+	int nInterval = 10;
+	QStringList keys = map.keys();
+	//分解所有无人机位置
+	foreach(QString name, keys) {
+		QVector<NavWayPointData> data = map.value(name);
+		//初始位置
+		NavWayPointData start = data.at(0);
+		unsigned int nStartTime = start.param3 * 1000;
+		for (int i = 1; i < data.count(); i++) {
+			NavWayPointData end = data.at(i);
+			//非航点数据不处理
+			if (_WaypointFly != end.commandID && _WaypointFlyLand != end.commandID) continue;
+			if (_WaypointFlyLand == end.commandID) {
+				//降落时使用固定速度
+				end.param3 = (start.z - end.z) / _WaypointLanding_;
+			}
+			//总时长,毫秒
+			int maxMillisecond = end.param3 * 1000;
+			//按时间间隔切分航线，细分判断每个航点
+			double temp = maxMillisecond / nInterval;
+			int n = qRound(temp);
+			for (int j = 1; j <= n; j++) {
+				//直接使用整数，四舍五入精确到厘米
+				int x = start.x + (end.x - start.x) * j / n;
+				int y = start.y + (end.y - start.y) * j / n;
+				int z = start.z + (end.z - start.z) * j / n;
+				_MidwayPosition pos(name, x, y, z);
+				unsigned int m = j * nInterval;
+				if (m > maxMillisecond) m = maxMillisecond;
+				unsigned int currentTime = nStartTime + m;
+				QList<_MidwayPosition> temp = mapTime.value(currentTime);
+				temp.append(pos);
+				mapTime.insert(currentTime, temp);
+			}
+			start = end;
+			nStartTime = nStartTime + start.param3 * 1000;
+		}
+	}
+	//判断无人机距离是否过近
+	QList<unsigned int> timelist = mapTime.keys();
+	foreach(unsigned int current, timelist) {
+		QList<_MidwayPosition> deviceList = mapTime.value(current);
+		int i = 1;
+		foreach(_MidwayPosition pos, deviceList) {
+			QList<_MidwayPosition> residue = deviceList.mid(i, deviceList.length() - i);
+			i++;
+			foreach(_MidwayPosition temp, residue) {
+				int d = getDistance(pos.x, pos.y, pos.z, temp.x, temp.y, temp.z);
+				if (d < _UAVMinDistance_) {
+					QString error = QString("%1在X:%2厘米 Y:%3厘米 Z:%4厘米位置处与%5在X:%6厘米 Y:%7厘米 Z:%8厘米位置处距离小于%9厘米有碰撞风险")
+						.arg(pos.name).arg(pos.x).arg(pos.y).arg(pos.z).arg(temp.name).arg(temp.x).arg(temp.y).arg(temp.z).arg(_UAVMinDistance_);
+					int minute = current / 1000 / 60;
+					int second = current / 1000 % 60;
+					int millisecond = current % 1000;
+					QString t = QString("当%1分%2秒%3毫秒时").arg(minute).arg(second).arg(millisecond);
+					_ShowErrorMessage(t + error);
+					return "，" + pos.name + "，" + temp.name;
+				}
+			}
+		}
+	}
+	if (upload) {
+		//上传舞步到无人机
+		for (int i = 0; i < ui.listWidget->count(); i++) {
+			QListWidgetItem* pItem = ui.listWidget->item(i);
+			if (!pItem) continue;
+			QWidget* pWidget = ui.listWidget->itemWidget(pItem);
+			if (!pWidget) continue;
+			DeviceControl* pDevice = dynamic_cast<DeviceControl*>(pWidget);
+			if (!pDevice) continue;
+			QString name = pDevice->getName();
+			if (name.isEmpty()) continue;
+			if (false == pDevice->isCheckDevice()) continue;
 #ifndef _DebugApp_
+			if (false == pDevice->isConnectDevice()) {
+				_ShowErrorMessage(name + tr("设备没有连接无法上传舞步"));
+				continue;
+			}
+			if (qAbs(pDevice->getX() - pDevice->getCurrentStatus().x) > _UAVMinDistance_) {
+				_ShowErrorMessage(name + QString("设备X轴方向距离初始位置超过%1厘米，无法上传舞步").arg(_UAVMinDistance_));
+				continue;
+			}
+			if (qAbs(pDevice->getY() - pDevice->getCurrentStatus().y) > _UAVMinDistance_) {
+				_ShowErrorMessage(name + QString("设备Y轴方向距离初始位置超过%1厘米，无法上传舞步").arg(_UAVMinDistance_));
+				continue;
+			}
 			//上次舞步到飞控之前检查是否进行三维仿真
 			qInfo() << QString("三维仿真是否完成:%1").arg(m_b3DFinished);
 			if (false == m_b3DFinished) {
@@ -798,16 +873,15 @@ QString DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upl
 #endif
 			//上传航点到飞控
 			qInfo() << "准备上传舞步到飞控";
-			int status = pDevice->DeviceMavWaypointStart(data);
+			int status = pDevice->DeviceMavWaypointStart(map.value(name));
 			if (_DeviceStatus::DeviceDataSucceed == status) {
 				_ShowInfoMessage(name + "上传舞步成功");
 			}
 			else {
 				qstrErrorNames.append("," + pDevice->getName());
-				_ShowErrorMessage(name + "上传舞步失败"+ Utility::waypointMessgeFromStatus(_DeviceWaypoint, status));
+				_ShowErrorMessage(name + "上传舞步失败" + Utility::waypointMessgeFromStatus(_DeviceWaypoint, status));
 			}
 		}
-		map.insert(name, data);
 	}
 	//发送航点到三维
 	sendWaypointTo3D(map);
@@ -1010,14 +1084,13 @@ void DeviceManage::sendWaypointTo3D(QMap<QString, QVector<NavWayPointData>> map)
 				waypoint.commandID = _WaypointFly;
 			}
 			else if (_WaypointFlyLand == waypoint.commandID) {
-				//降落速度每秒0.5米，计算降落时间
 				status = 9; //降落熄灭LED
 				red = green = blue = 0;
 				int x = waypoint.x;
 				int y = waypoint.y;
 				int z = waypoint.z;
 				int d = getDistance(lastX, lastY, lastZ, x, y, z);
-				waypoint.param3 = d  / 50;
+				waypoint.param3 = d  / _WaypointLanding_;
 				waypoint.commandID = _WaypointFly;
 			}
 
