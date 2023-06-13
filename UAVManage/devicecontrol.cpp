@@ -251,6 +251,11 @@ void DeviceControl::clearTimeSyncStatus()
 	m_bTimeSync = false;
 }
 
+unsigned int DeviceControl::getTimeSyncUTC()
+{
+	return m_nTimeSynsUTC;
+}
+
 bool DeviceControl::isPrepareTakeoff()
 {
 	return m_bPrepareTakeoff;
@@ -374,10 +379,14 @@ int DeviceControl::Fun_MAV_TimeSync()
 {
 	//不可以重发，发送后立刻返回
 	m_bTimeSync = false;
+	m_nTimeSynsUTC = 0;
 	QByteArray arrData = mavCommandLongToBuffer(0, 0, 0, 0, 0, 0, 0, MAV_CMD_WAYPOINT_USER_5);
 	int res = MavSendCommandLongMessage(tr("定桩授时"), MAV_CMD_WAYPOINT_USER_5, arrData, arrData, false);
 	//记录定桩授时状态
-	if (DeviceDataSucceed == res) m_bTimeSync = true;
+	if (DeviceDataSucceed == res) {
+		m_bTimeSync = true;
+		m_nTimeSynsUTC = QDateTime::currentDateTime().toTime_t();
+	}
 	return res;
 }
 

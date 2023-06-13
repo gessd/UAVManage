@@ -105,6 +105,10 @@ public:
 	 */
 	void clearTimeSyncStatus();
 	/**
+	 * @brief 获取定桩授时的时间，便于检查设备是否在同一时间完成定桩授时
+	 */
+	unsigned int getTimeSyncUTC();
+	/**
 	 * @brief 设备是否在准备起飞状态
 	 */
 	bool isPrepareTakeoff();
@@ -366,6 +370,7 @@ private:
 	bool m_bUploadFinished;
 	//已定桩授时
 	bool m_bTimeSync;
+	unsigned int m_nTimeSynsUTC;
 	//是否在准备起飞状态
 	bool m_bPrepareTakeoff;
 	//mavlink解包参数，区分不同设备数据

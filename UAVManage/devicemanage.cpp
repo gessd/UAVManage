@@ -448,6 +448,7 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 		QStringList listNames;
 		QStringList listCheck;
 		for (int i = 0; i < ui.listWidget->count(); i++) {
+			bool bTimeSync = true;
 			QListWidgetItem* pItem = ui.listWidget->item(i);
 			if (!pItem) continue;
 			QWidget* pWidget = ui.listWidget->itemWidget(pItem);
@@ -485,6 +486,27 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 			}
 			if (false == pDevice->isTimeSync()) {
 				_ShowErrorMessage(name + tr("未成功定桩授时"));
+				continue;
+			}
+			//检查定桩授时是否同步，防止单独对一个无人机进行定桩授时
+			for (int i = 0; i < ui.listWidget->count(); i++) {
+				QListWidgetItem* pItem = ui.listWidget->item(i);
+				if (!pItem) continue;
+				QWidget* pWidget = ui.listWidget->itemWidget(pItem);
+				if (!pWidget) continue;
+				DeviceControl* pTemp = dynamic_cast<DeviceControl*>(pWidget);
+				if (!pTemp) continue;
+				if (false == pTemp->isCheckDevice()) continue;
+				if(pDevice->getName() == pTemp->getName()) continue;
+				if (false == pTemp->isTimeSync()) continue;
+				if (qAbs(pDevice->getTimeSyncUTC() - pTemp->getTimeSyncUTC()) >= 3) {
+					qWarning() << "定桩授时不同步" << pDevice->getName() << pDevice->getTimeSyncUTC() << pTemp->getName() << pTemp->getTimeSyncUTC();
+					bTimeSync = false;
+					break;
+				}
+			}
+			if (false == bTimeSync) {
+				_ShowErrorMessage(name + tr("定桩授时不同步，请重新对所有无人机进行定桩授时"));
 				continue;
 			}
 #endif
