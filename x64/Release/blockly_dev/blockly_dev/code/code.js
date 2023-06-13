@@ -487,6 +487,8 @@ Code.init = function() {
   editor_content_python_text.setReadOnly(true);
   editor_content_python_text.setScrollSpeed(0.05);
   editor_content_python_text.setHighlightActiveLine(true);//行高亮  
+  editor_content_python_text.getCopyText = function () { return "";  }
+
   // Lazy-load the syntax-highlighting.
   window.setTimeout(Code.importPrettify, 1);
 
