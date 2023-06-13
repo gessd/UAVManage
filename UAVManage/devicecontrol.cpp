@@ -246,6 +246,11 @@ bool DeviceControl::isTimeSync()
 	return m_bTimeSync;
 }
 
+void DeviceControl::clearTimeSyncStatus()
+{
+	m_bTimeSync = false;
+}
+
 bool DeviceControl::isPrepareTakeoff()
 {
 	return m_bPrepareTakeoff;

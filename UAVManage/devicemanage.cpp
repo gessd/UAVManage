@@ -536,6 +536,28 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 			}
 		}
 	}
+	if (_DeviceTimeSync == comand) {
+		//定桩授时之前检查所有设备连接状态
+		QStringList errorList;
+		for (int i = 0; i < ui.listWidget->count(); i++) {
+			QListWidgetItem* pItem = ui.listWidget->item(i);
+			if (!pItem) continue;
+			QWidget* pWidget = ui.listWidget->itemWidget(pItem);
+			if (!pWidget) continue;
+			DeviceControl* pDevice = dynamic_cast<DeviceControl*>(pWidget);
+			if (!pDevice) continue;
+			if (false == pDevice->isCheckDevice()) continue;
+			QString qstrName = pDevice->getName();
+			if(pDevice->isConnectDevice()) continue;
+			errorList.append(qstrName);
+		}
+		if (false == errorList.isEmpty()) {
+			QString error = errorList.join("、") + tr("无人机未连接无法进行定桩授时");
+			_ShowErrorMessage(error);
+			QMessageBox::warning(this, tr("失败"), error);
+			return;
+		}
+	}
 	int x = 0;
 	int y = 0;
 	QStringList listCheck;
@@ -616,11 +638,24 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 	if (_DeviceTimeSync == comand) {
 		//定桩授时必须全部成功
 		if (listErrorDevice.isEmpty()) {
+			_ShowInfoMessage("无人机定桩授时成功");
 			QMessageBox::information(this, tr("完成"), tr("无人机定桩授时成功"));
 		}
 		else {
+			//定桩授时失败，重置所有无人机定桩授时状态
+			for (int i = 0; i < ui.listWidget->count(); i++) {
+				QListWidgetItem* pItem = ui.listWidget->item(i);
+				if (!pItem) continue;
+				QWidget* pWidget = ui.listWidget->itemWidget(pItem);
+				if (!pWidget) continue;
+				DeviceControl* pDevice = dynamic_cast<DeviceControl*>(pWidget);
+				if (!pDevice) continue;
+				if (false == pDevice->isCheckDevice()) continue;
+				pDevice->clearTimeSyncStatus();
+			}
 			QString error = listErrorDevice.join("、") + tr("定桩授时失败");
-			QMessageBox::warning(this, tr("完成"), error);
+			_ShowErrorMessage(error);
+			QMessageBox::warning(this, tr("失败"), error);
 		}
 	}
 }

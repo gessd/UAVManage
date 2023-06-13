@@ -101,6 +101,10 @@ public:
 	 */
 	bool isTimeSync();
 	/**
+	 * @brief 清除定桩授时状态
+	 */
+	void clearTimeSyncStatus();
+	/**
 	 * @brief 设备是否在准备起飞状态
 	 */
 	bool isPrepareTakeoff();
