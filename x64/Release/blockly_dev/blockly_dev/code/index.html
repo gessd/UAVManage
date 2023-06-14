@@ -82,7 +82,7 @@
 	  </div>
     <div style="z-index: 26 !important; top:51px; width: 200px; position: absolute; text-align: center; margin-left: 41% ; margin-right: 59% ;" id="showButton">
       <div style="width: 100%; height: auto; background-color: #F3F3F3; border-radius: 0 0 0.625rem 0.625rem; box-shadow: 0rem 0.375rem 0.375rem  rgba(0,0,0,0.25); border-top: 0.0625rem solid #c7c7c7;">
-        <button id="backButton" class="notext" onclick="backButton()" style="width: 28px; height:24px">
+        <button id="backButton" class="notext" onclick="backButton()" style="width: 28px; height:24px;">
           <img src="../static/images/undo2.png" style="height: 100%; width: 100%;">
         </button>
         <button id="goButton" class="notext" onclick="goButton()" style="width: 28px; height:24px; margin-left:20px;">
@@ -330,8 +330,8 @@
         document.getElementById("content_python_text").style.display = "none";
         document.getElementById("partitionFlag").style.display = 'none';
       }
-      console.log("点击图形按钮");
       Blockly.fireUiEvent(window, 'resize');
+      console.log("点击图形按钮");
     }
     function tab_python() {
       document.getElementById("tab_python").style.backgroundImage = "url(icons/workspace_button_python_cli&hov.png)";
@@ -342,7 +342,6 @@
       document.getElementById("partitionFlag").style.display = "none";
       document.getElementById("blocklyTitle").style.display = "none";
       document.getElementById("writePython").style.display = "";
-      //document.getElementById("tab_blocks").style.display = "none";
       Blockly.fireUiEvent(window, 'resize');
       console.log("点击编程按钮");
     }

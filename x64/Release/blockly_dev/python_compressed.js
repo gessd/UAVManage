@@ -47,6 +47,10 @@ Blockly.Python.finish = function (a) {
     delete Blockly.Python.definitions_;
     delete Blockly.Python.functionNames_;
     Blockly.Python.variableDB_.reset();
+
+    var t = c.join("\n\n") +"\n"+a;
+    return t;
+
     return (b.join("\n") + "\n\n" + c.join("\n\n")).replace(/\n\n+/g, "\n\n").replace(/\n*$/, "\n\n\n") + a
 };
 Blockly.Python.scrubNakedValue = function (a) {

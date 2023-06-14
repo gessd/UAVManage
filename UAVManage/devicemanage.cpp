@@ -714,11 +714,13 @@ QString DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upl
 		if (!file.open(QIODevice::ReadOnly)) continue;
 		QByteArray arrData = file.readAll();
 		file.close();
+
 		if (arrData.isEmpty()) {
 			_ShowErrorMessage(name + tr("没有编写舞步"));
 			qstrErrorNames.append("," + pDevice->getName());
 			continue;
 		}
+
 		int index = arrData.indexOf("Fly_");
 		if (bMauanl && index >= 0) {
 			//积木块接口前缀Fly_,用于区分
@@ -728,6 +730,29 @@ QString DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upl
 			qstrErrorNames.append("," + pDevice->getName());
 			continue;
 		}
+
+		if (false == bMauanl) {
+			//通过Python代码检查积木块连贯性，当包含空行时说明积木块没有连到一起
+			bool bGap = false;
+			if (file.open(QIODevice::ReadOnly)) {
+				while (false == file.atEnd()) {
+					QByteArray arrLine = file.readLine();
+					//去除回车换行后为空则代表有空白行
+					arrLine = arrLine.replace("\r", "").replace("\n", "");
+					if (arrLine.isEmpty()) {
+						bGap = true;
+						break;
+					}
+				}
+				file.close();
+			}
+			if (bGap) {
+				_ShowErrorMessage(name + tr("编程积木块不连贯，请检查"));
+				qstrErrorNames.append("," + pDevice->getName());
+				continue;
+			}
+		}
+
 		//执行python脚本之前初始参数，用于检查无人机编程参数
 		pythonThread.initParam(m_pointSpace.x(), m_pointSpace.y(), pDevice->getName(), pDevice->getX(), pDevice->getY());
 		//生成舞步过程必须一个个生成，python交互函数是静态全局，所以同时只能执行一个设备生成舞步
