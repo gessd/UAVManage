@@ -302,8 +302,6 @@ PyObject* QZAPI::FlySetLedColor(PyObject* self, PyObject* args)
 
 PyObject* QZAPI::FlyHover(PyObject* self, PyObject* args)
 {
-	//暂时去掉角度旋转
-	return Py_BuildValue("i", 0);
 	int n = 0;
 	if (!PyArg_ParseTuple(args, "i", &n)) {
 		QZAPI::Instance()->showWaypointError(tr("悬停参数值错误"));
@@ -414,6 +412,8 @@ PyObject* QZAPI::FlyTimeGroup(PyObject* self, PyObject* args)
 
 PyObject* QZAPI::FlyRevolve(PyObject* self, PyObject* args)
 {
+	//暂时去掉角度旋转
+	return Py_BuildValue("i", 0);
 	float angle = 0.0;
 	NavWayPointData data;
 #ifdef _WaypointUseTime_
