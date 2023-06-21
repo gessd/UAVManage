@@ -13,7 +13,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{F8B79D5F-A59A-494D-9806-960F779D99EF}</ProjectGuid>
     <Keyword>QtVS_v304</Keyword>
-	<PreferredToolArchitecture>x64</PreferredToolArchitecture>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
     <WindowsTargetPlatformVersion Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">10.0.19041.0</WindowsTargetPlatformVersion>
     <WindowsTargetPlatformVersion Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">10.0</WindowsTargetPlatformVersion>
     <QtMsBuild Condition="'$(QtMsBuild)'=='' OR !Exists('$(QtMsBuild)\qt.targets')">$(MSBuildProjectDirectory)\QtMsBuild</QtMsBuild>
@@ -129,6 +129,9 @@
     <ClCompile Include="sm4\sm4.c" />
     <ClCompile Include="stopflydialog.cpp" />
     <ClCompile Include="waitingwidget.cpp" />
+    <ClCompile Include="Ymodem\Ymodem.cpp" />
+    <ClCompile Include="Ymodem\YmodemFileReceive.cpp" />
+    <ClCompile Include="Ymodem\YmodemFileTransmit.cpp" />
     <QtRcc Include="uavmanage.qrc" />
     <QtUic Include="aboutdialog.ui" />
     <QtUic Include="adddevicedialog.ui" />
@@ -192,6 +195,9 @@
     <QtMoc Include="adddevicedialog.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Ymodem\Ymodem.h" />
+    <QtMoc Include="Ymodem\YmodemFileTransmit.h" />
+    <QtMoc Include="Ymodem\YmodemFileReceive.h" />
     <QtMoc Include="waitingwidget.h" />
     <QtMoc Include="AudioDecoder.h" />
     <QtMoc Include="calibrationdialog.h" />

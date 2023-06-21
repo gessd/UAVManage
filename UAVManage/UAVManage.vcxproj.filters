@@ -39,6 +39,12 @@
     <Filter Include="Source Files\qxtglobalshortcut5">
       <UniqueIdentifier>{7f305b10-664e-4736-85c9-0b1e5b94f41f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Ymodem">
+      <UniqueIdentifier>{f3054360-08d4-4f39-ba3f-e1f2ed89dc35}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Ymodem">
+      <UniqueIdentifier>{3092fd07-76b4-4147-8c76-9db9852170fa}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <QtRcc Include="uavmanage.qrc">
@@ -175,6 +181,15 @@
     <ClCompile Include="sm4\sm4.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Ymodem\Ymodem.cpp">
+      <Filter>Source Files\Ymodem</Filter>
+    </ClCompile>
+    <ClCompile Include="Ymodem\YmodemFileReceive.cpp">
+      <Filter>Source Files\Ymodem</Filter>
+    </ClCompile>
+    <ClCompile Include="Ymodem\YmodemFileTransmit.cpp">
+      <Filter>Source Files\Ymodem</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="devicemanage.h">
@@ -273,6 +288,12 @@
     <QtMoc Include="musicspectrum.h">
       <Filter>Header Files</Filter>
     </QtMoc>
+    <QtMoc Include="Ymodem\YmodemFileReceive.h">
+      <Filter>Header Files\Ymodem</Filter>
+    </QtMoc>
+    <QtMoc Include="Ymodem\YmodemFileTransmit.h">
+      <Filter>Header Files\Ymodem</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="devicemanage.ui">
@@ -366,6 +387,9 @@
     </ClInclude>
     <ClInclude Include="qxtglobalshortcut5\gui\qxtwindowsystem.h">
       <Filter>Header Files\qxtglobalshortcut5</Filter>
+    </ClInclude>
+    <ClInclude Include="Ymodem\Ymodem.h">
+      <Filter>Header Files\Ymodem</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
