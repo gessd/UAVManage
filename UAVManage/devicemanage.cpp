@@ -773,6 +773,26 @@ QString DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upl
 			continue;
 		}
 		QVector<NavWayPointData> data = pythonThread.getWaypointData();
+
+		//保存航点数据到本地，便于查看
+		QFile fileSvg(QApplication::applicationDirPath() + "/waypoint/" + name + ".csv");
+		if (fileSvg.open(QIODevice::ReadWrite | QIODevice::Truncate)) {
+			QTextStream text_stream(&fileSvg);
+			text_stream.setCodec("gbk");
+			QString title = "参数一,参数二,参数三,参数四,X,Y,Z,ID,说明";
+			text_stream << title << "\r\n";
+			for (int i = 0; i < data.count(); i++) {
+				NavWayPointData wp = data.at(i);
+				QString text = QString("%1,%2,%3,%4,%5,%6,%7,%8,%9")
+					.arg(wp.param1).arg(wp.param2).arg(wp.param3).arg(wp.param4).arg(wp.x).arg(wp.y).arg(wp.z).arg(wp.commandID)
+					.arg(Utility::getWaypointDescribeFromID(wp.commandID));
+				text_stream << text << "\r\n";
+				qDebug() << name << QString("第%1条航点").arg(i) << text;
+			}
+			fileSvg.flush();
+			fileSvg.close();
+		}
+
 		//最少2条，第一条是设置的起始位置
 		if (data.count() <= 1) {
 			_ShowErrorMessage(name + tr("没有舞步信息"));
@@ -816,24 +836,6 @@ QString DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upl
 			_ShowErrorMessage(name + QString("飞行动作超出音乐时长，音乐总时长%1分%2秒").arg(minute).arg(second));
 			qstrErrorNames.append("," + pDevice->getName());
 			continue;
-		}
-		//保存航点数据到本地，便于查看
-		QFile fileSvg(QApplication::applicationDirPath() + "/waypoint/" + name + ".csv");
-		if (fileSvg.open(QIODevice::ReadWrite | QIODevice::Truncate)) {
-			QTextStream text_stream(&fileSvg);
-			text_stream.setCodec("gbk");
-			QString title = "参数一,参数二,参数三,参数四,X,Y,Z,ID,说明";
-			text_stream << title << "\r\n";
-			for (int i = 0; i < data.count(); i++) {
-				NavWayPointData wp = data.at(i);
-				QString text = QString("%1,%2,%3,%4,%5,%6,%7,%8,%9")
-					.arg(wp.param1).arg(wp.param2).arg(wp.param3).arg(wp.param4).arg(wp.x).arg(wp.y).arg(wp.z).arg(wp.commandID)
-					.arg(Utility::getWaypointDescribeFromID(wp.commandID));
-				text_stream << text << "\r\n";
-				qDebug() << name << QString("第%1条航点").arg(i) << text;
-			}
-			fileSvg.flush();
-			fileSvg.close();
 		}
 		if (false == upload) {
 			//清空三维仿真碰撞信息
@@ -1536,10 +1538,14 @@ QString DeviceManage::updateBlocklyData(QString name, QMap<QString, unsigned int
 	tinyxml2::XMLDocument doc;
 	tinyxml2::XMLError error = doc.LoadFile(filename.c_str());
 	if (error != tinyxml2::XMLError::XML_SUCCESS) {
+		qWarning() << "无法打开blockly文件更新动作组时间" << error << filepath;
 		return "内部错误，无法更新动作组时间";
 	}
 	tinyxml2::XMLElement* root = doc.RootElement();
-	if (!root) return "内部错误，无法更新动作组时间";
+	if (!root) {
+		qWarning() << "无法更新blockly文件中动作组时间，缺少必要ROOT节点"<< filepath;
+		return "内部错误，无法更新动作组时间";
+	}
 	if (XMLBlocklyNode(root, mapTime)) {
 		error = doc.SaveFile(filename.c_str());
 		emit currentDeviceNameChanged(name, name);
@@ -1552,8 +1558,9 @@ bool DeviceManage::XMLBlocklyNode(void* pNode, QMap<QString, unsigned int> mapTi
 	if (!pNode) return false;
 	static bool bUpdate = false;
 	tinyxml2::XMLElement* element = (tinyxml2::XMLElement*)pNode;
-	for (tinyxml2::XMLElement* currentele = element->FirstChildElement(); currentele; currentele = currentele->NextSiblingElement())
-	{
+	for (tinyxml2::XMLElement* currentele = element->FirstChildElement(); 
+		currentele; 
+		currentele = currentele->NextSiblingElement()){
 		tinyxml2::XMLElement* tmpele = currentele;
 		QString qstrBlock = tmpele->Attribute("type");
 		if ("Fly_TimeGroup" == qstrBlock) {

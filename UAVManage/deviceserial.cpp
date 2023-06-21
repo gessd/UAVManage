@@ -3,45 +3,21 @@
 #include <QDebug>
 #include <QTimer>
 #include <QMessageBox>
+#include <QFileDialog>
+#include <QStandardPaths>
+#include <QFileInfo>
+#include <QKeyEvent>
+#include <QDateTime>
+#include "downloadtool.h"
+#include "definesetting.h"
+#include "paramreadwrite.h"
 
 #define _UAVPID_ 60000
 #define _SerialStart_ "qz+"
 #define _SerialEnd_   "\r\n"
-#define _SerialOk_ "ok"
+#define _SerialOk_    "ok"
 //最长20个英文字符
 #define _DataMaxLen_ 20
-SerialThread::SerialThread(QSerialPort* ser, QObject* parent /*= nullptr*/)
-{
-	m_pSerial = ser;
-}
-
-void SerialThread::clear()
-{
-	m_pSerial = nullptr;
-}
-
-void SerialThread::onDataSendWork(const QByteArray data)
-{
-	if (!m_pSerial) return;
-	m_pSerial->write(data);
-	m_pSerial->waitForBytesWritten(3000);
-}
-
-void SerialThread::onDataReciveWork()
-{
-	//有可能含有中文字符
-	if (!m_pSerial) return;
-	QString data = QString::fromLocal8Bit(m_pSerial->readAll());
-	emit sendResultToGui(data.toLocal8Bit());
-	//m_qstrData.append(data);
-	//QString qstrEnd = _SerialEnd_;
-	//while (m_qstrData.contains(qstrEnd)){
-	//	int index = m_qstrData.indexOf(qstrEnd);
-	//	QString temp = m_qstrData.left(index + qstrEnd.length());
-	//	m_qstrData = m_qstrData.remove(0, temp.length());
-	//	emit sendResultToGui(temp.toLocal8Bit());
-	//}
-}
 
 DeviceSerial::DeviceSerial(QWidget *parent)
 	: QDialog(parent)
@@ -52,14 +28,7 @@ DeviceSerial::DeviceSerial(QWidget *parent)
 	QRegExp regExp1("\\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\b");
 	ui.lineEditIP->setValidator(new QRegExpValidator(regExp1, this));
 
-	m_pSerial = new SerialThread(&m_serialPort);
-	(&m_serialPort)->moveToThread(&m_thread);
-	m_pSerial->moveToThread(&m_thread);
-	connect(&m_thread, &QThread::finished, m_pSerial, &QObject::deleteLater);           // 线程结束，自动删除对象
-	connect(this, &DeviceSerial::serialDataSend, m_pSerial, &SerialThread::onDataSendWork);   // 主线程串口数据发送的信号
-	connect(&m_serialPort, &QSerialPort::readyRead, m_pSerial, &SerialThread::onDataReciveWork); // 主线程通知子线程接收数据的信号
-	connect(m_pSerial, &SerialThread::sendResultToGui, this, &DeviceSerial::onSerialData);              // 主线程收到数据结果的信号
-	m_thread.start();
+	connect(&m_serialPort, &QSerialPort::readyRead, this, &DeviceSerial::onSerialReadyRead);
 	connect(ui.btnSet, &QAbstractButton::clicked, this, &DeviceSerial::onBtnWrite);
 	connect(ui.btnUpdate, &QAbstractButton::clicked, this, &DeviceSerial::onBtnRead);
 	connect(ui.btnSerial, &QAbstractButton::clicked, this, &DeviceSerial::onBtnSerial);
@@ -68,9 +37,13 @@ DeviceSerial::DeviceSerial(QWidget *parent)
 
 	connect(ui.btnCheckFirmware, &QAbstractButton::clicked, this, &DeviceSerial::onBtnCheckFirmware);
 	connect(ui.btnManualFirmware, &QAbstractButton::clicked, this, &DeviceSerial::onBtnManualFirmware);
+	connect(ui.btnAutoUpdateFirmware, &QAbstractButton::clicked, this, &DeviceSerial::onBtnAutoUpdateFirmwareClicked);
+	connect(ui.btnSend, &QAbstractButton::clicked, this, &DeviceSerial::onBtnSendClicekd);
+	connect(ui.btnClear, &QAbstractButton::clicked, this, &DeviceSerial::onBtnClearClicked);
 	connect(&m_timeoutWrite, &QTimer::timeout, this, &DeviceSerial::onTimeoutWrite);
 
-	ui.widgetDeviceParam->setEnabled(false);
+	ui.groupBoxNetwork->setEnabled(false);
+	ui.groupBoxFirmware->setEnabled(false);
 	//监控串口插拔
 	m_qextSerial.setUpNotifications();
 	connect(&m_qextSerial, SIGNAL(deviceDiscovered(const QextPortInfo&)), this, SLOT(onDeviceDiscovered(const QextPortInfo&)));
@@ -83,23 +56,27 @@ DeviceSerial::DeviceSerial(QWidget *parent)
 		if (_UAVPID_ != pid) continue;
 		ui.comboBoxCom->addItem(info.portName());
 	}
+	
+	//固件更新使用
+	m_bYmodemTransmitStatus = false;
+	m_pYmodemFileTransmit = new YmodemFileTransmit(this);
+	connect(m_pYmodemFileTransmit, SIGNAL(transmitProgress(int)), this, SLOT(onYmodemTransmitProgress(int)));
+	connect(m_pYmodemFileTransmit, SIGNAL(transmitStatus(YmodemFileTransmit::Status)), this, SLOT(onYmodemTransmitStatus(YmodemFileTransmit::Status)));
+
+	setFixedWidth(410);
+	ui.widgetData->setVisible(false);
 }
 
 DeviceSerial::~DeviceSerial()
 {
 	if (m_timeoutWrite.isActive()) m_timeoutWrite.stop();
-	if (m_pSerial) {
-		m_pSerial->clear();
-		m_pSerial->deleteLater();
-		m_pSerial = nullptr;
-	}
-	if (m_thread.isRunning()) {
-		m_thread.exit();
-		m_thread.wait();
-	}
 	if (m_pLabelBackground) {
 		delete m_pLabelBackground;
 		m_pLabelBackground = nullptr;
+	}
+	if (m_pYmodemFileTransmit) {
+		m_pYmodemFileTransmit->deleteLater();
+		m_pYmodemFileTransmit = nullptr;
 	}
 }
 
@@ -112,6 +89,7 @@ void DeviceSerial::updateSerial()
 		if (_UAVPID_ != pid) continue;
 		ui.comboBoxCom->addItem(info.portName());
 	}
+	ui.btnSerial->setEnabled(ui.comboBoxCom->count());
 	emit sigDeviceEnabled(ui.comboBoxCom->count());
 }
 
@@ -156,6 +134,8 @@ void DeviceSerial::onSerialData(QByteArray data)
 			}
 			else if (key.contains("qz+v")) {
 				//固件版本
+				qInfo() << "无人机固件版本" << msg;
+				msg = msg.replace("V", "");
 				ui.lineEditFirmwareVersion->setText(msg);
 			}
 		}
@@ -186,19 +166,17 @@ void DeviceSerial::onBtnWrite()
 	}
 	m_timeoutWrite.start(3 * 1000);
 	m_bWriteFinished = false;
-	QString text = QString("qz+w:%1+%2+%3%4").arg(ip).arg(name).arg(password).arg(_SerialEnd_);
-	emit serialDataSend(text.toLocal8Bit());
-
-	//emit serialDataSend("qz+w+name:" + name.toLocal8Bit() + QByteArray(_SerialEnd_));
-	//emit serialDataSend("qz+w+password:" + password.toLocal8Bit() + QByteArray(_SerialEnd_));
+	QString text = QString("qz+w:%1+%2+%3").arg(ip).arg(name).arg(password);
+	sendDataToSerial(text.toLocal8Bit());
 }
 
 void DeviceSerial::onBtnRead()
 {
+	qInfo() << "读取网络配置信息";
 	ui.lineEditIP->clear();
 	ui.lineEditName->clear();
 	ui.lineEditPass->clear();
-	emit serialDataSend("qz+r:" + QByteArray(_SerialEnd_));
+	sendDataToSerial("qz+r:");
 }
 
 void DeviceSerial::onBtnSerial()
@@ -208,56 +186,121 @@ void DeviceSerial::onBtnSerial()
 	ui.lineEditPass->clear();
 	ui.lineEditFirmwareVersion->clear();
 	if (m_serialPort.isOpen()) {
+		qInfo() << "断开串口连接";
+		dataRecord(true, "串口连接断开");
 		ui.btnSerial->setText(tr("连接"));
 		m_serialPort.close();
 		ui.comboBoxCom->setEnabled(true);
-		ui.widgetDeviceParam->setEnabled(false);
+		ui.groupBoxNetwork->setEnabled(false);
+		ui.groupBoxFirmware->setEnabled(false);
 	}
 	else {
+		qInfo() << "准备连接串口";
 		QString qstrCom = ui.comboBoxCom->currentText();
+		if (qstrCom.isEmpty()) {
+			return;
+		}
 		m_serialPort.setPortName(qstrCom);
 		m_serialPort.setBaudRate(QSerialPort::Baud115200, QSerialPort::AllDirections);//设置波特率和读写方向
 		if (!m_serialPort.open(QIODevice::ReadWrite)) {
+			qInfo() << "连接串口失败";
 			QMessageBox::warning(this, tr("提示"), tr("设备无法连接，请重试"));
 			return;
 		}
+		qInfo() << "连接串口成功，准备读取配置信息";
+		dataRecord(true, "串口连接成功");
 		ui.btnSerial->setText(tr("断开"));
 		ui.comboBoxCom->setEnabled(false);
-		ui.widgetDeviceParam->setEnabled(true);
+		ui.groupBoxNetwork->setEnabled(true);
+		ui.groupBoxFirmware->setEnabled(true);
 		//串口连接成功后读取配置内容
 		onBtnRead();
-		QTimer::singleShot(500, [this]() {onBtnCheckFirmware(); });
+		QTimer::singleShot(500, [this]() { onBtnCheckFirmware(); });
 	}
 }
 
 void DeviceSerial::onDeviceDiscovered(const QextPortInfo& info)
 {
 	if (_UAVPID_ != info.productID) return;
+	qDebug() << "串口插入" << info.portName;
 	updateSerial();
 }
 
 void DeviceSerial::onDeviceRemoved(const QextPortInfo& info)
 {
 	if (_UAVPID_ != info.productID) return;
-	if (m_serialPort.isOpen() && m_serialPort.portName() == info.portName) {
-		//当前已打开串口与拔出串口相同
-		ui.btnSerial->clicked();
+	qDebug() << "串口拔出" << info.portName;
+	if (m_serialPort.portName() == info.portName) {
+		if (m_serialPort.isOpen()) {
+			qWarning() << "正在使用的串口被拔出";
+			onBtnSerial();
+		}
+		if (m_bYmodemTransmitStatus) {
+			m_pYmodemFileTransmit->stopTransmit();
+			this->setEnabled(!m_bYmodemTransmitStatus);
+		}
 	}
 	updateSerial();
 }
 
 void DeviceSerial::onBtnCheckFirmware()
 {
-	//通过网络获取最新版本固件
-	//QMessageBox::information(this, tr("提示"), tr("功能开发中"));
+	qInfo() << "读取固件版本信息";
 	ui.lineEditFirmwareVersion->clear();
-	emit serialDataSend("qz+v:" + QByteArray(_SerialEnd_));
+	ui.lineEditServerVersion->clear();
+	sendDataToSerial("qz+v:");
+	//从服务器获取最新固件版本号
+
+	QString qstrSavePath = QApplication::applicationDirPath() + "/temp";
+	QString qstrUrl = QString("%1/%2").arg(_ServerUrl_).arg(_VersionFile_);
+	DownloadTool* download = new DownloadTool(qstrUrl, qstrSavePath, this);
+	download->startDownload();
+	connect(download, &DownloadTool::sigDownloadFinished, [this](QString error) {
+		if (error.isEmpty()) {
+			//解析升级配置文件，读取最新版本号
+			QString config = QString("%1%2/%3").arg(QApplication::applicationDirPath()).arg("/temp").arg(_VersionFile_);
+			QString qstrNewVersionNumber = ParamReadWrite::readParam("version", "", _Firmware_, config).toString();
+			qDebug() << "服务器固件版本" << qstrNewVersionNumber;
+			ui.lineEditServerVersion->setText(qstrNewVersionNumber);
+			if (qstrNewVersionNumber.isEmpty()) return;
+			QStringList list = qstrNewVersionNumber.split(".");
+			if (3 != list.count()) return;
+			unsigned int nNewVersion = list.at(0).toInt() * 100 * 100 + list.at(1).toInt() * 100 + list.at(2).toInt();
+			QString qstrCurrentVserion = ui.lineEditFirmwareVersion->text().trimmed();
+			if (qstrCurrentVserion.isEmpty()) return;
+			list = qstrCurrentVserion.split(".");
+			if (3 != list.count()) return;
+			unsigned int nCurrentVersion = list.at(0).toInt() * 100 * 100 + list.at(1).toInt() * 100 + list.at(2).toInt();
+			if (nNewVersion > nCurrentVersion) {
+				ui.btnAutoUpdateFirmware->setVisible(true);
+			}
+		}
+		else {
+			ui.lineEditServerVersion->setText("获取最新版本出错");
+		}
+		});
 }
 
 void DeviceSerial::onBtnManualFirmware()
 {
-	//选择本地已存在固件文件
+	//固件更新过程
+	//1.先发送指令qz+f
+	//2.收到回应The number should be either 1, 2, 3 or 4
+	//3.发送指令1
+	//4.收到回应C
+	//5.发送固件BIN文件
 	QMessageBox::information(this, tr("提示"), tr("功能开发中"));
+	return;
+	//选择本地已存在固件文件
+	QString qstrFile = QFileDialog::getOpenFileName(this, tr("选择固件"), QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation), "File(*.bin)");
+	if (qstrFile.isEmpty()) return;
+	qInfo() << "手动选择固件文件" << qstrFile;
+	m_qstrBinFile = qstrFile;
+	QFileInfo info(qstrFile);
+	QString name = info.fileName();
+	ui.labelYmodemTransmitError->setText("准备手动更新固件文件"+name);
+	ui.widgetYmodemTransmit->setVisible(true);
+	sendDataToSerial("qz+f");
 }
 
 void DeviceSerial::onLineEditChanged(QString text)
@@ -285,8 +328,125 @@ void DeviceSerial::onTimeoutWrite()
 	QMessageBox::warning(this, tr("错误"), tr("设置时无人机没有响应，请检查连接"));
 }
 
+void DeviceSerial::onSerialReadyRead()
+{
+	if (!m_serialPort.isOpen()) return;
+	QByteArray data = m_serialPort.readAll();
+	qDebug() << "串口收到内容" << data;
+	dataRecord(false, data);
+	onSerialData(data);
+	if (data.contains("either 1, 2, 3")) {
+		sendDataToSerial("1");
+	} 
+	if ("C" == data) {
+		//发送固件文件
+		if (m_bYmodemTransmitStatus) return;
+		if (false == QFile::exists(m_qstrBinFile)) {
+			static bool bWait = false;
+			if (bWait) return;
+			bWait = true;
+			QMessageBox::StandardButton button = QMessageBox::question(this, tr("询问"), tr("无人机等待更新固件，是否现在更新"));
+			if (QMessageBox::StandardButton::Yes != button) return;
+			m_qstrBinFile = QFileDialog::getOpenFileName(this, tr("选择固件"), QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation), "File(*.bin)");
+			qInfo() << "手动选择固件文件";
+			if (m_qstrBinFile.isEmpty()) return;
+		}
+		qInfo() << "固件所在位置" << m_qstrBinFile;
+		//先断开串口连接
+		if (m_serialPort.isOpen()){
+			onBtnSerial();
+		}
+		qInfo() << "开始发送固件到无人机";
+		ui.labelYmodemTransmitError->setText("正在更新中");
+		ui.progressBarTransmit->setValue(0);
+		m_pYmodemFileTransmit->setFileName(m_qstrBinFile);
+		m_pYmodemFileTransmit->setPortName(ui.comboBoxCom->currentText());
+		m_pYmodemFileTransmit->setPortBaudRate(QSerialPort::Baud115200);
+		if (m_pYmodemFileTransmit->startTransmit()) {
+			m_bYmodemTransmitStatus = true;
+		}
+		else {
+			m_bYmodemTransmitStatus = false;
+			QMessageBox::warning(this, tr("错误"), tr("固件更新出错，无法发送固件到无人机"));
+		}
+		this->setEnabled(!m_bYmodemTransmitStatus);
+	}
+}
+
+void DeviceSerial::onBtnSendClicekd()
+{
+	QString text = ui.lineEditData->text().trimmed();
+	if (text.isEmpty()) return;
+	sendDataToSerial(text.toLocal8Bit());
+}
+
+void DeviceSerial::onBtnClearClicked()
+{
+	ui.textBrowserData->clear();
+}
+
+void DeviceSerial::onBtnAutoUpdateFirmwareClicked()
+{
+	QMessageBox::information(this, tr("提示"), tr("功能开发中"));
+	return;
+	//从服务器上下载固件并写入无人机
+	qInfo() << "准备自动更新固件文件";
+	ui.widgetYmodemTransmit->setVisible(true);
+	QString qstrSavePath = QApplication::applicationDirPath() + "/temp";
+	QString config = QString("%1%2/%3").arg(QApplication::applicationDirPath()).arg("/temp").arg(_VersionFile_);
+	QString filename = ParamReadWrite::readParam("file", "", _Firmware_, config).toString();
+	QString qstrUrl = QString("%1/%2").arg(_ServerUrl_).arg(filename);
+	m_qstrBinFile = qstrSavePath + "/" + filename;
+	DownloadTool* download = new DownloadTool(qstrUrl, qstrSavePath, this);
+	download->startDownload();
+	ui.labelYmodemTransmitError->setText("正在下载最新版本固件");
+	connect(download, &DownloadTool::sigProgress, [this](qint64 bytesRead, qint64 totalBytes, qreal progress) {
+		//文件下载进度
+		ui.progressBarTransmit->setValue(progress * 100);
+		});
+	connect(download, &DownloadTool::sigDownloadFinished, [this](QString error) {
+		qInfo() << "最新固件下载完成" << m_qstrBinFile;
+		ui.labelYmodemTransmitError->setText("准备更新最新固件");
+		ui.progressBarTransmit->setValue(0);
+		sendDataToSerial("qz+f");
+		});
+}
+
+void DeviceSerial::onYmodemTransmitProgress(int progress)
+{
+	ui.progressBarTransmit->setValue(progress);
+}
+
+void DeviceSerial::onYmodemTransmitStatus(YmodemFileTransmit::Status status)
+{
+	qInfo() << "固件更新状态" << status;
+	switch (status){
+	case YmodemFileTransmit::StatusEstablish: "未开始"; break;
+	case YmodemFileTransmit::StatusTransmit: "更新中"; break;
+	case YmodemFileTransmit::StatusFinish:
+		m_bYmodemTransmitStatus = false;
+		ui.labelYmodemTransmitError->setText("固件更新成功");
+		break;
+	default:
+		qWarning() << "无人机固件更新失败" << status;
+		m_bYmodemTransmitStatus = false;
+		ui.labelYmodemTransmitError->setText("<font color=red>固件更新失败</font>");
+	}
+	this->setEnabled(!m_bYmodemTransmitStatus);
+	if (false == m_bYmodemTransmitStatus) {
+		//更新完成或失败，重新连接串口
+		if(isActiveWindow()) onBtnSerial();
+	}
+}
+
 void DeviceSerial::showEvent(QShowEvent* event)
 {
+	ui.lineEditServerVersion->clear();
+	ui.textBrowserData->clear();
+	ui.btnAutoUpdateFirmware->setVisible(false);
+	ui.widgetYmodemTransmit->setVisible(false);
+	setFixedWidth(410);
+	ui.widgetData->setVisible(false);
 	if (m_pLabelBackground) {
 		delete m_pLabelBackground;
 		m_pLabelBackground = nullptr;
@@ -297,6 +457,8 @@ void DeviceSerial::showEvent(QShowEvent* event)
 		if (!pTemp) break;
 		pWidget = pTemp;
 	}
+	ui.labelYmodemTransmitError->clear();
+	ui.progressBarTransmit->setValue(0);
 	m_pLabelBackground = new QLabel(pWidget);
 	m_pLabelBackground->setStyleSheet(QString("background-color: rgba(0, 0, 0, 50%);"));
 	m_pLabelBackground->setFixedSize(pWidget->size());
@@ -306,8 +468,9 @@ void DeviceSerial::showEvent(QShowEvent* event)
 		QTimer::singleShot(1000, [this]() { 
 			//延时连接防止界面阻塞
 			updateSerial(); 
+			qInfo() << "自动连接串口";
 			if (ui.comboBoxCom->count() > 0 && false == m_serialPort.isOpen()) {
-				ui.btnSerial->clicked();
+				onBtnSerial();
 			}
 			});
 	}
@@ -324,6 +487,41 @@ void DeviceSerial::closeEvent(QCloseEvent* event)
 
 void DeviceSerial::hideEvent(QHideEvent* event)
 {
+	m_qstrBinFile.clear();
 	if (m_pLabelBackground) m_pLabelBackground->close();
+	if (m_serialPort.isOpen()) {
+		m_serialPort.close();
+		ui.btnSerial->setText(tr("连接"));
+		ui.comboBoxCom->setEnabled(true);
+	}
+	if (m_bYmodemTransmitStatus) {
+		m_pYmodemFileTransmit->stopTransmit();
+	}
+}
+
+void DeviceSerial::keyPressEvent(QKeyEvent* event)
+{
+	if (Qt::Key_Q == event->key()) {
+		setFixedWidth(900);
+		ui.widgetData->setVisible(true);
+	}
+}
+
+void DeviceSerial::sendDataToSerial(const QByteArray data)
+{
+	if (!m_serialPort.isOpen()) return;
+	QByteArray temp = data + _SerialEnd_;
+	qDebug() << "串口发送数据内容" << temp;
+	dataRecord(true, temp);
+	m_serialPort.write(temp);
+}
+
+void DeviceSerial::dataRecord(bool send, QByteArray data)
+{
+	QString qstrText = QDateTime::currentDateTime().toString("[hh:mm:ss.zzz]:");
+	QString color = "#000000";
+	if (send) color = "#0000FF";
+	QString text = QString("<font color=%1>%2</font>").arg(color).arg(data.data());
+	ui.textBrowserData->append(qstrText+text);
 }
 

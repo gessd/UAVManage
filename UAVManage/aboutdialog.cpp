@@ -55,7 +55,7 @@ void AboutDialog::onCheckNewVersion()
 	}
 	QString qstrSavePath = QApplication::applicationDirPath() + _NewVersionPath_;
 	QString qstrUrl = QString("%1/%2").arg(_ServerUrl_).arg(_VersionFile_);
-	DownloadTool* download = new DownloadTool(qstrUrl, qstrSavePath);
+	DownloadTool* download = new DownloadTool(qstrUrl, qstrSavePath, this);
 	download->startDownload();
 	connect(download, &DownloadTool::sigDownloadFinished, [this](QString error) {
 		if (error.isEmpty()) {
@@ -111,7 +111,7 @@ void AboutDialog::onStartUpdate()
 	QString qstrUrl = QString("%1/%2").arg(_ServerUrl_).arg(m_qstrNewVersionName);
 	//qstrUrl = "http://downmini.yun.kugou.com/web/kugou_10112.exe";
 	//qstrUrl = "http://dl-cdn.oray.com/sunlogin/windows/SunloginClient_13.1.0.48900_x64.exe";
-	DownloadTool* download = new DownloadTool(qstrUrl, qstrSavePath);
+	DownloadTool* download = new DownloadTool(qstrUrl, qstrSavePath, this);
 	download->startDownload();
 	//TODO 需要增加下载超时
 	connect(download, &DownloadTool::sigProgress, [this](qint64 bytesRead, qint64 totalBytes, qreal progress) {
