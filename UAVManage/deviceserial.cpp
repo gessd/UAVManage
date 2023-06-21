@@ -187,7 +187,7 @@ void DeviceSerial::onBtnSerial()
 	ui.lineEditFirmwareVersion->clear();
 	if (m_serialPort.isOpen()) {
 		qInfo() << "断开串口连接";
-		dataRecord(true, "串口连接断开");
+		dataRecord(true, QString("串口连接断开").toLocal8Bit());
 		ui.btnSerial->setText(tr("连接"));
 		m_serialPort.close();
 		ui.comboBoxCom->setEnabled(true);
@@ -208,7 +208,7 @@ void DeviceSerial::onBtnSerial()
 			return;
 		}
 		qInfo() << "连接串口成功，准备读取配置信息";
-		dataRecord(true, "串口连接成功");
+		dataRecord(true, QString("串口连接成功").toLocal8Bit());
 		ui.btnSerial->setText(tr("断开"));
 		ui.comboBoxCom->setEnabled(false);
 		ui.groupBoxNetwork->setEnabled(true);
@@ -335,7 +335,7 @@ void DeviceSerial::onSerialReadyRead()
 	qDebug() << "串口收到内容" << data;
 	dataRecord(false, data);
 	onSerialData(data);
-	if (data.contains("either 1, 2, 3")) {
+	if (m_bYmodemTransmitStatus && data.contains("either 1, 2, 3")) {
 		sendDataToSerial("1");
 	} 
 	if ("C" == data) {
@@ -521,7 +521,7 @@ void DeviceSerial::dataRecord(bool send, QByteArray data)
 	QString qstrText = QDateTime::currentDateTime().toString("[hh:mm:ss.zzz]:");
 	QString color = "#000000";
 	if (send) color = "#0000FF";
-	QString text = QString("<font color=%1>%2</font>").arg(color).arg(data.data());
-	ui.textBrowserData->append(qstrText+text);
+	QString text = QString("<font color=%1>%2</font>").arg(color).arg(QString::fromLocal8Bit(data));
+	ui.textBrowserData->append(qstrText + text);
 }
 
