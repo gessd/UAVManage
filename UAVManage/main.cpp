@@ -85,9 +85,32 @@ bool checkVersion()
 	return false;
 }
 
+#ifdef Q_OS_WIN
+#include <imagehlp.h>
+#pragma comment(lib, "DbgHelp.lib")
+LONG ExceptionCrashHandler(EXCEPTION_POINTERS* pException)
+{
+	// 创建Dump文件
+	HANDLE hDumpFile = CreateFileW(L"app.dmp", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	// Dump信息
+	MINIDUMP_EXCEPTION_INFORMATION dumpInfo;
+	dumpInfo.ExceptionPointers = pException;
+	dumpInfo.ThreadId = GetCurrentThreadId();
+	dumpInfo.ClientPointers = TRUE;
+	// 写入Dump文件内容
+	MiniDumpWriteDump(GetCurrentProcess(), GetCurrentProcessId(), hDumpFile, MiniDumpNormal, &dumpInfo, NULL, NULL);
+	CloseHandle(hDumpFile);
+	return EXCEPTION_EXECUTE_HANDLER;
+}
+#endif
+
 int main(int argc, char *argv[])
 {
 	QtSingleApplication a("myapp_id", argc, argv);
+#ifdef Q_OS_WIN
+	//抛出异常
+	::SetUnhandledExceptionFilter((LPTOP_LEVEL_EXCEPTION_FILTER)ExceptionCrashHandler);
+#endif
 	//注册MessageHandler
 	qInstallMessageHandler(outputMessage);
 	if (a.isRunning())  //判断实例是否已经运行
