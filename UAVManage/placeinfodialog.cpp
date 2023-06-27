@@ -203,14 +203,30 @@ void PlaceInfoDialog::onParseSettingFrame(QByteArray arrNLINKData)
 			arrData[_id] = arrID[0];
 			//arrData[_reserved2] = arrFre[0];  //更新速率
 			for (int row = 0; row < 9; row++) {
-				for (int column = 0; column < 3; column++) {
-					float number = ui.tableWidget->item(row, column)->text().toFloat();
-					QByteArray arrNumber = NLINK_FloatToData(number);
-					int index = (row * 9) + _xyz0 + column * 3;
-					arrData[index] = arrNumber[0];
-					arrData[index + 1] = arrNumber[1];
-					arrData[index + 2] = arrNumber[2];
-				}
+				//因显示时调换了X列与Y列，所有写入时再调换回来
+				QByteArray a0 = NLINK_FloatToData(ui.tableWidget->item(row, 1)->text().toFloat());
+				QByteArray a1 = NLINK_FloatToData(ui.tableWidget->item(row, 0)->text().toFloat());
+				QByteArray a2 = NLINK_FloatToData(ui.tableWidget->item(row, 2)->text().toFloat());
+				int index = (row * 9) + _xyz0 + 0 * 3;
+				arrData[index] = a0[0];
+				arrData[index + 1] = a0[1];
+				arrData[index + 2] = a0[2];
+				index = (row * 9) + _xyz0 + 1 * 3;
+				arrData[index] = a1[0];
+				arrData[index + 1] = a1[1];
+				arrData[index + 2] = a1[2];
+				index = (row * 9) + _xyz0 + 2 * 3;
+				arrData[index] = a2[0];
+				arrData[index + 1] = a2[1];
+				arrData[index + 2] = a2[2];
+				//for (int column = 0; column < 3; column++) {
+				//	float number = ui.tableWidget->item(row, column)->text().toFloat();
+				//	QByteArray arrNumber = NLINK_FloatToData(number);
+				//	int index = (row * 9) + _xyz0 + column * 3;
+				//	arrData[index] = arrNumber[0];
+				//	arrData[index + 1] = arrNumber[1];
+				//	arrData[index + 2] = arrNumber[2];
+				//}
 			}
 		}
 		m_bOnekeySetNLINK = false;
@@ -242,6 +258,7 @@ void PlaceInfoDialog::onParseSettingFrame(QByteArray arrNLINKData)
 				unsigned char temp[3] = { arrData[index], arrData[index + 1], arrData[index + 2] };
 				double number = NLINK_ParseInt24(temp);
 				int n = column / 3;
+				//界面显示时X列与Y列调换显示
 				if (0 == n) {
 					ui.tableWidget->setItem(row, 1, new QTableWidgetItem(QString::number(number)));
 					xmax = qMax(xmax, number);
