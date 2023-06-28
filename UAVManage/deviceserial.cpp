@@ -19,6 +19,8 @@
 //最长20个英文字符
 #define _DataMaxLen_ 20
 
+#define _DisableUpdateFirmware_
+
 DeviceSerial::DeviceSerial(QWidget *parent)
 	: QDialog(parent)
 {
@@ -224,6 +226,9 @@ void DeviceSerial::onDeviceDiscovered(const QextPortInfo& info)
 	if (_UAVPID_ != info.productID) return;
 	qDebug() << "串口插入" << info.portName;
 	updateSerial();
+	if (isActiveWindow() && false == m_serialPort.isOpen()) {
+		onBtnSerial();
+	}
 }
 
 void DeviceSerial::onDeviceRemoved(const QextPortInfo& info)
@@ -273,10 +278,16 @@ void DeviceSerial::onBtnCheckFirmware()
 			unsigned int nCurrentVersion = list.at(0).toInt() * 100 * 100 + list.at(1).toInt() * 100 + list.at(2).toInt();
 			if (nNewVersion > nCurrentVersion) {
 				ui.btnAutoUpdateFirmware->setVisible(true);
+#ifndef _DisableUpdateFirmware_
+				QMessageBox::StandardButton button = QMessageBox::question(this, tr("升级"), tr("有新版本固件可以升级，是否现在升级？"));
+				if (QMessageBox::StandardButton::Yes == button) {
+					onBtnAutoUpdateFirmwareClicked();
+				}
+#endif
 			}
 		}
 		else {
-			ui.lineEditServerVersion->setText("获取最新版本出错");
+			ui.lineEditServerVersion->setText("出错");
 		}
 		});
 }
@@ -289,8 +300,10 @@ void DeviceSerial::onBtnManualFirmware()
 	//3.发送指令1
 	//4.收到回应C
 	//5.发送固件BIN文件
+#ifdef _DisableUpdateFirmware_
 	QMessageBox::information(this, tr("提示"), tr("功能开发中"));
 	return;
+#endif
 	//选择本地已存在固件文件
 	QString qstrFile = QFileDialog::getOpenFileName(this, tr("选择固件"), QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation), "File(*.bin)");
 	if (qstrFile.isEmpty()) return;
@@ -335,7 +348,7 @@ void DeviceSerial::onSerialReadyRead()
 	qDebug() << "串口收到内容" << data;
 	dataRecord(false, data);
 	onSerialData(data);
-	if (m_bYmodemTransmitStatus && data.contains("either 1, 2, 3")) {
+	if (false == m_bYmodemTransmitStatus && data.contains("either 1, 2, 3")) {
 		sendDataToSerial("1");
 	} 
 	if ("C" == data) {
@@ -387,8 +400,10 @@ void DeviceSerial::onBtnClearClicked()
 
 void DeviceSerial::onBtnAutoUpdateFirmwareClicked()
 {
+#ifdef _DisableUpdateFirmware_
 	QMessageBox::information(this, tr("提示"), tr("功能开发中"));
 	return;
+#endif
 	//从服务器上下载固件并写入无人机
 	qInfo() << "准备自动更新固件文件";
 	ui.widgetYmodemTransmit->setVisible(true);
@@ -408,6 +423,11 @@ void DeviceSerial::onBtnAutoUpdateFirmwareClicked()
 		qInfo() << "最新固件下载完成" << m_qstrBinFile;
 		ui.labelYmodemTransmitError->setText("准备更新最新固件");
 		ui.progressBarTransmit->setValue(0);
+		//下载固件过程中有可能串口被断开，所以此处重新判断
+		if (false == m_serialPort.isOpen()) {
+			QMessageBox::warning(this, tr("错误"), tr("串口未连接，无法升级固件"));
+			return;
+		}
 		sendDataToSerial("qz+f");
 		});
 }
