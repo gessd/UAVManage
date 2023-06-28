@@ -13,7 +13,6 @@ public:
 	
 	void setName(QString name);
 	void setIp(QString ip);
-	void setLocalPosition(unsigned int time_boot_ms, float x, float y, float z);
 protected:
 	void closeEvent(QCloseEvent* event);
 public slots:

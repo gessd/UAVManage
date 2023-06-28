@@ -117,14 +117,6 @@ void DeviceDebug::onUpdateLocalPosition(unsigned int time_boot_ms, int x, int y,
 	ui.lineEditZ->setText(QString("%1").arg(z));
 }
 
-void DeviceDebug::setLocalPosition(unsigned int time_boot_ms, float x, float y, float z)
-{
-	ui.lineEditTime->setText(QString("%1").arg(time_boot_ms/1000.0));
-	ui.lineEditX->setText(QString("%1").arg(x));
-	ui.lineEditY->setText(QString("%1").arg(y));
-	ui.lineEditZ->setText(QString("%1").arg(z));
-}
-
 void DeviceDebug::closeEvent(QCloseEvent* event)
 {
 }
