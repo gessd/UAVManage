@@ -28,8 +28,6 @@ socket.onmessage = function(event) {
         if(1 == msgID){
             console.log("更新编程区域");
             Code.workspace.clear();
-            //清空回撤功能数据
-            Code.workspace.clearUndo();
             document.getElementById("tab_blocks").click();
             var xml = Blockly.Xml.textToDom(jsonObject.xml);
             Blockly.Xml.domToWorkspace(xml, Code.workspace);
@@ -45,6 +43,8 @@ socket.onmessage = function(event) {
                 document.getElementById("tab_python").click();
                 ace.edit("content_python").setValue(pythonCode, 1);
             }
+            //清空回撤功能数据
+            Code.workspace.clearUndo();
         } else if(2 == msgID){
             console.log("清空编程区域");
             document.getElementById("tab_blocks").click();

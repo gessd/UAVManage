@@ -3,7 +3,7 @@
 //程序版本号
 #define _MajorNumber_ 1
 #define _MinorNumber_ 0
-#define _BuildNumber_ 13
+#define _BuildNumber_ 14
 //新程序下载存放文件夹
 #define _NewVersionPath_	"/update"
 #define _VersionFile_		"version.ini"
@@ -21,7 +21,7 @@
 #define _PyFileSuffix_       ".py"
 #define _PyManualSuffix_     ".mp"
 #define _BlcoklyFileSuffix_  ".blockly"
-#define _ProjectDirName_ "/code/"
+#define _ProjectDirName_	"/code/"
 
 //设备名称前缀
 #define _DeviceNamePrefix_ "无人机"
