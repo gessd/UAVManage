@@ -851,6 +851,8 @@ QString DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upl
 	//分片时间间隔，毫秒
 	int nInterval = 10;
 	QStringList keys = map.keys();
+	//记录降落位置
+	QList<_MidwayPosition> deviceFlyLandList;
 	//分解所有无人机位置
 	foreach(QString name, keys) {
 		QVector<NavWayPointData> data = map.value(name);
@@ -864,6 +866,8 @@ QString DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upl
 			if (_WaypointFlyLand == end.commandID) {
 				//降落时使用固定速度
 				end.param3 = (start.z - end.z) / _WaypointLanding_;
+				//记录降落位置，防止无人机降落时间不一样，无法判断降落时是否碰撞
+				deviceFlyLandList.append(_MidwayPosition(name, end.blockid, end.x, end.y, end.z));
 			}
 			//总时长,毫秒
 			int maxMillisecond = end.param3 * 1000;
@@ -887,7 +891,7 @@ QString DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upl
 			nStartTime = nStartTime + start.param3 * 1000;
 		}
 	}
-	//判断无人机距离是否过近
+	//判断无人机在时间片段点距离是否过近
 	QList<unsigned int> timelist = mapTime.keys();
 	foreach(unsigned int current, timelist) {
 		QList<_MidwayPosition> deviceList = mapTime.value(current);
@@ -907,14 +911,27 @@ QString DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upl
 					_ShowErrorMessage(t + error);
 					//定位当前设备的WEB积木块中，否则显示最前边
 					QString qstrCurrentNmae = getCurrentDeviceName();
-					if (qstrCurrentNmae == temp.name) {
-						emit sigBlockFlicker(temp.blockid);
-					}
-					else {
-						emit sigBlockFlicker(pos.blockid);
-					}
+					if (qstrCurrentNmae == temp.name) emit sigBlockFlicker(temp.blockid);
+					else emit sigBlockFlicker(pos.blockid);
 					return "，" + pos.name + "，" + temp.name;
 				}
+			}
+		}
+	}
+	//判断降落过程是否有碰撞情况
+	if (deviceFlyLandList.count() > 1) {
+		_MidwayPosition pos = deviceFlyLandList.at(0);
+		for (int i = 1; i < deviceFlyLandList.count(); i++) {
+			_MidwayPosition temp = deviceFlyLandList.at(i);
+			int d = getDistance(pos.x, pos.y, pos.z, temp.x, temp.y, temp.z);
+			if (d < _UAVMinDistance_) {
+				QString error = QString("%1与%2在降落过程中存在碰撞风险").arg(pos.name).arg(temp.name);
+				_ShowErrorMessage(error);
+				//定位当前设备的WEB积木块中，否则显示最前边
+				QString qstrCurrentNmae = getCurrentDeviceName();
+				if (qstrCurrentNmae == temp.name) emit sigBlockFlicker(temp.blockid);
+				else emit sigBlockFlicker(pos.blockid);
+				return "，" + pos.name + "，" + temp.name;
 			}
 		}
 	}

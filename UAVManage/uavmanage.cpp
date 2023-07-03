@@ -1236,6 +1236,7 @@ void UAVManage::onStart3DDialog()
 void UAVManage::onBlockFlicker(QString id)
 {
 	if (!m_pWebBlocklySocket) return;
+	if (id.isEmpty()) return;
 	QJsonObject jsonObj;
 	jsonObj.insert(_WMID, _WIDBlockFlicker);
 	jsonObj.insert("id", id);
