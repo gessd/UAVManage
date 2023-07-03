@@ -69,7 +69,7 @@ Blockly.Python['Fly_Takeoff'] = function(block) {
     addHead();
     var alt = block.getFieldValue("height");
     var t = block.getFieldValue('time');
-    var code = 'Fly_Takeoff('+ alt + ',' + t + ')' + '\n';
+    var code = 'Fly_Takeoff('+ alt + ',' + t + ',\'' +block.id + '\''+ ')' + '\n';
     return code;
 };
 
@@ -104,7 +104,7 @@ Blockly.Python['Fly_TimeGroup'] = function(block) {
     var m = block.getFieldValue("minute");
     var s = block.getFieldValue("second");
     var ff = Blockly.Python.statementToCode(block, 'interiorfunction');
-    var code = 'Fly_TimeGroup(\'' + name + '\',' +m+','+s+')\n';
+    var code = 'Fly_TimeGroup(\'' + name + '\',' + m + ',' + s + ',\'' +block.id + '\''+')\n';
     if(false == isEmpty(ff)) {
         code = code + "if True:\n"+ff;
     }
@@ -123,7 +123,7 @@ Blockly.Blocks['Fly_Land'] = {
 
 Blockly.Python['Fly_Land'] = function(block) {
     addHead();
-    var code = 'Fly_Land()' + '\n';
+    var code = 'Fly_Land('+ '\'' +block.id + '\''+')' + '\n';
     return code;
 };
 
@@ -163,7 +163,7 @@ Blockly.Python['Fly_AddMarkPoint'] = function(block) {
     var px = block.getFieldValue("coordinateX");
     var py = block.getFieldValue("coordinateY");
     var pz = block.getFieldValue("coordinateZ");
-    var code = 'Fly_AddMarkPoint(\'' + name + '\',' + px + ',' + py + ',' + pz + ')' + '\n';
+    var code = 'Fly_AddMarkPoint(\'' + name + '\',' + px + ',' + py + ',' + pz + ',\'' + block.id + '\'' + ')' + '\n';
     return code;
 };
 
@@ -196,7 +196,7 @@ Blockly.Python['Fly_ToMarkPoint'] = function(block) {
     var point = block.getFieldValue('mark');
     var t = block.getFieldValue('time');
     var u = block.getFieldValue('unit');
-    var code = 'Fly_ToMarkPoint(\'' + point + '\',' + t+ ')' + '\n';
+    var code = 'Fly_ToMarkPoint(\'' + point + '\',' + t + ',\'' +block.id + '\'' + ')' + '\n';
     return code;
 };
 
@@ -233,7 +233,7 @@ Blockly.Python['Fly_To'] = function(block) {
     var pz = block.getFieldValue("coordinateZ");
     var t = block.getFieldValue("time");
     var u = block.getFieldValue('unit');
-    var code = 'Fly_To(' + px + ',' + py + ',' + pz +',' + t +')' + '\n';
+    var code = 'Fly_To(' + px + ',' + py + ',' + pz +',' + t + ',\'' + block.id + '\'' + ')' + '\n';
     return code;
 };
 
@@ -272,7 +272,7 @@ Blockly.Python['Fly_ToNumber'] = function(block) {
 	var pz = Blockly.Python.valueToCode(block, 'Z', Blockly.Python.ORDER_NONE);
     var t = Blockly.Python.valueToCode(block, 'time', Blockly.Python.ORDER_NONE);
     var u = block.getFieldValue('unit');
-    var code = 'Fly_To(' + px + ',' + py + ',' + pz + ',' + t +')' + '\n';
+    var code = 'Fly_To(' + px + ',' + py + ',' + pz + ',' + t + ',\'' + block.id + '\'' + ')' + '\n';
     return code;
 };
 
@@ -319,7 +319,7 @@ Blockly.Python['Fly_Hover'] = function(block) {
     addHead();
     var t = block.getFieldValue('hover');
     var u = block.getFieldValue('unit');
-    var code = 'Fly_Hover('+t+')' + '\n';
+    var code = 'Fly_Hover(' +t + ',\'' + block.id + '\'' + ')' + '\n';
     return code; 
 };
 
@@ -356,9 +356,9 @@ Blockly.Python['Fly_Revolve'] = function(block) {
     var t = block.getFieldValue('time');
     var u = block.getFieldValue('unit');
     if("right" == d){
-        return 'Fly_Revolve('+r+','+t+')' + '\n';
+        return 'Fly_Revolve('+r+','+t+ ',\'' + block.id + '\'' + ')' + '\n';
     } else if("left" == d){
-        return 'Fly_Revolve('+-r+','+t+')' + '\n';
+        return 'Fly_Revolve('+-r+','+t+ ',\'' + block.id + '\'' + ')' + '\n';
     }
 };
 
@@ -398,7 +398,7 @@ Blockly.Python['Fly_Move'] = function(block) {
     var s = block.getFieldValue('distance');
     var t = block.getFieldValue('time');
     var u = block.getFieldValue('unit');
-    return 'Fly_Move('+d+','+s+','+t+')\n';
+    return 'Fly_Move('+d+','+s+','+t+ ',\'' + block.id + '\'' + ')\n';
 };
 
 Blockly.Blocks['Fly_SetLedMode'] = {
@@ -424,7 +424,7 @@ Blockly.Blocks['Fly_SetLedMode'] = {
 Blockly.Python['Fly_SetLedMode'] = function(block) {
     addHead();
     var m = block.getFieldValue('mode');
-    return 'Fly_SetLedMode('+m+')\n';
+    return 'Fly_SetLedMode(' + m + ',\'' + block.id + '\'' + ')\n';
 };
 
 Blockly.Blocks['Fly_SetLedColor'] = {
@@ -444,5 +444,5 @@ Blockly.Blocks['Fly_SetLedColor'] = {
 Blockly.Python['Fly_SetLedColor'] = function(block) {
     addHead();
     var color = block.getFieldValue('color');
-    return "Fly_SetLedColor('"+color+"')\n";
+    return 'Fly_SetLedColor('+ '\'' + color + '\'' + ',\'' + block.id + '\'' + ')\n';
 };

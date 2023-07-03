@@ -162,6 +162,11 @@ private slots:
      * @brief 启动三维仿真窗口
      */
     void onStart3DDialog();
+
+    /**
+     * @brief 定位积木块
+     */
+    void onBlockFlicker(QString id);
 private:
     /**
      * @brief 新建项目工程文件

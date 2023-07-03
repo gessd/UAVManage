@@ -204,6 +204,11 @@ signals:
 	 * @brief 三维仿真
 	 */
 	void sigStart3D();
+
+	/**
+	 * @brief 定位积木块
+	 */
+	void sigBlockFlicker(QString id);
 protected:
 	virtual bool eventFilter(QObject* watched, QEvent* event);
 	virtual void resizeEvent(QResizeEvent* event);

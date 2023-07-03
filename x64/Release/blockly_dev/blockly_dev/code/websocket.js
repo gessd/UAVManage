@@ -4,6 +4,12 @@ var url = "ws://127.0.0.1:25252";
 window.spaceX = 9000;
 window.spaceY = 9000;
 window.spaceZ = 500;
+
+window.color = 0;
+window.tipBlock = 0;
+window.timerid = 0;
+window.timerNumber = 0;
+
 //兼容 FireFox
 if ("WebSocket" in window) {
    var socket = new WebSocket(url);
@@ -23,8 +29,9 @@ socket.onmessage = function(event) {
     try{
         //解析json有可能出错
         var jsonObject= JSON.parse(content);
-        console.log("解析json");
         var msgID = jsonObject.msgID;
+        console.log("解析json " + msgID);
+        clearTipBlocklyColor();
         if(1 == msgID){
             console.log("更新编程区域");
             Code.workspace.clear();
@@ -48,7 +55,7 @@ socket.onmessage = function(event) {
         } else if(2 == msgID){
             console.log("清空编程区域");
             document.getElementById("tab_blocks").click();
-			document.getElementById("deviceName").textContent = "";
+			      document.getElementById("deviceName").textContent = "";
             Code.workspace.clear();
             //清空回撤功能数据
             Code.workspace.clearUndo();
@@ -58,6 +65,9 @@ socket.onmessage = function(event) {
             window.spaceY = jsonObject.y-100;
             window.spaceZ = jsonObject.z;
             console.log("x:"+window.spaceX+" y:"+window.spaceY+" z:"+window.spaceZ);
+        } else if(5 == msgID){
+            console.log("定位积木块"+jsonObject.id);
+            blockFlicker(jsonObject.id);
         }
     }catch(err){
     }
@@ -71,3 +81,49 @@ socket.onerror = function(evt)
 {
   console.log("socket WebSocketError!");
 };
+
+function blockFlicker(bid){
+  var len = Code.workspace.getAllBlocks(false).length;
+  console.log(len+"条积木块 查找的积木块"+bid);
+  var blocks = Code.workspace.getAllBlocks(false);
+  for (var i = 0; i < blocks.length; i++) {
+    var bb = blocks[i];
+    console.log("积木块ID" + bb.id);
+    if(bid != bb.id) continue;
+    console.log("找到对应ID积木块\n"+bb);
+    window.tipBlock = bb;
+    bb.select();
+    window.color = bb.getColour();
+    bb.setColour("#FF0000");
+    window.timerid = setInterval(setTipBlocklyColor, 500);
+    console.log(window.color + "原本颜色记录 开启定时闪烁 " + window.timerid);
+    break;
+  }
+}
+
+function setTipBlocklyColor(){
+  console.log(window.timerid + " 定时器到时 " + window.timerNumber);
+  window.timerNumber++;
+  //需要先判断积木块是否还存在或改变
+  var current = window.tipBlock.getColour();
+  if(current == window.color){
+    window.tipBlock.setColour("#FF0000");
+  } else {
+    window.tipBlock.setColour(window.color);
+  }
+  if(window.timerNumber>6){
+    clearTipBlocklyColor();
+  }
+}
+
+function clearTipBlocklyColor(){
+  if(window.timerid != 0){
+    console.log("清空积木块闪烁状态");
+    clearInterval(window.timerid);
+    window.tipBlock.setColour(window.color);
+    window.color = 0;
+    window.tipBlock = 0;
+    window.timerid = 0;
+    window.timerNumber = 0;
+  }
+}

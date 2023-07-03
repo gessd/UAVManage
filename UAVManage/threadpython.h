@@ -84,7 +84,10 @@ private:
 	QZAPI() {}
 	~QZAPI() {}
 	PyObject* examineWaypoint();
-	void showWaypointError(QString error);
+	void showWaypointError(QString error, QString id="");
+	void blockFlicker(QString id);
+signals:
+	void sigBlockFlicker(QString id);
 };
 
 class ThreadPython : public QThread
@@ -99,8 +102,9 @@ public:
 	 * @param 设备名称
 	 * @param X轴 厘米
 	 * @param Y轴 厘米
+	 * @param 积木块获取python代码
 	 */
-	void initParam(unsigned int nSpaceX, unsigned int nSapaceY, QString name, unsigned int nStartX, unsigned int nStartY);
+	void initParam(unsigned int nSpaceX, unsigned int nSapaceY, QString name, unsigned int nStartX, unsigned int nStartY, bool blockly);
 	/**
 	 * @brief 通过Python代码交互得到航点数据
 	 * @param python代码

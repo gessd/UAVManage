@@ -31,6 +31,7 @@
 #include "managertopwidget.h"
 #include "mytooltip.h"
 #include "define3d.h"
+#include "threadpython.h"
 
 UAVManage::UAVManage(QWidget* parent)
 	: QMainWindow(parent)
@@ -75,6 +76,7 @@ UAVManage::UAVManage(QWidget* parent)
 	connect(m_pDeviceManage, &DeviceManage::sig3DDialogStatus, this, &UAVManage::on3DDialogStauts);
 	connect(m_pDeviceManage, &DeviceManage::sigStart3D, this, &UAVManage::onStart3DDialog);
 	connect(m_pDeviceManage, &DeviceManage::sigPrepareWidget, this, &UAVManage::onPrepareWidget);
+	connect(m_pDeviceManage, &DeviceManage::sigBlockFlicker, this, &UAVManage::onBlockFlicker);
 
 	m_pAbout = new AboutDialog(this);
 	m_pMusicPlayer = new MusicPlayer(this);
@@ -86,6 +88,8 @@ UAVManage::UAVManage(QWidget* parent)
 	connect(m_pMusicPlayer, &MusicPlayer::sigUpdateMusicTime, m_pDeviceManage, &DeviceManage::onUpdateMusicMaxTime);
 	ui.horizontalLayoutSound->addWidget(m_pMusicPlayer);
 	
+	connect(QZAPI::Instance(), SIGNAL(sigBlockFlicker(QString)), this, SLOT(onBlockFlicker(QString)));
+
 	m_pToopTip = new MyTooltip(this);
 	initMenu();
 }
@@ -890,17 +894,17 @@ void UAVManage::onDeviceAdd(QString name, QString ip, float x, float y)
 		QString qstrPythonFile = QString("%1%2%3.py").arg(qstrPath).arg(_ProjectDirName_).arg(name);
 		QFile file(qstrBlocklyFile);
 		if (file.open(QIODevice::ReadWrite | QIODevice::Truncate)) {
-			//当设备不存在写入默认blockly控件
+			//当设备不存在写入默认blockly控件,默认ID为空，防止不同设备ID重复
 			QString qstrBlock = "\
 <xml xmlns=\"https://developers.google.com/blockly/xml\">\
-  <block type=\"Fly_Takeoff\" id=\"RHfWI7IcqrRM~UK}OEnp\" x=\"88\" y=\"38\">\
+  <block type=\"Fly_Takeoff\" id=\"\" x=\"88\" y=\"38\">\
     <field name=\"height\">100</field>\
     <next>\
-      <block type=\"Fly_TimeGroup\" id=\"W5WBWFi9LI[Xy{I/4OG3\">\
+      <block type=\"Fly_TimeGroup\" id=\"\">\
         <field name=\"minute\">0</field>\
         <field name=\"second\">5</field>\
         <next>\
-          <block type=\"Fly_Land\" id=\"4X4;~Xwrm@Qa53W;3T2.\"></block>\
+          <block type=\"Fly_Land\" id=\"\"></block>\
         </next>\
       </block>\
     </next>\
@@ -1227,6 +1231,16 @@ void UAVManage::onStart3DDialog()
 	m_p3DProcess->start("UAV_Program_UE4-Win64-Shipping.exe");
 	m_p3DProcess->waitForStarted(1000);
 	QDir::setCurrent(QApplication::applicationDirPath());
+}
+
+void UAVManage::onBlockFlicker(QString id)
+{
+	if (!m_pWebBlocklySocket) return;
+	QJsonObject jsonObj;
+	jsonObj.insert(_WMID, _WIDBlockFlicker);
+	jsonObj.insert("id", id);
+	QJsonDocument doc(jsonObj);
+	m_pWebBlocklySocket->sendTextMessage(doc.toJson());
 }
 
 bool UAVManage::newProjectFile(QString qstrFile, unsigned int X, unsigned int Y)

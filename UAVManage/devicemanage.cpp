@@ -754,7 +754,7 @@ QString DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upl
 		}
 
 		//执行python脚本之前初始参数，用于检查无人机编程参数
-		pythonThread.initParam(m_pointSpace.x(), m_pointSpace.y(), pDevice->getName(), pDevice->getX(), pDevice->getY());
+		pythonThread.initParam(m_pointSpace.x(), m_pointSpace.y(), pDevice->getName(), pDevice->getX(), pDevice->getY(), !bMauanl);
 		//生成舞步过程必须一个个生成，python交互函数是静态全局，所以同时只能执行一个设备生成舞步
 		if (!pythonThread.compilePythonCode(arrData)) {
 			//生成舞步失败
@@ -875,7 +875,7 @@ QString DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upl
 				int x = start.x + (end.x - start.x) * j / n;
 				int y = start.y + (end.y - start.y) * j / n;
 				int z = start.z + (end.z - start.z) * j / n;
-				_MidwayPosition pos(name, x, y, z);
+				_MidwayPosition pos(name, end.blockid, x, y, z);
 				unsigned int m = j * nInterval;
 				if (m > maxMillisecond) m = maxMillisecond;
 				unsigned int currentTime = nStartTime + m;
@@ -905,6 +905,14 @@ QString DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upl
 					int millisecond = current % 1000;
 					QString t = QString("当%1分%2秒%3毫秒时").arg(minute).arg(second).arg(millisecond);
 					_ShowErrorMessage(t + error);
+					//定位当前设备的WEB积木块中，否则显示最前边
+					QString qstrCurrentNmae = getCurrentDeviceName();
+					if (qstrCurrentNmae == temp.name) {
+						emit sigBlockFlicker(temp.blockid);
+					}
+					else {
+						emit sigBlockFlicker(pos.blockid);
+					}
 					return "，" + pos.name + "，" + temp.name;
 				}
 			}
@@ -1548,7 +1556,9 @@ QString DeviceManage::updateBlocklyData(QString name, QMap<QString, unsigned int
 	}
 	if (XMLBlocklyNode(root, mapTime)) {
 		error = doc.SaveFile(filename.c_str());
-		emit currentDeviceNameChanged(name, name);
+		if (name == getCurrentDeviceName()) {
+			emit currentDeviceNameChanged(name, name);
+		}
 	}
 	return "";
 }

@@ -288,6 +288,7 @@ typedef struct __NavWayPointData
 	unsigned int commandID;
 	QString message;
 	QString groupname;
+	QString blockid;	//积木块唯一ID，用于定位积木块
 	bool bTakeoff;
 	__NavWayPointData() {
 		param2 = 0.20;   //接受半径需要有默认值 TODO 参数单位
@@ -302,11 +303,13 @@ typedef struct __NavWayPointData
 
 struct _MidwayPosition {
 	QString name;
+	QString blockid;
 	int x;
 	int y;
 	int z;
-	_MidwayPosition(QString n, int n1, int n2, int n3) {
+	_MidwayPosition(QString n, QString id, int n1, int n2, int n3) {
 		name = n;
+		blockid = id;
 		x = n1;
 		y = n2;
 		z = n3;
@@ -339,5 +342,6 @@ enum _TypeWMID {
 	_WIDUpdate = 1,	//blockly区域更新
 	_WIDClear = 2,	//情况编程区域
 	_WIDSet = 3,	//设置场地大小
-	_WIDManual = 4	//手动python代码更新
+	_WIDManual = 4,	//手动python代码更新
+	_WIDBlockFlicker = 5	//定位积木块，使其闪烁显示
 };
