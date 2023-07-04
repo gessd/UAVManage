@@ -304,7 +304,6 @@ PyObject* QZAPI::FlySetLedColor(PyObject* self, PyObject* args)
 		return nullptr;
 	}
 	QColor qc(color);
-	//TODO 暂时未定义LED灯颜色使用方式
 	NavWayPointData data;
 	data.blockid = qstrId;
 	data.param1 = qc.red();
