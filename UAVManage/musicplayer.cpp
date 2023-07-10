@@ -6,6 +6,7 @@
 #include <QAbstractButton>
 #include <QPainter>
 #include <QMessageBox>
+#include <QMouseEvent>
 
 MusicPlayer::MusicPlayer(QWidget *parent)
 	: QWidget(parent)
@@ -23,6 +24,7 @@ MusicPlayer::MusicPlayer(QWidget *parent)
 	connect(ui.sliderMusic, &QSlider::sliderPressed, this, &MusicPlayer::onSliderPressed);
 	connect(ui.sliderMusic, &QSlider::sliderReleased, this, &MusicPlayer::onSliderReleased);
 	connect(ui.widgetSpectrum, SIGNAL(updateMusicWaveFinished()), this, SIGNAL(updateMusicWaveFinished()));
+	ui.sliderMusic->installEventFilter(this);
 }
 
 MusicPlayer::~MusicPlayer()
@@ -182,7 +184,11 @@ void MusicPlayer::onMediaDurationChanged(qint64 duration)
 
 void MusicPlayer::onSliderPressed()
 {
-	if (m_mediaPlayer.state() == QMediaPlayer::PlayingState) m_mediaPlayer.pause();
+	m_bPlayIng = false;
+	if (m_mediaPlayer.state() == QMediaPlayer::PlayingState) {
+		m_bPlayIng = true;
+		m_mediaPlayer.pause();
+	}
 }
 
 void MusicPlayer::onSliderReleased()
@@ -193,5 +199,26 @@ void MusicPlayer::onSliderReleased()
 	}
 	qint64 position = ui.sliderMusic->value();
 	m_mediaPlayer.setPosition(position);
-	m_mediaPlayer.play();
+	if(m_bPlayIng) m_mediaPlayer.play();
+}
+
+bool MusicPlayer::eventFilter(QObject* watched, QEvent* event)
+{
+	if (watched == ui.sliderMusic ){
+		//鼠标左键点击跳到进度条位置
+		if (event->type() == QEvent::MouseButtonPress){
+			QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(event);
+			if (mouseEvent && mouseEvent->button() == Qt::LeftButton) {
+				QSlider* pSlider = (QSlider*)watched;
+				int dur = pSlider->maximum() - pSlider->minimum();
+				int pos = pSlider->minimum() + dur * ((double)mouseEvent->x() / pSlider->width());
+				if (pos != pSlider->sliderPosition()) {
+					pSlider->setValue(pos);
+					qint64 position = ui.sliderMusic->value();
+					m_mediaPlayer.setPosition(position);
+				}
+			}
+		}
+	}
+	return QObject::eventFilter(watched, event);
 }

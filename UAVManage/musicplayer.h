@@ -73,6 +73,8 @@ private slots:
 	 * @brief 音乐滑块释放
 	 */
 	void onSliderReleased();
+private:
+	bool eventFilter(QObject* watched, QEvent* event);
 signals:
 	void sigUpdateMusic(QString file);
 	void sigMsuicTime(unsigned int second);
@@ -88,4 +90,5 @@ private:
 	QString m_qstrMusicFile;
 	//音乐播放器
 	QMediaPlayer m_mediaPlayer;
+	bool m_bPlayIng;
 };
