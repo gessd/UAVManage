@@ -8,6 +8,7 @@
 #include <QHideEvent>
 #include <QCloseEvent>
 #include <QThread>
+#include <QTimer>
 
 //NLINK设置协议格式
 enum _NLINK_Setting_Frame0_
@@ -75,6 +76,7 @@ private slots:
 	void onBtnOnekeyClicked();
 	void onParseSettingFrame(QByteArray arrNLINKData);
 	void onComparePlace(QPoint point);
+	void onTimerOnekeyStatus();
 signals:
 	void serialDataSend(const QByteArray data);
 private:
@@ -88,4 +90,7 @@ private:
 	QThread m_threadSerial;
 	QLabel* m_pLabelBackground;
 	QPoint m_pointPlace;
+	QByteArray m_arrLastData;
+	QChar m_cOneKeyStatus;
+	QTimer m_timerOnekeyStatus;
 };

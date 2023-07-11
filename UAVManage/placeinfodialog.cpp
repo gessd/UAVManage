@@ -31,6 +31,7 @@ PlaceInfoDialog::PlaceInfoDialog(QPoint place, QWidget *parent)
 	m_threadSerial.start();                   // 线程开始运行
 	ui.labelSpace->setText(QString("场地大小:%1米 X %2米").arg(place.x() / 100).arg(place.y() / 100));
 	ui.btnWrite->setVisible(false);
+	connect(&m_timerOnekeyStatus, &QTimer::timeout, this, &PlaceInfoDialog::onTimerOnekeyStatus);
 }
 
 PlaceInfoDialog::~PlaceInfoDialog()
@@ -156,8 +157,11 @@ void PlaceInfoDialog::onBtnOnekeyClicked()
 	m_bOnekeySetNLINK = true;
 	m_nOnekeySetIndex = 1;
 	ui.labelStationSpace->clear();
+	ui.labelStationSpace->setText("正在进行一键标定");
 	qDebug() << "开始一键标定";
-	emit serialDataSend(_OneKey_Set_Start_);
+	//emit serialDataSend(_OneKey_Set_Start_);
+	//先发送读取数据指令，根据返回数据修改对应字节使其变成一键标定指令然后发送
+	emit serialDataSend(_Get_Setting_Frame0_);
 }
 //NLINK数据转数值,根据协议转换
 double NLINK_ParseInt24(uint8_t byte[3])
@@ -190,6 +194,7 @@ void PlaceInfoDialog::onParseSettingFrame(QByteArray arrNLINKData)
 {
 	//qDebug() << "----nlinkmsg:" << arrNLINKData.length()<<arrNLINKData.toHex().toUpper();
 	QByteArray arrData = arrNLINKData;
+	m_arrLastData = arrNLINKData;
 	if (m_bSetNLINK) {
 		m_bSetNLINK = false;
 		if (!m_bOnekeySetNLINK) {
@@ -219,14 +224,6 @@ void PlaceInfoDialog::onParseSettingFrame(QByteArray arrNLINKData)
 				arrData[index] = a2[0];
 				arrData[index + 1] = a2[1];
 				arrData[index + 2] = a2[2];
-				//for (int column = 0; column < 3; column++) {
-				//	float number = ui.tableWidget->item(row, column)->text().toFloat();
-				//	QByteArray arrNumber = NLINK_FloatToData(number);
-				//	int index = (row * 9) + _xyz0 + column * 3;
-				//	arrData[index] = arrNumber[0];
-				//	arrData[index + 1] = arrNumber[1];
-				//	arrData[index + 2] = arrNumber[2];
-				//}
 			}
 		}
 		m_bOnekeySetNLINK = false;
@@ -291,24 +288,46 @@ void PlaceInfoDialog::onParseSettingFrame(QByteArray arrNLINKData)
 	}
 
 	if (m_nOnekeySetIndex > 0) {
-		if (m_nOnekeySetIndex > 300) {
-			//一键标定完成
-			qDebug() << "一键标定完成";
+		if (1 == m_nOnekeySetIndex) {
+			m_nOnekeySetIndex++;
+			m_cOneKeyStatus = arrData.at(17);
+			//根据接受数据改为一键标定指令然后发送开始一键标定指令
+			arrData[2] = 0x02;
+			arrData[17] = 0x08;
+			QByteArray arrNew = arrData.left(arrData.length() - 1);
+			arrNew.append(getCheckSum(arrNew));
+			emit serialDataSend(arrNew);
+			//定时200毫秒查询一次标定状态
+			m_timerOnekeyStatus.start(200);
+			m_timerOnekeyStatus.setProperty("start", QDateTime::currentDateTime().toTime_t());
+			return;
+		}
+		//与标定前状态一致则标定完成
+		if (arrData.at(17) == m_cOneKeyStatus) {
+			m_timerOnekeyStatus.stop();
+			m_bOnekeySetNLINK = false;
 			m_nOnekeySetIndex = 0;
+			ui.progressBar->setValue(ui.progressBar->maximum());
+			//标定完成后检查标定位置是否符合使用条件
+			qDebug() << "一键标定完成检查数据";
 			//检查标定基站位置 -8388为无效值
 			double xmax = 0;
 			double ymax = 0;
 			for (int row = 0; row < 6; row++) {
 				//检查前6行数值，对应6个基站
-				for (int column = 0; column < 2; column ++) {
+				for (int column = 0; column < 2; column++) {
 					double value = ui.tableWidget->item(row, column)->text().toDouble();
 					if (0 == row && 0 != value) {
 						//第一行A0基站必须全为0
-						QMessageBox::warning(this, tr("提示"), tr("A0基站标定失败，请重试"));
+						QString error = tr("A0基站标定失败，请重试");
+						qWarning() << error;
+						QMessageBox::warning(this, tr("提示"), error);
 						return;
 					}
 					if (_InvalidValue_ == value) {
-						QMessageBox::warning(this, tr("提示"), QString("A%1基站标定失败，请重试").arg(row));
+						QString error = QString("A%1基站标定失败，请重试").arg(row);
+						qWarning() << error;
+						QMessageBox::warning(this, tr("提示"), error);
 						return;
 					}
 					if (0 == column) xmax = qMax(xmax, value);
@@ -318,36 +337,36 @@ void PlaceInfoDialog::onParseSettingFrame(QByteArray arrNLINKData)
 			QString text = QString("基站范围:%1米 X %2米").arg(xmax).arg(ymax);
 			qInfo() << text << m_pointPlace;
 			ui.labelStationSpace->setText(text);
-#ifndef _DebugApp_
 			//判断场地是否太小或太大
-			if (xmax > 100 || ymax > 100) {
-				QMessageBox::warning(this, tr("提示"), tr("基站范围距离太远，请检查后重新标定"));
+			if (xmax > 52 || ymax > 52) {
+				QString error = tr("基站范围[%1米X%2米]大于[52米X52米]无法使用请检查后重新标定").arg(xmax).arg(ymax);
+				qWarning() << error;
+				QMessageBox::warning(this, tr("提示"), error);
 				return;
 			}
 			if (xmax < 5 || ymax < 5) {
-				QMessageBox::warning(this, tr("提示"), tr("基站范围距离太近，请检查后重新标定"));
+				QString error = tr("基站范围[%1米X%2米]小于[5米X5米]无法使用请检查后重新标定").arg(xmax).arg(ymax);
+				qWarning() << error;
+				QMessageBox::warning(this, tr("提示"), error);
 				return;
 			}
 			if (xmax < (m_pointPlace.x() / 100)) {
-				QMessageBox::warning(this, tr("提示"), tr("X轴方向距离比项目设定场地小"));
+				QString error = QString("X轴方向长度%1米比项目设定场地长度%2米小，基站无法满足飞行范围").arg(xmax).arg(m_pointPlace.x() / 100);
+				qWarning() << error;
+				QMessageBox::warning(this, tr("提示"), error);
 				return;
 			}
 			if (ymax < (m_pointPlace.y() / 100)) {
-				QMessageBox::warning(this, tr("提示"), tr("Y轴方向距离比项目设定场地小"));
+				QString error = QString("Y轴方向长度%1米比项目设定场地长度%2米小，基站无法满足飞行范围").arg(xmax).arg(m_pointPlace.x() / 100);
+				qWarning() << error;
+				QMessageBox::warning(this, tr("提示"), error);
 				return;
 			}
-#endif
-			m_bOnekeySetNLINK = false;
-			onComparePlace(QPoint(xmax * 100, ymax * 100));
 			m_stationStatus = 1;
-			onBtnWriteClicked();
+			qWarning() << "一键标定完成并且位置可用";
 			QMessageBox::information(this, tr("完成"), tr("一键标定完成"));
 			return;
 		}
-		emit serialDataSend(_OneKey_Set_Next_);
-		m_nOnekeySetIndex++;
-		ui.progressBar->setValue(m_nOnekeySetIndex);
-		//qDebug() << "标定进度" << m_nOnekeySetIndex;
 	}
 }
 
@@ -356,6 +375,40 @@ void PlaceInfoDialog::onComparePlace(QPoint point)
 	if (0 == point.x() || 0 == point.y()) return;
 	if (m_pointPlace == point) return;
 	m_stationStatus = 0;
+}
+
+void PlaceInfoDialog::onTimerOnekeyStatus()
+{
+	//查询一键标定状态
+	if (_ByteCount != m_arrLastData.count()) return;
+	uint nStart = m_timerOnekeyStatus.property("start").toUInt();
+	uint nCurrent = QDateTime::currentDateTime().toTime_t();
+	if ((nCurrent - nStart) > 60) {
+		//一键标定超时，停止一键标定
+		m_timerOnekeyStatus.stop();
+		m_bOnekeySetNLINK = false;
+		m_nOnekeySetIndex = 0;
+		ui.labelStationSpace->setText("基站长时间无法标定成功");
+		QByteArray arrData = m_arrLastData;
+		arrData[2] = 0x02;
+		arrData.remove(17, 1);
+		arrData.insert(17, m_cOneKeyStatus);
+		QByteArray arrNew = arrData.left(arrData.length() - 1);
+		arrNew.append(getCheckSum(arrNew));
+		emit serialDataSend(arrNew);
+		QMessageBox::warning(this, "错误", "基站长时间无法标定成功，请检查基站摆放环境后重新标定");
+		return;
+	}
+
+	//根据记录数据改为查询标定状态指令，直到返回数据中的标定状态与之前一直结束标定
+	QByteArray arrData = m_arrLastData;
+	arrData[2] = 0x20;
+	arrData[17] = 0x08;
+	QByteArray arrNew = arrData.left(arrData.length() - 1);
+	arrNew.append(getCheckSum(arrNew));
+	emit serialDataSend(arrNew);
+	m_nOnekeySetIndex++;
+	ui.progressBar->setValue(m_nOnekeySetIndex);
 }
 
 SerialWorker::SerialWorker(QSerialPort* ser, QObject* parent /*= nullptr*/)
