@@ -236,7 +236,7 @@ void DeviceControl::setHeartbeatEnable(bool enable)
 	m_bHeartbeatEnable = enable;
 }
 
-bool DeviceControl::isUploadWaypoint()
+bool DeviceControl::isUploadWaypointFinished()
 {
 	return m_bUploadFinished;
 }
@@ -244,6 +244,11 @@ bool DeviceControl::isUploadWaypoint()
 bool DeviceControl::isTimeSync()
 {
 	return m_bTimeSync;
+}
+
+bool DeviceControl::isUploadWaypointIng()
+{
+	return m_bWaypointSending;
 }
 
 void DeviceControl::clearTimeSyncStatus()

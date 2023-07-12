@@ -285,6 +285,10 @@ void DeviceManage::setStationAddress(QMap<QString, QPoint> station)
 
 QString DeviceManage::addDevice(QString qstrName, QString ip, long x, long y)
 {
+	int count = ui.listWidget->count();
+	if (count >= _MaxDevice_) {
+		return tr("无法添加新无人机，已超出最大控制数量");
+	}
 	if (qstrName.isEmpty()) return tr("设备名称不能为空");
 	//判断设备是否重复
 	QString temp = isRepetitionDevice(qstrName, ip, x, y, "111");
@@ -472,7 +476,7 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 				_ShowErrorMessage(name + tr("基站未成功标定无法起飞"));
 				continue;
 			}
-			if (false == pDevice->isUploadWaypoint()) {
+			if (false == pDevice->isUploadWaypointFinished()) {
 				_ShowErrorMessage(name + tr("设备未上传舞步无法起飞"));
 				continue;
 			}
@@ -792,10 +796,17 @@ QString DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upl
 			fileSvg.flush();
 			fileSvg.close();
 		}
-
+		QString temp = QString("%1舞步数量%2").arg(name).arg(data.count());
+		qInfo() << temp;
 		//最少2条，第一条是设置的起始位置
 		if (data.count() <= 1) {
 			_ShowErrorMessage(name + tr("没有舞步信息"));
+			qstrErrorNames.append("," + pDevice->getName());
+			continue;
+		}
+		//超过无人机保存舞步数量
+		if (data.count() > _WaypointMaxCount_) {
+			_ShowErrorMessage(temp + "超出最大的上传数量" + QString::number(_WaypointMaxCount_));
 			qstrErrorNames.append("," + pDevice->getName());
 			continue;
 		}
@@ -984,7 +995,7 @@ QString DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upl
 			qInfo() << "准备上传舞步到飞控";
 			int status = pDevice->DeviceMavWaypointStart(map.value(name));
 			if (_DeviceStatus::DeviceDataSucceed == status) {
-				_ShowInfoMessage(name + "上传舞步成功");
+				_ShowInfoMessage(name + "开始舞步上传");
 			}
 			else {
 				qstrErrorNames.append("," + pDevice->getName());
@@ -997,10 +1008,6 @@ QString DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upl
 	return qstrErrorNames;
 }
 
-void DeviceManage::setUpdateWaypointTime(int second)
-{
-
-}
 
 void DeviceManage::setCurrentPlayeState(qint8 state)
 {
@@ -1282,7 +1289,16 @@ bool DeviceManage::eventFilter(QObject* watched, QEvent* event)
 	if (ui.listWidget == watched) {
 		//设备列表菜单
 		if (QEvent::ContextMenu != event->type()) return false;
-		if (!ui.listWidget->itemAt(ui.listWidget->mapFromGlobal(QCursor::pos()))) return false;
+		QListWidgetItem* pItem = ui.listWidget->itemAt(ui.listWidget->mapFromGlobal(QCursor::pos()));
+		if (!pItem) return false;
+		//当前在上传舞步过程中禁用右键菜单，防止进行起飞降落操作
+		QWidget* pWidget = ui.listWidget->itemWidget(pItem);
+		if (pWidget) {
+			DeviceControl* pDevice = dynamic_cast<DeviceControl*>(pWidget);
+			if (pDevice && pDevice->isUploadWaypointIng()) {
+				return false;
+			}
+		}
 		if (m_bDebug) {
 			m_pMenu->addAction(m_pActionMagnetismOpen);
 			m_pMenu->addAction(m_pActionMagnetismClose);

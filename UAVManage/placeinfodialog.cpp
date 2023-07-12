@@ -338,6 +338,7 @@ void PlaceInfoDialog::onParseSettingFrame(QByteArray arrNLINKData)
 			qInfo() << text << m_pointPlace;
 			ui.labelStationSpace->setText(text);
 			//判断场地是否太小或太大
+#ifndef _DebugApp_
 			if (xmax > 52 || ymax > 52) {
 				QString error = tr("基站范围[%1米X%2米]大于[52米X52米]无法使用请检查后重新标定").arg(xmax).arg(ymax);
 				qWarning() << error;
@@ -362,6 +363,7 @@ void PlaceInfoDialog::onParseSettingFrame(QByteArray arrNLINKData)
 				QMessageBox::warning(this, tr("提示"), error);
 				return;
 			}
+#endif
 			m_stationStatus = 1;
 			qWarning() << "一键标定完成并且位置可用";
 			QMessageBox::information(this, tr("完成"), tr("一键标定完成"));

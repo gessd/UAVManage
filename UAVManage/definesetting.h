@@ -16,6 +16,11 @@
 //调试版本
 //#define _DebugApp_
 
+//可添加最大无人机数量
+#define _MaxDevice_			40
+//上传舞步最大数量
+#define _WaypointMaxCount_  250
+
 //项目后缀名
 #define _ProjectSuffix       "qz"
 #define _PyFileSuffix_       ".py"

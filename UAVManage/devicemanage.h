@@ -106,12 +106,6 @@ public:
 	QString waypointComposeAndUpload(QString qstrProjectFile, bool upload);
 
 	/**
-	* @brief 根据音乐进度更新舞步时间
-	* @param 秒值
-	*/
-	void setUpdateWaypointTime(int second);
-
-	/**
 	* @brief 设置当前音频播放状态
 	*/
 	void setCurrentPlayeState(qint8 state);

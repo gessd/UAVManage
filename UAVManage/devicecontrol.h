@@ -95,11 +95,17 @@ public:
 	/**
 	 * @brief 设备是否已经上传航点
 	 */
-	bool isUploadWaypoint();
+	bool isUploadWaypointFinished();
 	/**
 	 * @brief 设备是否已经定桩授时
 	 */
 	bool isTimeSync();
+
+	/**
+	 * @brief 是否处于舞步上传状态中
+	 */
+	bool isUploadWaypointIng();
+
 	/**
 	 * @brief 清除定桩授时状态
 	 */
