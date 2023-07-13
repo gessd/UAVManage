@@ -167,6 +167,11 @@ private slots:
      * @brief 定位积木块
      */
     void onBlockFlicker(QString id);
+
+    /**
+     * @brief 定时删除历史日志文件
+     */
+    void onTimerLogFile();
 private:
     /**
      * @brief 新建项目工程文件
@@ -218,4 +223,6 @@ private:
     QWidget* m_pMenuWidget;
     //最大化按钮
     QToolButton* m_pBtnMax;
+    //定时删除历史日志文件
+    QTimer m_timerLogFile;
 };

@@ -90,6 +90,9 @@ UAVManage::UAVManage(QWidget* parent)
 	
 	connect(QZAPI::Instance(), SIGNAL(sigBlockFlicker(QString)), this, SLOT(onBlockFlicker(QString)));
 
+	connect(&m_timerLogFile, &QTimer::timeout, this, &UAVManage::onTimerLogFile);
+	m_timerLogFile.start(10 * 60 * 1000);
+
 	m_pToopTip = new MyTooltip(this);
 	initMenu();
 }
@@ -1242,6 +1245,34 @@ void UAVManage::onBlockFlicker(QString id)
 	jsonObj.insert("id", id);
 	QJsonDocument doc(jsonObj);
 	m_pWebBlocklySocket->sendTextMessage(doc.toJson());
+}
+
+void UAVManage::onTimerLogFile()
+{
+	//检查Log文件夹是否存在，删除存在时间长的文件
+	qDebug() << "处理日志文件目录";
+	QString qstrPath = QApplication::applicationDirPath() + "/Log";
+	if (!QFile::exists(qstrPath)) return;
+	QDir dir(qstrPath);
+	QFileInfoList fileInfoList = dir.entryInfoList();
+	QDateTime current = QDateTime::currentDateTime();
+	foreach(QFileInfo info, fileInfoList) {
+		if (info.fileName() == "." || info.fileName() == "..") continue;
+		if (info.isDir()) {
+			QString temp = info.filePath();
+			qDebug() << "删除日志目录中多余的文件夹" << temp;
+			deleteDir(temp);
+		}
+		else {
+			//判断文件创建时间
+			QDateTime time = info.lastModified();
+			int days = time.daysTo(current);
+			if (days > 7) {
+				qDebug() << "删除旧日志文件" << info.filePath();
+				QFile::remove(info.filePath());
+			}
+		}
+	}
 }
 
 bool UAVManage::newProjectFile(QString qstrFile, unsigned int X, unsigned int Y)
