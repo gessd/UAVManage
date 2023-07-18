@@ -366,7 +366,7 @@ void PlaceInfoDialog::onParseSettingFrame(QByteArray arrNLINKData)
 #endif
 			m_stationStatus = 1;
 			qWarning() << "一键标定完成并且位置可用";
-			QMessageBox::information(this, tr("完成"), tr("一键标定完成"));
+			QMessageBox::information(this, tr("提示"), tr("标定成功"));
 			return;
 		}
 	}
@@ -398,7 +398,7 @@ void PlaceInfoDialog::onTimerOnekeyStatus()
 		QByteArray arrNew = arrData.left(arrData.length() - 1);
 		arrNew.append(getCheckSum(arrNew));
 		emit serialDataSend(arrNew);
-		QMessageBox::warning(this, "错误", "基站长时间无法标定成功，请检查基站摆放环境后重新标定");
+		QMessageBox::warning(this, "提示", "基站长时间无法标定成功，请检查基站摆放环境后重新标定");
 		return;
 	}
 
