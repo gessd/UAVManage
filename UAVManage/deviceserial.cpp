@@ -46,6 +46,7 @@ DeviceSerial::DeviceSerial(QWidget *parent)
 
 	ui.groupBoxNetwork->setEnabled(false);
 	ui.groupBoxFirmware->setEnabled(false);
+	ui.groupBoxDebug->setEnabled(false);
 	//监控串口插拔
 	m_qextSerial.setUpNotifications();
 	connect(&m_qextSerial, SIGNAL(deviceDiscovered(const QextPortInfo&)), this, SLOT(onDeviceDiscovered(const QextPortInfo&)));
@@ -65,7 +66,7 @@ DeviceSerial::DeviceSerial(QWidget *parent)
 	connect(m_pYmodemFileTransmit, SIGNAL(transmitProgress(int)), this, SLOT(onYmodemTransmitProgress(int)));
 	connect(m_pYmodemFileTransmit, SIGNAL(transmitStatus(YmodemFileTransmit::Status)), this, SLOT(onYmodemTransmitStatus(YmodemFileTransmit::Status)));
 
-	setFixedWidth(410);
+	setFixedWidth(420);
 	ui.widgetData->setVisible(false);
 }
 
@@ -140,6 +141,11 @@ void DeviceSerial::onSerialData(QByteArray data)
 				msg = msg.replace("V", "");
 				ui.lineEditFirmwareVersion->setText(msg);
 			}
+			else if (key.contains("qz+dr")) {
+				//设备ID
+				qInfo() << "设备ID" << msg;
+				ui.lineEditID->setText(msg);
+			}
 		}
 	}
 }
@@ -195,6 +201,7 @@ void DeviceSerial::onBtnSerial()
 		ui.comboBoxCom->setEnabled(true);
 		ui.groupBoxNetwork->setEnabled(false);
 		ui.groupBoxFirmware->setEnabled(false);
+		ui.groupBoxDebug->setEnabled(false);
 	}
 	else {
 		qInfo() << "准备连接串口";
@@ -215,9 +222,11 @@ void DeviceSerial::onBtnSerial()
 		ui.comboBoxCom->setEnabled(false);
 		ui.groupBoxNetwork->setEnabled(true);
 		ui.groupBoxFirmware->setEnabled(true);
+		ui.groupBoxDebug->setEnabled(true);
 		//串口连接成功后读取配置内容
 		onBtnRead();
 		QTimer::singleShot(500, [this]() { onBtnCheckFirmware(); });
+		QTimer::singleShot(1000, [this]() { on_btnReadID_clicked(); });
 	}
 }
 
@@ -459,13 +468,19 @@ void DeviceSerial::onYmodemTransmitStatus(YmodemFileTransmit::Status status)
 	}
 }
 
+void DeviceSerial::on_btnReadID_clicked()
+{
+	ui.lineEditID->clear();
+	sendDataToSerial("qz+dr:");
+}
+
 void DeviceSerial::showEvent(QShowEvent* event)
 {
 	ui.lineEditServerVersion->clear();
 	ui.textBrowserData->clear();
 	ui.btnAutoUpdateFirmware->setVisible(false);
 	ui.widgetYmodemTransmit->setVisible(false);
-	setFixedWidth(410);
+	setFixedWidth(420);
 	ui.widgetData->setVisible(false);
 	if (m_pLabelBackground) {
 		delete m_pLabelBackground;

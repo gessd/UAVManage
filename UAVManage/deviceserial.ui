@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>723</width>
-    <height>482</height>
+    <width>900</width>
+    <height>560</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -15,6 +15,18 @@
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>0</width>
+    <height>560</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>16777215</width>
+    <height>560</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>无人机配置</string>
@@ -254,12 +266,6 @@
    </item>
    <item row="1" column="0">
     <widget class="QGroupBox" name="groupBoxFirmware">
-     <property name="maximumSize">
-      <size>
-       <width>409</width>
-       <height>300</height>
-      </size>
-     </property>
      <property name="styleSheet">
       <string notr="true"/>
      </property>
@@ -475,8 +481,20 @@
      </layout>
     </widget>
    </item>
-   <item row="0" column="1" rowspan="2">
+   <item row="0" column="1" rowspan="3">
     <widget class="QWidget" name="widgetData" native="true">
+     <property name="minimumSize">
+      <size>
+       <width>480</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>480</width>
+       <height>16777215</height>
+      </size>
+     </property>
      <layout class="QGridLayout" name="gridLayout_4">
       <item row="1" column="1">
        <widget class="QPushButton" name="btnSend">
@@ -540,6 +558,42 @@
       </item>
       <item row="0" column="0" colspan="3">
        <widget class="QTextBrowser" name="textBrowserData"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QGroupBox" name="groupBoxDebug">
+     <property name="title">
+      <string>设备ID</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_6">
+      <item row="0" column="2">
+       <widget class="QPushButton" name="btnReadID">
+        <property name="minimumSize">
+         <size>
+          <width>120</width>
+          <height>30</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>读取</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_7">
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="lineEditID">
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>

@@ -37,6 +37,8 @@ public slots:
 	void  onYmodemTransmitProgress(int progress);
 	//固件更新状态
 	void onYmodemTransmitStatus(YmodemFileTransmit::Status status);
+
+	void on_btnReadID_clicked();
 protected:
 	void showEvent(QShowEvent* event);
 	void closeEvent(QCloseEvent* event);
