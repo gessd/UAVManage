@@ -61,13 +61,13 @@ DeviceSerial::DeviceSerial(QWidget *parent)
 	}
 	
 	//固件更新使用
-	m_bYmodemTransmitStatus = false;
+	m_bYmodemTransmitIng = false;
 	m_pYmodemFileTransmit = new YmodemFileTransmit(this);
 	connect(m_pYmodemFileTransmit, SIGNAL(transmitProgress(int)), this, SLOT(onYmodemTransmitProgress(int)));
 	connect(m_pYmodemFileTransmit, SIGNAL(transmitStatus(YmodemFileTransmit::Status)), this, SLOT(onYmodemTransmitStatus(YmodemFileTransmit::Status)));
 
 	setFixedWidth(420);
-	ui.widgetData->setVisible(false);
+	//ui.widgetData->setVisible(false);
 }
 
 DeviceSerial::~DeviceSerial()
@@ -224,9 +224,17 @@ void DeviceSerial::onBtnSerial()
 		ui.groupBoxFirmware->setEnabled(true);
 		ui.groupBoxDebug->setEnabled(true);
 		//串口连接成功后读取配置内容
-		onBtnRead();
-		QTimer::singleShot(500, [this]() { onBtnCheckFirmware(); });
-		QTimer::singleShot(1000, [this]() { on_btnReadID_clicked(); });
+		if (m_bYmodemTransmitIng) {
+			m_bYmodemTransmitIng = false;
+			connect(&m_serialPort, &QSerialPort::readyRead, this, &DeviceSerial::onSerialReadyRead);
+			QTimer::singleShot(1000, [this]() {  sendDataToSerial("1"); });
+		}
+		else {
+			//更新固件过程中不发送新数据
+			onBtnRead();
+			QTimer::singleShot(500, [this]() { onBtnCheckFirmware(); });
+			QTimer::singleShot(1000, [this]() { on_btnReadID_clicked(); });
+		}
 	}
 }
 
@@ -249,9 +257,9 @@ void DeviceSerial::onDeviceRemoved(const QextPortInfo& info)
 			qWarning() << "正在使用的串口被拔出";
 			onBtnSerial();
 		}
-		if (m_bYmodemTransmitStatus) {
+		if (m_bYmodemTransmitIng) {
 			m_pYmodemFileTransmit->stopTransmit();
-			this->setEnabled(!m_bYmodemTransmitStatus);
+			this->setEnabled(!m_bYmodemTransmitIng);
 		}
 	}
 	updateSerial();
@@ -287,12 +295,14 @@ void DeviceSerial::onBtnCheckFirmware()
 			unsigned int nCurrentVersion = list.at(0).toInt() * 100 * 100 + list.at(1).toInt() * 100 + list.at(2).toInt();
 			if (nNewVersion > nCurrentVersion) {
 				ui.btnAutoUpdateFirmware->setVisible(true);
+				if (!m_bYmodemTransmitIng) {
 #ifndef _DisableUpdateFirmware_
-				QMessageBox::StandardButton button = QMessageBox::question(this, tr("升级"), tr("有新版本固件可以升级，是否现在升级？"));
-				if (QMessageBox::StandardButton::Yes == button) {
-					onBtnAutoUpdateFirmwareClicked();
-				}
+					QMessageBox::StandardButton button = QMessageBox::question(this, tr("升级"), tr("有新版本固件可以升级，是否现在升级？"));
+					if (QMessageBox::StandardButton::Yes == button) {
+						onBtnAutoUpdateFirmwareClicked();
+					}
 #endif
+				}
 			}
 		}
 		else {
@@ -309,10 +319,10 @@ void DeviceSerial::onBtnManualFirmware()
 	//3.发送指令1
 	//4.收到回应C
 	//5.发送固件BIN文件
-#ifdef _DisableUpdateFirmware_
-	QMessageBox::information(this, tr("提示"), tr("功能开发中"));
-	return;
-#endif
+//#ifdef _DisableUpdateFirmware_
+//	QMessageBox::information(this, tr("提示"), tr("功能开发中"));
+//	return;
+//#endif
 	//选择本地已存在固件文件
 	QString qstrFile = QFileDialog::getOpenFileName(this, tr("选择固件"), QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation), "File(*.bin)");
 	if (qstrFile.isEmpty()) return;
@@ -354,15 +364,16 @@ void DeviceSerial::onSerialReadyRead()
 {
 	if (!m_serialPort.isOpen()) return;
 	QByteArray data = m_serialPort.readAll();
-	qDebug() << "串口收到内容" << data;
+	//qDebug() << "串口收到内容" << data;
 	dataRecord(false, data);
 	onSerialData(data);
-	if (false == m_bYmodemTransmitStatus && data.contains("either 1, 2, 3")) {
+	if (false == m_bYmodemTransmitIng && data.contains("either 1, 2, 3")) {
+		//无人机启动模式，发送1进入固件更新状态
 		sendDataToSerial("1");
 	} 
 	if ("C" == data) {
-		//发送固件文件
-		if (m_bYmodemTransmitStatus) return;
+		//无人机等待接受固件中，发送固件文件
+		if (m_bYmodemTransmitIng) return;
 		if (false == QFile::exists(m_qstrBinFile)) {
 			static bool bWait = false;
 			if (bWait) return;
@@ -371,27 +382,16 @@ void DeviceSerial::onSerialReadyRead()
 			if (QMessageBox::StandardButton::Yes != button) return;
 			m_qstrBinFile = QFileDialog::getOpenFileName(this, tr("选择固件"), QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation), "File(*.bin)");
 			qInfo() << "手动选择固件文件";
+			ui.widgetYmodemTransmit->setVisible(true);
 			if (m_qstrBinFile.isEmpty()) return;
 		}
-		qInfo() << "固件所在位置" << m_qstrBinFile;
-		//先断开串口连接
-		if (m_serialPort.isOpen()){
-			onBtnSerial();
-		}
-		qInfo() << "开始发送固件到无人机";
+		m_bYmodemTransmitIng = true;
+		qInfo() << "开始发送固件到无人机" << m_qstrBinFile;
 		ui.labelYmodemTransmitError->setText("正在更新中");
 		ui.progressBarTransmit->setValue(0);
-		m_pYmodemFileTransmit->setFileName(m_qstrBinFile);
-		m_pYmodemFileTransmit->setPortName(ui.comboBoxCom->currentText());
-		m_pYmodemFileTransmit->setPortBaudRate(QSerialPort::Baud115200);
-		if (m_pYmodemFileTransmit->startTransmit()) {
-			m_bYmodemTransmitStatus = true;
-		}
-		else {
-			m_bYmodemTransmitStatus = false;
-			QMessageBox::warning(this, tr("错误"), tr("固件更新出错，无法发送固件到无人机"));
-		}
-		this->setEnabled(!m_bYmodemTransmitStatus);
+		disconnect(&m_serialPort, &QSerialPort::readyRead, this, &DeviceSerial::onSerialReadyRead);
+		m_pYmodemFileTransmit->startTransmit(&m_serialPort, m_qstrBinFile, ui.comboBoxCom->currentText(), QSerialPort::Baud115200);
+		this->setEnabled(!m_bYmodemTransmitIng);
 	}
 }
 
@@ -453,18 +453,24 @@ void DeviceSerial::onYmodemTransmitStatus(YmodemFileTransmit::Status status)
 	case YmodemFileTransmit::StatusEstablish: "未开始"; break;
 	case YmodemFileTransmit::StatusTransmit: "更新中"; break;
 	case YmodemFileTransmit::StatusFinish:
-		m_bYmodemTransmitStatus = false;
+		m_bYmodemTransmitIng = false;
 		ui.labelYmodemTransmitError->setText("固件更新成功");
 		break;
 	default:
-		qWarning() << "无人机固件更新失败" << status;
-		m_bYmodemTransmitStatus = false;
-		ui.labelYmodemTransmitError->setText("<font color=red>固件更新失败</font>");
+	{
+		if (m_serialPort.isOpen()) {
+			qWarning() << "无人机固件更新失败" << status;
+			m_bYmodemTransmitIng = false;
+			ui.labelYmodemTransmitError->setText("<font color=red>固件更新失败</font>");
+		}
+		else {
+			ui.labelYmodemTransmitError->setText("<font color=red>无人机连接断开，请重新连接</font>");
+		}
 	}
-	this->setEnabled(!m_bYmodemTransmitStatus);
-	if (false == m_bYmodemTransmitStatus) {
-		//更新完成或失败，重新连接串口
-		if(isActiveWindow()) onBtnSerial();
+	}
+	if (!m_bYmodemTransmitIng) {
+		connect(&m_serialPort, &QSerialPort::readyRead, this, &DeviceSerial::onSerialReadyRead);
+		this->setEnabled(!m_bYmodemTransmitIng);
 	}
 }
 
@@ -480,8 +486,8 @@ void DeviceSerial::showEvent(QShowEvent* event)
 	ui.textBrowserData->clear();
 	ui.btnAutoUpdateFirmware->setVisible(false);
 	ui.widgetYmodemTransmit->setVisible(false);
-	setFixedWidth(420);
-	ui.widgetData->setVisible(false);
+	setFixedWidth(900);
+	//ui.widgetData->setVisible(false);
 	if (m_pLabelBackground) {
 		delete m_pLabelBackground;
 		m_pLabelBackground = nullptr;
@@ -529,7 +535,7 @@ void DeviceSerial::hideEvent(QHideEvent* event)
 		ui.btnSerial->setText(tr("连接"));
 		ui.comboBoxCom->setEnabled(true);
 	}
-	if (m_bYmodemTransmitStatus) {
+	if (m_bYmodemTransmitIng) {
 		m_pYmodemFileTransmit->stopTransmit();
 	}
 }

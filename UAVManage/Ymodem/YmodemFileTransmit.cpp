@@ -8,19 +8,14 @@ YmodemFileTransmit::YmodemFileTransmit(QObject *parent) :
     QObject(parent),
     file(new QFile),
     readTimer(new QTimer),
-    writeTimer(new QTimer),
-    serialPort(new QSerialPort)
+    writeTimer(new QTimer)
+
 {
+    serialPort = nullptr;
+
     setTimeDivide(499);
     setTimeMax(5);
     setErrorMax(999);
-
-    serialPort->setPortName("COM1");
-    serialPort->setBaudRate(115200);
-    serialPort->setDataBits(QSerialPort::Data8);
-    serialPort->setStopBits(QSerialPort::OneStop);
-    serialPort->setParity(QSerialPort::NoParity);
-    serialPort->setFlowControl(QSerialPort::NoFlowControl);
 
     connect(readTimer, SIGNAL(timeout()), this, SLOT(readTimeOut()));
     connect(writeTimer, SIGNAL(timeout()), this, SLOT(writeTimeOut()));
@@ -31,39 +26,16 @@ YmodemFileTransmit::~YmodemFileTransmit()
     delete file;
     delete readTimer;
     delete writeTimer;
-    delete serialPort;
 }
 
-void YmodemFileTransmit::setFileName(const QString &name)
+bool YmodemFileTransmit::startTransmit(QSerialPort* serial, QString filename, QString portname, qint32 baudrate)
 {
-    file->setFileName(name);
-}
-
-void YmodemFileTransmit::setPortName(const QString &name)
-{
-    serialPort->setPortName(name);
-}
-
-void YmodemFileTransmit::setPortBaudRate(qint32 baudrate)
-{
-    serialPort->setBaudRate(baudrate);
-}
-
-bool YmodemFileTransmit::startTransmit()
-{
+	file->setFileName(filename);
+	serialPort = serial;
     progress = 0;
     status   = StatusEstablish;
-
-    if(serialPort->open(QSerialPort::ReadWrite) == true)
-    {
-        readTimer->start(READ_TIME_OUT);
-
-        return true;
-    }
-    else
-    {
-        return false;
-    }
+    readTimer->start(READ_TIME_OUT);
+    return true;
 }
 
 void YmodemFileTransmit::stopTransmit()
@@ -99,7 +71,6 @@ void YmodemFileTransmit::readTimeOut()
 void YmodemFileTransmit::writeTimeOut()
 {
     writeTimer->stop();
-    serialPort->close();
     transmitStatus(status);
 }
 
@@ -219,10 +190,17 @@ Ymodem::Code YmodemFileTransmit::callback(Status status, uint8_t *buff, uint32_t
 
 uint32_t YmodemFileTransmit::read(uint8_t *buff, uint32_t len)
 {
-    return serialPort->read((char *)buff, len);
+    qint64 res = 0;
+    if (serialPort) {
+        res = serialPort->read((char*)buff, len);
+    }
+    return res;
 }
 
 uint32_t YmodemFileTransmit::write(uint8_t *buff, uint32_t len)
 {
-    return serialPort->write((char *)buff, len);
+    qint64 res = 0;
+    if(serialPort) 
+        res = serialPort->write((char*)buff, len);
+    return res;
 }

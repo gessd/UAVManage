@@ -15,12 +15,7 @@ public:
     explicit YmodemFileTransmit(QObject *parent = 0);
     ~YmodemFileTransmit();
 
-    void setFileName(const QString &name);
-
-    void setPortName(const QString &name);
-    void setPortBaudRate(qint32 baudrate);
-
-    bool startTransmit();
+    bool startTransmit(QSerialPort* serial, QString filename, QString portname, qint32 baudrate);
     void stopTransmit();
 
     int getTransmitProgress();

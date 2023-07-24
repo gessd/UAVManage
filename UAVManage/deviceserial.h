@@ -63,7 +63,7 @@ private:
 	//固件更新
 	YmodemFileTransmit* m_pYmodemFileTransmit;
 	//固件正在更新中
-	bool m_bYmodemTransmitStatus;
+	bool m_bYmodemTransmitIng;
 	//更新的固件文件
 	QString m_qstrBinFile;
 };
