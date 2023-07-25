@@ -67,7 +67,7 @@ DeviceSerial::DeviceSerial(QWidget *parent)
 	connect(m_pYmodemFileTransmit, SIGNAL(transmitStatus(YmodemFileTransmit::Status)), this, SLOT(onYmodemTransmitStatus(YmodemFileTransmit::Status)));
 
 	setFixedWidth(420);
-	//ui.widgetData->setVisible(false);
+	ui.widgetData->setVisible(false);
 }
 
 DeviceSerial::~DeviceSerial()
@@ -319,10 +319,10 @@ void DeviceSerial::onBtnManualFirmware()
 	//3.发送指令1
 	//4.收到回应C
 	//5.发送固件BIN文件
-//#ifdef _DisableUpdateFirmware_
-//	QMessageBox::information(this, tr("提示"), tr("功能开发中"));
-//	return;
-//#endif
+#ifdef _DisableUpdateFirmware_
+	QMessageBox::information(this, tr("提示"), tr("功能开发中"));
+	return;
+#endif
 	//选择本地已存在固件文件
 	QString qstrFile = QFileDialog::getOpenFileName(this, tr("选择固件"), QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation), "File(*.bin)");
 	if (qstrFile.isEmpty()) return;
@@ -486,8 +486,8 @@ void DeviceSerial::showEvent(QShowEvent* event)
 	ui.textBrowserData->clear();
 	ui.btnAutoUpdateFirmware->setVisible(false);
 	ui.widgetYmodemTransmit->setVisible(false);
-	setFixedWidth(900);
-	//ui.widgetData->setVisible(false);
+	setFixedWidth(420);
+	ui.widgetData->setVisible(false);
 	if (m_pLabelBackground) {
 		delete m_pLabelBackground;
 		m_pLabelBackground = nullptr;
