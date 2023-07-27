@@ -100,19 +100,10 @@
     <ClCompile Include="AudioDecoder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="qwchartview.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SoundGrade.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="paramreadwrite.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="spaceparam.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="musicscale.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="calibrationdialog.cpp">
@@ -225,19 +216,10 @@
     <QtMoc Include="AudioDecoder.h">
       <Filter>Header Files</Filter>
     </QtMoc>
-    <QtMoc Include="qwchartview.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="SoundGrade.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
     <QtMoc Include="paramreadwrite.h">
       <Filter>Header Files</Filter>
     </QtMoc>
     <QtMoc Include="spaceparam.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="musicscale.h">
       <Filter>Header Files</Filter>
     </QtMoc>
     <QtMoc Include="calibrationdialog.h">
@@ -312,9 +294,6 @@
       <Filter>Form Files</Filter>
     </QtUic>
     <QtUic Include="placeinfodialog.ui">
-      <Filter>Form Files</Filter>
-    </QtUic>
-    <QtUic Include="SoundGrade.ui">
       <Filter>Form Files</Filter>
     </QtUic>
     <QtUic Include="spaceparam.ui">

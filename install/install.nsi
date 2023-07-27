@@ -129,7 +129,6 @@ Section "MainSection" SEC01
 	File    "${appDir}\opengl32sw.dll"
 	File    "${appDir}\python3.dll"
 	File    "${appDir}\python38.dll"
-	File    "${appDir}\Qt5Charts.dll"
 	File    "${appDir}\Qt5Core.dll"
 	File    "${appDir}\Qt5Gui.dll"
 	File    "${appDir}\Qt5Multimedia.dll"

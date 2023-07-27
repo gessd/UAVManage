@@ -38,7 +38,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="QtSettings">
     <QtInstall>msvc2019_64</QtInstall>
-    <QtModules>core;network;gui;multimedia;widgets;serialport;webchannel;websockets;webengine;webenginewidgets;charts</QtModules>
+    <QtModules>core;network;gui;multimedia;widgets;serialport;webchannel;websockets;webengine;webenginewidgets</QtModules>
     <QtBuildConfig>release</QtBuildConfig>
   </PropertyGroup>
   <Target Name="QtMsBuildNotFound" BeforeTargets="CustomBuild;ClCompile" Condition="!Exists('$(QtMsBuild)\qt.targets') or !Exists('$(QtMsBuild)\qt.props')">
@@ -148,7 +148,6 @@
     <QtUic Include="musicplayer.ui" />
     <QtUic Include="placeinfodialog.ui" />
     <QtUic Include="registerdialog.ui" />
-    <QtUic Include="SoundGrade.ui" />
     <QtUic Include="spaceparam.ui" />
     <QtUic Include="stopflydialog.ui" />
     <QtUic Include="uavmanage.ui" />
@@ -168,16 +167,13 @@
     <ClCompile Include="deviceserial.cpp" />
     <ClCompile Include="downloadtool.cpp" />
     <ClCompile Include="messagelistdialog.cpp" />
-    <ClCompile Include="musicscale.cpp" />
     <ClCompile Include="paramreadwrite.cpp" />
     <ClCompile Include="placeinfodialog.cpp" />
     <ClCompile Include="qtsingleapplication\qtlocalpeer.cpp" />
     <ClCompile Include="qtsingleapplication\qtsingleapplication.cpp" />
-    <ClCompile Include="qwchartview.cpp" />
     <ClCompile Include="resendmessage.cpp" />
     <ClCompile Include="serial\qextserialenumerator.cpp" />
     <ClCompile Include="serial\qextserialenumerator_win.cpp" />
-    <ClCompile Include="SoundGrade.cpp" />
     <ClCompile Include="spaceparam.cpp" />
     <ClCompile Include="threadpython.cpp" />
     <ClCompile Include="tinyxml2\tinyxml2.cpp" />
@@ -215,15 +211,12 @@
     <ClInclude Include="mavlinksetting.h" />
     <QtMoc Include="threadpython.h" />
     <QtMoc Include="messagelistdialog.h" />
-    <QtMoc Include="musicscale.h" />
     <QtMoc Include="musicplayer.h" />
     <QtMoc Include="musicspectrum.h" />
     <ClInclude Include="mypythondefine.h" />
     <QtMoc Include="qtsingleapplication\qtlocalpeer.h" />
     <QtMoc Include="qtsingleapplication\qtsingleapplication.h" />
     <QtMoc Include="placeinfodialog.h" />
-    <QtMoc Include="qwchartview.h" />
-    <QtMoc Include="SoundGrade.h" />
     <QtMoc Include="paramreadwrite.h" />
     <QtMoc Include="spaceparam.h" />
     <QtMoc Include="serial\qextserialenumerator.h" />
