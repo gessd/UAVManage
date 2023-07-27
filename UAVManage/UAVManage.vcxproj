@@ -78,11 +78,11 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <PreprocessorDefinitions>BUILD_QXT_CORE;BUILD_QXT_GUI;HV_STATICLIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Qt\Tools\OpenSSL\Win_x64\include;.\qxtglobalshortcut5\core;.\qxtglobalshortcut5\gui;.\qtsingleapplication;.\python395-64\include;.\mavlink1-c\common;.\mavlink1-c\;.\libhv\include;.\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Qt\Tools\OpenSSL\Win_x64\include;.\qxtglobalshortcut5\core;.\qxtglobalshortcut5\gui;.\qtsingleapplication;.\python38x64\include;.\mavlink1-c\common;.\mavlink1-c\;.\libhv\include;.\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies>Setupapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>.\python395-64\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>.\python38x64\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
     </Link>
   </ItemDefinitionGroup>
