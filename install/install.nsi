@@ -159,18 +159,18 @@ Section "MainSection" SEC01
 	
   StrCpy $File3DCount 0
   ;三维仿真依赖库
-  IfFileExists "C:\WINDOWS\system32\x3daudio1_7.dll" 0 +2
-        StrCpy $File3DCount $File3DCount+1
-  IfFileExists "C:\WINDOWS\system32\D3DCOMPILER_43.dll" 0 +2
-        StrCpy $File3DCount $File3DCount+2
-  IfFileExists "C:\WINDOWS\system32\OPENGL32.dll" 0 +2
-        StrCpy $File3DCount $File3DCount+3
-  IfFileExists "C:\WINDOWS\system32\VCRUNTIME140.dll" 0 +2
-        StrCpy $File3DCount $File3DCount+4
-  ${If} $File3DCount != "0+1+2+3+4"
-		;MessageBox MB_OK "安装三维依赖库"
-        ExecWait "$INSTDIR\3D\Engine\Extras\Redist\en-us\UE4PrereqSetup_x64.exe"
-  ${EndIf}
+  ;IfFileExists "C:\WINDOWS\system32\x3daudio1_7.dll" 0 +2
+  ;      StrCpy $File3DCount $File3DCount+1
+  ;IfFileExists "C:\WINDOWS\system32\D3DCOMPILER_43.dll" 0 +2
+  ;      StrCpy $File3DCount $File3DCount+2
+  ;IfFileExists "C:\WINDOWS\system32\OPENGL32.dll" 0 +2
+  ;      StrCpy $File3DCount $File3DCount+3
+  ;IfFileExists "C:\WINDOWS\system32\VCRUNTIME140.dll" 0 +2
+  ;      StrCpy $File3DCount $File3DCount+4
+  ;${If} $File3DCount != "0+1+2+3+4"
+  ;	     ;MessageBox MB_OK "安装三维依赖库"
+  ;      ExecWait "$INSTDIR\3D\Engine\Extras\Redist\en-us\UE4PrereqSetup_x64.exe"
+  ;${EndIf}
   
   ;禁用系统目录重定向，否则IfFileExists会自动跑到SysWOW64目录寻找文件
   ${DisableX64FSRedirection}
