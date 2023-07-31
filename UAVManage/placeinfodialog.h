@@ -7,7 +7,6 @@
 #include <QShowEvent>
 #include <QHideEvent>
 #include <QCloseEvent>
-#include <QThread>
 #include <QTimer>
 
 //NLINK设置协议格式
@@ -31,7 +30,7 @@ enum _NLINK_Setting_Frame0_
 	_xyz7 =     _xyz6 + 9,
 	_xyz8 =     _xyz7 + 9,
 	_xyz9 =     _xyz8 + 9,
-	_Checksum = _xyz9+9,
+	_Checksum = _xyz9 + 9,
 	_ByteCount   //完整数据长度为128
 };
 
@@ -40,21 +39,6 @@ enum _NLINK_Setting_Frame0_
 #define _OneKey_Set_Next_    QByteArray::fromHex("54002000000000000000000000FF00FF0000FFFF00FFFF0000000000000000FFFFFFFFFF0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000069")
 //基站无效数据
 #define _InvalidValue_   -8388
-
-class SerialWorker : public QObject
-{
-	Q_OBJECT
-public:
-	explicit SerialWorker(QSerialPort* ser, QObject* parent = nullptr);
-signals:
-	void sendResultToGui(QByteArray result);
-public slots:
-	void onDataSendWork(const QByteArray data);
-	void onDataReciveWork();
-private:
-	QSerialPort* m_pSerial;
-	QByteArray m_SerialData;
-};
 
 class PlaceInfoDialog : public QDialog
 {
@@ -74,11 +58,13 @@ private slots:
 	void onBtnReadClicked();
 	void onBtnWriteClicked();
 	void onBtnOnekeyClicked();
+	void onSerialReadData();
 	void onParseSettingFrame(QByteArray arrNLINKData);
-	void onComparePlace(QPoint point);
 	void onTimerOnekeyStatus();
-signals:
-	void serialDataSend(const QByteArray data);
+private:
+	void sendDataToSerial(QByteArray data);
+	void verifyBaseStationPosition();
+	void clearStatus();
 private:
 	Ui::PlaceInfoDialog ui;
 	QSerialPort m_serialPort;
@@ -87,10 +73,10 @@ private:
 	int m_nOnekeySetIndex;
 	//基站标定状态 [0未标定|1标定成功|-1标定失败]
 	int m_stationStatus;
-	QThread m_threadSerial;
 	QLabel* m_pLabelBackground;
 	QPoint m_pointPlace;
 	QByteArray m_arrLastData;
 	QChar m_cOneKeyStatus;
 	QTimer m_timerOnekeyStatus;
+	QByteArray m_SerialData;
 };
