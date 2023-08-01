@@ -337,17 +337,6 @@ void PlaceInfoDialog::onTimerOnekeyStatus()
 	if ((nCurrent - nStart) > 60) {
 		//一键标定超时，停止一键标定
 		m_timerOnekeyStatus.stop();
-		m_bOnekeySetNLINK = false;
-		m_nOnekeySetIndex = 0;
-		ui.labelStationSpace->setText("基站长时间无法标定成功");
-		QByteArray arrData = m_arrLastData;
-		arrData[2] = 0x02;
-		arrData.remove(17, 1);
-		arrData.insert(17, m_cOneKeyStatus);
-		QByteArray arrNew = arrData.left(arrData.length() - 1);
-		arrNew.append(getCheckSum(arrNew));
-		sendDataToSerial(arrNew);
-		//QMessageBox::warning(this, "提示", "基站长时间无法标定成功，请检查基站摆放环境后重新标定");
 		QMessageBox question(QMessageBox::Question, "询问", "基站长时间无法标定完成，请选择继续标定或结束标定直接使用最后的基站位置？"
 			, QMessageBox::Reset | QMessageBox::Apply, this);
 		question.setButtonText(QMessageBox::Reset, "继续标定");
@@ -355,11 +344,22 @@ void PlaceInfoDialog::onTimerOnekeyStatus()
 		int res = question.exec();
 		if (QMessageBox::Reset == res) {
 			qInfo() << "基站长时间无法标定完成，继续标定";
-			m_timerOnekeyStatus.setProperty("start", nCurrent);
+			m_nOnekeySetIndex = 2;
+			m_timerOnekeyStatus.setProperty("start", QDateTime::currentDateTime().toTime_t());
 			m_timerOnekeyStatus.start(200);
 		}
 		else if(QMessageBox::Apply == res){
 			qInfo() << "基站长时间无法标定完成，确认标定完成，直接使用基站位置";
+			m_bOnekeySetNLINK = false;
+			m_nOnekeySetIndex = 0;
+			ui.labelStationSpace->setText("基站长时间无法标定成功");
+			QByteArray arrData = m_arrLastData;
+			arrData[2] = 0x02;
+			arrData.remove(17, 1);
+			arrData.insert(17, m_cOneKeyStatus);
+			QByteArray arrNew = arrData.left(arrData.length() - 1);
+			arrNew.append(getCheckSum(arrNew));
+			sendDataToSerial(arrNew);
 			verifyBaseStationPosition();
 		}
 		return;
@@ -390,7 +390,6 @@ void PlaceInfoDialog::verifyBaseStationPosition()
 	m_timerOnekeyStatus.stop();
 	m_bOnekeySetNLINK = false;
 	m_nOnekeySetIndex = 0;
-	ui.progressBar->setValue(ui.progressBar->maximum());
 	//标定完成后检查标定位置是否符合使用条件
 	qDebug() << "一键标定完成检查数据";
 	//检查标定基站位置 -8388为无效值
@@ -448,6 +447,7 @@ void PlaceInfoDialog::verifyBaseStationPosition()
 	}
 #endif
 	m_stationStatus = 1;
+	ui.progressBar->setValue(ui.progressBar->maximum());
 	qWarning() << "一键标定完成并且位置可用";
 	QMessageBox::information(this, tr("提示"), tr("标定成功"));
 	return;
