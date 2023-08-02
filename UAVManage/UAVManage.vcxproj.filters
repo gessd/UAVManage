@@ -181,6 +181,9 @@
     <ClCompile Include="Ymodem\YmodemFileTransmit.cpp">
       <Filter>Source Files\Ymodem</Filter>
     </ClCompile>
+    <ClCompile Include="planelocation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="devicemanage.h">
@@ -275,6 +278,9 @@
     </QtMoc>
     <QtMoc Include="Ymodem\YmodemFileTransmit.h">
       <Filter>Header Files\Ymodem</Filter>
+    </QtMoc>
+    <QtMoc Include="planelocation.h">
+      <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>

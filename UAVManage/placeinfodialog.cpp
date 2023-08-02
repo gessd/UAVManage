@@ -298,6 +298,16 @@ void PlaceInfoDialog::onParseSettingFrame(QByteArray arrNLINKData)
 				}
 			}
 		}
+		//更新基站在坐标轴的位置
+		QMap<QString, QPointF> maps;
+		maps.insert("A0", QPointF(ui.tableWidget->item(0, 1)->text().toDouble(), ui.tableWidget->item(0, 0)->text().toDouble()));
+		maps.insert("A1", QPointF(ui.tableWidget->item(1, 1)->text().toDouble(), ui.tableWidget->item(1, 0)->text().toDouble()));
+		maps.insert("A2", QPointF(ui.tableWidget->item(2, 1)->text().toDouble(), ui.tableWidget->item(2, 0)->text().toDouble()));
+		maps.insert("A3", QPointF(ui.tableWidget->item(3, 1)->text().toDouble(), ui.tableWidget->item(3, 0)->text().toDouble()));
+		maps.insert("A4", QPointF(ui.tableWidget->item(4, 1)->text().toDouble(), ui.tableWidget->item(4, 0)->text().toDouble()));
+		maps.insert("A5", QPointF(ui.tableWidget->item(5, 1)->text().toDouble(), ui.tableWidget->item(5, 0)->text().toDouble()));
+		ui.widget->drawPoint(maps);
+
 		if (bUsable) {
 			ui.labelStationSpace->setText(QString("基站范围:%1米 X %2米").arg(xmax).arg(ymax));
 		}
@@ -337,7 +347,15 @@ void PlaceInfoDialog::onTimerOnekeyStatus()
 	if ((nCurrent - nStart) > 60) {
 		//一键标定超时，停止一键标定
 		m_timerOnekeyStatus.stop();
-		QMessageBox question(QMessageBox::Question, "询问", "基站长时间无法标定完成，请选择继续标定或结束标定直接使用最后的基站位置？"
+		//QMessageBox question(QMessageBox::Question, "询问", "基站长时间无法标定完成，请选择继续标定或结束标定直接使用最后的基站位置？"
+		QMessageBox question(QMessageBox::Question, "当前标定时间过长，请按如下步骤检查:", "\
+  1.请保持基站之间无遮挡、空旷;\n\
+  2.基站需要保持在同一个平面，一般要求各个基站的高度误差不超过20cm;\n\
+  3.基站布局范围一般需大于1 * 1m;\n\
+  4.基站长宽比一般需小于3:1;\n\
+  5.若以上步骤未解决您的问题，请点击结束标定，最后一次标定结果将会被存储在发起一键标定的基站或控制台;\n\
+  6.若标定结果与实际情况大致符合，则自动标定完成;\n\
+  是否结束标定?"
 			, QMessageBox::Reset | QMessageBox::Apply, this);
 		question.setButtonText(QMessageBox::Reset, "继续标定");
 		question.setButtonText(QMessageBox::Apply, "结束标定");

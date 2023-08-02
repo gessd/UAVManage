@@ -120,6 +120,7 @@
     <ClCompile Include="musicplayer.cpp" />
     <ClCompile Include="musicspectrum.cpp" />
     <ClCompile Include="mytooltip.cpp" />
+    <ClCompile Include="planelocation.cpp" />
     <ClCompile Include="qxtglobalshortcut5\core\qxtglobal.cpp" />
     <ClCompile Include="qxtglobalshortcut5\gui\qxtglobalshortcut.cpp" />
     <ClCompile Include="qxtglobalshortcut5\gui\qxtglobalshortcut_win.cpp" />
@@ -191,6 +192,7 @@
     <QtMoc Include="adddevicedialog.h" />
   </ItemGroup>
   <ItemGroup>
+    <QtMoc Include="planelocation.h" />
     <ClInclude Include="Ymodem\Ymodem.h" />
     <QtMoc Include="Ymodem\YmodemFileTransmit.h" />
     <QtMoc Include="Ymodem\YmodemFileReceive.h" />

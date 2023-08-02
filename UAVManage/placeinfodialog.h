@@ -45,6 +45,7 @@ class PlaceInfoDialog : public QDialog
 	Q_OBJECT
 
 public:
+	//项目场地范围，厘米
 	PlaceInfoDialog(QPoint place, QWidget *parent);
 	~PlaceInfoDialog();
 	QMap<QString, QPoint> getStationAddress();
@@ -74,6 +75,7 @@ private:
 	//基站标定状态 [0未标定|1标定成功|-1标定失败]
 	int m_stationStatus;
 	QLabel* m_pLabelBackground;
+	//项目场地范围，厘米
 	QPoint m_pointPlace;
 	QByteArray m_arrLastData;
 	QChar m_cOneKeyStatus;
