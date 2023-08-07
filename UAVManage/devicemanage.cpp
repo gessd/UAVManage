@@ -849,8 +849,6 @@ QString DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upl
 			continue;
 		}
 		if (false == upload) {
-			//清空三维仿真碰撞信息
-			reset3DStatus();
 			_ShowInfoMessage(name + tr("生成舞步完成"));
 		}
 		map.insert(name, data);
@@ -971,7 +969,7 @@ QString DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upl
 				_ShowErrorMessage(name + QString("设备Y轴方向距离初始位置超过%1厘米，无法上传舞步").arg(_UAVMinDistance_));
 				continue;
 			}
-			//上次舞步到飞控之前检查是否进行三维仿真
+			//上传舞步到飞控之前检查是否进行三维仿真
 			qInfo() << QString("三维仿真是否完成:%1").arg(m_b3DFinished);
 			if (false == m_b3DFinished) {
 				_ShowErrorMessage("三维仿真未完成，无法上传舞步到无人机");
@@ -1002,6 +1000,8 @@ QString DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upl
 				_ShowErrorMessage(name + "上传舞步失败" + Utility::waypointMessgeFromStatus(_DeviceWaypoint, status));
 			}
 		}
+		//上传舞步后清空三维仿真碰撞信息
+		reset3DStatus();
 	}
 	//发送航点到三维
 	sendWaypointTo3D(map);
@@ -1506,7 +1506,12 @@ void DeviceManage::analyzeMessageFrom3D(QByteArray data)
 		return;
 	}
 	QJsonObject jsonObj = jsonDoc.object();
+	//记录上一次消息，仿真三维仿真重复发送初始消息
+	static QJsonObject lastJson;
+	if (lastJson == jsonObj) return;
+	lastJson = jsonObj;
 	int id = jsonObj.value(_ID_).toInt();
+	qDebug() << "处理三维消息" << id;
 	if (m_map3DMsgRecord.contains(id)) {
 		m_map3DMsgRecord.remove(id);
 		if (m_map3DMsgRecord.isEmpty()) m_timerMessage3D.stop();
@@ -1528,6 +1533,9 @@ void DeviceManage::analyzeMessageFrom3D(QByteArray data)
 	else if (_3dDeviceFinished == id) {
 		qDebug() << "三维仿真结束" << jsonObj;
 		m_b3DFinished = true;
+	}
+	else {
+		qWarning() << "未知三维消息";
 	}
 }
 
