@@ -550,6 +550,7 @@ void UAVManage::onSaveasProject()
 	bool bcp = QFile::copy(m_qstrCurrentProjectFile, qstrName);
 	m_qstrCurrentProjectFile = qstrName;
 	m_pDeviceManage->setCrrentProject(m_qstrCurrentProjectFile);
+	ParamReadWrite::writeParam(_Path_, m_qstrCurrentProjectFile);
 }
 
 void UAVManage::onCloseProject()
