@@ -466,7 +466,7 @@ void PlaceInfoDialog::verifyBaseStationPosition()
 #endif
 	m_stationStatus = 1;
 	ui.progressBar->setValue(ui.progressBar->maximum());
-	qWarning() << "一键标定完成并且位置可用";
+	qInfo() << "一键标定完成并且位置可用";
 	QMessageBox::information(this, tr("提示"), tr("标定成功"));
 	return;
 }

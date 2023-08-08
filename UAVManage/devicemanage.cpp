@@ -449,7 +449,7 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 		//先清空错误消息
 		_MessageListClear;
 		//记录出错设备名称
-		QStringList listNames;
+		QStringList listErrorNames;
 		QStringList listCheck;
 		for (int i = 0; i < ui.listWidget->count(); i++) {
 			bool bTimeSync = true;
@@ -462,7 +462,7 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 			if(false == pDevice->isCheckDevice()) continue;
 			QString name = pDevice->getName();
 			listCheck.append(name);
-			listNames.append(name);
+			listErrorNames.append(name);
 			if (false == pDevice->isConnectDevice()) {
 				_ShowErrorMessage(name + tr("设备未连接无法起飞"));
 				continue;
@@ -480,12 +480,12 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 				_ShowErrorMessage(name + tr("设备未上传舞步无法起飞"));
 				continue;
 			}
-			if (qAbs(pDevice->getX() - pDevice->getCurrentStatus().x) > 50) {
-				_ShowErrorMessage(name + tr("设备X轴方向距离初始位置超过50厘米"));
+			if (qAbs(pDevice->getX() - pDevice->getCurrentStatus().x) >= _UAVStartLocation_) {
+				_ShowErrorMessage(name + tr("设备X轴方向距离初始位置超过10厘米"));
 				continue;
 			}
-			if (qAbs(pDevice->getY() - pDevice->getCurrentStatus().y) > 50) {
-				_ShowErrorMessage(name + tr("设备Y轴方向距离初始位置超过50厘米"));
+			if (qAbs(pDevice->getY() - pDevice->getCurrentStatus().y) >= _UAVStartLocation_) {
+				_ShowErrorMessage(name + tr("设备Y轴方向距离初始位置超过10厘米"));
 				continue;
 			}
 			if (false == pDevice->isTimeSync()) {
@@ -519,11 +519,11 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 				continue;
 			}
 			//所有判断检查通过
-			listNames.removeOne(name);
+			listErrorNames.removeOne(name);
 		}
-		
-		if (false == listNames.isEmpty()) {
-			QString qstrError = listNames.join("、");
+		//所有设备准备完成才可以起飞
+		if (false == listErrorNames.isEmpty()) {
+			QString qstrError = listErrorNames.join("、");
 			QString error = qstrError + tr("检查出错，请重试");
 			_ShowErrorMessage(error);
 			QMessageBox::warning(this, tr("警告"), error);
@@ -689,6 +689,11 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 QString DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upload)
 {
 	_MessageListClear
+
+	//执行python中不能重复执行，防止崩溃
+	static bool bComposeIng = false;
+	if (bComposeIng) return "正在处理舞步中，请稍后重试";
+	bComposeIng = true;
 	//MAP用于统一发送航点信息到三维
 	QMap<QString, QVector<NavWayPointData>> map;
 	qDebug() << "准备生成舞步信息";
@@ -922,6 +927,7 @@ QString DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upl
 					QString qstrCurrentNmae = getCurrentDeviceName();
 					if (qstrCurrentNmae == temp.name) emit sigBlockFlicker(temp.blockid);
 					else emit sigBlockFlicker(pos.blockid);
+					bComposeIng = false;
 					return "，" + pos.name + "，" + temp.name;
 				}
 			}
@@ -940,6 +946,7 @@ QString DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upl
 				QString qstrCurrentNmae = getCurrentDeviceName();
 				if (qstrCurrentNmae == temp.name) emit sigBlockFlicker(temp.blockid);
 				else emit sigBlockFlicker(pos.blockid);
+				bComposeIng = false;
 				return "，" + pos.name + "，" + temp.name;
 			}
 		}
@@ -961,17 +968,18 @@ QString DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upl
 				_ShowErrorMessage(name + tr("设备没有连接无法上传舞步"));
 				continue;
 			}
-			if (qAbs(pDevice->getX() - pDevice->getCurrentStatus().x) > _UAVMinDistance_) {
-				_ShowErrorMessage(name + QString("设备X轴方向距离初始位置超过%1厘米，无法上传舞步").arg(_UAVMinDistance_));
+			if (qAbs(pDevice->getX() - pDevice->getCurrentStatus().x) >= _UAVStartLocation_) {
+				_ShowErrorMessage(name + QString("设备X轴方向距离初始位置超过%1厘米，无法上传舞步").arg(_UAVStartLocation_));
 				continue;
 			}
-			if (qAbs(pDevice->getY() - pDevice->getCurrentStatus().y) > _UAVMinDistance_) {
-				_ShowErrorMessage(name + QString("设备Y轴方向距离初始位置超过%1厘米，无法上传舞步").arg(_UAVMinDistance_));
+			if (qAbs(pDevice->getY() - pDevice->getCurrentStatus().y) >= _UAVStartLocation_) {
+				_ShowErrorMessage(name + QString("设备Y轴方向距离初始位置超过%1厘米，无法上传舞步").arg(_UAVStartLocation_));
 				continue;
 			}
 			//上传舞步到飞控之前检查是否进行三维仿真
 			qInfo() << QString("三维仿真是否完成:%1").arg(m_b3DFinished);
 			if (false == m_b3DFinished) {
+				bComposeIng = false;
 				_ShowErrorMessage("三维仿真未完成，无法上传舞步到无人机");
 				QMessageBox::warning(this, "警告", "三维仿真未完成，无法上传舞步到无人机");
 				return false;
@@ -984,6 +992,7 @@ QString DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upl
 					text.append(name + "，");
 				}
 				text.append("舞步存在碰撞风险，请检查后重试");
+				bComposeIng = false;
 				_ShowErrorMessage(text);
 				QMessageBox::warning(this, "警告", text);
 				return false;
@@ -1005,6 +1014,7 @@ QString DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upl
 	}
 	//发送航点到三维
 	sendWaypointTo3D(map);
+	bComposeIng = false;
 	return qstrErrorNames;
 }
 

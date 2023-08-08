@@ -3,7 +3,7 @@
 //程序版本号
 #define _MajorNumber_ 1
 #define _MinorNumber_ 0
-#define _BuildNumber_ 16
+#define _BuildNumber_ 17
 //新程序下载存放文件夹
 #define _NewVersionPath_	"/update"
 #define _VersionFile_		"version.ini"
@@ -64,6 +64,8 @@
 #define _WaypointLanding_ 50
 //无人机碰撞检测距离 厘米
 #define _UAVMinDistance_  50
+//无人机初始位置偏差 厘米
+#define _UAVStartLocation_ 10
 
 enum _WaypointType {
 	_WaypointFly		= 16,		//飞行动作航点
