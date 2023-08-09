@@ -288,6 +288,10 @@ private:
 	 * @brief 更新设备连接状态
 	 */
 	void onUpdateConnectStatus(QString name, QString ip, bool connect);
+	/**
+	 * @brief 更新Tip框内容
+	 */
+	void updateToopTip();
 signals:
 	/**
 	* @brief 设备命令控制返回结果

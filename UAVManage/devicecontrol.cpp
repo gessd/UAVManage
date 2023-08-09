@@ -94,6 +94,7 @@ QString DeviceControl::getName()
 void DeviceControl::setName(QString name)
 {
 	ui.labelDeviceName->setText(name);
+	updateToopTip();
 }
 
 QString DeviceControl::getIP()
@@ -120,6 +121,7 @@ long DeviceControl::getX()
 void DeviceControl::setX(long x)
 {
 	m_nStartX = x;
+	updateToopTip();
 }
 
 long DeviceControl::getY()
@@ -130,6 +132,7 @@ long DeviceControl::getY()
 void DeviceControl::setY(long y)
 {
 	m_nStartY = y;
+	updateToopTip();
 }
 
 void DeviceControl::setCurrentTime(unsigned int time)
@@ -751,6 +754,11 @@ void DeviceControl::onUpdateConnectStatus(QString name, QString ip, bool connect
 		//onUpdateLocation(0, 0, 0, 0);
 		onUpdateBatteryStatus(0, 0, 0);
 	}
+}
+
+void DeviceControl::updateToopTip()
+{
+	ui.labelDeviceName->setToolTip(QString("%1\n%2\nX:%3 Y:%4").arg(getName()).arg(getIP()).arg(getX()).arg(getY()));
 }
 
 void DeviceControl::onWaypointStart()

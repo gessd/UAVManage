@@ -3,11 +3,12 @@
 #include <QHelpEvent>
 #include <QDebug>
 
+#define _OneLineHeight_  22
 MyTooltip::MyTooltip(QWidget* parent)
     :QLabel(parent)
 {
     m_bMove = false;
-    setFixedHeight(22);
+    setFixedHeight(_OneLineHeight_);
     setWindowFlags(Qt::ToolTip);    
     setAlignment(Qt::AlignCenter);
     setAttribute(Qt::WA_StyledBackground);
@@ -28,6 +29,9 @@ void MyTooltip::onHide()
 
 void MyTooltip::setText(const QString& text)
 {
+    QStringList list = text.split("\n");
+    int height = _OneLineHeight_ * list.count();
+    setFixedHeight(height);
     m_bMove = false;
     if (m_qstrLast != text) {
         onHide();
