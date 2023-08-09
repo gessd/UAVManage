@@ -93,7 +93,6 @@ void MessageListDialog::onShowMessageText(QString text, _Messagelevel level, boo
 		return;
 	}
 
-	qDebug() << "提示消息" << level <<text;
 	if (parent()) {
 		QWidget* pWidget = dynamic_cast<QWidget*>(parent());
 		if (pWidget) {
@@ -120,14 +119,17 @@ void MessageListDialog::onShowMessageText(QString text, _Messagelevel level, boo
 	case InfoMessage:
 		pItem->setData(_ItemWaitTime_, 3);
 		pLabel->setObjectName("LabelInfoMessage");
+		qInfo() << "普通消息提示" << text;
 		break;
 	case WarningMessage:
 		pItem->setData(_ItemWaitTime_, 6);
 		pLabel->setObjectName("LabelWarningMessage");
+		qWarning() << "警告消息提示" << text;
 		break;
 	case ErrorMessage:
 		pItem->setData(_ItemWaitTime_, 9);
 		pLabel->setObjectName("LabelErrorMessage");
+		qWarning() << "错误消息提示" << text;
 		break;
 	default:
 		break;

@@ -106,10 +106,6 @@ public:
 	QString waypointComposeAndUpload(QString qstrProjectFile, bool upload);
 
 	/**
-	* @brief 设置当前音频播放状态
-	*/
-	void setCurrentPlayeState(qint8 state);
-	/**
 	* @brief 三维设置音乐文件路径
 	*/
 	void setCurrentMusicPath(QString filePath, QPixmap pixmap);

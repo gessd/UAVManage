@@ -821,7 +821,8 @@ void UAVManage::onSocketDisconnected()
 
 void UAVManage::onCurrentDeviceNameChanged(QString currentName, QString previousName)
 {
-	qDebug() << "设备切换" << currentName << previousName;
+	if (currentName.isEmpty()) return;
+	qInfo() << "设备切换" << currentName << previousName;
 	QString blocklyFilePath = getCurrentBlocklyFile();
 	if (blocklyFilePath.isEmpty()) {
 		onWebClear();
@@ -1125,7 +1126,6 @@ void UAVManage::onCurrentMusicTime(unsigned int second)
 void UAVManage::onCurrentPlayeState(qint8 state)
 {
 	//播放状态 1:开始 2 : 暂停 3 : 结束
-	m_pDeviceManage->setCurrentPlayeState(state);
 	if (3 == state) m_pStopDialog->close();
 }
 

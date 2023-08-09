@@ -437,6 +437,29 @@ QString DeviceManage::isRepetitionDevice(QString qstrName, QString ip, long x, l
 
 void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 {
+	static bool bControlIng = false;
+	if (bControlIng) {
+		//避免反复控制，造成逻辑错误
+		_ShowInfoMessage("上一次操控未结束，请等待");
+		return;
+	}
+	bControlIng = true;
+	QString text = "无人机控制";
+	switch (comand) {
+	case _DeviceTakeoffLocal: text.append("起飞"); break;
+	case _DeviceLandLocal: text.append("降落"); break;
+	case _DeviceQuickStop: text.append("急停"); break;
+	case _DeviceTimeSync: text.append("定桩授时"); break;
+	case _DevicePrepare: text.append("准备起飞"); break;
+	case _DeviceQueue: text.append("列队"); break;
+	case _DeviceRegain: text.append("回收"); break;
+	case _DeviceLed: text.append("LED控制"); break;
+	case _DeviceWaypoint: text.append("舞步"); break;
+	case _DeviceCalibration: text.append("设备校准"); break;
+	default: text.append("未定义操作"); break;
+	}
+	qInfo() << text;
+
 	if (_DeviceTakeoffLocal == comand || _DevicePrepare == comand) {
 		//起飞前检查所有设备状态
 		//设备连接状态
@@ -529,10 +552,12 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 			QString error = qstrError + tr("检查出错，请重试");
 			_ShowErrorMessage(error);
 			QMessageBox::warning(this, tr("警告"), error);
+			bControlIng = false;
 			return;
 		}
 		if (listCheck.isEmpty()) {
 			_ShowInfoMessage(tr("未选中无人机"));
+			bControlIng = false;
 			return;
 		}
 		
@@ -583,6 +608,7 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 			QString error = errorList.join("、") + tr("无人机未连接无法进行定桩授时");
 			_ShowErrorMessage(error);
 			QMessageBox::warning(this, tr("失败"), error);
+			bControlIng = false;
 			return;
 		}
 	}
@@ -658,6 +684,7 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 	
 	if (listCheck.isEmpty()) {
 		_ShowInfoMessage(tr("未选中无人机"));
+		bControlIng = false;
 		return;
 	}
 	//其他情况停止音乐播放
@@ -686,6 +713,7 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 			QMessageBox::warning(this, tr("失败"), error);
 		}
 	}
+	bControlIng = false;
 }
 
 QString DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upload)
@@ -1020,12 +1048,6 @@ QString DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upl
 	return qstrErrorNames;
 }
 
-
-void DeviceManage::setCurrentPlayeState(qint8 state)
-{
-
-}
-
 void DeviceManage::setCurrentMusicPath(QString filePath, QPixmap pixmap)
 {
 	m_qstrMusicFile = filePath;
@@ -1037,17 +1059,6 @@ void DeviceManage::setCurrentMusicPath(QString filePath, QPixmap pixmap)
 		qDebug() << "保存音乐波形图片失败";
 		return;
 	}
-	//QJsonObject obj3dmsg;
-	//obj3dmsg.insert(_Ver_, _VerNum_);
-	//obj3dmsg.insert(_Tag_, _TabName_);
-	//obj3dmsg.insert(_ID_, _3dDeviceMusicPath);
-	//obj3dmsg.insert(_Time_, QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"));
-	////obj3dmsg.insert(_Data_, filePath);
-	//QJsonObject data;
-	//data.insert("file", filePath);
-	//data.insert("image", qstrPixmapPath);
-	//obj3dmsg.insert(_Data_, data);
-	//sendMessageTo3D(obj3dmsg);
 }
 
 void DeviceManage::sendWaypointTo3D(QMap<QString, QVector<NavWayPointData>> map)
@@ -1239,13 +1250,7 @@ void DeviceManage::sendWaypointTo3D(QMap<QString, QVector<NavWayPointData>> map)
 			int d = getDistance(lastX, lastY, lastZ, x, y, z);
 			//计算飞行时间 时间使用毫秒单位
 			int time = d * 1000 / speed;
-#ifdef _WaypointUseTime_
 			time = waypoint.param3 * 1000;
-#else
-			if (waypoint.param1 > 0) {
-				time = time + waypoint.param1 * 1000;
-			}
-#endif
 			timesum += time;
 			QList<QVariant> value;
 			value << timesum << red << green << blue << status << angle << x << y << z << 16;

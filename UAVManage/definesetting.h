@@ -3,7 +3,7 @@
 //程序版本号
 #define _MajorNumber_ 1
 #define _MinorNumber_ 0
-#define _BuildNumber_ 17
+#define _BuildNumber_ 18
 //新程序下载存放文件夹
 #define _NewVersionPath_	"/update"
 #define _VersionFile_		"version.ini"
@@ -34,9 +34,6 @@
 #define _TakeoffLocalHeight_ 100
 //无人机最大飞行高度 厘米
 #define _MaxFlyHeight_       500
-
-//航点增加时间
-#define _WaypointUseTime_
 
 //XML文件
 // <?xml version="1.0" encoding="UTF-8"?>
