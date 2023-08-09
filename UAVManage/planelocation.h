@@ -14,7 +14,7 @@ protected:
     virtual void paintEvent(QPaintEvent* event);
     virtual void wheelEvent(QWheelEvent *event);
 private:
-    //界面区域场地大小，正方形
+    //鐣岄潰鍖哄煙鍦哄湴澶у皬锛屾鏂瑰舰
     QRectF m_rect;
     int m_nScale;
     QMap<QString, QPointF> m_mapPoint;

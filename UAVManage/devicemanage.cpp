@@ -506,11 +506,11 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 				continue;
 			}
 			if (qAbs(pDevice->getX() - pDevice->getCurrentStatus().x) >= _UAVStartLocation_) {
-				_ShowErrorMessage(name + tr("设备X轴方向距离初始位置超过10厘米"));
+				_ShowErrorMessage(name + QString("设备X轴方向距离初始位置超过%1厘米").arg(_UAVStartLocation_));
 				continue;
 			}
 			if (qAbs(pDevice->getY() - pDevice->getCurrentStatus().y) >= _UAVStartLocation_) {
-				_ShowErrorMessage(name + tr("设备Y轴方向距离初始位置超过10厘米"));
+				_ShowErrorMessage(name + QString("设备Y轴方向距离初始位置超过%1厘米").arg(_UAVStartLocation_));
 				continue;
 			}
 			if (false == pDevice->isTimeSync()) {
@@ -1672,6 +1672,6 @@ void DeviceManage::onDeviceConrolFinished(QString text, int res, QString explain
 	if (DeviceDataSucceed == res) return;
 	DeviceControl* pControl = dynamic_cast<DeviceControl*>(sender());
 	if (!pControl) return;
-	text.prepend(pControl->getName());
-	_ShowErrorMessage(text + tr("错误:") + Utility::waypointMessgeFromStatus(_DeviceWaypoint, res));
+	QString temp = pControl->getName() + text + Utility::waypointMessgeFromStatus(_DeviceWaypoint, res) + QString::number(res);
+	_ShowErrorMessage(temp);
 }

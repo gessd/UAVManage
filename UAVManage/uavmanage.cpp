@@ -191,35 +191,8 @@ void UAVManage::initMenu()
 	QMenu* pMenuFlyPrepare = new QMenu(tr("起飞准备"));
 	pMenuFlyPrepare->setWindowFlags(pMenuFlyPrepare->windowFlags() | Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint);
 	pMenuFlyPrepare->setAttribute(Qt::WA_TranslucentBackground);
-	QAction* pActionFly1 = new QAction(QIcon(":/res/images/inspect.png"), tr("检查舞步"));
-	QAction* pActionFly2 = new QAction(QIcon(":/res/images/stereoscopic.png"), tr("三维仿真"));
-	QAction* pActionFly3 = new QAction(QIcon(":/res/images/basestation.png"), tr("基站标定"));
-	QAction* pActionFly4 = new QAction(QIcon(":/res/images/upload.png"), tr("上传舞步"));
-	QAction* pActionFly5 = new QAction(QIcon(":/res/images/time.png"), tr("定桩授时"));
-	QAction* pActionFly6 = new QAction(QIcon(":/res/images/prepare.png"), tr("准备起飞"));
-	pMenuFlyPrepare->addAction(pActionFly1);
-	pMenuFlyPrepare->addAction(pActionFly2);
-	pMenuFlyPrepare->addAction(pActionFly3);
-	pMenuFlyPrepare->addAction(pActionFly4);
-	pMenuFlyPrepare->addAction(pActionFly5);
-	pMenuFlyPrepare->addAction(pActionFly6);
-	ui.toolBar->addAction(pActionFly1);
-	ui.toolBar->addAction(pActionFly2);
-	ui.toolBar->addAction(pActionFly3);
-	ui.toolBar->addAction(pActionFly4);
-	ui.toolBar->addAction(pActionFly5);
-	ui.toolBar->addAction(pActionFly6);
-	ui.toolBar->layout()->setSpacing(2);
-	ui.toolBar->layout()->setContentsMargins(0, 8, 0, 0);
-	ui.toolBar->setVisible(false);
 
-	//pMenuLayout->addWidget(initMenuButton(pMenuWidget, tr(""), ":/res/logo/qz_logo.ico", ":/res/logo/qz_logo.ico", pIconMenu));
 	pMenuLayout->addWidget(initMenuButton(m_pMenuWidget, tr("项目"), ":/res/menu/P01_file_open_btn_cli.png", ":/res/menu/P01_file_open_btn_cli.png", pProjectMenu));
-	m_pButtonFlyPrepare = initMenuButton(m_pMenuWidget, tr("起飞准备"), ":/res/menu/preparation.png", ":/res/menu/preparation.png", pMenuFlyPrepare);
-	m_pButtonFlyPrepare->setEnabled(false);
-	ui.toolBar->setEnabled(false);
-	m_pButtonFlyPrepare->close();
-	//pMenuLayout->addWidget(m_pButtonFlyPrepare);
 	QMenu* pActionHelp = new QMenu(tr("帮助"));
 	pActionHelp->setWindowFlags(pMenuFlyPrepare->windowFlags() | Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint);
 	pActionHelp->setAttribute(Qt::WA_TranslucentBackground);
@@ -236,48 +209,6 @@ void UAVManage::initMenu()
 	QAction* pActionReg = new QAction(QIcon(":/res/menu/authority.png"), tr("授权"));
 	connect(pActionReg, &QAction::triggered, [this]() {m_pRegister->exec(); });
 	pActionHelp->addAction(pActionReg);
-
-	connect(pActionFly1, &QAction::triggered, [this]() { m_pDeviceManage->waypointComposeAndUpload(m_qstrCurrentProjectFile, false); });
-	connect(pActionFly2, &QAction::triggered, [this]() { onStart3DDialog();});
-	connect(pActionFly3, &QAction::triggered, [this]() {
-		if (m_qstrCurrentProjectFile.isEmpty()) return;
-		PlaceInfoDialog info(m_pDeviceManage->getSpaceSize(), this);
-		info.exec();
-		if (false == info.isValidStation()) return;
-		QMap<QString, QPoint> map = info.getStationAddress();
-		m_pDeviceManage->setStationAddress(map);
-		//不允许更新场地大小
-		return;
-		//根据基站判断场地大小，修改场地范围
-		QStringList keys = map.keys();
-		int xmax = 0;
-		int ymax = 0;
-		foreach(QString name, keys) {
-			xmax = qMax(xmax, map.value(name).x());
-			ymax = qMax(ymax, map.value(name).y());
-		}
-		m_pDeviceManage->setSpaceSize(xmax, ymax);
-		if (m_qstrCurrentProjectFile.isEmpty()) return;
-		QTextCodec* code = QTextCodec::codecForName(_XMLNameCoding_);
-		std::string filename = code->fromUnicode(m_qstrCurrentProjectFile).data();
-		tinyxml2::XMLDocument doc;
-		tinyxml2::XMLError error = doc.LoadFile(filename.c_str());
-		if (error != tinyxml2::XMLError::XML_SUCCESS) return;
-		tinyxml2::XMLElement* root = doc.RootElement();
-		if (!root) return;
-		tinyxml2::XMLElement* place = root->FirstChildElement(_ElementPlace_);
-		if (!place) return;
-		place->SetAttribute(_AttributeX_, xmax);
-		place->SetAttribute(_AttributeY_, ymax);
-		error = doc.SaveFile(filename.c_str());
-		});
-	connect(pActionFly4, &QAction::triggered, [this]() { m_pDeviceManage->waypointComposeAndUpload(m_qstrCurrentProjectFile, true); });
-	connect(pActionFly5, &QAction::triggered, [this]() {  //暂无功能
-		});
-	connect(pActionFly6, &QAction::triggered, [this]() {
-		if (m_qstrCurrentProjectFile.isEmpty()) return;
-		m_pDeviceManage->allDeviceControl(_DevicePrepare);
-		});
 	pMenuLayout->addItem(new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum));
 	
 	m_pStopDialog = new StopFlyDialog(this);
@@ -483,7 +414,6 @@ void UAVManage::onOpenProject(QString qstrFile)
 	m_pMusicPlayer->updateLoadMusic(qstrMusicFilePath);
 	m_pDeviceManage->setEnabled(true);
 	m_pMusicPlayer->setEnabled(true);
-	m_pButtonFlyPrepare->setEnabled(true);
 	ui.toolBar->setEnabled(true);
 	ParamReadWrite::writeParam(_Path_, m_qstrCurrentProjectFile);
 	m_pActionAttribute->setEnabled(true);
@@ -562,7 +492,6 @@ void UAVManage::onCloseProject()
 	m_pActionAttribute->setEnabled(false);
 	m_pDeviceManage->setEnabled(false);
 	m_pMusicPlayer->setEnabled(false);
-	m_pButtonFlyPrepare->setEnabled(false);
 	ui.toolBar->setEnabled(false);
 	//先清空数据
 	if (false == m_qstrCurrentProjectFile.isEmpty()) {
