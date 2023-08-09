@@ -119,7 +119,7 @@ int main(int argc, char *argv[])
 		a.sendMessage("raise_window_noop", 1000);
 		return EXIT_SUCCESS;
 	}
-	qInfo() << "程序启动";
+	qInfo() << "--------------------程序启动--------------------" << AppVersion() << __DATE__ << __TIME__;
 	//添加翻译文件，用于界面控件中的英文翻译
 	QTranslator translator;
 	if (translator.load(":/res/translations/qt_zh_CN.qm")) {
@@ -148,6 +148,6 @@ int main(int argc, char *argv[])
 		a.installEventFilter(&w);
 		w.show(); });
 	int n = a.exec();
-	qInfo() << "程序退出" << n;
+	qInfo() << "====================程序退出====================" << n;
     return n;
 }

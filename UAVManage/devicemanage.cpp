@@ -283,7 +283,7 @@ void DeviceManage::setStationAddress(QMap<QString, QPoint> station)
 	m_stationMap = station;
 }
 
-QString DeviceManage::addDevice(QString qstrName, QString ip, long x, long y)
+QString DeviceManage::addDevice(QString qstrName, QString ip, long x, long y, bool bUpdateBlockly)
 {
 	int count = ui.listWidget->count();
 	if (count >= _MaxDevice_) {
@@ -303,9 +303,11 @@ QString DeviceManage::addDevice(QString qstrName, QString ip, long x, long y)
 	connect(pControl, &DeviceControl::sigConrolFinished, this, &DeviceManage::onDeviceConrolFinished);
 	connect(pControl, &DeviceControl::sigRemoveDevice, this, &DeviceManage::onRemoveDevice);
 	//需要先发送添加设备信息，用于创建默认blockly布局，当ui.listWidget->setCurrentItem触发设备切换时可以显示有布局的WEB界面
-	emit deviceAddFinished(qstrName, ip, x, y);
 	ui.listWidget->setItemWidget(item, pControl);
-	ui.listWidget->setCurrentItem(item);
+	if (bUpdateBlockly) {
+		emit deviceAddFinished(qstrName, ip, x, y);
+		ui.listWidget->setCurrentItem(item);
+	}
 	return "";
 }
 
@@ -331,8 +333,8 @@ bool DeviceManage::setCurrentDevice(QString qstrName)
 		DeviceControl* pDevice = dynamic_cast<DeviceControl*>(pWidget);
 		if (!pDevice) continue;
 		if(pDevice->getName() != qstrName) continue;
+		qDebug() << "项目中选中的设备" << qstrName;
 		ui.listWidget->setCurrentItem(pItem);
-		qDebug() << "选中设备" << qstrName;
 		return true;
 	}
 	return false;
@@ -761,7 +763,7 @@ QString DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upl
 				continue;
 			}
 		}
-
+		qInfo() << "开始处理舞步" << pDevice->getName() << bMauanl;
 		//执行python脚本之前初始参数，用于检查无人机编程参数
 		pythonThread.initParam(m_pointSpace.x(), m_pointSpace.y(), pDevice->getName(), pDevice->getX(), pDevice->getY(), !bMauanl);
 		//生成舞步过程必须一个个生成，python交互函数是静态全局，所以同时只能执行一个设备生成舞步
@@ -1385,6 +1387,13 @@ void DeviceManage::on3dNewConnection()
 		m_map3DMsgRecord.clear();
 		if (m_timerUpdateStatus.isActive()) m_timerUpdateStatus.stop();
 		if (m_timerMessage3D.isActive()) m_timerMessage3D.stop();
+		if (false == m_b3DFinished) {
+			//未收到三维窗口音乐进度完成消息，代表三维仿真未完成，无法上传舞步
+			_ShowErrorMessage("三维仿真未完成，请重试");
+		}
+		else {
+			_ShowInfoMessage("三维仿真结束");
+		}
 		});
 	emit sig3DDialogStatus(true);
 }

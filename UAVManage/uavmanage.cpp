@@ -470,7 +470,7 @@ void UAVManage::onOpenProject(QString qstrFile)
 		int y = device->IntAttribute(_AttributeY_);
 		device = device->NextSiblingElement(_ElementDevice_);
 		if (m_pDeviceManage) {
-			QString error = m_pDeviceManage->addDevice(devicename, ip, x, y);
+			QString error = m_pDeviceManage->addDevice(devicename, ip, x, y, false);
 			if (!error.isEmpty()) {
 				_ShowErrorMessage(tr("无法使用设备") + devicename + error);
 			}

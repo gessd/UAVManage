@@ -56,7 +56,7 @@ public:
 	* @param [in] y 初始位置
 	* @return 错误信息,成功为空
 	*/
-	QString addDevice(QString qstrName, QString ip, long x, long y);
+	QString addDevice(QString qstrName, QString ip, long x, long y, bool bUpdateBlockly = true);
 	/**
 	 * @brief 清空所有设备
 	 */
