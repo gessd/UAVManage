@@ -100,7 +100,10 @@ public:
 	 * @brief 设备是否已经定桩授时
 	 */
 	bool isTimeSync();
-
+	/**
+	 * @brief 获取设备标签
+	 */
+	int getDeviceTag();
 	/**
 	 * @brief 是否处于舞步上传状态中
 	 */
@@ -337,6 +340,8 @@ signals:
 	void sigLogMessage(QString data);
 	//当前位置信息
 	void sigLocalPosition(unsigned int time_boot_ms, int x, int y, int z);
+	//无人机标签
+	void sigUpdateTag(unsigned int n);
 	//IMU数据
 	void sigHighresImu(unsigned long long, QList<float>);
 	//姿态角
@@ -384,4 +389,6 @@ private:
 	bool m_bPrepareTakeoff;
 	//mavlink解包参数，区分不同设备数据
 	int m_nMavChan;
+	//无人机标签 不可重复，UWB基站定位使用，负值则无效
+	int m_nUWBTag;
 };

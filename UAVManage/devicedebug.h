@@ -23,6 +23,7 @@ public slots:
 	void onUpdateHighresImu(unsigned long long time, QList<float> list);
 	void onUpdateAttitude(unsigned int time, float roll, float pitch, float yaw);
 	void onUpdateLocalPosition(unsigned int time_boot_ms, int x, int y, int z);
+	void onUpdateTag(unsigned int n);
 private:
 	Ui::DeviceDebug ui;
 };

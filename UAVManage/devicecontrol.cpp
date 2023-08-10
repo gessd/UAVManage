@@ -22,6 +22,7 @@ DeviceControl::DeviceControl(QString name, float x, float y, QString ip, QWidget
 	m_bUploadFinished = false;
 	m_bPrepareTakeoff = false;
 	m_bTimeSync = false;
+	m_nUWBTag = -1;
 	ui.stackedWidgetStatus->setCurrentIndex(0);
 	QPixmap pixmap(":/res/images/uavred.png");
 	ui.labelStatus->setPixmap(pixmap.scaled(ui.labelStatus->size()));
@@ -39,6 +40,7 @@ DeviceControl::DeviceControl(QString name, float x, float y, QString ip, QWidget
 	connect(this, &DeviceControl::sigAttitude, m_pDebugDialog, &DeviceDebug::onUpdateAttitude);
 	connect(this, &DeviceControl::sigLogMessage, m_pDebugDialog, &DeviceDebug::onMessageData);
 	connect(this, &DeviceControl::sigLocalPosition, m_pDebugDialog, &DeviceDebug::onUpdateLocalPosition);
+	connect(this, &DeviceControl::sigUpdateTag, m_pDebugDialog, &DeviceDebug::onUpdateTag);
 
 	m_heartbeatStatus.bNoHeartbeatIng = false;
 	connect(&m_timerHeartbeat, &QTimer::timeout, [this]() {
@@ -247,6 +249,11 @@ bool DeviceControl::isUploadWaypointFinished()
 bool DeviceControl::isTimeSync()
 {
 	return m_bTimeSync;
+}
+
+int DeviceControl::getDeviceTag()
+{
+	return m_nUWBTag;
 }
 
 bool DeviceControl::isUploadWaypointIng()
@@ -586,6 +593,12 @@ void DeviceControl::hvcbReceiveMessage(const hv::SocketChannelPtr& channel, hv::
 			mavlink_sys_status_t t;
 			mavlink_msg_sys_status_decode(&msg, &t);
 			unsigned int nVersionFirmware = t.onboard_control_sensors_present;
+			char c = t.battery_remaining;
+			if (m_nUWBTag != c) {
+				m_nUWBTag = c;
+				emit sigUpdateTag(m_nUWBTag);
+				updateToopTip();
+			}
 		}
 		default:
 			//qWarning() << getName() << "未知消息" << msg.msgid;
@@ -760,7 +773,15 @@ void DeviceControl::onUpdateConnectStatus(QString name, QString ip, bool connect
 
 void DeviceControl::updateToopTip()
 {
-	ui.labelDeviceName->setToolTip(QString("%1\n%2\nX:%3 Y:%4").arg(getName()).arg(getIP()).arg(getX()).arg(getY()));
+	QString tip = getName();
+	if (!getIP().isEmpty()) {
+		tip.append("\n" + getIP());
+	}
+	tip.append(QString("\nX:%1 Y:%2").arg(getX()).arg(getY()));
+	if (isConnectDevice() && m_nUWBTag >= 0) {
+		tip.append("\n" + QString::number(m_nUWBTag));
+	}
+	ui.labelDeviceName->setToolTip(tip);
 }
 
 void DeviceControl::onWaypointStart()
@@ -848,6 +869,7 @@ void DeviceControl::onMessageThreadFinished()
 	ResendMessage* pMessage = dynamic_cast<ResendMessage*>(sender());
 	if (!pMessage) return;
 	int mid = pMessage->getMessageID();
+	qInfo() << getName() << mid << "控制操作完成" << pMessage->getResult();
 	emit sigConrolFinished(pMessage->getCommandName(), pMessage->getResult(), "");
 	delete pMessage;
 }

@@ -231,7 +231,7 @@ DeviceManage::DeviceManage(QWidget *parent)
 		PlaceInfoDialog info(getSpaceSize(), this);
 		info.exec();
 		if(info.isUpdateStation()) ui.labelStationStatus->setText("<font color=#FF0000>基站标定未完成</font>");
-		//if (false == info.isValidStation()) return;
+		if (false == info.isValidStation()) return;
 		QMap<QString, QPoint> map = info.getStationAddress();
 		setStationAddress(map);
 		ui.labelStationStatus->setText("<font color=#467FC1>基站标定已完成</font>");
