@@ -230,9 +230,11 @@ DeviceManage::DeviceManage(QWidget *parent)
 	connect(ui.btnBaseStation, &QAbstractButton::clicked, [this]() { 
 		PlaceInfoDialog info(getSpaceSize(), this);
 		info.exec();
-		if (false == info.isValidStation()) return;
+		if(info.isUpdateStation()) ui.labelStationStatus->setText("<font color=#FF0000>基站标定未完成</font>");
+		//if (false == info.isValidStation()) return;
 		QMap<QString, QPoint> map = info.getStationAddress();
 		setStationAddress(map);
+		ui.labelStationStatus->setText("<font color=#467FC1>基站标定已完成</font>");
 		});
 
 	//设备IP地址信息
@@ -299,7 +301,7 @@ QString DeviceManage::addDevice(QString qstrName, QString ip, long x, long y, bo
 	ui.listWidget->addItem(item);
 	//此处会耗时
 	DeviceControl* pControl = new DeviceControl(qstrName, x, y, ip);
-	connect(pControl, &DeviceControl::sigWaypointFinished, this, &DeviceManage::sigWaypointFinished);
+	connect(pControl, &DeviceControl::sigWaypointFinished, this, &DeviceManage::onWaypointFinished);
 	connect(pControl, &DeviceControl::sigConrolFinished, this, &DeviceManage::onDeviceConrolFinished);
 	connect(pControl, &DeviceControl::sigRemoveDevice, this, &DeviceManage::onRemoveDevice);
 	//需要先发送添加设备信息，用于创建默认blockly布局，当ui.listWidget->setCurrentItem触发设备切换时可以显示有布局的WEB界面
@@ -528,7 +530,7 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 				if (false == pTemp->isCheckDevice()) continue;
 				if(pDevice->getName() == pTemp->getName()) continue;
 				if (false == pTemp->isTimeSync()) continue;
-				if (qAbs(pDevice->getTimeSyncUTC() - pTemp->getTimeSyncUTC()) >= 3) {
+				if (qAbs(pDevice->getTimeSyncUTC() - pTemp->getTimeSyncUTC()) >= 5) {
 					qWarning() << "定桩授时不同步" << pDevice->getName() << pDevice->getTimeSyncUTC() << pTemp->getName() << pTemp->getTimeSyncUTC();
 					bTimeSync = false;
 					break;
@@ -590,7 +592,7 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 		}
 	}
 	if (_DeviceTimeSync == comand) {
-		//定桩授时之前检查所有设备连接状态
+		//定桩授时之前检查所有设备连接状态		
 		QStringList errorList;
 		for (int i = 0; i < ui.listWidget->count(); i++) {
 			QListWidgetItem* pItem = ui.listWidget->item(i);
@@ -605,7 +607,7 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 			errorList.append(qstrName);
 		}
 		if (false == errorList.isEmpty()) {
-			QString error = errorList.join("、") + tr("无人机未连接无法进行定桩授时");
+			QString error = errorList.join("、") + tr("未连接无法进行定桩授时");
 			_ShowErrorMessage(error);
 			QMessageBox::warning(this, tr("失败"), error);
 			bControlIng = false;
@@ -647,7 +649,7 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 			res = pDevice->Fun_MAV_TimeSync();
 			break;
 		case _DevicePrepare:
-			res = pDevice->Fun_MAV_CMD_DO_SET_MODE(3, false);
+			res = pDevice->Fun_MAV_CMD_DO_SET_MODE();
 			qstrText = tr("准备起飞");
 			break;
 		case _DeviceQueue:
@@ -722,8 +724,12 @@ QString DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upl
 
 	//执行python中不能重复执行，防止崩溃
 	static bool bComposeIng = false;
-	if (bComposeIng) return "正在处理舞步中，请稍后重试";
+	if (bComposeIng) {
+		_ShowInfoMessage("正在处理舞步中，请稍后重试");
+		return "正在处理舞步中，请稍后重试";
+	}
 	bComposeIng = true;
+
 	//MAP用于统一发送航点信息到三维
 	QMap<QString, QVector<NavWayPointData>> map;
 	qDebug() << "准备生成舞步信息";
@@ -888,7 +894,6 @@ QString DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upl
 		}
 		map.insert(name, data);
 	}
-
 	//根据航点检查碰撞，把总时以固定间隔分片，计算所有无人机所在位置，然后判断是否有无人机距离过近
 	//当前毫秒时间，无人机位置
 	QMap<unsigned int, QList<_MidwayPosition>> mapTime;
@@ -981,6 +986,8 @@ QString DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upl
 			}
 		}
 	}
+	qInfo() << "生成舞步完成";
+	//判断是否需要上传舞步
 	if (upload) {
 		//上传舞步到无人机
 		for (int i = 0; i < ui.listWidget->count(); i++) {
@@ -1039,8 +1046,6 @@ QString DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upl
 				_ShowErrorMessage(name + "上传舞步失败" + Utility::waypointMessgeFromStatus(_DeviceWaypoint, status));
 			}
 		}
-		//上传舞步后清空三维仿真碰撞信息
-		reset3DStatus();
 	}
 	//发送航点到三维
 	sendWaypointTo3D(map);
@@ -1297,6 +1302,7 @@ void DeviceManage::reset3DStatus()
 {
 	qInfo() << "清空三维仿真记录";
 	m_b3DFinished = false;
+	ui.label3DStatus->setText("<font color=#FF0000>三维仿真未完成</font>");
 	m_map3DCollision.clear();
 }
 
@@ -1398,6 +1404,7 @@ void DeviceManage::on3dNewConnection()
 		}
 		else {
 			_ShowInfoMessage("三维仿真结束");
+			ui.label3DStatus->setText("<font color=#467FC1>三维仿真已完成</font>");
 		}
 		});
 	emit sig3DDialogStatus(true);
@@ -1469,6 +1476,11 @@ void DeviceManage::onRemoveDevice(QString name)
 		return;
 	}
 	
+}
+
+void DeviceManage::onWaypointFinished(QString name, bool success, QString text)
+{
+	emit sigWaypointFinished(name, success, text);
 }
 
 void DeviceManage::onUpdateMusicMaxTime(unsigned int time)

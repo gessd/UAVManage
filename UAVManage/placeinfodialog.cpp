@@ -12,6 +12,7 @@ PlaceInfoDialog::PlaceInfoDialog(QPoint place, QWidget *parent)
 	ui.setupUi(this);
 	m_pLabelBackground = nullptr;
 	m_bSetNLINK = false;
+	m_bIsUpdateStation = false;
 	m_stationStatus = 0;
 	m_nOnekeySetIndex = -1;
 	m_pointPlace = place;
@@ -49,6 +50,11 @@ QMap<QString, QPoint> PlaceInfoDialog::getStationAddress()
 	stations.insert("A4", QPoint(ui.tableWidget->item(4, 1)->text().toDouble() * 100, ui.tableWidget->item(4, 0)->text().toDouble() * 100));
 	stations.insert("A5", QPoint(ui.tableWidget->item(5, 1)->text().toDouble() * 100, ui.tableWidget->item(5, 0)->text().toDouble() * 100));
 	return stations;
+}
+
+bool PlaceInfoDialog::isUpdateStation()
+{
+	return m_bIsUpdateStation;
 }
 
 bool PlaceInfoDialog::isValidStation()
@@ -154,9 +160,10 @@ void PlaceInfoDialog::onBtnOnekeyClicked()
 	ui.labelStationSpace->clear();
 	ui.btnRead->setEnabled(false);
 	ui.labelStationSpace->setText("正在进行一键标定");
-	qDebug() << "开始一键标定";
+	qInfo() << "开始一键标定";
 	//先发送读取数据指令，根据返回数据修改对应字节使其变成一键标定指令然后发送
 	sendDataToSerial(_Get_Setting_Frame0_);
+	m_bIsUpdateStation = true;
 }
 
 //NLINK数据转数值,根据协议转换

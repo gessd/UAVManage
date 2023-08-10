@@ -17,6 +17,7 @@ public:
 	QString getCommandName();
 	int getResult();
 	void setAutoDelete(bool bauto);
+	int getMessageID();
 private slots:
 	void stopThread(); 
 private slots:

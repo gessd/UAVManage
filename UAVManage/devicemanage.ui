@@ -351,6 +351,38 @@ border-radius:0px;
           </item>
          </layout>
         </widget>
+        <widget class="QWidget" name="widgetStatus" native="true">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>510</y>
+           <width>221</width>
+           <height>71</height>
+          </rect>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_5">
+          <item>
+           <widget class="QLabel" name="label3DStatus">
+            <property name="text">
+             <string>&lt;font color=#FF0000&gt;三维仿真未完成&lt;/font&gt;</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="labelStationStatus">
+            <property name="text">
+             <string>&lt;font color=#FF0000&gt;基站标定未完成&lt;/font&gt;</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
        </widget>
       </item>
      </layout>

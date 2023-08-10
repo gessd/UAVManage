@@ -221,6 +221,14 @@ private slots:
 	* @brief 删除设备
 	*/
 	void onRemoveDevice(QString name);
+
+	/**
+	 * @brief 舞步上传完成
+	 * @param 无人机名称
+	 * @param 成功/失败
+	 * @param 说明
+	 */
+	void onWaypointFinished(QString name, bool success, QString text);
 public slots:
 	/**
 	 * @brief 更新音乐播放总时长 秒

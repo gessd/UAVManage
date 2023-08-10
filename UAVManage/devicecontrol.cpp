@@ -269,17 +269,6 @@ bool DeviceControl::isPrepareTakeoff()
 	return m_bPrepareTakeoff;
 }
 
-//无人机设置模式
-int DeviceControl::Fun_MAV_CMD_DO_SET_MODE(float Mode, bool wait, bool again)
-{
-	//参数2,3,4,5,6,7无效
-	//1姿态模式|2定高模式|3航点模式
-	QByteArray arrData = mavCommandLongToBuffer(Mode, 0, 0, 0, 0, 0, 0, MAV_CMD_DO_SET_MODE);
-	int res = MavSendCommandLongMessage(tr("准备起飞"), MAV_CMD_DO_SET_MODE, arrData, again ? arrData : "", false);
-	if (DeviceDataSucceed == res) m_bPrepareTakeoff = true;
-	return res;
-}
-
 int DeviceControl::DeviceMavWaypointStart(QVector<NavWayPointData> data)
 {
 	if (!isConnectDevice()) return DeviceUnConnect;
@@ -310,6 +299,19 @@ int DeviceControl::DeviceMavWaypointStart(QVector<NavWayPointData> data)
 	connect(pMessageThread, SIGNAL(finished()), this, SLOT(onWaypointStart()));
 	pMessageThread->start();
 	return DeviceDataSucceed;
+}
+
+//无人机设置模式
+int DeviceControl::Fun_MAV_CMD_DO_SET_MODE(bool wait, bool again)
+{
+	//参数2,3,4,5,6,7无效
+	//1姿态模式|2定高模式|3航点模式
+	QByteArray arrData = mavCommandLongToBuffer(3, 0, 0, 0, 0, 0, 0, MAV_CMD_DO_SET_MODE);
+	int res = MavSendCommandLongMessage(tr("准备起飞"), MAV_CMD_DO_SET_MODE, arrData, again ? arrData : "", false);
+	if (DeviceDataSucceed == res) {
+		m_bPrepareTakeoff = true;
+	}
+	return res;
 }
 
 //无人机起飞
@@ -845,6 +847,7 @@ void DeviceControl::onMessageThreadFinished()
 {
 	ResendMessage* pMessage = dynamic_cast<ResendMessage*>(sender());
 	if (!pMessage) return;
+	int mid = pMessage->getMessageID();
 	emit sigConrolFinished(pMessage->getCommandName(), pMessage->getResult(), "");
 	delete pMessage;
 }

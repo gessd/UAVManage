@@ -117,6 +117,10 @@ public:
 	 */
 	PythonRunState getLastState();
 	/**
+	 * @brief 积木块检查是否有错误
+	 */
+	bool isBlocklyError();
+	/**
 	 * @brief 获取动作时间组，以名称当KEY防止重复
 	 */
 	QMap<QString, unsigned int> getTimeGroup();

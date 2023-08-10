@@ -128,10 +128,9 @@ public:
 
 	/**
 	 * @brief 无人机设置模式
-	 * @param Mode        [in] 模式类型 1姿态模式|2定高模式|3航点模式
 	 * @return 返回消息错误值 [0成功]
 	 */
-	int Fun_MAV_CMD_DO_SET_MODE(float Mode, bool wait = true, bool again = true);
+	int Fun_MAV_CMD_DO_SET_MODE(bool wait = true, bool again = true);
 
 	/**
 	 * @brief 无人机起飞

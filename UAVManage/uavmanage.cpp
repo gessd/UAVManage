@@ -414,7 +414,6 @@ void UAVManage::onOpenProject(QString qstrFile)
 	m_pMusicPlayer->updateLoadMusic(qstrMusicFilePath);
 	m_pDeviceManage->setEnabled(true);
 	m_pMusicPlayer->setEnabled(true);
-	ui.toolBar->setEnabled(true);
 	ParamReadWrite::writeParam(_Path_, m_qstrCurrentProjectFile);
 	m_pActionAttribute->setEnabled(true);
 }
@@ -492,7 +491,6 @@ void UAVManage::onCloseProject()
 	m_pActionAttribute->setEnabled(false);
 	m_pDeviceManage->setEnabled(false);
 	m_pMusicPlayer->setEnabled(false);
-	ui.toolBar->setEnabled(false);
 	//先清空数据
 	if (false == m_qstrCurrentProjectFile.isEmpty()) {
 		QFileInfo info(m_qstrCurrentProjectFile);
@@ -543,6 +541,11 @@ void UAVManage::showEvent(QShowEvent* event)
 
 void UAVManage::closeEvent(QCloseEvent* event)
 {
+	QMessageBox::StandardButton button = QMessageBox::question(this, "关闭", "软件关闭后需要重新进行三维仿真、基站标定、上传舞步等操作，确认关闭软件吗？");
+	if (QMessageBox::StandardButton::Yes != button) {
+		event->ignore();
+		return;
+	}
 	MessageListDialog::getInstance()->exitDialog();
 }
 

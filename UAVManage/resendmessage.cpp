@@ -59,6 +59,11 @@ void ResendMessage::setAutoDelete(bool bauto)
 	m_bAutoDelete = bauto;
 }
 
+int ResendMessage::getMessageID()
+{
+	return m_nMessageID;
+}
+
 void ResendMessage::onResult(QString name, int res, int id)
 {
 	if (m_nMessageID != id) return;

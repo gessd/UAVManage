@@ -7,6 +7,7 @@
 #include <QMessageBox>
 #include "messagelistdialog.h"
 
+bool m_bBlocklyError;
 struct _MarkPoint
 {
 	unsigned int x;
@@ -82,7 +83,7 @@ PyObject* QZAPI::examineWaypoint()
 				if (qAbs(d) > 0 && qAbs(data.param3) > 0) {
 					float speed = qAbs(d) / data.param3;
 					if (speed > 200.0) {
-						showWaypointError(data.message+tr("，超出最大飞行速度每秒2米"), data.blockid);
+						showWaypointError(data.message+tr("超出最大飞行速度每秒2米"), data.blockid);
 						return nullptr;
 					}
 				}
@@ -158,6 +159,7 @@ void QZAPI::showWaypointError(QString error, QString id)
 {
 	QString text = QString("%1 %2").arg(g_deviceName).arg(error);
 	_ShowErrorMessage(text);
+	m_bBlocklyError = true;
 	blockFlicker(id);
 }
 
@@ -601,6 +603,7 @@ ThreadPython::ThreadPython(QObject *parent)
 	: QThread(parent)
 {
 	m_pythonState = PythonRunNone;
+	m_bBlocklyError = false;
 }
 
 ThreadPython::~ThreadPython()
@@ -637,6 +640,7 @@ bool ThreadPython::compilePythonCode(QByteArray arrCode)
 {
 	if(arrCode.isEmpty()) return false;
 	m_pythonState = PythonRunNone;
+	m_bBlocklyError = false;
 	//python代码保存至文件后执行
 	QString path = QApplication::applicationDirPath() + _PyRunDir_;
 	//删除python运行目录，防止缓存影响
@@ -660,6 +664,12 @@ bool ThreadPython::compilePythonCode(QByteArray arrCode)
 PythonRunState ThreadPython::getLastState()
 {
 	return m_pythonState;
+}
+
+
+bool ThreadPython::isBlocklyError()
+{
+	return m_bBlocklyError;
 }
 
 QMap<QString, unsigned int> ThreadPython::getTimeGroup()

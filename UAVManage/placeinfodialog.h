@@ -49,6 +49,13 @@ public:
 	PlaceInfoDialog(QPoint place, QWidget *parent);
 	~PlaceInfoDialog();
 	QMap<QString, QPoint> getStationAddress();
+	/**
+	 * 是否进行进行过一键标定
+	 */
+	bool isUpdateStation();
+	/**
+	 * 基站位置是否有效
+	 */
 	bool isValidStation();
 protected:
 	void showEvent(QShowEvent* event);
@@ -81,4 +88,5 @@ private:
 	QChar m_cOneKeyStatus;
 	QTimer m_timerOnekeyStatus;
 	QByteArray m_SerialData;
+	bool m_bIsUpdateStation;
 };
