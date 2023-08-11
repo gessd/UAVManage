@@ -311,12 +311,14 @@ struct _MidwayPosition {
 	int x;
 	int y;
 	int z;
-	_MidwayPosition(QString n, QString id, int n1, int n2, int n3) {
+	unsigned int time;
+	_MidwayPosition(QString n, QString id, int n1, int n2, int n3, unsigned int t = 0) {
 		name = n;
 		blockid = id;
 		x = n1;
 		y = n2;
 		z = n3;
+		time = t;
 	}
 };
 

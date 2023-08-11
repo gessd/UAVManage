@@ -945,18 +945,89 @@ QString DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upl
 		}
 	}
 	//判断无人机在时间片段点距离是否过近
-	QList<unsigned int> timelist = mapTime.keys();
-	foreach(unsigned int current, timelist) {
+	QList<unsigned int> listTimeKeys = mapTime.keys();
+	//记录上次重叠信息，避免反复判断
+	QString qstrOverlapName1, qstrOverlapName2;
+	unsigned int nEndOverlap = 0;
+	//按时间片循环，分片时间间隔nInterval毫秒
+	//因为存在每台无人机飞行时间不一致，所以先按时间片循环
+	foreach(unsigned int current, listTimeKeys) {
 		QList<_MidwayPosition> deviceList = mapTime.value(current);
 		int i = 1;
+		//循环判断无人机在当前时间current所在位置
 		foreach(_MidwayPosition pos, deviceList) {
 			QList<_MidwayPosition> residue = deviceList.mid(i, deviceList.length() - i);
 			i++;
+			//与当前无人机后边pos的无人机进行位置距离比较
 			foreach(_MidwayPosition temp, residue) {
+				//计算相互之间距离
+				QString error;
 				int d = getDistance(pos.x, pos.y, pos.z, temp.x, temp.y, temp.z);
 				if (d < _UAVMinDistance_) {
-					QString error = QString("%1在X:%2厘米 Y:%3厘米 Z:%4厘米位置处与%5在X:%6厘米 Y:%7厘米 Z:%8厘米位置处距离小于%9厘米有碰撞风险")
+					error = QString("%1在X:%2厘米 Y:%3厘米 Z:%4厘米位置处与%5在X:%6厘米 Y:%7厘米 Z:%8厘米位置处距离小于%9厘米有碰撞风险")
 						.arg(pos.name).arg(pos.x).arg(pos.y).arg(pos.z).arg(temp.name).arg(temp.x).arg(temp.y).arg(temp.z).arg(_UAVMinDistance_);
+				}
+				//判断Z轴是否有重叠
+				int z = getDistance(pos.x, pos.y, 0, temp.x, temp.y, 0);
+				//两台无人机相互重叠范围 厘米
+				int nOverlapLenght = 20;
+				if (z < nOverlapLenght) {
+					//if (qstrOverlapName1 != pos.name && qstrOverlapName2 != temp.name && current > nEndOverlap) {
+						bool bOverlap = true;
+						//int minute = current / 1000 / 60;
+						//int second = current / 1000 % 60;
+						//int millisecond = current % 1000;
+						//QString t = QString("当%1分%2秒%3毫秒时").arg(minute).arg(second).arg(millisecond);
+						//QString text = QString("%1位置[X:%2 Y:%3 Z:%4]与%5位置[X:%6 Y:%7 Z:%8]开始重叠")
+						//	.arg(pos.name).arg(pos.x).arg(pos.y).arg(pos.z).arg(temp.name).arg(temp.x).arg(temp.y).arg(temp.z);
+						//qInfo() << t + text;
+
+						//此时两台无人机Z轴重叠，需要判断时间，当持续重叠时则警告
+						int index = listTimeKeys.indexOf(current);
+						for (int i = 0; i < (1000 / nInterval); i++) {
+							//判断1000毫秒内是否持续重叠
+							if (false == bOverlap) break;
+							index++;	//找到下一个时间片
+							int count = listTimeKeys.count();
+							if (index >= count) break;
+							unsigned int nNextTime = listTimeKeys.at(index);
+
+							//下一个时间片所有无人机所在位置
+							QList<_MidwayPosition> listNext = mapTime.value(nNextTime);
+							_MidwayPosition w = pos;
+							foreach(_MidwayPosition m, listNext) {
+								if (pos.name == m.name) {
+									w = m;
+									continue;
+								}
+								if (temp.name == m.name) {
+									//判断是否持续重叠
+									int z = getDistance(w.x, w.y, 0, m.x, m.y, 0);
+									if (z > nOverlapLenght) {
+										//已经解除重叠，直接跳出判断
+										bOverlap = false;
+										nEndOverlap = nNextTime;
+										qstrOverlapName1 = w.name;
+										qstrOverlapName2 = m.name;
+
+										//int minute = nNextTime / 1000 / 60;
+										//int second = nNextTime / 1000 % 60;
+										//int millisecond = nNextTime % 1000;
+										//QString t = QString("当%1分%2秒%3毫秒时").arg(minute).arg(second).arg(millisecond);
+										//QString text = QString("%1位置[X:%2 Y:%3 Z:%4]与%5位置[X:%6 Y:%7 Z:%8]解除重叠")
+										//	.arg(w.name).arg(w.x).arg(w.y).arg(w.z).arg(m.name).arg(m.x).arg(m.y).arg(m.z);
+										//qInfo() << t + text << "持续重叠时间" << nNextTime - current;
+
+										break;
+									}
+								}
+							}
+						}
+						if (bOverlap) error = QString("%1在X:%2厘米 Y:%3厘米 Z:%4厘米位置处与%5在X:%6厘米 Y:%7厘米 Z:%8厘米位置处有上下重叠风险")
+							.arg(pos.name).arg(pos.x).arg(pos.y).arg(pos.z).arg(temp.name).arg(temp.x).arg(temp.y).arg(temp.z);
+					//}
+				}
+				if (!error.isEmpty()) {
 					int minute = current / 1000 / 60;
 					int second = current / 1000 % 60;
 					int millisecond = current % 1000;
