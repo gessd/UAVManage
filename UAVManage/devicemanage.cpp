@@ -894,6 +894,10 @@ QString DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upl
 		}
 		map.insert(name, data);
 	}
+
+	//先发送航点到三维，允许在航点有碰撞情况进行三维模拟
+	sendWaypointTo3D(map);
+
 	//根据航点检查碰撞，把总时以固定间隔分片，计算所有无人机所在位置，然后判断是否有无人机距离过近
 	//当前毫秒时间，无人机位置
 	QMap<unsigned int, QList<_MidwayPosition>> mapTime;
@@ -1047,8 +1051,6 @@ QString DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upl
 			}
 		}
 	}
-	//发送航点到三维
-	sendWaypointTo3D(map);
 	bComposeIng = false;
 	return qstrErrorNames;
 }
@@ -1558,13 +1560,14 @@ void DeviceManage::analyzeMessageFrom3D(QByteArray data)
 		if (!m_timerUpdateStatus.isActive()) m_timerUpdateStatus.start(1000);
 	}
 	else if (_3dDeviceCollision == id) {
-		//三维仿真中发生无人机碰撞
-		qDebug() << "三维仿真中发生无人机碰撞" << jsonObj;
-		QString name = jsonObj.value("name").toString();
-		QStringList list = getDeviceNameList();
-		if (list.contains(name)) {
-			m_map3DCollision.insert(name, true);
-		}
+		//暂时不处理三维中的碰撞情况
+		////三维仿真中发生无人机碰撞
+		//qDebug() << "三维仿真中发生无人机碰撞" << jsonObj;
+		//QString name = jsonObj.value("name").toString();
+		//QStringList list = getDeviceNameList();
+		//if (list.contains(name)) {
+		//	m_map3DCollision.insert(name, true);
+		//}
 	}
 	else if (_3dDeviceFinished == id) {
 		qDebug() << "三维仿真结束" << jsonObj;
