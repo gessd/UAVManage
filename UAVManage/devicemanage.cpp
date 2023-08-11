@@ -1679,7 +1679,7 @@ bool DeviceManage::XMLBlocklyNode(void* pNode, QMap<QString, unsigned int> mapTi
 	return bUpdate;
 }
 
-void DeviceManage::onDeviceConrolFinished(QString text, int res, QString explain)
+void DeviceManage::onDeviceConrolFinished(int nCommanId, QString text, int res, QString explain)
 {
 	if (DeviceDataSucceed == res) return;
 	DeviceControl* pControl = dynamic_cast<DeviceControl*>(sender());

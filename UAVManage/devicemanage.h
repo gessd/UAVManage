@@ -204,7 +204,7 @@ protected:
 	virtual void resizeEvent(QResizeEvent* event);
 	virtual void keyReleaseEvent(QKeyEvent* keyEvent);
 private slots:
-	void onDeviceConrolFinished(QString text, int res, QString explain);
+	void onDeviceConrolFinished(int nCommanId, QString text, int res, QString explain);
 	/**
 	 * @brief 三维窗口建立连接
 	 */

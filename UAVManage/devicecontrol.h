@@ -297,11 +297,12 @@ private:
 signals:
 	/**
 	* @brief 设备命令控制返回结果
+	* 
 	* @param 指令名称
 	* @param 消息返回结果
 	* @param 消息错误说明
 	*/
-	void sigConrolFinished(QString text, int res, QString explain);
+	void sigConrolFinished(int nCommanId, QString text, int res, QString explain);
 	/**
 	 * @brief 心跳响应更新
 	 */

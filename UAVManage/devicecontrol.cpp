@@ -284,7 +284,7 @@ int DeviceControl::DeviceMavWaypointStart(QVector<NavWayPointData> data)
 	//标记航点下发是否进行中
 	if (m_bWaypointSending) return DeviceMessageSending;
 	m_bWaypointSending = true;
-	QString text = tr("准备上传舞步数量")+QString::number(count);
+	QString text = tr("准备上传舞步数量") + QString::number(count);
 	emit sigLogMessage(text);
 	//先发送航点总数，消息响应成功后才能上传航点
 	mavlink_message_t msg;
@@ -869,7 +869,35 @@ void DeviceControl::onMessageThreadFinished()
 	ResendMessage* pMessage = dynamic_cast<ResendMessage*>(sender());
 	if (!pMessage) return;
 	int mid = pMessage->getMessageID();
-	qInfo() << getName() << mid << "控制操作完成" << pMessage->getResult();
-	emit sigConrolFinished(pMessage->getCommandName(), pMessage->getResult(), "");
+	int res = pMessage->getResult();
+	qInfo() << getName() << mid << "控制完成" << pMessage->getResult();
+	int cid = 0;
+	switch (mid)
+	{
+		//定桩授时
+	case MAV_CMD_WAYPOINT_USER_5:
+		cid = _DeviceTimeSync;
+		if (DeviceDataSucceed == res) {
+			m_nTimeSynsUTC = QDateTime::currentDateTime().toTime_t();
+			m_bTimeSync = true;
+		} else m_bTimeSync = false;
+		break;
+		//准备起飞
+	case MAV_CMD_DO_SET_MODE:
+		cid = _DevicePrepare;
+		if (DeviceDataSucceed == res) m_bPrepareTakeoff = true;
+		else m_bPrepareTakeoff = false;
+		break;
+		//起飞
+	case MAV_CMD_NAV_TAKEOFF_LOCAL: 
+		//起飞成功后清空状态
+		cid = _DeviceTakeoffLocal;
+		m_bTimeSync = false;
+		m_bPrepareTakeoff = false;
+		break;
+	default:
+		break;
+	}
+	emit sigConrolFinished(cid, pMessage->getCommandName(), pMessage->getResult(), "");
 	delete pMessage;
 }
