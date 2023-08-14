@@ -14,7 +14,7 @@
 #include "tinyxml2/tinyxml2.h"
 
 #define _ItemHeight_ 70
-DeviceManage::DeviceManage(QWidget *parent)
+DeviceManage::DeviceManage(QWidget* parent)
 	: QWidget(parent)
 {
 	ui.setupUi(this);
@@ -185,7 +185,7 @@ DeviceManage::DeviceManage(QWidget *parent)
 			QMessageBox::warning(this, tr("错误"), qstrError);
 		}
 		});
-	connect(ui.btnSelectAll, &QAbstractButton::clicked, [this]() { 
+	connect(ui.btnSelectAll, &QAbstractButton::clicked, [this]() {
 		for (int i = 0; i < ui.listWidget->count(); i++) {
 			QListWidgetItem* pItem = ui.listWidget->item(i);
 			if (!pItem) continue;
@@ -196,7 +196,7 @@ DeviceManage::DeviceManage(QWidget *parent)
 			pDevice->setChcekStatus(true);
 		}
 		});
-	connect(ui.btnReverse, &QAbstractButton::clicked, [this]() { 
+	connect(ui.btnReverse, &QAbstractButton::clicked, [this]() {
 		for (int i = 0; i < ui.listWidget->count(); i++) {
 			QListWidgetItem* pItem = ui.listWidget->item(i);
 			if (!pItem) continue;
@@ -217,20 +217,20 @@ DeviceManage::DeviceManage(QWidget *parent)
 	connect(ui.btnFlyTakeoff, &QAbstractButton::clicked, [this]() { allDeviceControl(_DeviceTakeoffLocal); });
 	connect(ui.btnFlyLand, &QAbstractButton::clicked, [this]() { allDeviceControl(_DeviceLandLocal); });
 	connect(ui.btnFlyStop, &QAbstractButton::clicked, [this]() { allDeviceControl(_DeviceQuickStop); });
-	connect(ui.btnQueue, &QAbstractButton::clicked, [this]() { 
+	connect(ui.btnQueue, &QAbstractButton::clicked, [this]() {
 		QMessageBox::information(this, "提示", "此功能正在功能开发中......");
 		return;
 		allDeviceControl(_DeviceQueue); });
-	connect(ui.btnRegain, &QAbstractButton::clicked, [this]() { 
+	connect(ui.btnRegain, &QAbstractButton::clicked, [this]() {
 		QMessageBox::information(this, "提示", "此功能正在功能开发中......");
 		return;
 		allDeviceControl(_DeviceRegain); });
 	connect(&m_timerUpdateStatus, &QTimer::timeout, this, &DeviceManage::onUpdateStatusTo3D);
 	connect(&m_timerMessage3D, &QTimer::timeout, this, &DeviceManage::onTimeout3DMessage);
-	connect(ui.btnBaseStation, &QAbstractButton::clicked, [this]() { 
+	connect(ui.btnBaseStation, &QAbstractButton::clicked, [this]() {
 		PlaceInfoDialog info(getSpaceSize(), this);
 		info.exec();
-		if(info.isUpdateStation()) ui.labelStationStatus->setText("<font color=#FF0000>基站标定未完成</font>");
+		if (info.isUpdateStation()) ui.labelStationStatus->setText("<font color=#FF0000>基站标定未完成</font>");
 		if (false == info.isValidStation()) return;
 		QMap<QString, QPoint> map = info.getStationAddress();
 		setStationAddress(map);
@@ -240,7 +240,7 @@ DeviceManage::DeviceManage(QWidget *parent)
 	//设备IP地址信息
 	m_pDeviceNetwork = new DeviceSerial(this);
 	ui.btnSerial->setVisible(m_pDeviceNetwork->isSerialEnabled());
-	connect(m_pDeviceNetwork, &DeviceSerial::sigDeviceEnabled, [this](bool enabled) { ui.btnSerial->setVisible(enabled);});
+	connect(m_pDeviceNetwork, &DeviceSerial::sigDeviceEnabled, [this](bool enabled) { ui.btnSerial->setVisible(enabled); });
 	connect(ui.btnSerial, &QAbstractButton::clicked, [this]() { m_pDeviceNetwork->exec(); });
 }
 
@@ -334,7 +334,7 @@ bool DeviceManage::setCurrentDevice(QString qstrName)
 		if (!pWidget) continue;
 		DeviceControl* pDevice = dynamic_cast<DeviceControl*>(pWidget);
 		if (!pDevice) continue;
-		if(pDevice->getName() != qstrName) continue;
+		if (pDevice->getName() != qstrName) continue;
 		qDebug() << "项目中选中的设备" << qstrName;
 		ui.listWidget->setCurrentItem(pItem);
 		return true;
@@ -399,7 +399,7 @@ QPoint DeviceManage::getNewDevicePoint()
 	//以水平Y轴方向顺序排放
 	int x = maxx;
 	int y = maxy + 100;
-	if (y > (m_pointSpace.y()-100)) {
+	if (y > (m_pointSpace.y() - 100)) {
 		y = 100;
 		x = maxx + 100;
 		if (x >= (m_pointSpace.x() - 100)) x = 100;
@@ -472,7 +472,7 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 		//无人机是否在初始位置附近
 		//起飞时_DeviceTakeoffLocal检查已经准备起飞
 		//TODO 需要考虑已上传舞步后又重新编辑舞步处理方式
-		
+
 		//先清空错误消息
 		_MessageListClear;
 		//记录出错设备名称
@@ -486,7 +486,7 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 			if (!pWidget) continue;
 			DeviceControl* pDevice = dynamic_cast<DeviceControl*>(pWidget);
 			if (!pDevice) continue;
-			if(false == pDevice->isCheckDevice()) continue;
+			if (false == pDevice->isCheckDevice()) continue;
 			QString name = pDevice->getName();
 			listCheck.append(name);
 			listErrorNames.append(name);
@@ -528,7 +528,7 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 				DeviceControl* pTemp = dynamic_cast<DeviceControl*>(pWidget);
 				if (!pTemp) continue;
 				if (false == pTemp->isCheckDevice()) continue;
-				if(pDevice->getName() == pTemp->getName()) continue;
+				if (pDevice->getName() == pTemp->getName()) continue;
 				if (false == pTemp->isTimeSync()) continue;
 				if (qAbs(pDevice->getTimeSyncUTC() - pTemp->getTimeSyncUTC()) >= 5) {
 					qWarning() << "定桩授时不同步" << pDevice->getName() << pDevice->getTimeSyncUTC() << pTemp->getName() << pTemp->getTimeSyncUTC();
@@ -562,7 +562,7 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 			bControlIng = false;
 			return;
 		}
-		
+
 		if (_DeviceTakeoffLocal == comand) {
 			//起飞前增加倒计时
 			QWidget* pWidget = this;
@@ -603,7 +603,7 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 			if (!pDevice) continue;
 			if (false == pDevice->isCheckDevice()) continue;
 			QString qstrName = pDevice->getName();
-			if(pDevice->isConnectDevice()) continue;
+			if (pDevice->isConnectDevice()) continue;
 			errorList.append(qstrName);
 		}
 		if (false == errorList.isEmpty()) {
@@ -683,7 +683,7 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 			_ShowInfoMessage(qstrName + "起飞前准备完毕");
 		}
 	}
-	
+
 	if (listCheck.isEmpty()) {
 		_ShowInfoMessage(tr("未选中无人机"));
 		bControlIng = false;
@@ -722,8 +722,8 @@ QString DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upl
 {
 	_MessageListClear
 
-	//执行python中不能重复执行，防止崩溃
-	static bool bComposeIng = false;
+		//执行python中不能重复执行，防止崩溃
+		static bool bComposeIng = false;
 	if (bComposeIng) {
 		_ShowInfoMessage("正在处理舞步中，请稍后重试");
 		return "正在处理舞步中，请稍后重试";
@@ -743,7 +743,7 @@ QString DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upl
 		if (!pDevice) continue;
 		QString name = pDevice->getName();
 		if (name.isEmpty()) continue;
-		if(false == pDevice->isCheckDevice()) continue;
+		if (false == pDevice->isCheckDevice()) continue;
 		QFileInfo infoProject(qstrProjectFile);
 		QString qstrDevicePyFile = infoProject.path() + _ProjectDirName_ + name + _PyFileSuffix_;
 		if (false == QFile::exists(qstrDevicePyFile)) continue;
@@ -813,7 +813,7 @@ QString DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upl
 		}
 		int state = pythonThread.getLastState();
 		if (PythonSuccessful != state) {
-			_ShowErrorMessage(name + tr("舞步转换失败")+pythonThread.getErrorString(state));
+			_ShowErrorMessage(name + tr("舞步转换失败") + pythonThread.getErrorString(state));
 			qstrErrorNames.append("," + pDevice->getName());
 			continue;
 		}
@@ -946,9 +946,18 @@ QString DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upl
 	}
 	//判断无人机在时间片段点距离是否过近
 	QList<unsigned int> listTimeKeys = mapTime.keys();
-	//记录上次重叠信息，避免反复判断
-	QString qstrOverlapName1, qstrOverlapName2;
-	unsigned int nEndOverlap = 0;
+	//已经判断过的重叠设备
+	struct stProcessedDevice {
+		unsigned int nEndOverlap;
+		QString name1;
+		QString name2;
+		stProcessedDevice(unsigned int n, QString qstr1, QString qstr2) {
+			nEndOverlap = n;
+			name1 = qstr1;
+			name2 = qstr2;
+		}
+	};
+	QList<stProcessedDevice> listOverlapProcessed;
 	//按时间片循环，分片时间间隔nInterval毫秒
 	//因为存在每台无人机飞行时间不一致，所以先按时间片循环
 	foreach(unsigned int current, listTimeKeys) {
@@ -970,16 +979,26 @@ QString DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upl
 				//判断Z轴是否有重叠
 				int z = getDistance(pos.x, pos.y, 0, temp.x, temp.y, 0);
 				//两台无人机相互重叠范围 厘米
-				int nOverlapLenght = 20;
+				int nOverlapLenght = 30;
 				if (z < nOverlapLenght) {
-					//if (qstrOverlapName1 != pos.name && qstrOverlapName2 != temp.name && current > nEndOverlap) {
+					bool bProcessed = false;
+					if (false == listOverlapProcessed.isEmpty()) {
+						//时间段内是否判断过重叠
+						foreach(stProcessedDevice processed, listOverlapProcessed) {
+							if (processed.nEndOverlap > current && processed.name1 == pos.name && processed.name2 == temp.name) {
+								bProcessed = true;
+								break;
+							}
+						}
+					}
+					if (false == bProcessed) {
 						bool bOverlap = true;
-						//int minute = current / 1000 / 60;
-						//int second = current / 1000 % 60;
-						//int millisecond = current % 1000;
-						//QString t = QString("当%1分%2秒%3毫秒时").arg(minute).arg(second).arg(millisecond);
-						//QString text = QString("%1位置[X:%2 Y:%3 Z:%4]与%5位置[X:%6 Y:%7 Z:%8]开始重叠")
-						//	.arg(pos.name).arg(pos.x).arg(pos.y).arg(pos.z).arg(temp.name).arg(temp.x).arg(temp.y).arg(temp.z);
+						int minute = current / 1000 / 60;
+						int second = current / 1000 % 60;
+						int millisecond = current % 1000;
+						QString t = QString("当%1分%2秒%3毫秒时").arg(minute).arg(second).arg(millisecond);
+						QString text = QString("%1位置[X:%2 Y:%3 Z:%4]与%5位置[X:%6 Y:%7 Z:%8]开始重叠")
+							.arg(pos.name).arg(pos.x).arg(pos.y).arg(pos.z).arg(temp.name).arg(temp.x).arg(temp.y).arg(temp.z);
 						//qInfo() << t + text;
 
 						//此时两台无人机Z轴重叠，需要判断时间，当持续重叠时则警告
@@ -991,7 +1010,6 @@ QString DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upl
 							int count = listTimeKeys.count();
 							if (index >= count) break;
 							unsigned int nNextTime = listTimeKeys.at(index);
-
 							//下一个时间片所有无人机所在位置
 							QList<_MidwayPosition> listNext = mapTime.value(nNextTime);
 							_MidwayPosition w = pos;
@@ -1006,26 +1024,24 @@ QString DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upl
 									if (z > nOverlapLenght) {
 										//已经解除重叠，直接跳出判断
 										bOverlap = false;
-										nEndOverlap = nNextTime;
-										qstrOverlapName1 = w.name;
-										qstrOverlapName2 = m.name;
-
-										//int minute = nNextTime / 1000 / 60;
-										//int second = nNextTime / 1000 % 60;
-										//int millisecond = nNextTime % 1000;
-										//QString t = QString("当%1分%2秒%3毫秒时").arg(minute).arg(second).arg(millisecond);
-										//QString text = QString("%1位置[X:%2 Y:%3 Z:%4]与%5位置[X:%6 Y:%7 Z:%8]解除重叠")
-										//	.arg(w.name).arg(w.x).arg(w.y).arg(w.z).arg(m.name).arg(m.x).arg(m.y).arg(m.z);
+										listOverlapProcessed.append(stProcessedDevice(nNextTime, w.name, m.name));
+										int minute = nNextTime / 1000 / 60;
+										int second = nNextTime / 1000 % 60;
+										int millisecond = nNextTime % 1000;
+										QString t = QString("当%1分%2秒%3毫秒时").arg(minute).arg(second).arg(millisecond);
+										QString text = QString("%1位置[X:%2 Y:%3 Z:%4]与%5位置[X:%6 Y:%7 Z:%8]解除重叠")
+											.arg(w.name).arg(w.x).arg(w.y).arg(w.z).arg(m.name).arg(m.x).arg(m.y).arg(m.z);
 										//qInfo() << t + text << "持续重叠时间" << nNextTime - current;
-
 										break;
 									}
 								}
 							}
 						}
-						if (bOverlap) error = QString("%1在X:%2厘米 Y:%3厘米 Z:%4厘米位置处与%5在X:%6厘米 Y:%7厘米 Z:%8厘米位置处有上下重叠风险")
-							.arg(pos.name).arg(pos.x).arg(pos.y).arg(pos.z).arg(temp.name).arg(temp.x).arg(temp.y).arg(temp.z);
-					//}
+						if (bOverlap) {
+							error = QString("%1在X:%2厘米 Y:%3厘米 Z:%4厘米位置处与%5在X:%6厘米 Y:%7厘米 Z:%8厘米位置处有上下重叠风险")
+								.arg(pos.name).arg(pos.x).arg(pos.y).arg(pos.z).arg(temp.name).arg(temp.x).arg(temp.y).arg(temp.z);
+						}
+					}
 				}
 				if (!error.isEmpty()) {
 					int minute = current / 1000 / 60;
@@ -1243,7 +1259,7 @@ void DeviceManage::sendWaypointTo3D(QMap<QString, QVector<NavWayPointData>> map)
 		int angle = 0;
 		//int color = 0;
 		int red = 0;
-		int green = 0; 
+		int green = 0;
 		int blue = 0;
 		int status = 0;
 		for (int i = 0; i < data.count(); i++) {
@@ -1260,7 +1276,8 @@ void DeviceManage::sendWaypointTo3D(QMap<QString, QVector<NavWayPointData>> map)
 				if (speed <= 0) speed = 60;
 				waypoint.param1 = 0;
 				waypoint.commandID = _WaypointFly;
-			} else if (_WaypointHover == waypoint.commandID) {
+			}
+			else if (_WaypointHover == waypoint.commandID) {
 				waypoint.commandID = _WaypointFly;
 			}
 			else if (_WaypointRevolve == waypoint.commandID) {
@@ -1307,11 +1324,11 @@ void DeviceManage::sendWaypointTo3D(QMap<QString, QVector<NavWayPointData>> map)
 				int y = waypoint.y;
 				int z = waypoint.z;
 				int d = getDistance(lastX, lastY, lastZ, x, y, z);
-				waypoint.param3 = d  / _WaypointLanding_;
+				waypoint.param3 = d / _WaypointLanding_;
 				waypoint.commandID = _WaypointFly;
 			}
 
-			if(_WaypointFly != waypoint.commandID) continue;
+			if (_WaypointFly != waypoint.commandID) continue;
 			int x = waypoint.x;
 			int y = waypoint.y;
 			int z = waypoint.z;
@@ -1410,7 +1427,7 @@ bool DeviceManage::eventFilter(QObject* watched, QEvent* event)
 			m_pMenu->removeAction(m_pActionDebug);
 		}
 		m_pMenu->exec(QCursor::pos());
-	} 
+	}
 	return false;
 }
 
@@ -1511,7 +1528,7 @@ void DeviceManage::onUpdateStatusTo3D()
 		DeviceControl* pDevice = dynamic_cast<DeviceControl*>(pWidget);
 		if (!pDevice) continue;
 		//设备连接后才更新实时位置
-		if(!pDevice->isConnectDevice()) continue;
+		if (!pDevice->isConnectDevice()) continue;
 		_stDeviceCurrentStatus status = pDevice->getCurrentStatus();
 		QJsonObject device;
 		device.insert("name", pDevice->getName());
@@ -1543,12 +1560,12 @@ void DeviceManage::onRemoveDevice(QString name)
 		DeviceControl* pDevice = dynamic_cast<DeviceControl*>(pWidget);
 		if (!pDevice) continue;
 		QString temp = pDevice->getName();
-		if(temp != name) continue;
+		if (temp != name) continue;
 		ui.listWidget->takeItem(i);
 		emit deviceRemoveFinished(name);
 		return;
 	}
-	
+
 }
 
 void DeviceManage::onWaypointFinished(QString name, bool success, QString text)
@@ -1581,7 +1598,7 @@ DeviceControl* DeviceManage::getDeviceFromName(QString name)
 		if (!pWidget) continue;
 		DeviceControl* pDevice = dynamic_cast<DeviceControl*>(pWidget);
 		if (!pDevice) continue;
-		if(pDevice->getName() != name) continue;
+		if (pDevice->getName() != name) continue;
 		return pDevice;
 	}
 	return nullptr;
@@ -1702,7 +1719,7 @@ QString DeviceManage::updateBlocklyData(QString name, QMap<QString, unsigned int
 	}
 	tinyxml2::XMLElement* root = doc.RootElement();
 	if (!root) {
-		qWarning() << "无法更新blockly文件中动作组时间，缺少必要ROOT节点"<< filepath;
+		qWarning() << "无法更新blockly文件中动作组时间，缺少必要ROOT节点" << filepath;
 		return "内部错误，无法更新动作组时间";
 	}
 	if (XMLBlocklyNode(root, mapTime)) {
@@ -1719,9 +1736,9 @@ bool DeviceManage::XMLBlocklyNode(void* pNode, QMap<QString, unsigned int> mapTi
 	if (!pNode) return false;
 	static bool bUpdate = false;
 	tinyxml2::XMLElement* element = (tinyxml2::XMLElement*)pNode;
-	for (tinyxml2::XMLElement* currentele = element->FirstChildElement(); 
-		currentele; 
-		currentele = currentele->NextSiblingElement()){
+	for (tinyxml2::XMLElement* currentele = element->FirstChildElement();
+		currentele;
+		currentele = currentele->NextSiblingElement()) {
 		tinyxml2::XMLElement* tmpele = currentele;
 		QString qstrBlock = tmpele->Attribute("type");
 		if ("Fly_TimeGroup" == qstrBlock) {
