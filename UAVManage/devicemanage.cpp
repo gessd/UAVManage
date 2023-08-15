@@ -530,8 +530,9 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 				if (false == pTemp->isCheckDevice()) continue;
 				if (pDevice->getName() == pTemp->getName()) continue;
 				if (false == pTemp->isTimeSync()) continue;
-				if (qAbs(pDevice->getTimeSyncUTC() - pTemp->getTimeSyncUTC()) >= 5) {
-					qWarning() << "定桩授时不同步" << pDevice->getName() << pDevice->getTimeSyncUTC() << pTemp->getName() << pTemp->getTimeSyncUTC();
+				int n = pDevice->getTimeSyncUTC() - pTemp->getTimeSyncUTC();
+				if (qAbs(n) >= 5) {
+					qWarning() << "定桩授时不同步" << pDevice->getName() << pDevice->getTimeSyncUTC() << pTemp->getName() << pTemp->getTimeSyncUTC() << n;
 					bTimeSync = false;
 					break;
 				}
@@ -716,6 +717,7 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 		}
 	}
 	bControlIng = false;
+	return;
 }
 
 QString DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upload)
@@ -1775,6 +1777,6 @@ void DeviceManage::onDeviceConrolFinished(int nCommanId, QString text, int res, 
 	if (DeviceDataSucceed == res) return;
 	DeviceControl* pControl = dynamic_cast<DeviceControl*>(sender());
 	if (!pControl) return;
-	QString temp = pControl->getName() + text + Utility::waypointMessgeFromStatus(_DeviceWaypoint, res) + QString::number(res);
+	QString temp = pControl->getName() + text + Utility::waypointMessgeFromStatus(nCommanId, res);
 	_ShowErrorMessage(temp);
 }
