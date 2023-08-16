@@ -420,7 +420,7 @@ void PlaceInfoDialog::verifyBaseStationPosition()
 	//检查标定基站位置 -8388为无效值
 	double xmax = 0;
 	double ymax = 0;
-	for (int row = 0; row < 6; row++) {
+	for (int row = 0; row < 4; row++) {
 		//检查前6行数值，对应6个基站
 		for (int column = 0; column < 2; column++) {
 			double value = ui.tableWidget->item(row, column)->text().toDouble();

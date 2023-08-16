@@ -473,6 +473,13 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 		//起飞时_DeviceTakeoffLocal检查已经准备起飞
 		//TODO 需要考虑已上传舞步后又重新编辑舞步处理方式
 
+#ifndef _DebugApp_
+		if (0 == m_stationMap.count()) {
+			m_bControlIng = false;
+			_ShowErrorMessage(tr("基站未成功标定无法起飞"));
+			return;
+		}
+#endif
 		//先清空错误消息
 		_MessageListClear;
 		//记录出错设备名称
@@ -497,10 +504,6 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 #ifndef _DebugApp_
 			if (pDevice->getCurrentStatus().battery < 50) {
 				_ShowErrorMessage(name + tr("设备电量过低无法起飞"));
-				continue;
-			}
-			if (0 == m_stationMap.count()) {
-				_ShowErrorMessage(name + tr("基站未成功标定无法起飞"));
 				continue;
 			}
 			if (false == pDevice->isUploadWaypointFinished()) {
