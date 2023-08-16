@@ -23,6 +23,7 @@ DeviceManage::DeviceManage(QWidget* parent)
 	m_b3DFinished = false;
 	m_pFirmwareDialog = nullptr;
 	m_p3dTcpSocket = nullptr;
+	m_bControlIng = false;
 	m_p3dTcpServer = new QTcpServer(this);
 	ui.widgetPreflightCheck->setVisible(false);
 	connect(m_p3dTcpServer, SIGNAL(newConnection()), this, SLOT(on3dNewConnection()));
@@ -439,13 +440,12 @@ QString DeviceManage::isRepetitionDevice(QString qstrName, QString ip, long x, l
 
 void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 {
-	static bool bControlIng = false;
-	if (bControlIng) {
+	if (m_bControlIng) {
 		//避免反复控制，造成逻辑错误
 		_ShowInfoMessage("上一次操控未结束，请等待");
 		return;
 	}
-	bControlIng = true;
+	m_bControlIng = true;
 	QString text = "无人机控制";
 	switch (comand) {
 	case _DeviceTakeoffLocal: text.append("起飞"); break;
@@ -507,6 +507,10 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 				_ShowErrorMessage(name + tr("设备未上传舞步无法起飞"));
 				continue;
 			}
+			if (pDevice->isUploadWaypointIng()) {
+				_ShowErrorMessage(name + tr("正在上传舞步中，请稍后重试"));
+				continue;
+			}
 			if (qAbs(pDevice->getX() - pDevice->getCurrentStatus().x) >= _UAVStartLocation_) {
 				_ShowErrorMessage(name + QString("设备X轴方向距离初始位置超过%1厘米").arg(_UAVStartLocation_));
 				continue;
@@ -551,16 +555,16 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 		}
 		//所有设备准备完成才可以起飞
 		if (false == listErrorNames.isEmpty()) {
+			m_bControlIng = false;
 			QString qstrError = listErrorNames.join("、");
 			QString error = qstrError + tr("检查出错，请重试");
 			_ShowErrorMessage(error);
 			QMessageBox::warning(this, tr("警告"), error);
-			bControlIng = false;
 			return;
 		}
 		if (listCheck.isEmpty()) {
+			m_bControlIng = false;
 			_ShowInfoMessage(tr("未选中无人机"));
-			bControlIng = false;
 			return;
 		}
 
@@ -608,10 +612,10 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 			errorList.append(qstrName);
 		}
 		if (false == errorList.isEmpty()) {
+			m_bControlIng = false;
 			QString error = errorList.join("、") + tr("未连接无法进行定桩授时");
 			_ShowErrorMessage(error);
 			QMessageBox::warning(this, tr("失败"), error);
-			bControlIng = false;
 			return;
 		}
 	}
@@ -686,8 +690,8 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 	}
 
 	if (listCheck.isEmpty()) {
+		m_bControlIng = false;
 		_ShowInfoMessage(tr("未选中无人机"));
-		bControlIng = false;
 		return;
 	}
 	//其他情况停止音乐播放
@@ -716,7 +720,7 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 			QMessageBox::warning(this, tr("失败"), error);
 		}
 	}
-	bControlIng = false;
+	m_bControlIng = false;
 	return;
 }
 

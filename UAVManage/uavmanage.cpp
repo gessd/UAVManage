@@ -72,7 +72,8 @@ UAVManage::UAVManage(QWidget* parent)
 	connect(m_pDeviceManage, &DeviceManage::deviceResetIp, this, &UAVManage::onDeviceResetIp);
 	connect(m_pDeviceManage, &DeviceManage::deviceResetLocation, this, &UAVManage::onDeviceResetLocation);
 	connect(m_pDeviceManage, &DeviceManage::sigWaypointFinished, this, &UAVManage::onWaypointFinished);
-	connect(m_pDeviceManage, &DeviceManage::sigTakeoffFinished, this, &UAVManage::onDeviceTakeoffFinished);
+	//因槽函数中有exec阻塞，使用QueuedConnection不等待槽函数执行过程
+	connect(m_pDeviceManage, &DeviceManage::sigTakeoffFinished, this, &UAVManage::onDeviceTakeoffFinished, Qt::QueuedConnection);
 	connect(m_pDeviceManage, &DeviceManage::sig3DDialogStatus, this, &UAVManage::on3DDialogStauts);
 	connect(m_pDeviceManage, &DeviceManage::sigStart3D, this, &UAVManage::onStart3DDialog);
 	connect(m_pDeviceManage, &DeviceManage::sigPrepareWidget, this, &UAVManage::onPrepareWidget);

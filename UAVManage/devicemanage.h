@@ -305,4 +305,6 @@ private:
 	QString m_qstrCurrentProjectFile;
 	//音乐总时间 秒
 	unsigned int m_nMusicMaxTime;
+	//正在进行指令控制中，起飞/降落/授时等操作
+	bool m_bControlIng;
 };
