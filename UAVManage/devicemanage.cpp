@@ -254,6 +254,8 @@ DeviceManage::DeviceManage(QWidget* parent)
 	m_pUWBStation = new UWBStationData(this);
 	connect(m_pUWBStation, &UWBStationData::sigConnectStatus, this, &DeviceManage::onUWBConnectStatus);
 	connect(m_pUWBStation, &UWBStationData::sigReceiveData, this, &DeviceManage::onUWBReceiveData);
+#else 
+	ui.labelUWBStatus->setVisible(false);
 #endif
 }
 
@@ -343,7 +345,6 @@ QString DeviceManage::addDevice(QString qstrName, QString ip, long x, long y, bo
 	connect(pControl, &DeviceControl::sigRemoveDevice, this, &DeviceManage::onRemoveDevice);
 #ifdef _UseUWBData_
 	connect(pControl, &DeviceControl::sigSendDataToUWB, this, &DeviceManage::onSendDataToUWB);
-	//需要提前设定无人机标签TAG，标签值匹配才会处理数据
 #endif
 	//需要先发送添加设备信息，用于创建默认blockly布局，当ui.listWidget->setCurrentItem触发设备切换时可以显示有布局的WEB界面
 	ui.listWidget->setItemWidget(item, pControl);
@@ -1182,7 +1183,7 @@ QString DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upl
 #ifdef _UseUWBData_
 				while (pDevice->isUploadWaypointIng()){
 					//等待航点航点上传完成后执行下一个飞机上传航点程序
-					//因此连续发送会造成串口数据阻塞
+					//因此连续发送会造成串口数据阻塞,造成后续无人机一直处于等待回应状态
 					QApplication::processEvents();
 				}
 #endif
@@ -1720,8 +1721,10 @@ void DeviceManage::onUWBConnectStatus(bool connect, QString error)
 	qstrLast = error;
 	if (connect) {
 		_ShowInfoMessage(error);
+		ui.labelUWBStatus->setStyleSheet("background-color:#00FF00;border-radius:6px;");
 	} else {
 		_ShowErrorMessage(error);
+		ui.labelUWBStatus->setStyleSheet("background-color:#FF0000;border-radius:6px;");
 	}
 }
 
