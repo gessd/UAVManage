@@ -21,7 +21,7 @@
 //上传舞步最大数量
 #define _WaypointMaxCount_  250
 
-//使用UWB透传通讯数据
+//使用UWB透传通讯数据 在VS项目文件中定义
 //#define _UseUWBData_
 
 //UWB基站串口ID

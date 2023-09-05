@@ -100,6 +100,9 @@ UAVManage::UAVManage(QWidget* parent)
 
 UAVManage::~UAVManage()
 {
+	if (m_pWebBlocklySocket) {
+		m_pWebBlocklySocket->disconnected();
+	}
 	if (m_p3DProcess) {
 		m_p3DProcess->close();
 		m_p3DProcess->kill();
@@ -201,6 +204,7 @@ void UAVManage::initMenu()
 	pActionHelp->addAction(pActionAbout);
 	QAction* pActionFirmware = new QAction(QIcon(":/res/menu/firmware.png"), tr("固件"));
 	pActionHelp->addAction(pActionFirmware);
+	
 	pMenuLayout->addWidget(initMenuButton(m_pMenuWidget, tr("帮助"), ":/res/menu/P02_help_about_page_ic.png", ":/res/menu/P02_help_about_page_ic.png", pActionHelp));
 	connect(pActionAbout, &QAction::triggered, [this]() {m_pAbout->exec(); });
 	connect(pActionFirmware, &QAction::triggered, [this]() {
@@ -211,7 +215,25 @@ void UAVManage::initMenu()
 	connect(pActionReg, &QAction::triggered, [this]() {m_pRegister->exec(); });
 	pActionHelp->addAction(pActionReg);
 	pMenuLayout->addItem(new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum));
-	
+
+	QString text = tr("切换UWB基站模式");
+#ifdef _UseUWBData_
+	text = tr("切换WIFI网络模式");
+#endif
+	QAction* pActionModeSwitch = new QAction(QIcon(""), text);
+	pActionHelp->addAction(pActionModeSwitch);
+	connect(pActionModeSwitch, &QAction::triggered, [this]() {
+		QMessageBox::StandardButton button = QMessageBox::question(this, tr("询问"), tr("切换模式需要重新启动软件，是否切换？"));
+		if (QMessageBox::StandardButton::Yes != button)  return;
+		QProcess* process = new QProcess;
+#ifdef _UseUWBData_
+		process->start("UAVManage.exe");
+#else
+		process->start("UAVManage-UWB.exe");
+#endif
+		qApp->quit();
+		});
+
 	m_pStopDialog = new StopFlyDialog(this);
 	m_pStopDialog->close();
 	connect(m_pStopDialog, &StopFlyDialog::sigFlyControl, [this](bool stop) {

@@ -120,6 +120,11 @@ int main(int argc, char *argv[])
 		return EXIT_SUCCESS;
 	}
 	qInfo() << "--------------------程序启动--------------------" << AppVersion() << __DATE__ << __TIME__;
+#ifdef _UseUWBData_
+	qInfo() << "使用UWB基站模式";
+#else 
+	qInfo() << "使用WIFI网络模式";
+#endif
 	//添加翻译文件，用于界面控件中的英文翻译
 	QTranslator translator;
 	if (translator.load(":/res/translations/qt_zh_CN.qm")) {
