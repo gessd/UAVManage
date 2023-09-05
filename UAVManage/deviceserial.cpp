@@ -12,7 +12,6 @@
 #include "definesetting.h"
 #include "paramreadwrite.h"
 
-#define _UAVPID_ 60000
 #define _SerialStart_ "qz+"
 #define _SerialEnd_   "\r\n"
 #define _SerialOk_    "ok"
@@ -56,7 +55,7 @@ DeviceSerial::DeviceSerial(QWidget *parent)
 		quint16 pid = info.productIdentifier();
 		qDebug() << info.portName() << pid;
 		//无人机设备PID值
-		if (_UAVPID_ != pid) continue;
+		if (_UAVSeialPID_ != pid) continue;
 		ui.comboBoxCom->addItem(info.portName());
 	}
 	
@@ -89,7 +88,7 @@ void DeviceSerial::updateSerial()
 	foreach(QSerialPortInfo info, QSerialPortInfo::availablePorts()) {
 		quint16 pid = info.productIdentifier();
 		//无人机设备PID值
-		if (_UAVPID_ != pid) continue;
+		if (_UAVSeialPID_ != pid) continue;
 		ui.comboBoxCom->addItem(info.portName());
 	}
 	ui.btnSerial->setEnabled(ui.comboBoxCom->count());
@@ -240,7 +239,7 @@ void DeviceSerial::onBtnSerial()
 
 void DeviceSerial::onDeviceDiscovered(const QextPortInfo& info)
 {
-	if (_UAVPID_ != info.productID) return;
+	if (_UAVSeialPID_ != info.productID) return;
 	qDebug() << "串口插入" << info.portName;
 	updateSerial();
 	if (isActiveWindow() && false == m_serialPort.isOpen()) {
@@ -250,7 +249,7 @@ void DeviceSerial::onDeviceDiscovered(const QextPortInfo& info)
 
 void DeviceSerial::onDeviceRemoved(const QextPortInfo& info)
 {
-	if (_UAVPID_ != info.productID) return;
+	if (_UAVSeialPID_ != info.productID) return;
 	qDebug() << "串口拔出" << info.portName;
 	if (m_serialPort.portName() == info.portName) {
 		if (m_serialPort.isOpen()) {

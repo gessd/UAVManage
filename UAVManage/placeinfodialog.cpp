@@ -82,7 +82,7 @@ void PlaceInfoDialog::showEvent(QShowEvent* event)
 	foreach(QSerialPortInfo info, QSerialPortInfo::availablePorts()) {
 		quint16 pid = info.productIdentifier();
 		//基站设备PID值
-		if (21972 != pid && 60000 != pid) continue;
+		if (_UWBSeialPID_ != pid) continue;
 		ui.comboBoxCom->addItem(info.portName());
 	}
 	if (1 == ui.comboBoxCom->count()) {
@@ -105,7 +105,6 @@ void PlaceInfoDialog::closeEvent(QCloseEvent* event)
 {
 	m_bSetNLINK = false;
 	if (m_serialPort.isOpen()) {
-		
 		m_serialPort.close();
 	}
 }

@@ -1,9 +1,9 @@
 #pragma once
 #include <QDir>
 //程序版本号
-#define _MajorNumber_ 1
+#define _MajorNumber_ 2
 #define _MinorNumber_ 0
-#define _BuildNumber_ 18
+#define _BuildNumber_ 1
 //新程序下载存放文件夹
 #define _NewVersionPath_	"/update"
 #define _VersionFile_		"version.ini"
@@ -20,6 +20,18 @@
 #define _MaxDevice_			40
 //上传舞步最大数量
 #define _WaypointMaxCount_  250
+
+//使用UWB透传通讯数据
+//#define _UseUWBData_
+
+//UWB基站串口ID
+#define _UWBSeialPID_ 21972
+
+//无人机串口ID
+#define _UAVSeialPID_ 60000
+
+//无人机通讯误差值，用来判断无人机通讯差值 毫秒
+#define _DeviceTimeLimits_  2000
 
 //项目后缀名
 #define _ProjectSuffix       "qz"
@@ -39,9 +51,9 @@
 // <?xml version="1.0" encoding="UTF-8"?>
 // <root>
 //     场地
-//     <place x="10" y="10"/> 
+//     <place x="1000" y="1000" version="" name="" music=""/> 
 //     无人名称，IP,初始位置
-//     <device name="无人机" ip="" x="0" y="0"/>
+//     <device name="无人机" ip="" x="0" y="0" tag=""/>
 // </root>
 //tinyxml2文件名不能使用UTF-8编码,否则无法打开
 #define _XMLNameCoding_    "GBK"
@@ -56,6 +68,7 @@
 #define _QZVersion_		   "version"
 #define _AttributeName_    "name"
 #define _AttributeIP_      "ip"
+#define _AttributeTag_		"tag"
 
 //无人机降落速度 厘米/秒
 #define _WaypointLanding_ 50
@@ -255,7 +268,7 @@ public:
 	}
 	//航点
 	static QString getWaypointError(int type) {
-		QString qstrText = "操作出错";
+		QString qstrText = "操作出错" + QString::number(type);
 		return qstrText;
 	}
 	//定桩授时
@@ -295,7 +308,7 @@ typedef struct __NavWayPointData
 	QString blockid;	//积木块唯一ID，用于定位积木块
 	bool bTakeoff;
 	__NavWayPointData() {
-		param2 = 0.20;   //接受半径需要有默认值 TODO 参数单位
+		param2 = 0.20;   //接受半径需要有默认值
 		param1 = param3 = param4 = z = 0.0;
 		x = y = 0;
 		//[16=航点信息||31000=速度信息||31001= 转向信息||31002=延时停留时间||31003=LED状态灯||31004=初始位置||31005=时间信息]

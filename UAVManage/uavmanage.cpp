@@ -394,10 +394,23 @@ void UAVManage::onOpenProject(QString qstrFile)
 	}
 	m_qstrCurrentProjectFile = qstrFile;
 	m_pDeviceManage->setCrrentProject(m_qstrCurrentProjectFile);
+	int nTagTemp = 1;
+	bool bUpdateXML = false;
 	while (device){
 		//遍历无人机属性
 		QString devicename = device->Attribute(_AttributeName_);
+#ifdef _UseUWBData_
+		QString ip = device->Attribute(_AttributeTag_);
+		if (ip.isEmpty()) {
+			//标签为空说名是以前没有写入标签时建立的项目
+			ip = QString::number(nTagTemp);
+			device->SetAttribute(_AttributeTag_, ip.toUtf8().data());
+			nTagTemp++;
+			bUpdateXML = true;
+		}
+#else
 		QString ip = device->Attribute(_AttributeIP_);
+#endif
 		int x = device->IntAttribute(_AttributeX_);
 		int y = device->IntAttribute(_AttributeY_);
 		device = device->NextSiblingElement(_ElementDevice_);
@@ -408,6 +421,7 @@ void UAVManage::onOpenProject(QString qstrFile)
 			}
 		}
 	}
+	if(bUpdateXML) error = doc.SaveFile(filename.c_str());
 	_ShowInfoMessage(tr("打开工程完成"));
 	QFileInfo info(m_qstrCurrentProjectFile);
 	QString name = info.baseName();
@@ -857,7 +871,11 @@ void UAVManage::onDeviceAdd(QString name, QString ip, float x, float y)
 		if (file.open(QIODevice::ReadWrite | QIODevice::Truncate)) file.close();
 	}
 	device->SetAttribute(_AttributeName_, name.toUtf8().data());
+#ifdef _UseUWBData_
+	device->SetAttribute(_AttributeTag_, ip.toUtf8().data());
+#else
 	device->SetAttribute(_AttributeIP_, ip.toUtf8().data());
+#endif
 	device->SetAttribute(_AttributeX_, x);
 	device->SetAttribute(_AttributeY_, y);
 	error = doc.SaveFile(filename.c_str());
@@ -955,7 +973,11 @@ void UAVManage::onDeviceResetIp(QString name, QString ip)
 			device = device->NextSiblingElement(_ElementDevice_);
 			continue;
 		}
+#ifdef _UseUWBData_
+		device->SetAttribute(_AttributeTag_, ip.toUtf8().data());
+#else
 		device->SetAttribute(_AttributeIP_, ip.toUtf8().data());
+#endif
 		break;
 	}
 	doc.SaveFile(filename.c_str());

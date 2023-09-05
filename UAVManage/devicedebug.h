@@ -13,8 +13,6 @@ public:
 	
 	void setName(QString name);
 	void setIp(QString ip);
-protected:
-	void closeEvent(QCloseEvent* event);
 public slots:
 	void onConnectStatus(QString name, QString ip, bool connect);
 	void onDeviceMessage(QByteArray arrData, bool bReceive, int msgID);

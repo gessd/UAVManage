@@ -45,6 +45,12 @@
     <Filter Include="Source Files\Ymodem">
       <UniqueIdentifier>{3092fd07-76b4-4147-8c76-9db9852170fa}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\uwb">
+      <UniqueIdentifier>{06e6a0d8-86fa-4904-8220-ee1ad1c40e8d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\uwb">
+      <UniqueIdentifier>{1a8f5af6-2bcb-4f2a-8ece-a081344821fc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <QtRcc Include="uavmanage.qrc">
@@ -184,6 +190,15 @@
     <ClCompile Include="planelocation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="uwb\nlink_linktrack_nodeframe0.c">
+      <Filter>Source Files\uwb</Filter>
+    </ClCompile>
+    <ClCompile Include="uwb\nlink_utils.c">
+      <Filter>Source Files\uwb</Filter>
+    </ClCompile>
+    <ClCompile Include="uwbstationdata.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="devicemanage.h">
@@ -282,6 +297,9 @@
     <QtMoc Include="planelocation.h">
       <Filter>Header Files</Filter>
     </QtMoc>
+    <QtMoc Include="uwbstationdata.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="devicemanage.ui">
@@ -375,6 +393,15 @@
     </ClInclude>
     <ClInclude Include="Ymodem\Ymodem.h">
       <Filter>Header Files\Ymodem</Filter>
+    </ClInclude>
+    <ClInclude Include="uwb\nlink_utils.h">
+      <Filter>Header Files\uwb</Filter>
+    </ClInclude>
+    <ClInclude Include="uwb\nlink_typedef.h">
+      <Filter>Header Files\uwb</Filter>
+    </ClInclude>
+    <ClInclude Include="uwb\nlink_linktrack_nodeframe0.h">
+      <Filter>Header Files\uwb</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

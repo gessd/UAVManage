@@ -121,7 +121,3 @@ void DeviceDebug::onUpdateTag(unsigned int n)
 {
 	ui.lineEditTag->setText(QString::number(n));
 }
-
-void DeviceDebug::closeEvent(QCloseEvent* event)
-{
-}

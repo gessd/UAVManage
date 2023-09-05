@@ -129,6 +129,9 @@
     <ClCompile Include="registerdialog.cpp" />
     <ClCompile Include="sm4\sm4.c" />
     <ClCompile Include="stopflydialog.cpp" />
+    <ClCompile Include="uwbstationdata.cpp" />
+    <ClCompile Include="uwb\nlink_linktrack_nodeframe0.c" />
+    <ClCompile Include="uwb\nlink_utils.c" />
     <ClCompile Include="waitingwidget.cpp" />
     <ClCompile Include="Ymodem\Ymodem.cpp" />
     <ClCompile Include="Ymodem\YmodemFileReceive.cpp" />
@@ -193,6 +196,10 @@
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="planelocation.h" />
+    <QtMoc Include="uwbstationdata.h" />
+    <ClInclude Include="uwb\nlink_linktrack_nodeframe0.h" />
+    <ClInclude Include="uwb\nlink_typedef.h" />
+    <ClInclude Include="uwb\nlink_utils.h" />
     <ClInclude Include="Ymodem\Ymodem.h" />
     <QtMoc Include="Ymodem\YmodemFileTransmit.h" />
     <QtMoc Include="Ymodem\YmodemFileReceive.h" />

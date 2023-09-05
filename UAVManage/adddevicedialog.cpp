@@ -15,10 +15,17 @@ AddDeviceDialog::AddDeviceDialog(QString qstrName, unsigned int maxX, unsigned i
 	m_maxX = maxX;
 	m_maxY = maxY;
 	ui.btnOK->setVisible(true);
+	
+	//限制输入
+#ifdef _UseUWBData_
+	//标签数量最多40
+	QRegExp regExp1("\\b([0-9]|[1-3][0-9]|40)\\b");
+	ui.lineEditIP->setValidator(new QRegExpValidator(regExp1, this));
+#else
 	QRegExp regExp1("\\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.)"
 		"{3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\b");
-	//限制输入
 	ui.lineEditIP->setValidator(new QRegExpValidator(regExp1, this));
+#endif
 	ui.lineEditX->setValidator(new QIntValidator(100, maxX - 100, this));
 	ui.lineEditY->setValidator(new QIntValidator(100, maxY - 100, this));
 	ui.lineEditX->setMaxLength(5);
@@ -50,6 +57,9 @@ AddDeviceDialog::AddDeviceDialog(QString qstrName, unsigned int maxX, unsigned i
 		});
 	ui.lineEditX->setText(QString::number(100));
 	ui.lineEditY->setText(QString::number(100));
+#ifdef _UseUWBData_
+	ui.labelAddress->setText("标签地址:");
+#endif 
 }
 
 AddDeviceDialog::~AddDeviceDialog()

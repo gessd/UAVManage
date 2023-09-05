@@ -43,7 +43,6 @@ DeviceManage::DeviceManage(QWidget* parent)
 		}
 		emit currentDeviceNameChanged(name, previousname);
 		});
-
 	//添加右键菜单
 	m_bDebug = false;
 	m_pMenu = new QMenu(this);
@@ -228,21 +227,34 @@ DeviceManage::DeviceManage(QWidget* parent)
 		allDeviceControl(_DeviceRegain); });
 	connect(&m_timerUpdateStatus, &QTimer::timeout, this, &DeviceManage::onUpdateStatusTo3D);
 	connect(&m_timerMessage3D, &QTimer::timeout, this, &DeviceManage::onTimeout3DMessage);
+	connect(&m_timerSync, &QTimer::timeout, this, &DeviceManage::onTimeoutSync);
 	connect(ui.btnBaseStation, &QAbstractButton::clicked, [this]() {
+#ifdef _UseUWBData_
+		m_pUWBStation->closeSeial();
+#endif
 		PlaceInfoDialog info(getSpaceSize(), this);
 		info.exec();
+#ifdef _UseUWBData_
+		m_pUWBStation->openSerial();
+#endif
 		if (info.isUpdateStation()) ui.labelStationStatus->setText("<font color=#FF0000>基站标定未完成</font>");
 		if (false == info.isValidStation()) return;
 		QMap<QString, QPoint> map = info.getStationAddress();
 		setStationAddress(map);
 		ui.labelStationStatus->setText("<font color=#467FC1>基站标定已完成</font>");
 		});
-
 	//设备IP地址信息
 	m_pDeviceNetwork = new DeviceSerial(this);
 	ui.btnSerial->setVisible(m_pDeviceNetwork->isSerialEnabled());
 	connect(m_pDeviceNetwork, &DeviceSerial::sigDeviceEnabled, [this](bool enabled) { ui.btnSerial->setVisible(enabled); });
 	connect(ui.btnSerial, &QAbstractButton::clicked, [this]() { m_pDeviceNetwork->exec(); });
+
+	m_pUWBStation = nullptr;
+#ifdef _UseUWBData_
+	m_pUWBStation = new UWBStationData(this);
+	connect(m_pUWBStation, &UWBStationData::sigConnectStatus, this, &DeviceManage::onUWBConnectStatus);
+	connect(m_pUWBStation, &UWBStationData::sigReceiveData, this, &DeviceManage::onUWBReceiveData);
+#endif
 }
 
 DeviceManage::~DeviceManage()
@@ -293,6 +305,30 @@ QString DeviceManage::addDevice(QString qstrName, QString ip, long x, long y, bo
 		return tr("无法添加新无人机，已超出最大控制数量");
 	}
 	if (qstrName.isEmpty()) return tr("设备名称不能为空");
+#ifdef _UseUWBData_
+	if (ip.isEmpty()) {
+		int nTag = ip.toInt();
+		QList<int> listCount;
+		for (int i = 1; i <= 40; i++) {
+			listCount.append(i);
+		}
+		for (int i = 0; i < ui.listWidget->count(); i++) {
+			QListWidgetItem* pItem = ui.listWidget->item(i);
+			if (!pItem) continue;
+			QWidget* pWidget = ui.listWidget->itemWidget(pItem);
+			if (!pWidget) continue;
+			DeviceControl* pDevice = dynamic_cast<DeviceControl*>(pWidget);
+			if (!pDevice) continue;
+			listCount.removeOne(pDevice->getIP().toInt());
+		}
+		if (0 == listCount.count()) {
+			return "超过无人机最大标签数量";
+		}
+		int temp = listCount.first();
+		ip = QString::number(temp);
+	}
+#endif
+
 	//判断设备是否重复
 	QString temp = isRepetitionDevice(qstrName, ip, x, y, "111");
 	if (!temp.isEmpty())  return temp;
@@ -305,6 +341,10 @@ QString DeviceManage::addDevice(QString qstrName, QString ip, long x, long y, bo
 	connect(pControl, &DeviceControl::sigWaypointFinished, this, &DeviceManage::onWaypointFinished);
 	connect(pControl, &DeviceControl::sigConrolFinished, this, &DeviceManage::onDeviceConrolFinished);
 	connect(pControl, &DeviceControl::sigRemoveDevice, this, &DeviceManage::onRemoveDevice);
+#ifdef _UseUWBData_
+	connect(pControl, &DeviceControl::sigSendDataToUWB, this, &DeviceManage::onSendDataToUWB);
+	//需要提前设定无人机标签TAG，标签值匹配才会处理数据
+#endif
 	//需要先发送添加设备信息，用于创建默认blockly布局，当ui.listWidget->setCurrentItem触发设备切换时可以显示有布局的WEB界面
 	ui.listWidget->setItemWidget(item, pControl);
 	if (bUpdateBlockly) {
@@ -429,7 +469,7 @@ QString DeviceManage::isRepetitionDevice(QString qstrName, QString ip, long x, l
 			if (qstrName == pDevice->getName()) return tr("设备名称重复");
 		}
 		if (!ip.isEmpty() && '0' != qstrRep.at(1)) {
-			if (ip == pDevice->getIP()) return tr("设备IP重复");
+			if (ip == pDevice->getIP()) return tr("设备地址重复");
 		}
 		if ('0' != qstrRep.at(2)) {
 			if (x == pDevice->getX() && y == pDevice->getY()) return tr("设备初始位置重复");
@@ -444,6 +484,12 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 		//避免反复控制，造成逻辑错误
 		_ShowInfoMessage("上一次操控未结束，请等待");
 		return;
+	}
+	if (_DeviceTimeSync == comand) {
+		if (m_timerSync.isActive()) {
+			QMessageBox::information(this, tr("提示"), tr("定装授时正在进行中"));
+			return;
+		}
 	}
 	m_bControlIng = true;
 	QString text = "无人机控制";
@@ -461,7 +507,6 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 	default: text.append("未定义操作"); break;
 	}
 	qInfo() << text;
-
 	if (_DeviceTakeoffLocal == comand || _DevicePrepare == comand) {
 		//起飞前检查所有设备状态
 		//设备连接状态
@@ -522,9 +567,15 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 				_ShowErrorMessage(name + QString("设备Y轴方向距离初始位置超过%1厘米").arg(_UAVStartLocation_));
 				continue;
 			}
-			if (false == pDevice->isTimeSync()) {
+			if (m_timerSync.isActive()) {
+				QMessageBox::information(this, tr("提示"), tr("定装授时正在进行中"));
+				m_bControlIng = false;
+				return;
+			}
+			if (false == pDevice->isTimeSyncFinished() || 0 == pDevice->getTimeSyncMSecsUTC()) {
 				_ShowErrorMessage(name + tr("未成功定桩授时"));
-				continue;
+				m_bControlIng = false;
+				return;
 			}
 			//检查定桩授时是否同步，防止单独对一个无人机进行定桩授时
 			for (int i = 0; i < ui.listWidget->count(); i++) {
@@ -536,10 +587,10 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 				if (!pTemp) continue;
 				if (false == pTemp->isCheckDevice()) continue;
 				if (pDevice->getName() == pTemp->getName()) continue;
-				if (false == pTemp->isTimeSync()) continue;
-				int n = pDevice->getTimeSyncUTC() - pTemp->getTimeSyncUTC();
-				if (qAbs(n) >= 5) {
-					qWarning() << "定桩授时不同步" << pDevice->getName() << pDevice->getTimeSyncUTC() << pTemp->getName() << pTemp->getTimeSyncUTC() << n;
+				if (false == pTemp->isTimeSyncFinished()) continue;
+				qint64 n = pDevice->getTimeSyncMSecsUTC() - pTemp->getTimeSyncMSecsUTC();
+				if (qAbs(n) >= _DeviceTimeLimits_) {
+					qWarning() << "定桩授时不同步" << pDevice->getName() << pDevice->getTimeSyncMSecsUTC() << pTemp->getName() << pTemp->getTimeSyncMSecsUTC() << n;
 					bTimeSync = false;
 					break;
 				}
@@ -701,27 +752,10 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 	if (_DeviceTakeoffLocal == comand) emit sigTakeoffFinished(true);
 	else emit sigTakeoffFinished(false);
 	if (_DeviceTimeSync == comand) {
-		//定桩授时必须全部成功
-		if (listErrorDevice.isEmpty()) {
-			_ShowInfoMessage("无人机定桩授时成功");
-			QMessageBox::information(this, tr("完成"), tr("无人机定桩授时成功"));
-		}
-		else {
-			//定桩授时失败，重置所有无人机定桩授时状态
-			for (int i = 0; i < ui.listWidget->count(); i++) {
-				QListWidgetItem* pItem = ui.listWidget->item(i);
-				if (!pItem) continue;
-				QWidget* pWidget = ui.listWidget->itemWidget(pItem);
-				if (!pWidget) continue;
-				DeviceControl* pDevice = dynamic_cast<DeviceControl*>(pWidget);
-				if (!pDevice) continue;
-				if (false == pDevice->isCheckDevice()) continue;
-				pDevice->clearTimeSyncStatus();
-			}
-			QString error = listErrorDevice.join("、") + tr("定桩授时失败");
-			_ShowErrorMessage(error);
-			QMessageBox::warning(this, tr("失败"), error);
-		}
+		//定时查询授时是否全部返回
+		if (m_timerSync.isActive())m_timerSync.stop();
+		m_timerSync.setProperty("start", QDateTime::currentDateTime());
+		m_timerSync.start(1000);
 	}
 	m_bControlIng = false;
 	return;
@@ -738,7 +772,8 @@ QString DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upl
 		return "正在处理舞步中，请稍后重试";
 	}
 	bComposeIng = true;
-
+	//上传航点过程中禁止操作无人机列表
+	if (upload) setEnabled(false);
 	//MAP用于统一发送航点信息到三维
 	QMap<QString, QVector<NavWayPointData>> map;
 	qDebug() << "准备生成舞步信息";
@@ -1063,6 +1098,7 @@ QString DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upl
 					if (qstrCurrentNmae == temp.name) emit sigBlockFlicker(temp.blockid);
 					else emit sigBlockFlicker(pos.blockid);
 					bComposeIng = false;
+					setEnabled(true);
 					return "，" + pos.name + "，" + temp.name;
 				}
 			}
@@ -1082,6 +1118,7 @@ QString DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upl
 				if (qstrCurrentNmae == temp.name) emit sigBlockFlicker(temp.blockid);
 				else emit sigBlockFlicker(pos.blockid);
 				bComposeIng = false;
+				setEnabled(true);
 				return "，" + pos.name + "，" + temp.name;
 			}
 		}
@@ -1119,6 +1156,7 @@ QString DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upl
 				bComposeIng = false;
 				_ShowErrorMessage("三维仿真未完成，无法上传舞步到无人机");
 				QMessageBox::warning(this, "警告", "三维仿真未完成，无法上传舞步到无人机");
+				setEnabled(true);
 				return false;
 			}
 			qInfo() << "三维仿真中碰撞设备" << m_map3DCollision;
@@ -1132,6 +1170,7 @@ QString DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upl
 				bComposeIng = false;
 				_ShowErrorMessage(text);
 				QMessageBox::warning(this, "警告", text);
+				setEnabled(true);
 				return false;
 			}
 #endif
@@ -1140,6 +1179,13 @@ QString DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upl
 			int status = pDevice->DeviceMavWaypointStart(map.value(name));
 			if (_DeviceStatus::DeviceDataSucceed == status) {
 				_ShowInfoMessage(name + "开始舞步上传");
+#ifdef _UseUWBData_
+				while (pDevice->isUploadWaypointIng()){
+					//等待航点航点上传完成后执行下一个飞机上传航点程序
+					//因此连续发送会造成串口数据阻塞
+					QApplication::processEvents();
+				}
+#endif
 			}
 			else {
 				qstrErrorNames.append("," + pDevice->getName());
@@ -1148,6 +1194,7 @@ QString DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upl
 		}
 	}
 	bComposeIng = false;
+	setEnabled(true);
 	return qstrErrorNames;
 }
 
@@ -1520,6 +1567,83 @@ void DeviceManage::onTimeout3DMessage()
 	}
 }
 
+void DeviceManage::onTimeoutSync()
+{
+	//指令下发超时时间9秒，如果全成功，并且时间差值在限定值内则提示成功
+	QDateTime startTime = m_timerSync.property("start").toDateTime();
+	QDateTime currentTime = QDateTime::currentDateTime();
+	int n = startTime.secsTo(currentTime);
+	if (qAbs(n) > 9) {
+		//判断超时的情况
+		if (m_timerSync.isActive()) m_timerSync.stop();
+		//清空所有无人机定桩授时状态
+		for (int i = 0; i < ui.listWidget->count(); i++) {
+			QListWidgetItem* pItem = ui.listWidget->item(i);
+			if (!pItem) continue;
+			QWidget* pWidget = ui.listWidget->itemWidget(pItem);
+			if (!pWidget) continue;
+			DeviceControl* pDevice = dynamic_cast<DeviceControl*>(pWidget);
+			if (!pDevice) continue;
+			pDevice->clearTimeSyncStatus();
+		}
+		QMessageBox::warning(this, tr("警告"), tr("定桩授时超时"));
+	}
+	else {
+		//先判断定桩授时操作是否完成
+		bool bAllFinished = false;
+		for (int i = 0; i < ui.listWidget->count(); i++) {
+			bAllFinished = true;
+			QListWidgetItem* pItem = ui.listWidget->item(i);
+			if (!pItem) continue;
+			QWidget* pWidget = ui.listWidget->itemWidget(pItem);
+			if (!pWidget) continue;
+			DeviceControl* pDevice = dynamic_cast<DeviceControl*>(pWidget);
+			if (!pDevice) continue;
+			if (false == pDevice->isCheckDevice()) continue;
+			if (false == pDevice->isTimeSyncFinished()) bAllFinished = false;
+		}
+		qint64 nMinTime = 0;
+		qint64 nMaxTime = 0;
+		if (bAllFinished) {
+			//所有无人机定桩授时完成，判断同步
+			if (m_timerSync.isActive()) m_timerSync.stop();
+			for (int i = 0; i < ui.listWidget->count(); i++) {
+				bAllFinished = true;
+				QListWidgetItem* pItem = ui.listWidget->item(i);
+				if (!pItem) continue;
+				QWidget* pWidget = ui.listWidget->itemWidget(pItem);
+				if (!pWidget) continue;
+				DeviceControl* pDevice = dynamic_cast<DeviceControl*>(pWidget);
+				if (!pDevice) continue;
+				if (false == pDevice->isCheckDevice()) continue;
+				if (0 == pDevice->getTimeSyncMSecsUTC()) {
+					//定桩授时有失败情况则全部失败
+					for (int i = 0; i < ui.listWidget->count(); i++) {
+						QListWidgetItem* pItem = ui.listWidget->item(i);
+						if (!pItem) continue;
+						QWidget* pWidget = ui.listWidget->itemWidget(pItem);
+						if (!pWidget) continue;
+						DeviceControl* pDevice = dynamic_cast<DeviceControl*>(pWidget);
+						if (!pDevice) continue;
+						pDevice->clearTimeSyncStatus();
+					}
+					QMessageBox::warning(this, tr("警告"), tr("定桩授时失败"));
+					return;
+				}
+				if (0 == nMinTime) nMinTime = pDevice->getTimeSyncMSecsUTC();
+				nMinTime = qMin(pDevice->getTimeSyncMSecsUTC(), nMinTime);
+				nMaxTime = qMax(pDevice->getTimeSyncMSecsUTC(), nMaxTime);
+			}
+			qint64 n = qAbs(nMaxTime - nMinTime);
+			if (n > _DeviceTimeLimits_) {
+				QMessageBox::warning(this, tr("警告"), tr("定桩授时不同步"));
+				return;
+			}
+			QMessageBox::information(this, tr("提示"), tr("定桩授时完成"));
+		}
+	}
+}
+
 void DeviceManage::onUpdateStatusTo3D()
 {
 	//定时向三维发送无人机状态信息
@@ -1580,6 +1704,41 @@ void DeviceManage::onRemoveDevice(QString name)
 void DeviceManage::onWaypointFinished(QString name, bool success, QString text)
 {
 	emit sigWaypointFinished(name, success, text);
+}
+
+void DeviceManage::onSendDataToUWB(unsigned int tag, QByteArray data)
+{
+#ifdef _UseUWBData_
+	m_pUWBStation->appendData(tag, data);
+#endif
+}
+
+void DeviceManage::onUWBConnectStatus(bool connect, QString error)
+{
+	static QString qstrLast = "";
+	if (qstrLast == error) return;
+	qstrLast = error;
+	if (connect) {
+		_ShowInfoMessage(error);
+	} else {
+		_ShowErrorMessage(error);
+	}
+}
+
+void DeviceManage::onUWBReceiveData(QList<_ReadyData> list)
+{
+	foreach(_ReadyData data, list) {
+		for (int i = 0; i < ui.listWidget->count(); i++) {
+			QListWidgetItem* pItem = ui.listWidget->item(i);
+			if (!pItem) continue;
+			QWidget* pWidget = ui.listWidget->itemWidget(pItem);
+			if (!pWidget) continue;
+			DeviceControl* pDevice = dynamic_cast<DeviceControl*>(pWidget);
+			if (!pDevice) continue;
+			if(pDevice->getIP().toInt() != data.tag) continue;
+			pDevice->receiveUWBData(data.tag, data.data);
+		}
+	}
 }
 
 void DeviceManage::onUpdateMusicMaxTime(unsigned int time)
@@ -1688,7 +1847,6 @@ void DeviceManage::deviceCalibration()
 	int n = pAction->property("Calibration").toInt();
 	DeviceControl* pDevice = getCurrentDevice();
 	if (nullptr == pDevice) return;
-	//TODO 测试使用，暂时去掉提示框
 	if (false == pDevice->isConnectDevice()) {
 		QMessageBox::warning(this, tr("提示"), tr("设备未连接，无法校准"));
 		return;
@@ -1781,9 +1939,11 @@ bool DeviceManage::XMLBlocklyNode(void* pNode, QMap<QString, unsigned int> mapTi
 
 void DeviceManage::onDeviceConrolFinished(int nCommanId, QString text, int res, QString explain)
 {
-	if (DeviceDataSucceed == res) return;
 	DeviceControl* pControl = dynamic_cast<DeviceControl*>(sender());
 	if (!pControl) return;
-	QString temp = pControl->getName() + text + Utility::waypointMessgeFromStatus(nCommanId, res);
-	_ShowErrorMessage(temp);
+	if (DeviceDataSucceed != res) {
+		//失败时提示错误消息
+		QString temp = pControl->getName() + text + Utility::waypointMessgeFromStatus(nCommanId, res);
+		_ShowErrorMessage(temp);
+	}
 }

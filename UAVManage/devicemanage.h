@@ -20,6 +20,7 @@
 #include <QJsonObject>
 #include <QJsonDocument>
 #include "definesetting.h"
+#include "uwbstationdata.h"
 
 class FirmwareDialog;
 class DeviceSerial;
@@ -214,6 +215,10 @@ private slots:
 	 */
 	void onTimeout3DMessage();
 	/**
+	 * @brief 定桩授时指令下发后定时判断返回结果
+	 */
+	void onTimeoutSync();
+	/**
 	 * @brief 定时发送设备状态到三维
 	 */
 	void onUpdateStatusTo3D();
@@ -229,6 +234,18 @@ private slots:
 	 * @param 说明
 	 */
 	void onWaypointFinished(QString name, bool success, QString text);
+	/*
+	* @brief 准备发送到UWB的数据
+	*/
+	void onSendDataToUWB(unsigned int tag, QByteArray data);
+	/**
+	 * UWB基站串口连接状态
+	 */
+	void onUWBConnectStatus(bool connect, QString error);
+	/**
+	 * @brief UWB接收到的数据
+	 */
+	void onUWBReceiveData(QList<_ReadyData> list);
 public slots:
 	/**
 	 * @brief 更新音乐播放总时长 秒
@@ -307,4 +324,8 @@ private:
 	unsigned int m_nMusicMaxTime;
 	//正在进行指令控制中，起飞/降落/授时等操作
 	bool m_bControlIng;
+	//UWB数据控制
+	UWBStationData* m_pUWBStation;
+	//定时查询无人机定桩授时返回值
+	QTimer m_timerSync;
 };

@@ -21,8 +21,11 @@ DeviceControl::DeviceControl(QString name, float x, float y, QString ip, QWidget
 	m_nCurrentMusicTime = 0;
 	m_bUploadFinished = false;
 	m_bPrepareTakeoff = false;
-	m_bTimeSync = false;
+	m_bTimeSyncFinished = false;
 	m_nUWBTag = -1;
+#ifdef _UseUWBData_
+	m_nUWBTag = ip.toInt();
+#endif 
 	ui.stackedWidgetStatus->setCurrentIndex(0);
 	QPixmap pixmap(":/res/images/uavred.png");
 	ui.labelStatus->setPixmap(pixmap.scaled(ui.labelStatus->size()));
@@ -57,6 +60,9 @@ DeviceControl::DeviceControl(QString name, float x, float y, QString ip, QWidget
 			}
 		}
 		});
+#ifdef _UseUWBData_
+	connect(&m_timerUWBHeartbeat, &QTimer::timeout, [this]() { sendHeartBeatData(); });
+#endif
 	connect(ui.btnRemove, &QToolButton::clicked, [this]() {
 		emit sigRemoveDevice(ui.labelDeviceName->text()); 
 		});
@@ -101,11 +107,18 @@ void DeviceControl::setName(QString name)
 
 QString DeviceControl::getIP()
 {
+#ifdef _UseUWBData_
+	return QString::number(m_nUWBTag);
+#endif // _UseUWBData_
 	return m_qstrIP;
 }
 
 void DeviceControl::setIp(QString ip)
 {
+#ifdef _UseUWBData_
+	m_nUWBTag = ip.toInt();
+#endif
+	updateToopTip();
 	//此处会连接设备,如果无法连接则耗时比较长
 	if (m_qstrIP == ip) return;
 	m_qstrIP = ip;
@@ -178,6 +191,12 @@ void DeviceControl::setChcekStatus(bool check)
 //连接设备
 bool DeviceControl::connectDevice()
 {
+#ifdef _UseUWBData_
+	if (!m_timerUWBHeartbeat.isActive()) {
+		m_timerUWBHeartbeat.start(_DeviceHeartbeatInterval_);
+	}
+	return true;
+#endif
 	//无论是否连接，需要先把上一次的tcp对象删除后重建，否则造成崩溃
 	disconnectDevice();
 	if (nullptr == m_pHvTcpClient) m_pHvTcpClient = new hv::TcpClient;
@@ -192,7 +211,7 @@ bool DeviceControl::connectDevice()
 	m_pHvTcpClient->setConnectTimeout(2 * 1000);
 
 	m_bUploadFinished = false;
-	m_bTimeSync = false;
+	m_bTimeSyncFinished = false;
 	m_bPrepareTakeoff = false;
 
 	//配置自动重连模式
@@ -209,8 +228,11 @@ bool DeviceControl::connectDevice()
 void DeviceControl::disconnectDevice()
 {
 	m_bUploadFinished = false;
-	m_bTimeSync = false;
+	m_bTimeSyncFinished = false;
 	m_bPrepareTakeoff = false;
+#ifdef _UseUWBData_
+	return;
+#endif
 	if (isConnectDevice()) 
 		m_pHvTcpClient->stop();
 	SAFE_DELETE(m_pHvTcpClient);
@@ -219,6 +241,9 @@ void DeviceControl::disconnectDevice()
 //是否已连接
 bool DeviceControl::isConnectDevice()
 {
+#ifdef _UseUWBData_
+	return (QDateTime::currentDateTime().toTime_t() - m_nLastDataUWBData) < 5;
+#endif
 	if (nullptr == m_pHvTcpClient) return false;
 	return m_pHvTcpClient->isConnected();
 }
@@ -226,6 +251,10 @@ bool DeviceControl::isConnectDevice()
 //发送数据
 bool DeviceControl::sendMessage(bool again, QByteArray data)
 {
+#ifdef _UseUWBData_
+	emit sigSendDataToUWB(m_nUWBTag, data);
+	return true;
+#endif // _UseUWBData_
 	if (data.isEmpty()) return false;
 	if (!isConnectDevice()) return false;
 	int len = m_pHvTcpClient->send(data.data(), data.length());
@@ -246,14 +275,9 @@ bool DeviceControl::isUploadWaypointFinished()
 	return m_bUploadFinished;
 }
 
-bool DeviceControl::isTimeSync()
+bool DeviceControl::isTimeSyncFinished()
 {
-	return m_bTimeSync;
-}
-
-int DeviceControl::getDeviceTag()
-{
-	return m_nUWBTag;
+	return m_bTimeSyncFinished;
 }
 
 bool DeviceControl::isUploadWaypointIng()
@@ -263,12 +287,13 @@ bool DeviceControl::isUploadWaypointIng()
 
 void DeviceControl::clearTimeSyncStatus()
 {
-	m_bTimeSync = false;
+	m_bTimeSyncFinished = false;
+	m_nTimeSynsMSecsUTC = 0;
 }
 
-unsigned int DeviceControl::getTimeSyncUTC()
+qint64 DeviceControl::getTimeSyncMSecsUTC()
 {
-	return m_nTimeSynsUTC;
+	return m_nTimeSynsMSecsUTC;
 }
 
 bool DeviceControl::isPrepareTakeoff()
@@ -332,7 +357,7 @@ int DeviceControl::Fun_MAV_CMD_NAV_TAKEOFF_LOCAL(float Pitch, float Empty, float
 	if (DeviceDataSucceed == res) {
 		m_bPrepareTakeoff = false;
 		m_bUploadFinished = false;
-		m_bTimeSync = false;
+		m_bTimeSyncFinished = false;
 	}
 	return res;
 }
@@ -395,16 +420,19 @@ int DeviceControl::Fun_MAV_LED_MODE()
 int DeviceControl::Fun_MAV_TimeSync()
 {
 	//不可以重发，发送后立刻返回
-	m_bTimeSync = false;
-	m_nTimeSynsUTC = 0;
+	m_bTimeSyncFinished = false;
+	m_nTimeSynsMSecsUTC = 0;
 	QByteArray arrData = mavCommandLongToBuffer(0, 0, 0, 0, 0, 0, 0, MAV_CMD_WAYPOINT_USER_5);
 	int res = MavSendCommandLongMessage(tr("定桩授时"), MAV_CMD_WAYPOINT_USER_5, arrData, arrData, false);
-	//记录定桩授时状态
-	if (DeviceDataSucceed == res) {
-		m_bTimeSync = true;
-		m_nTimeSynsUTC = QDateTime::currentDateTime().toTime_t();
-	}
 	return res;
+}
+
+void DeviceControl::receiveUWBData(unsigned int tag, QByteArray data)
+{
+	if (m_nUWBTag != tag) return;
+	m_nLastDataUWBData = QDateTime::currentDateTime().toTime_t();
+	//data = data.remove(0, 1);
+	UnpackData(data);
 }
 
 void DeviceControl::onUpdateBatteryStatus(float voltages, float battery, unsigned short electric)
@@ -419,7 +447,7 @@ void DeviceControl::onUpdateBatteryStatus(float voltages, float battery, unsigne
 	else {
 		text = text.arg("#FF0000");
 	}
-	ui.labelBattery->setText(QString(text+tr("%1%</font>")).arg(electric));
+	ui.labelBattery->setText(QString(text + tr("%1%</font>")).arg(electric));
 	m_pDebugDialog->onSetBatteryStatus(voltages, battery, electric);
 }
 
@@ -436,21 +464,7 @@ void DeviceControl::hvcbConnectionStatus(const hv::SocketChannelPtr& channel)
 	if (channel->isConnected()) {
 		//连接成功
 		channel->setHeartbeat(_DeviceHeartbeatInterval_, [&, this]() {
-			//设置心跳
-			if (!m_bHeartbeatEnable) return;
-			unsigned int time = m_nCurrentMusicTime;
-			mavlink_message_t message;
-			mavlink_heartbeat_t heard;
-			heard.custom_mode = time;
-			heard.type = 17;
-			heard.autopilot = 84;
-			heard.base_mode = 151;
-			heard.system_status = 218;
-			if (mavlink_msg_heartbeat_encode(_DeviceSYS_ID_, _DeviceCOMP_ID_, &message, &heard) > 0) {
-				QByteArray arrData = mavMessageToBuffer(message);
-				m_pHvTcpClient->send(arrData.data(), arrData.length());
-				//qDebug() << time<<"心跳消息" << arrData;
-			}
+			sendHeartBeatData();
 			});
 	}
 	emit sigConnectStatus(ui.labelDeviceName->text(), peeraddr.c_str(), channel->isConnected());
@@ -462,149 +476,7 @@ void DeviceControl::hvcbReceiveMessage(const hv::SocketChannelPtr& channel, hv::
 	if (buf->size() <= 0) return;
 	QByteArray arrData((char*)buf->data(), buf->size());
 	if (arrData.isEmpty()) return;
-	QString qstrStart(_DeviceLogPrefix_);
-	QString qstrEnd(_DeviceLogEnd_);
-	QString qstrData = QString::fromLocal8Bit(arrData);
-	//qDebug() << getName()<< "收到消息" << arrData.toHex().toUpper();
-	if (qstrData.contains(qstrStart)) {
-		//校准时没有心跳数据
-		emit sigUpdateHeartbeat();
-		QString qstrLog = qstrData;
-		while (qstrLog.contains(qstrStart)){
-			int nStart = qstrLog.indexOf(qstrStart);
-			int nEnd = qstrLog.indexOf(qstrEnd) + qstrEnd.length();
-			if (qstrEnd.length() == nEnd) nEnd = qstrLog.length() - nStart;
-			QString temp = qstrLog.mid(nStart, nEnd);
-			qstrLog.remove(temp);
-			emit sigLogMessage(temp);
-		}
-	}
-	//解包
-	//重置通道状态
-	mavlink_reset_channel_status(m_nMavChan);
-	mavlink_message_t msg;
-	mavlink_status_t status;
-	for (int i = 0; i < arrData.length(); i++) {
-		uint8_t par = mavlink_parse_char(m_nMavChan, arrData[i], &msg, &status);
-		if (0 == par) continue;
-		//qDebug() << getName() << "解包后消息ID" << msg.msgid;
-		if (m_heartbeatStatus.bNoHeartbeatIng) {
-			//长时间无心跳时则恢复心跳超时判断
-			if ((QDateTime::currentDateTime().toTime_t() - m_heartbeatStatus.nLastTime) > 60) {
-				m_heartbeatStatus.bNoHeartbeatIng = false;
-			}
-		}
-		switch (msg.msgid)
-		{
-		case MAVLINK_MSG_ID_HEARTBEAT://心跳
-			mavlink_heartbeat_t heart;
-			mavlink_msg_heartbeat_decode(&msg, &heart);
-			emit sigUpdateHeartbeat();
-			//qDebug() << getName() << "心跳消息" << msg.msgid;
-			break;
-		case MAVLINK_MSG_ID_MISSION_COUNT:  //航点起始应答
-		{
-			emit sigUpdateHeartbeat();
-			qDebug() << getName() << "起始航点应答" << msg.msgid;
-			mavlink_mission_count_t missionCount;
-			mavlink_msg_mission_count_decode(&msg, &missionCount);
-			uint8_t buffer[MAVLINK_MAX_PACKET_LEN] = { 0 };
-			int len = mavlink_msg_to_send_buffer(buffer, &msg);
-			QByteArray temp = QByteArray((char*)buffer, len);
-			//0成功,成功后发送航点数据
-			emit sigCommandResult(ui.labelDeviceName->text(), missionCount.count > 0 ? 0 : -1, MAVLINK_MSG_ID_MISSION_COUNT);
-			emit sigMessageByte(temp, true, MAVLINK_MSG_ID_MISSION_COUNT);
-			break;
-		}
-		case MAVLINK_MSG_ID_MISSION_ACK:    //航点应答
-		{
-			emit sigUpdateHeartbeat();
-			qDebug() << getName() << "航点应答" << msg.msgid;
-			mavlink_mission_ack_t ack;
-			mavlink_msg_mission_ack_decode(&msg, &ack);
-			uint8_t buffer[MAVLINK_MAX_PACKET_LEN] = { 0 };
-			int len = mavlink_msg_to_send_buffer(buffer, &msg);
-			QByteArray temp = QByteArray((char*)buffer, len);
-			emit sigCommandResult(ui.labelDeviceName->text(), ack.type, MAVLINK_MSG_ID_MISSION_ACK);
-			emit sigMessageByte(temp, true, MAVLINK_MSG_ID_MISSION_ACK);
-			break;
-		}
-		case MAVLINK_MSG_ID_COMMAND_ACK:	//命令应答
-		{	//起飞降落等实时控制指令应答
-			emit sigUpdateHeartbeat();
-			mavlink_command_ack_t ack;
-			mavlink_msg_command_ack_decode(&msg, &ack);
-			uint8_t buffer[MAVLINK_MAX_PACKET_LEN] = { 0 };
-			int len = mavlink_msg_to_send_buffer(buffer, &msg);
-			QByteArray temp = QByteArray((char*)buffer, len);
-			emit sigMessageByte(temp, true, MAVLINK_MSG_ID_COMMAND_ACK);
-			emit sigCommandResult(ui.labelDeviceName->text(), ack.result, ack.command);
-			break;
-		}
-		case MAVLINK_MSG_ID_BATTERY_STATUS:  //电池信息
-		{
-			mavlink_battery_status_t battery;
-			mavlink_msg_battery_status_decode(&msg, &battery);
-			//电压范围9.6-12.6
-			uint16_t v = battery.voltages[0];
-			int16_t b = battery.current_battery;
-			//计算剩余电量
-			uint16_t n = (float(v - 9600) / (12600 - 9600)) * 100;
-			if (n > 100) n = 100;
-			emit sigBatteryStatus((float)v / 1000, (float)b / 1000, n);
-			m_deviceStatus.battery = n;
-			//qDebug() << getName() << "电池信息" << msg.msgid;
-			break;
-		}
-		case MAVLINK_MSG_ID_ATTITUDE:	//姿态角
-			mavlink_attitude_t attitude;
-			mavlink_msg_attitude_decode(&msg, &attitude);
-			m_deviceStatus.roll = attitude.roll;
-			m_deviceStatus.pitch = attitude.pitch;
-			m_deviceStatus.yaw = attitude.yaw;
-			emit sigAttitude(attitude.time_boot_ms, attitude.roll, attitude.pitch, attitude.yaw);
-			//qDebug() << getName() << "姿态角" << msg.msgid;
-			break;
-		case MAVLINK_MSG_ID_LOCAL_POSITION_NED: //位置信息
-		{
-			mavlink_local_position_ned_t t;
-			mavlink_msg_local_position_ned_decode(&msg, &t);
-			//单位转换成cm
-			m_deviceStatus.x = QString::number(t.x * 100.0, 'f', 0).toInt();
-			m_deviceStatus.y = QString::number(t.y * 100.0, 'f', 0).toInt();
-			m_deviceStatus.z = QString::number(t.z * 100.0, 'f', 0).toInt();
-			emit sigLocalPosition(t.time_boot_ms, m_deviceStatus.x, m_deviceStatus.y, m_deviceStatus.z);
-			//qDebug() << getName() << "位置信息" << msg.msgid;
-			break;
-		}
-		case MAVLINK_MSG_ID_HIGHRES_IMU:	//IMU数据
-		{
-			mavlink_highres_imu_t t;
-			mavlink_msg_highres_imu_decode(&msg, &t);
-			QList<float> list;
-			list << t.xacc << t.yacc << t.zacc << t.xgyro << t.ygyro << t.zgyro << t.xmag << t.ymag << t.zmag;
-			emit sigHighresImu(t.time_usec, list);
-			//qDebug() << getName() << "IMU数据" << msg.msgid;
-			break;
-		}
-		case MAVLINK_MSG_ID_SYS_STATUS:
-		{
-			//包含固件版本信息
-			mavlink_sys_status_t t;
-			mavlink_msg_sys_status_decode(&msg, &t);
-			unsigned int nVersionFirmware = t.onboard_control_sensors_present;
-			char c = t.battery_remaining;
-			if (m_nUWBTag != c) {
-				m_nUWBTag = c;
-				emit sigUpdateTag(m_nUWBTag);
-				updateToopTip();
-			}
-		}
-		default:
-			//qWarning() << getName() << "未知消息" << msg.msgid;
-			break;
-		}
-	}
+	UnpackData(arrData);
 	//qDebug() << getName() << "数据包处理完成" << msg.msgid << status.packet_rx_success_count;
 }
 
@@ -700,7 +572,7 @@ QByteArray DeviceControl::getWaypointData(float param1, float param2, float para
 	return mavMessageToBuffer(msg);
 }
 
-void DeviceControl::DeviceMavWaypointEnd(unsigned int count)
+void DeviceControl::DeviceMavWaypointEnd(unsigned int count, bool bFinihed)
 {
 	mavlink_message_t msg;
 	mavlink_mission_ack_t ack;
@@ -725,12 +597,12 @@ void DeviceControl::DeviceMavWaypointEnd(unsigned int count)
 	pMessageThread = nullptr;
 	//整个上传航点过程结束
 	m_bWaypointSending = false;
-	m_bUploadFinished = true;
+	m_bUploadFinished = bFinihed;
 	ui.btnRemove->setEnabled(true);
 	ui.checkBox->setEnabled(true);
 	m_nCurrentWaypontIndex = -1;
 	ui.stackedWidgetStatus->setCurrentIndex(0);	
-	QString text = "舞步上传" + Utility::getControlError(res);
+	QString text = "结束舞步上传" + Utility::getControlError(res);
 	emit sigLogMessage(text);
 	emit sigWaypointFinished(getName(), DeviceDataSucceed == res, text);
 }
@@ -778,10 +650,189 @@ void DeviceControl::updateToopTip()
 		tip.append("\n" + getIP());
 	}
 	tip.append(QString("\nX:%1 Y:%2").arg(getX()).arg(getY()));
+#ifndef _UseUWBData_
 	if (isConnectDevice() && m_nUWBTag >= 0) {
 		tip.append("\n" + QString::number(m_nUWBTag));
 	}
+#endif
 	ui.labelDeviceName->setToolTip(tip);
+}
+
+void DeviceControl::UnpackData(QByteArray arrData)
+{
+	if (arrData.isEmpty()) return;
+	QString qstrStart(_DeviceLogPrefix_);
+	QString qstrEnd(_DeviceLogEnd_);
+	QString qstrData = QString::fromLocal8Bit(arrData);
+	//qDebug() << getName()<< "收到消息" << arrData.toHex().toUpper();
+	if (qstrData.contains(qstrStart)) {
+		//校准时没有心跳数据
+		emit sigUpdateHeartbeat();
+		QString qstrLog = qstrData;
+		while (qstrLog.contains(qstrStart)) {
+			int nStart = qstrLog.indexOf(qstrStart);
+			int nEnd = qstrLog.indexOf(qstrEnd) + qstrEnd.length();
+			if (qstrEnd.length() == nEnd) nEnd = qstrLog.length() - nStart;
+			QString temp = qstrLog.mid(nStart, nEnd);
+			qstrLog.remove(temp);
+			emit sigLogMessage(temp);
+		}
+	}
+	//解包
+	//重置通道状态
+	mavlink_reset_channel_status(m_nMavChan);
+	mavlink_message_t msg;
+	mavlink_status_t status;
+	for (int i = 0; i < arrData.length(); i++) {
+		uint8_t par = mavlink_parse_char(m_nMavChan, arrData[i], &msg, &status);
+		if (0 == par) continue;
+		//qDebug() << getName() << "解包后消息ID" << msg.msgid;
+		if (m_heartbeatStatus.bNoHeartbeatIng) {
+			//长时间无心跳时则恢复心跳超时判断
+			if ((QDateTime::currentDateTime().toTime_t() - m_heartbeatStatus.nLastTime) > 60) {
+				m_heartbeatStatus.bNoHeartbeatIng = false;
+			}
+		}
+		switch (msg.msgid)
+		{
+		case MAVLINK_MSG_ID_HEARTBEAT://心跳
+			mavlink_heartbeat_t heart;
+			mavlink_msg_heartbeat_decode(&msg, &heart);
+			emit sigUpdateHeartbeat();
+#ifdef _UseUWBData_
+			sendHeartBeatData();
+#endif
+			//qDebug() << getName() << "心跳消息" << msg.msgid;
+			break;
+		case MAVLINK_MSG_ID_MISSION_COUNT:  //航点起始应答
+		{
+			emit sigUpdateHeartbeat();
+			qDebug() << getName() << "起始航点应答" << msg.msgid;
+			mavlink_mission_count_t missionCount;
+			mavlink_msg_mission_count_decode(&msg, &missionCount);
+			uint8_t buffer[MAVLINK_MAX_PACKET_LEN] = { 0 };
+			int len = mavlink_msg_to_send_buffer(buffer, &msg);
+			QByteArray temp = QByteArray((char*)buffer, len);
+			//0成功,成功后发送航点数据
+			emit sigCommandResult(ui.labelDeviceName->text(), missionCount.count > 0 ? 0 : -1, MAVLINK_MSG_ID_MISSION_COUNT);
+			emit sigMessageByte(temp, true, MAVLINK_MSG_ID_MISSION_COUNT);
+			break;
+		}
+		case MAVLINK_MSG_ID_MISSION_ACK:    //航点应答
+		{
+			emit sigUpdateHeartbeat();
+			qDebug() << getName() << "航点应答" << msg.msgid;
+			mavlink_mission_ack_t ack;
+			mavlink_msg_mission_ack_decode(&msg, &ack);
+			uint8_t buffer[MAVLINK_MAX_PACKET_LEN] = { 0 };
+			int len = mavlink_msg_to_send_buffer(buffer, &msg);
+			QByteArray temp = QByteArray((char*)buffer, len);
+			emit sigCommandResult(ui.labelDeviceName->text(), ack.type, MAVLINK_MSG_ID_MISSION_ACK);
+			emit sigMessageByte(temp, true, MAVLINK_MSG_ID_MISSION_ACK);
+			break;
+		}
+		case MAVLINK_MSG_ID_COMMAND_ACK:	//命令应答
+		{	//起飞降落等实时控制指令应答
+			emit sigUpdateHeartbeat();
+			mavlink_command_ack_t ack;
+			mavlink_msg_command_ack_decode(&msg, &ack);
+			uint8_t buffer[MAVLINK_MAX_PACKET_LEN] = { 0 };
+			int len = mavlink_msg_to_send_buffer(buffer, &msg);
+			QByteArray temp = QByteArray((char*)buffer, len);
+			emit sigMessageByte(temp, true, MAVLINK_MSG_ID_COMMAND_ACK);
+			emit sigCommandResult(ui.labelDeviceName->text(), ack.result, ack.command);
+			break;
+		}
+		case MAVLINK_MSG_ID_BATTERY_STATUS:  //电池信息
+		{
+			mavlink_battery_status_t battery;
+			mavlink_msg_battery_status_decode(&msg, &battery);
+			//电压范围9.6-12.6
+			uint16_t v = battery.voltages[0];
+			int16_t b = battery.current_battery;
+			//计算剩余电量
+			uint16_t n = (float(v - 9600) / (12600 - 9600)) * 100;
+			if (n > 100) n = 100;
+			emit sigBatteryStatus((float)v / 1000, (float)b / 1000, n);
+			m_deviceStatus.battery = n;
+			//qDebug() << getName() << "电池信息" << msg.msgid;
+			break;
+		}
+		case MAVLINK_MSG_ID_ATTITUDE:	//姿态角
+			mavlink_attitude_t attitude;
+			mavlink_msg_attitude_decode(&msg, &attitude);
+			m_deviceStatus.roll = attitude.roll;
+			m_deviceStatus.pitch = attitude.pitch;
+			m_deviceStatus.yaw = attitude.yaw;
+			emit sigAttitude(attitude.time_boot_ms, attitude.roll, attitude.pitch, attitude.yaw);
+			//qDebug() << getName() << "姿态角" << msg.msgid;
+			break;
+		case MAVLINK_MSG_ID_LOCAL_POSITION_NED: //位置信息
+		{
+			mavlink_local_position_ned_t t;
+			mavlink_msg_local_position_ned_decode(&msg, &t);
+			//单位转换成cm
+			m_deviceStatus.x = QString::number(t.x * 100.0, 'f', 0).toInt();
+			m_deviceStatus.y = QString::number(t.y * 100.0, 'f', 0).toInt();
+			m_deviceStatus.z = QString::number(t.z * 100.0, 'f', 0).toInt();
+			emit sigLocalPosition(t.time_boot_ms, m_deviceStatus.x, m_deviceStatus.y, m_deviceStatus.z);
+			//qDebug() << getName() << "位置信息" << msg.msgid;
+			break;
+		}
+		case MAVLINK_MSG_ID_HIGHRES_IMU:	//IMU数据
+		{
+			mavlink_highres_imu_t t;
+			mavlink_msg_highres_imu_decode(&msg, &t);
+			QList<float> list;
+			list << t.xacc << t.yacc << t.zacc << t.xgyro << t.ygyro << t.zgyro << t.xmag << t.ymag << t.zmag;
+			emit sigHighresImu(t.time_usec, list);
+			//qDebug() << getName() << "IMU数据" << msg.msgid;
+			break;
+		}
+		case MAVLINK_MSG_ID_SYS_STATUS:
+		{
+			//包含固件版本信息
+			mavlink_sys_status_t t;
+			mavlink_msg_sys_status_decode(&msg, &t);
+			unsigned int nVersionFirmware = t.onboard_control_sensors_present;
+			char c = t.battery_remaining;
+#ifndef _UseUWBData_
+			if (m_nUWBTag != c) {
+				m_nUWBTag = c;
+				emit sigUpdateTag(m_nUWBTag);
+				updateToopTip();
+		}
+#endif	
+		}
+		default:
+			//qWarning() << getName() << "未知消息" << msg.msgid;
+			break;
+		}
+	}
+}
+
+void DeviceControl::sendHeartBeatData()
+{
+	//设置心跳
+	if (!m_bHeartbeatEnable) return;
+	unsigned int time = m_nCurrentMusicTime;
+	mavlink_message_t message;
+	mavlink_heartbeat_t heard;
+	heard.custom_mode = time;
+	heard.type = 17;
+	heard.autopilot = 84;
+	heard.base_mode = 151;
+	heard.system_status = 218;
+	if (mavlink_msg_heartbeat_encode(_DeviceSYS_ID_, _DeviceCOMP_ID_, &message, &heard) > 0) {
+		QByteArray arrData = mavMessageToBuffer(message);
+#ifdef _UseUWBData_
+		//上传航点及校准过程中没有没有心跳数据
+		if (m_bWaypointSending || m_heartbeatStatus.bNoHeartbeatIng) return;
+		emit sigSendDataToUWB(m_nUWBTag, arrData);
+#else
+		m_pHvTcpClient->send(arrData.data(), arrData.length());
+#endif
+	}
 }
 
 void DeviceControl::onWaypointStart()
@@ -826,15 +877,17 @@ void DeviceControl::onWaypointNext()
 		ui.btnRemove->setEnabled(true);
 		ui.checkBox->setEnabled(true);
 		ui.stackedWidgetStatus->setCurrentIndex(0);
-		QString error = QString("%1号航点上传失败%2").arg(m_nCurrentWaypontIndex).arg(Utility::getLedError(res));
-		if (m_nCurrentWaypontIndex < 0) error = tr("0号航点上传失败") + Utility::getLedError(res);
+		QString error = QString("%1号航点上传失败%2").arg(m_nCurrentWaypontIndex + 1).arg(Utility::getWaypointError(res));
+		if (m_nCurrentWaypontIndex < 0) error = tr("0号航点上传失败") + Utility::getWaypointError(res);
 		emit sigLogMessage(error);
 		emit sigWaypointFinished(getName(), false, error);
+		//上传航点失败后需要下发结束指令，否则无人机一直处于等待接收航点过程中造成无法连接
+		DeviceMavWaypointEnd(m_currentWaypointData.count(), false);
 		return;
 	}
 
 	if (m_nCurrentWaypontIndex > m_currentWaypointData.count()) {
-		DeviceMavWaypointEnd(m_currentWaypointData.count());
+		DeviceMavWaypointEnd(m_currentWaypointData.count(), true);
 		return;
 	}
 	//上传进度
@@ -854,7 +907,7 @@ void DeviceControl::onWaypointNext()
 	}
 	else {
 		//航点下发完成后需要发送结束信息
-		DeviceMavWaypointEnd(m_currentWaypointData.count());
+		DeviceMavWaypointEnd(m_currentWaypointData.count(), true);
 		return;
 	}
 	ResendMessage* pWaypointThread = new ResendMessage(tr("上传舞步"), ui.labelDeviceName->text(), _MavWaypointRetryNum_, _MavWaypointTimeout_, arrData, arrAgainData, MAVLINK_MSG_ID_MISSION_ACK);
@@ -874,30 +927,28 @@ void DeviceControl::onMessageThreadFinished()
 	int cid = 0;
 	switch (mid)
 	{
-		//定桩授时
-	case MAV_CMD_WAYPOINT_USER_5:
+	case MAV_CMD_WAYPOINT_USER_5: //定桩授时
 		cid = _DeviceTimeSync;
+		m_bTimeSyncFinished = true;
 		if (DeviceDataSucceed == res) {
-			m_nTimeSynsUTC = QDateTime::currentDateTime().toTime_t();
-			m_bTimeSync = true;
-		} else m_bTimeSync = false;
+			//成功则记录定桩授时时间
+			m_nTimeSynsMSecsUTC = QDateTime::currentDateTime().toMSecsSinceEpoch();
+		} 
 		break;
-		//准备起飞
-	case MAV_CMD_DO_SET_MODE:
+	case MAV_CMD_DO_SET_MODE: //准备起飞
 		cid = _DevicePrepare;
 		if (DeviceDataSucceed == res) m_bPrepareTakeoff = true;
 		else m_bPrepareTakeoff = false;
 		break;
-		//起飞
-	case MAV_CMD_NAV_TAKEOFF_LOCAL: 
+	case MAV_CMD_NAV_TAKEOFF_LOCAL:  //起飞
 		//起飞成功后清空状态
 		cid = _DeviceTakeoffLocal;
-		m_bTimeSync = false;
+		m_bTimeSyncFinished = false;
 		m_bPrepareTakeoff = false;
 		break;
 	default:
 		break;
 	}
-	emit sigConrolFinished(cid, pMessage->getCommandName(), pMessage->getResult(), "");
+	emit sigConrolFinished(cid, pMessage->getCommandName(), res, "");
 	delete pMessage;
 }

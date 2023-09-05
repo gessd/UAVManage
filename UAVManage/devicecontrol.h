@@ -7,6 +7,7 @@
 #include <QMutex>
 #include <QTimer>
 #include <QEvent>
+#include <QDateTime>
 #include "libhvsetting.h"
 #include "mavlinksetting.h"
 #include "resendmessage.h"
@@ -99,11 +100,7 @@ public:
 	/**
 	 * @brief 设备是否已经定桩授时
 	 */
-	bool isTimeSync();
-	/**
-	 * @brief 获取设备标签
-	 */
-	int getDeviceTag();
+	bool isTimeSyncFinished();
 	/**
 	 * @brief 是否处于舞步上传状态中
 	 */
@@ -116,7 +113,7 @@ public:
 	/**
 	 * @brief 获取定桩授时的时间，便于检查设备是否在同一时间完成定桩授时
 	 */
-	unsigned int getTimeSyncUTC();
+	qint64 getTimeSyncMSecsUTC();
 	/**
 	 * @brief 设备是否在准备起飞状态
 	 */
@@ -213,6 +210,11 @@ public:
 	 * @brief 定桩授时
 	 */
 	int Fun_MAV_TimeSync();
+
+	/**
+	 * @brief 处理UWB返回的数据
+	 */
+	void receiveUWBData(unsigned int tag, QByteArray data);
 private slots:
 	/**
 	* @brief 发送数据
@@ -281,7 +283,7 @@ private:
 	/**
 	 * @brief 发送航点结束指令
 	 */
-	void DeviceMavWaypointEnd(unsigned int count);
+	void DeviceMavWaypointEnd(unsigned int count, bool bFinihed);
 	/**
 	 * @brief 心跳响应更新
 	 */
@@ -294,6 +296,14 @@ private:
 	 * @brief 更新Tip框内容
 	 */
 	void updateToopTip();
+	/**
+	 * @brief 解析收到的无人机数据
+	 */
+	void UnpackData(QByteArray data);
+	/**
+	 * @brief 发送心跳消息
+	 */
+	void sendHeartBeatData();
 signals:
 	/**
 	* @brief 设备命令控制返回结果
@@ -352,6 +362,10 @@ signals:
 	* @param 设备名称
 	*/
 	void sigRemoveDevice(QString name);
+	/**
+	 * @brief 发送数据到UWB
+	 */
+	void sigSendDataToUWB(unsigned int tag, QByteArray data);
 private slots:
 	void onWaypointStart();
 	void onWaypointNext();
@@ -384,12 +398,15 @@ private:
 	//已上传航点
 	bool m_bUploadFinished;
 	//已定桩授时
-	bool m_bTimeSync;
-	unsigned int m_nTimeSynsUTC;
+	bool m_bTimeSyncFinished;
+	qint64 m_nTimeSynsMSecsUTC;
 	//是否在准备起飞状态
 	bool m_bPrepareTakeoff;
 	//mavlink解包参数，区分不同设备数据
 	int m_nMavChan;
 	//无人机标签 不可重复，UWB基站定位使用，负值则无效
 	int m_nUWBTag;
+	//上一次收到UWB数据时间，用来判断设备是否在线
+	unsigned int m_nLastDataUWBData;
+	QTimer m_timerUWBHeartbeat;
 };
