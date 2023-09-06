@@ -19,6 +19,8 @@ FirstDialog::~FirstDialog()
 void FirstDialog::showEvent(QShowEvent* event)
 {
 	QTimer::singleShot(1000, [this]() { emit sigStartApp(); });
+	//自动关闭窗口，防止有错误提示时因窗口置顶造成遮挡
+	QTimer::singleShot(3000, [this]() { close(); });
 }
 
 void FirstDialog::onBtnClose()
