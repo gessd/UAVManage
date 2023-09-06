@@ -155,6 +155,11 @@ void DeviceControl::setCurrentTime(unsigned int time)
 	m_nCurrentMusicTime = time;
 }
 
+int DeviceControl::getTag()
+{
+	return m_nUWBTag;
+}
+
 DeviceDebug* DeviceControl::getDeviceDebug()
 {
 	return m_pDebugDialog;

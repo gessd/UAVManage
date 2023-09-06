@@ -1127,6 +1127,27 @@ QString DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upl
 	qInfo() << "生成舞步完成";
 	//判断是否需要上传舞步
 	if (upload) {
+		//上传舞步前检查无人机标签是否用重复，所有已连接设备都要检查，标签重复会造成定位错误
+		QMap<int, QString> mapTags;
+		for (int i = 0; i < ui.listWidget->count(); i++) {
+			QListWidgetItem* pItem = ui.listWidget->item(i);
+			if (!pItem) continue;
+			QWidget* pWidget = ui.listWidget->itemWidget(pItem);
+			if (!pWidget) continue;
+			DeviceControl* pDevice = dynamic_cast<DeviceControl*>(pWidget);
+			if (!pDevice) continue;
+			int n = pDevice->getTag();
+			if (n < 0) continue;
+			if (mapTags.contains(n)) {
+				//有重复的标签
+				bComposeIng = false;
+				setEnabled(true);
+				QString error = QString("%1与%2设备标签重复，请关闭或修改后重新").arg(mapTags.value(n)).arg(pDevice->getName());
+				_ShowErrorMessage(error);
+				return error;
+			}
+			mapTags.insert(n, pDevice->getName());
+		}
 		//上传舞步到无人机
 		for (int i = 0; i < ui.listWidget->count(); i++) {
 			QListWidgetItem* pItem = ui.listWidget->item(i);
@@ -1155,10 +1176,11 @@ QString DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upl
 			qInfo() << QString("三维仿真是否完成:%1").arg(m_b3DFinished);
 			if (false == m_b3DFinished) {
 				bComposeIng = false;
-				_ShowErrorMessage("三维仿真未完成，无法上传舞步到无人机");
-				QMessageBox::warning(this, "警告", "三维仿真未完成，无法上传舞步到无人机");
+				QString error = tr("三维仿真未完成，无法上传舞步到无人机");
+				_ShowErrorMessage(error);
+				QMessageBox::warning(this, tr("警告"), error);
 				setEnabled(true);
-				return false;
+				return error;
 			}
 			qInfo() << "三维仿真中碰撞设备" << m_map3DCollision;
 			if (false == m_map3DCollision.isEmpty()) {
@@ -1172,7 +1194,7 @@ QString DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upl
 				_ShowErrorMessage(text);
 				QMessageBox::warning(this, "警告", text);
 				setEnabled(true);
-				return false;
+				return text;
 			}
 #endif
 			//上传航点到飞控

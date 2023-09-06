@@ -58,6 +58,7 @@ public:
 	long getY();
 	void setY(long y);
 	void setCurrentTime(unsigned int time);
+	int getTag();
 	DeviceDebug* getDeviceDebug();
 	void setStartLocation(long x, long y);
 	_stDeviceCurrentStatus getCurrentStatus();
