@@ -42,6 +42,7 @@ RegisterDialog::RegisterDialog(QWidget *parent):QDialog(parent)
 {
 	ui.setupUi(this);
 	m_bClose = false;
+	m_bRegister = false;
 	m_pLabelBackground = nullptr;
 	ui.lineEditID->setText(getCpuId());
 	connect(ui.btnRegister, &QAbstractButton::clicked, [this]() {
@@ -61,7 +62,7 @@ RegisterDialog::RegisterDialog(QWidget *parent):QDialog(parent)
 			close();
 			return;
 		}
-		qDebug() << error;
+		qInfo() << error;
 		ui.labelError->setText(error);
 		QMessageBox::warning(this, tr("提示"), error);
 		});
@@ -82,9 +83,13 @@ bool RegisterDialog::isRegister()
 	QString key = set.value("key").toString();
 	QString id = ui.lineEditID->text().trimmed();
 	QString error = DecipherKey(key, id);
-	if (error.isEmpty())  return true;
-	qDebug() << error;
+	if (error.isEmpty()) {
+		m_bRegister = true;
+		return true;
+	}
+	qInfo() << error;
 	ui.labelError->setText(error);
+	m_bRegister = false;
 	return false;
 }
 
@@ -102,14 +107,25 @@ void RegisterDialog::showEvent(QShowEvent* event)
 	m_pLabelBackground->setFixedSize(dynamic_cast<QWidget*>(parent())->size());
 	m_pLabelBackground->setAlignment(Qt::AlignHCenter | Qt::AlignBottom);
 	m_pLabelBackground->setText(tr("请授权后使用"));
+	ui.btnRegister->setEnabled(true);
+	ui.lineEditKey->setEnabled(true);
+	if (m_bRegister) {
+		m_pLabelBackground->setText(tr("软件已授权完成"));
+		ui.btnRegister->setEnabled(false);
+		ui.lineEditKey->setEnabled(false);
+	}
 	m_pLabelBackground->show();
 }
 
 void RegisterDialog::closeEvent(QCloseEvent* event)
 {
-	if (m_pLabelBackground)m_pLabelBackground->close();
+	if (m_pLabelBackground) m_pLabelBackground->close();
 	event->accept();
-	if (false == isRegister())((QWidget*)parent())->close();
+	//授权失败则关闭程序
+	if (false == isRegister()) {
+		qInfo() << "授权失败关闭程序";
+		qApp->quit();
+	}
 }
 
 void RegisterDialog::keyPressEvent(QKeyEvent* event)
@@ -129,7 +145,7 @@ QString RegisterDialog::DecipherKey(QString text, QString& id)
 	if (arrData.length() != 16 * 2) {
 		return tr("授权码长度错误");
 	}
-	qDebug() << "验证授权码" << text;
+	qInfo() << "验证授权码" << text;
 	SM4_KEY sm4_key;
 	SM4_set_key(key, &sm4_key);
 	uint8_t cbuf[16] = { 0 };
@@ -149,10 +165,9 @@ QString RegisterDialog::DecipherKey(QString text, QString& id)
 	SM4_decrypt(cbuf, pbuf, &sm4_key);
 	QString date = QByteArray((char*)pbuf, sizeof(pbuf));
 	QDateTime t = QDateTime::fromString(date, "yyyy-MM-dd"); 
-	qDebug() << date << t;
 	unsigned int current = QDateTime::currentDateTime().toTime_t();
 	unsigned int v = t.toTime_t();
-	qDebug() << "授权码到期时间" << v << current;
+	qInfo() << "授权码到期时间" << t;
 	int n = current - v;
 	if (n > 0) {
 		return tr("授权码已过期");

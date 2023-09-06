@@ -22,4 +22,5 @@ private:
 	Ui::RegisterDialog ui;
 	QLabel* m_pLabelBackground;
 	bool m_bClose;
+	bool m_bRegister;
 };
