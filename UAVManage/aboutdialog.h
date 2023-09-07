@@ -18,6 +18,7 @@ public slots:
 protected:
 	void showEvent(QShowEvent* event);
 	void hideEvent(QHideEvent* event);
+	void keyPressEvent(QKeyEvent* event);
 private:
 	Ui::AboutDialogClass ui;
 	QLabel* m_pLabelBackground;
@@ -25,4 +26,5 @@ private:
 	bool m_bShowing;
 	bool m_bAutoUpdate;
 	QLabel* m_pLabelProgress;
+	bool m_bManualUpdate;
 };
