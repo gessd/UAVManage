@@ -113,18 +113,37 @@ int main(int argc, char *argv[])
 #endif
 	//注册MessageHandler
 	qInstallMessageHandler(outputMessage);
-	if (a.isRunning())  //判断实例是否已经运行
-	{
-		qInfo() << "程序已运行";
-		a.sendMessage("raise_window_noop", 1000);
-		return EXIT_SUCCESS;
+	//判断实例是否已经运行
+	if (a.isRunning()) {
+		QTime time;
+		time.start();
+		while (time.elapsed() < 1000) {
+			//如果程序正在运行则等1秒，防止切换模式时会操作程序未完全退出造成无法启动
+			QApplication::processEvents();
+		}
+		if (a.isRunning()) {
+			qInfo() << "程序已运行";
+			a.sendMessage("raise_window_noop", 1000);
+			return EXIT_SUCCESS;
+		}
 	}
-	qInfo() << "--------------------程序启动--------------------" << AppVersion() << __DATE__ << __TIME__;
+
 #ifdef _UseUWBData_
 	qInfo() << "使用UWB基站模式";
-#else 
+	ParamReadWrite::writeParam("UWB", true);
+#else
+	//默认启动为WIFI模式，所以先读取配置，如果上一次用的是UWB模式则启动UWB程序
+	bool bUseUwb = ParamReadWrite::readParam("UWB", false).toBool();
+	if (bUseUwb) {
+		QProcess* process = new QProcess;
+		process->start("UAVManage-UWB.exe");
+		return 0;
+	}
 	qInfo() << "使用WIFI网络模式";
+	ParamReadWrite::writeParam("UWB", false);
 #endif
+
+	qInfo() << "--------------------程序启动--------------------" << AppVersion() << __DATE__ << __TIME__;
 	//添加翻译文件，用于界面控件中的英文翻译
 	QTranslator translator;
 	if (translator.load(":/res/translations/qt_zh_CN.qm")) {

@@ -227,8 +227,10 @@ void UAVManage::initMenu()
 		if (QMessageBox::StandardButton::Yes != button)  return;
 		QProcess* process = new QProcess;
 #ifdef _UseUWBData_
+		ParamReadWrite::writeParam("UWB", false);
 		process->start("UAVManage.exe");
 #else
+		ParamReadWrite::writeParam("UWB", true);
 		process->start("UAVManage-UWB.exe");
 #endif
 		qApp->quit();
