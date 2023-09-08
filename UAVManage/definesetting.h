@@ -14,7 +14,7 @@
 #define _WebSocketPort_ 25252
 
 //调试版本
-#define _DebugApp_
+//#define _DebugApp_
 
 //可添加最大无人机数量
 #define _MaxDevice_			40
