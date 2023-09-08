@@ -246,6 +246,10 @@ private slots:
 	 * @brief UWB接收到的数据
 	 */
 	void onUWBReceiveData(QList<_ReadyData> list);
+	/**
+	 * @brief 对无人机位置进行定位
+	 */
+	void onActionLocateDevice();
 public slots:
 	/**
 	 * @brief 更新音乐播放总时长 秒
@@ -328,4 +332,5 @@ private:
 	UWBStationData* m_pUWBStation;
 	//定时查询无人机定桩授时返回值
 	QTimer m_timerSync;
+	QTimer m_timerLocate;
 };

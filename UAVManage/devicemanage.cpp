@@ -59,6 +59,7 @@ DeviceManage::DeviceManage(QWidget* parent)
 	m_pActionGyro = new QAction(tr("陀螺校准"), this);
 	m_pActionBaro = new QAction(tr("电调校准"), this);
 	m_pActionDebug = new QAction(tr("调试"), this);
+	QAction* pActionLocate = new QAction(tr("手动定位"), this);
 	m_pMenu->addAction(pActionParam);
 	m_pMenu->addAction(pActionDicconnect);
 	m_pMenu->addSeparator();
@@ -68,10 +69,13 @@ DeviceManage::DeviceManage(QWidget* parent)
 	m_pMenu->addAction(pActionMagnetism);
 	m_pMenu->addAction(pActionAccelerometer);
 	m_pMenu->addSeparator();
+	//m_pMenu->addAction(pActionLocate);
 	m_pActionGyro->setProperty("Calibration", _Gyro);
 	pActionMagnetism->setProperty("Calibration", _Magnetometer);
 	pActionAccelerometer->setProperty("Calibration", _Accelerometer);
 	m_pActionBaro->setProperty("Calibration", _Baro);
+	connect(pActionLocate, &QAction::triggered, this, &DeviceManage::onActionLocateDevice);
+	connect(&m_timerLocate, &QTimer::timeout, this, &DeviceManage::onActionLocateDevice);
 	connect(m_pActionGyro, &QAction::triggered, this, &DeviceManage::deviceCalibration);
 	connect(pActionMagnetism, &QAction::triggered, this, &DeviceManage::deviceCalibration);
 	connect(pActionAccelerometer, &QAction::triggered, this, &DeviceManage::deviceCalibration);
@@ -560,11 +564,11 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 				_ShowErrorMessage(name + tr("正在上传舞步中，请稍后重试"));
 				continue;
 			}
-			if (qAbs(pDevice->getX() - pDevice->getCurrentStatus().x) >= _UAVStartLocation_) {
+			if (qAbs(pDevice->getX() - pDevice->getCurrentStatus().x) > _UAVStartLocation_) {
 				_ShowErrorMessage(name + QString("设备X轴方向距离初始位置超过%1厘米").arg(_UAVStartLocation_));
 				continue;
 			}
-			if (qAbs(pDevice->getY() - pDevice->getCurrentStatus().y) >= _UAVStartLocation_) {
+			if (qAbs(pDevice->getY() - pDevice->getCurrentStatus().y) > _UAVStartLocation_) {
 				_ShowErrorMessage(name + QString("设备Y轴方向距离初始位置超过%1厘米").arg(_UAVStartLocation_));
 				continue;
 			}
@@ -935,7 +939,7 @@ QString DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upl
 			continue;
 		}
 		if (false == upload) {
-			_ShowInfoMessage(name + tr("生成舞步完成"));
+			_ShowInfoMessage(QString("%1生成舞步完成，共%2条舞步").arg(name).arg(data.count()));
 		}
 		map.insert(name, data);
 	}
@@ -1164,11 +1168,11 @@ QString DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upl
 				_ShowErrorMessage(name + tr("设备没有连接无法上传舞步"));
 				continue;
 			}
-			if (qAbs(pDevice->getX() - pDevice->getCurrentStatus().x) >= _UAVStartLocation_) {
+			if (qAbs(pDevice->getX() - pDevice->getCurrentStatus().x) > _UAVStartLocation_) {
 				_ShowErrorMessage(name + QString("设备X轴方向距离初始位置超过%1厘米，无法上传舞步").arg(_UAVStartLocation_));
 				continue;
 			}
-			if (qAbs(pDevice->getY() - pDevice->getCurrentStatus().y) >= _UAVStartLocation_) {
+			if (qAbs(pDevice->getY() - pDevice->getCurrentStatus().y) > _UAVStartLocation_) {
 				_ShowErrorMessage(name + QString("设备Y轴方向距离初始位置超过%1厘米，无法上传舞步").arg(_UAVStartLocation_));
 				continue;
 			}
@@ -1763,6 +1767,27 @@ void DeviceManage::onUWBReceiveData(QList<_ReadyData> list)
 			if(pDevice->getIP().toInt() != data.tag) continue;
 			pDevice->receiveUWBData(data.tag, data.data);
 		}
+	}
+}
+
+void DeviceManage::onActionLocateDevice()
+{
+	DeviceControl* pDevice = getCurrentDevice();
+	if (nullptr == pDevice) return;
+	if (false == pDevice->isConnectDevice()) {
+		QMessageBox::warning(this, tr("警告"), tr("设备未连接，无法定位"));
+		return;
+	}
+	if (false == m_timerLocate.isActive()) m_timerLocate.start(1000);
+	int nStartX = pDevice->getX();
+	int nStartY = pDevice->getY();
+	_stDeviceCurrentStatus current = pDevice->getCurrentStatus();
+	if (qAbs(nStartX - current.x) > _UAVStartLocation_ || qAbs(nStartY - current.y) > _UAVStartLocation_) {
+		//超出误差范围，播放警告音
+		QApplication::beep();
+	}
+	else {
+		m_timerLocate.stop();
 	}
 }
 
