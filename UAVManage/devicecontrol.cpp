@@ -117,8 +117,9 @@ void DeviceControl::setIp(QString ip)
 {
 #ifdef _UseUWBData_
 	m_nUWBTag = ip.toInt();
-#endif
 	updateToopTip();
+	return;
+#endif
 	//此处会连接设备,如果无法连接则耗时比较长
 	if (m_qstrIP == ip) return;
 	m_qstrIP = ip;
@@ -126,6 +127,7 @@ void DeviceControl::setIp(QString ip)
 	if (m_qstrIP.isEmpty()) return;
 	//连接设备
 	connectDevice();
+	updateToopTip();
 }
 
 long DeviceControl::getX()
