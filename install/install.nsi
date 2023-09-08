@@ -178,7 +178,7 @@ Section "MainSection" SEC01
   ;Çý¶¯°²×°
   StrCpy $CP2102 0
   StrCpy $CH340 0
-  IfFileExists "C:\WINDOWS\system32\drivers\silabenm.sys" 0 +2
+  IfFileExists "C:\WINDOWS\system32\drivers\silabser.sys" 0 +2
 	StrCpy $CP2102 1
   IfFileExists "C:\WINDOWS\system32\drivers\CH343S64.SYS" 0 +2
 	StrCpy $CH340 1
