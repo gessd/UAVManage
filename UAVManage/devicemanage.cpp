@@ -829,6 +829,18 @@ QString DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upl
 			//通过Python代码检查积木块连贯性，当包含空行时说明积木块没有连到一起
 			bool bGap = false;
 			if (file.open(QIODevice::ReadOnly)) {
+				//判断是否有变量，有变量则删除后边的空白行
+				QByteArray data = file.readAll();
+				file.close();
+				if (data.contains("= None\n\n")) {
+					data = data.replace("= None\n\n", "= None\n");
+					if (file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+						file.write(data);
+						file.close();
+					}
+				}
+			}
+			if (file.open(QIODevice::ReadOnly)) {
 				while (false == file.atEnd()) {
 					QByteArray arrLine = file.readLine();
 					//去除回车换行后为空则代表有空白行
