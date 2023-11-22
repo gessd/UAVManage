@@ -2,13 +2,13 @@
 #include <QDir>
 //程序版本号
 #define _MajorNumber_ 2
-#define _MinorNumber_ 1
+#define _MinorNumber_ 2
 #define _BuildNumber_ 0
 //新程序下载存放文件夹
 #define _NewVersionPath_	"/update"
 #define _VersionFile_		"version.ini"
 //服务器地址
-#define _ServerUrl_ "http://203.93.121.18:8086/downloads/software/UAVManage/"
+#define _ServerUrl_ "http://www.qzrobotics.com/downlonds/files/software/edu/UAVManage/"
 
 //blockly交互端口
 #define _WebSocketPort_ 25252
