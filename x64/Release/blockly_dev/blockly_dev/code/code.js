@@ -522,6 +522,37 @@ Code.init = function() {
     }
   }
   ace.edit("content_python").myEditPythonChange = myEditPythonChange;
+
+  //获取动作组名称最大数值
+  function getNewGroupName(id){
+    var workspace = Blockly.getMainWorkspace();
+    var blocks = workspace.getAllBlocks();
+    var maxNumber = 0;
+    for (var i = 0; i < blocks.length; i++) {
+      var block = blocks[i];
+      if("Fly_TimeGroup" != block.type) continue;
+      if(block.id == id) continue;
+      var name = block.getFieldValue("GroupName");
+      var num = parseInt(name);
+      if(Object.is(num, NaN)) num = 0;
+      maxNumber = Math.max(maxNumber, num);
+    }
+    return maxNumber+1;
+  }
+  
+  //自定义事件处理创建动作组积木块事件
+  Blockly.getMainWorkspace().addChangeListener(function (event) {
+    if (event.type == Blockly.Events.CREATE) {
+      // 创建事件，即有新的块被拖拽到工作区
+      var createdBlock = Blockly.getMainWorkspace().getBlockById(event.blockId);
+      if (createdBlock) {
+        if("Fly_TimeGroup" == createdBlock.type) {
+          createdBlock.setFieldValue(getNewGroupName(event.blockId), "GroupName");
+        }
+      }
+    }
+  });
+  
 };
 
 /**
