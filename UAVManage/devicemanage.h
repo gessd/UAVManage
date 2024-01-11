@@ -250,6 +250,10 @@ private slots:
 	 * @brief 对无人机位置进行定位
 	 */
 	void onActionLocateDevice();
+	/**
+	 * @brief 设备粘贴操作
+	 */
+	void onActionPaste();
 public slots:
 	/**
 	 * @brief 更新音乐播放总时长 秒
@@ -328,9 +332,11 @@ private:
 	unsigned int m_nMusicMaxTime;
 	//正在进行指令控制中，起飞/降落/授时等操作
 	bool m_bControlIng;
-	//UWB数据控制
-	UWBStationData* m_pUWBStation;
-	//定时查询无人机定桩授时返回值
 	QTimer m_timerSync;
 	QTimer m_timerLocate;
+	//已复制的设备名称
+	QString m_qstrCopyName;
+	//粘贴菜单
+	QMenu* m_pMenuPaste;
+	QAction* m_pActionPaste;
 };

@@ -869,9 +869,11 @@ void UAVManage::onDeviceAdd(QString name, QString ip, float x, float y)
 		QString qstrBlocklyFile = QString("%1%2%3.blockly").arg(qstrPath).arg(_ProjectDirName_).arg(name);
 		QString qstrPythonFile = QString("%1%2%3.py").arg(qstrPath).arg(_ProjectDirName_).arg(name);
 		QFile file(qstrBlocklyFile);
-		if (file.open(QIODevice::ReadWrite | QIODevice::Truncate)) {
-			//当设备不存在写入默认blockly控件,默认ID为空，防止不同设备ID重复
-			QString qstrBlock = "\
+		//文件不存在则新建并写入默认内容
+		if (false == file.exists()) {
+			if (file.open(QIODevice::ReadWrite | QIODevice::Truncate)) {
+				//当设备不存在写入默认blockly控件,默认ID为空，防止不同设备ID重复
+				QString qstrBlock = "\
 <xml xmlns=\"https://developers.google.com/blockly/xml\">\
   <block type=\"Fly_Takeoff\" id=\"\" x=\"88\" y=\"38\">\
     <field name=\"height\">100</field>\
@@ -887,9 +889,10 @@ void UAVManage::onDeviceAdd(QString name, QString ip, float x, float y)
   </block>\
 </xml>\
 ";
-			file.write(qstrBlock.toUtf8());
-			file.waitForBytesWritten(1000);
-			file.close();
+				file.write(qstrBlock.toUtf8());
+				file.waitForBytesWritten(1000);
+				file.close();
+			}
 		}
 		file.setFileName(qstrPythonFile);
 		if (file.open(QIODevice::ReadWrite | QIODevice::Truncate)) file.close();

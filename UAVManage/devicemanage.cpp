@@ -45,13 +45,19 @@ DeviceManage::DeviceManage(QWidget* parent)
 		});
 	//添加右键菜单
 	m_bDebug = false;
+	
+	//初始化粘贴菜单
+	m_pMenuPaste = new QMenu(this);
+	m_pActionPaste = new QAction(tr("粘贴"), this);
+	m_pMenuPaste->addAction(m_pActionPaste);
+	connect(m_pActionPaste, &QAction::triggered, this, &DeviceManage::onActionPaste);
+
 	m_pMenu = new QMenu(this);
 	m_pMenu->setWindowFlags(m_pMenu->windowFlags() | Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint);
 	m_pMenu->setAttribute(Qt::WA_TranslucentBackground);
 	QAction* pActionParam = new QAction(tr("修改"), this);
 	QAction* pActionDicconnect = new QAction(tr("连接/断开"), this);
 	QAction* pActionCopy = new QAction(tr("复制"), this);
-	QAction* pActionPpaste = new QAction(tr("粘贴"), this);
 	QAction* pFlyTo = new QAction(tr("起飞"), this);
 	QAction* pLand = new QAction(tr("降落"), this);
 	QAction* pActionMagnetism = new QAction(tr("磁罗盘校准"), this);
@@ -65,8 +71,7 @@ DeviceManage::DeviceManage(QWidget* parent)
 	m_pMenu->addAction(pActionParam);
 	m_pMenu->addAction(pActionDicconnect);
 	m_pMenu->addSeparator();
-	//m_pMenu->addAction(pActionCopy);
-	//m_pMenu->addAction(pActionPpaste);
+	m_pMenu->addAction(pActionCopy);
 	m_pMenu->addSeparator();
 	m_pMenu->addAction(pFlyTo);
 	m_pMenu->addAction(pLand);
@@ -105,6 +110,10 @@ DeviceManage::DeviceManage(QWidget* parent)
 		}
 		_ShowInfoMessage(pDevice->getName() + tr("磁罗盘关闭成功"));
 		});
+	connect(pActionCopy, &QAction::triggered, [this]() {
+		m_qstrCopyName = getCurrentDeviceName();
+		qInfo() << "已复制设备" << m_qstrCopyName;
+		});
 	//菜单响应处理
 	connect(pActionParam, &QAction::triggered, [this](bool checked) {
 		DeviceControl* pControl = getCurrentDevice();
@@ -125,6 +134,7 @@ DeviceManage::DeviceManage(QWidget* parent)
 			}
 			qDebug() << "修改设备名称" << qstrName << qstrNewName;
 			pControl->setName(qstrNewName);
+			if (m_qstrCopyName == qstrName) m_qstrCopyName = qstrNewName;
 			emit deviceRenameFinished(qstrNewName, qstrName);
 			emit currentDeviceNameChanged(qstrNewName, qstrName);
 		}
@@ -343,6 +353,7 @@ QString DeviceManage::addDevice(QString qstrName, QString ip, long x, long y, bo
 void DeviceManage::clearDevice()
 {
 	ui.listWidget->clear();
+	m_qstrCopyName.clear();
 }
 
 QString DeviceManage::getCurrentDeviceName()
@@ -1470,30 +1481,39 @@ bool DeviceManage::eventFilter(QObject* watched, QEvent* event)
 		//设备列表菜单
 		if (QEvent::ContextMenu != event->type()) return false;
 		QListWidgetItem* pItem = ui.listWidget->itemAt(ui.listWidget->mapFromGlobal(QCursor::pos()));
-		if (!pItem) return false;
-		//当前在上传舞步过程中禁用右键菜单，防止进行起飞降落操作
-		QWidget* pWidget = ui.listWidget->itemWidget(pItem);
-		if (pWidget) {
-			DeviceControl* pDevice = dynamic_cast<DeviceControl*>(pWidget);
-			if (pDevice && pDevice->isUploadWaypointIng()) {
-				return false;
+		if (pItem) {
+			//当前在上传舞步过程中禁用右键菜单，防止进行起飞降落操作
+			QWidget* pWidget = ui.listWidget->itemWidget(pItem);
+			if (pWidget) {
+				DeviceControl* pDevice = dynamic_cast<DeviceControl*>(pWidget);
+				if (pDevice && pDevice->isUploadWaypointIng()) {
+					return false;
+				}
 			}
-		}
-		if (m_bDebug) {
-			m_pMenu->addAction(m_pActionMagnetismOpen);
-			m_pMenu->addAction(m_pActionMagnetismClose);
-			m_pMenu->addAction(m_pActionGyro);
-			m_pMenu->addAction(m_pActionBaro);
-			m_pMenu->addAction(m_pActionDebug);
+			if (m_bDebug) {
+				m_pMenu->addAction(m_pActionMagnetismOpen);
+				m_pMenu->addAction(m_pActionMagnetismClose);
+				m_pMenu->addAction(m_pActionGyro);
+				m_pMenu->addAction(m_pActionBaro);
+				m_pMenu->addAction(m_pActionDebug);
+			}
+			else {
+				m_pMenu->removeAction(m_pActionMagnetismOpen);
+				m_pMenu->removeAction(m_pActionMagnetismClose);
+				m_pMenu->removeAction(m_pActionGyro);
+				m_pMenu->removeAction(m_pActionBaro);
+				m_pMenu->removeAction(m_pActionDebug);
+			}
+			m_pMenu->exec(QCursor::pos());
 		}
 		else {
-			m_pMenu->removeAction(m_pActionMagnetismOpen);
-			m_pMenu->removeAction(m_pActionMagnetismClose);
-			m_pMenu->removeAction(m_pActionGyro);
-			m_pMenu->removeAction(m_pActionBaro);
-			m_pMenu->removeAction(m_pActionDebug);
+			//点击空白区域时判断是否已经复制设备，如果有复制设备则显示粘贴菜单
+			if (false == m_qstrCopyName.isEmpty()) {
+				qInfo() << "有可粘贴设备" << m_qstrCopyName;
+				m_pActionPaste->setText(tr("粘贴:") + m_qstrCopyName);
+				m_pMenuPaste->exec(QCursor::pos());
+			}
 		}
-		m_pMenu->exec(QCursor::pos());
 	}
 	return false;
 }
@@ -1706,6 +1726,7 @@ void DeviceManage::onRemoveDevice(QString name)
 		QString temp = pDevice->getName();
 		if (temp != name) continue;
 		ui.listWidget->takeItem(i);
+		if (m_qstrCopyName == name) m_qstrCopyName.clear();
 		emit deviceRemoveFinished(name);
 		return;
 	}
@@ -1773,6 +1794,29 @@ void DeviceManage::onActionLocateDevice()
 	else {
 		m_timerLocate.stop();
 	}
+}
+
+void DeviceManage::onActionPaste()
+{
+	qInfo() << "粘贴设备:" << m_qstrCopyName;
+	QString qstrNewNmae = getNewDefaultName();
+	//复制已存在的blockly文件
+	QFileInfo info(m_qstrCurrentProjectFile);
+	QString path = info.path();
+	QString qstrDeviceBlocklyFile = path + _ProjectDirName_ + m_qstrCopyName + _BlcoklyFileSuffix_;
+	if (false == QFile::exists(qstrDeviceBlocklyFile)) {
+		_ShowErrorMessage(qstrNewNmae + "源文件错误无法粘贴");
+		return;
+	}
+	QString qstrNewBlocklyFile = path + _ProjectDirName_ + qstrNewNmae + _BlcoklyFileSuffix_;
+	QFile::copy(qstrDeviceBlocklyFile, qstrNewBlocklyFile);
+	QPoint point = getNewDevicePoint();
+	QString qstrError = addDevice(qstrNewNmae, "", point.x(), point.y());
+	if (false == qstrError.isEmpty()) {
+		_ShowErrorMessage(qstrError);
+		return;
+	}
+	m_qstrCopyName.clear();
 }
 
 void DeviceManage::onUpdateMusicMaxTime(unsigned int time)
