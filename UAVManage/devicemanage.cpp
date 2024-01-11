@@ -13,7 +13,7 @@
 #include "placeinfodialog.h"
 #include "tinyxml2/tinyxml2.h"
 
-#define _ItemHeight_ 70
+#define _ItemHeight_ 76
 DeviceManage::DeviceManage(QWidget* parent)
 	: QWidget(parent)
 {
@@ -50,6 +50,8 @@ DeviceManage::DeviceManage(QWidget* parent)
 	m_pMenu->setAttribute(Qt::WA_TranslucentBackground);
 	QAction* pActionParam = new QAction(tr("修改"), this);
 	QAction* pActionDicconnect = new QAction(tr("连接/断开"), this);
+	QAction* pActionCopy = new QAction(tr("复制"), this);
+	QAction* pActionPpaste = new QAction(tr("粘贴"), this);
 	QAction* pFlyTo = new QAction(tr("起飞"), this);
 	QAction* pLand = new QAction(tr("降落"), this);
 	QAction* pActionMagnetism = new QAction(tr("磁罗盘校准"), this);
@@ -62,6 +64,9 @@ DeviceManage::DeviceManage(QWidget* parent)
 	QAction* pActionLocate = new QAction(tr("手动定位"), this);
 	m_pMenu->addAction(pActionParam);
 	m_pMenu->addAction(pActionDicconnect);
+	m_pMenu->addSeparator();
+	//m_pMenu->addAction(pActionCopy);
+	//m_pMenu->addAction(pActionPpaste);
 	m_pMenu->addSeparator();
 	m_pMenu->addAction(pFlyTo);
 	m_pMenu->addAction(pLand);
@@ -232,35 +237,11 @@ DeviceManage::DeviceManage(QWidget* parent)
 	connect(&m_timerUpdateStatus, &QTimer::timeout, this, &DeviceManage::onUpdateStatusTo3D);
 	connect(&m_timerMessage3D, &QTimer::timeout, this, &DeviceManage::onTimeout3DMessage);
 	connect(&m_timerSync, &QTimer::timeout, this, &DeviceManage::onTimeoutSync);
-	connect(ui.btnBaseStation, &QAbstractButton::clicked, [this]() {
-#ifdef _UseUWBData_
-		m_pUWBStation->closeSeial();
-#endif
-		PlaceInfoDialog info(getSpaceSize(), this);
-		info.exec();
-#ifdef _UseUWBData_
-		m_pUWBStation->openSerial();
-#endif
-		if (info.isUpdateStation()) ui.labelStationStatus->setText("<font color=#FF0000>基站标定未完成</font>");
-		if (false == info.isValidStation()) return;
-		QMap<QString, QPoint> map = info.getStationAddress();
-		setStationAddress(map);
-		ui.labelStationStatus->setText("<font color=#467FC1>基站标定已完成</font>");
-		});
 	//设备IP地址信息
 	m_pDeviceNetwork = new DeviceSerial(this);
 	ui.btnSerial->setVisible(m_pDeviceNetwork->isSerialEnabled());
 	connect(m_pDeviceNetwork, &DeviceSerial::sigDeviceEnabled, [this](bool enabled) { ui.btnSerial->setVisible(enabled); });
 	connect(ui.btnSerial, &QAbstractButton::clicked, [this]() { m_pDeviceNetwork->exec(); });
-
-	m_pUWBStation = nullptr;
-#ifdef _UseUWBData_
-	m_pUWBStation = new UWBStationData(this);
-	connect(m_pUWBStation, &UWBStationData::sigConnectStatus, this, &DeviceManage::onUWBConnectStatus);
-	connect(m_pUWBStation, &UWBStationData::sigReceiveData, this, &DeviceManage::onUWBReceiveData);
-#else 
-	ui.labelUWBStatus->setVisible(false);
-#endif
 }
 
 DeviceManage::~DeviceManage()
@@ -517,19 +498,10 @@ void DeviceManage::allDeviceControl(_AllDeviceCommand comand)
 		//设备连接状态
 		//设备电量
 		//舞步已上传
-		//基站校准
-		//基站电量
 		//无人机是否在初始位置附近
 		//起飞时_DeviceTakeoffLocal检查已经准备起飞
 		//TODO 需要考虑已上传舞步后又重新编辑舞步处理方式
 
-#ifndef _DebugApp_
-		if (0 == m_stationMap.count()) {
-			m_bControlIng = false;
-			_ShowErrorMessage(tr("基站未成功标定无法起飞"));
-			return;
-		}
-#endif
 		//先清空错误消息
 		_MessageListClear;
 		//记录出错设备名称

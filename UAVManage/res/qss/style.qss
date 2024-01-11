@@ -20,6 +20,9 @@ QPushButton:hover,QToolButton:hover{
 QPushButton:pressed,QToolButton:pressed{
     background:#DDDDDD;
 }
+QToolButton:checked{
+	background:#4488CC;
+}
 QCheckBox::indicator{
 	width:24px;
 	height:24px;
@@ -56,7 +59,7 @@ DeviceControl QToolButton:hover, #m_pBtnPlay:hover, #m_pbtnStop:hover{
 #widgetManager{
 	border-radius:0px;
 }
-#labelLocation{
+#labelLocation,#labelDeviceIP{
 	font-size:11px;
 }
 #btnFlyStop{
@@ -309,3 +312,30 @@ QSlider::handle:horizontal:hover {
     margin-bottom:0px;
 }
 
+/*开关按钮*/
+QRadioButton{
+    spacing: 2px;
+	color:#FFFFFF;
+}
+QRadioButton::indicator {
+    width: 50px;
+    height: 20px;
+}
+QRadioButton::indicator:unchecked {
+    image: url(:/res/images/switchoff);
+}
+QRadioButton::indicator:unchecked:hover {
+    image: url(:/res/images/switchoff);
+}
+QRadioButton::indicator:unchecked:pressed {
+    image: url(:/res/images/switchoff);
+}
+QRadioButton::indicator:checked {
+    image: url(:/res/images/switchon);
+}
+QRadioButton::indicator:checked:hover {
+    image: url(:/res/images/switchon);
+}
+QRadioButton::indicator:checked:pressed {
+    image: url(:/res/images/switchon);
+}
