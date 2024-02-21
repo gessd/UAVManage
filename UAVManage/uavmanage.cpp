@@ -228,10 +228,10 @@ void UAVManage::initMenu()
 		QProcess* process = new QProcess;
 #ifdef _UseUWBData_
 		ParamReadWrite::writeParam("UWB", false);
-		process->start("UAVManage.exe");
+		process->start("UAVManage.exe p210");
 #else
 		ParamReadWrite::writeParam("UWB", true);
-		process->start("UAVManage-UWB.exe");
+		process->start("UAVManage-UWB.exe p210");
 #endif
 		qApp->quit();
 		});

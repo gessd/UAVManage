@@ -332,6 +332,9 @@ private:
 	unsigned int m_nMusicMaxTime;
 	//正在进行指令控制中，起飞/降落/授时等操作
 	bool m_bControlIng;
+	//UWB数据控制
+	UWBStationData* m_pUWBStation;
+	//定时查询无人机定桩授时返回值
 	QTimer m_timerSync;
 	QTimer m_timerLocate;
 	//已复制的设备名称

@@ -116,7 +116,7 @@ int main(int argc, char *argv[])
 	bool bUseUwb = ParamReadWrite::readParam("UWB", false).toBool();
 	if (bUseUwb) {
 		QProcess* process = new QProcess;
-		process->start("UAVManage-UWB.exe");
+		process->start("UAVManage-UWB.exe p210");
 		return 0;
 	}
 	qInfo() << "使用WIFI网络模式";
