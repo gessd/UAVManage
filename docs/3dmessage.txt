@@ -44,6 +44,9 @@
 	"file": "E:/fly/temp/测试/code/我和我的祖国.mp3",	//音乐文件
 	"image": "E:/fly/temp/测试/code/music.png"			//音乐波形
   },
+  "qrcode":{
+	"floor":"E:/fly/temp/测试/code/qrcode.png"
+  },
   "waypoint":			//飞行航点
   [
 	{

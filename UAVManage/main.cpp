@@ -50,41 +50,6 @@ void outputMessage(QtMsgType type, const QMessageLogContext& context, const QStr
 	mutex.unlock();
 }
 
-bool checkVersion() 
-{
-	QString config = QString("%1%2/%3").arg(QApplication::applicationDirPath()).arg(_NewVersionPath_).arg(_VersionFile_);
-	QString qstrNewVersionNumber = ParamReadWrite::readParam("version", AppVersion(), _Root_, config).toString();
-	qInfo() << "记录的版本号" << qstrNewVersionNumber;
-	QStringList list = qstrNewVersionNumber.split(".");
-	if (list.count() != 3) {
-		return false;
-	}
-	bool bUpdate = false;
-	if (list.at(0).toUInt() > _MajorNumber_) {
-		bUpdate = true;
-	}
-	else if (list.at(0).toUInt() >= _MajorNumber_ && list.at(1).toUInt() > _MinorNumber_) {
-		bUpdate = true;
-	}
-	else if (list.at(0).toUInt() >= _MajorNumber_ && list.at(1).toUInt() >= _MinorNumber_ && list.at(2).toUInt() > _BuildNumber_) {
-		bUpdate = true;
-	}
-	else {
-		return false;
-	}
-	if (bUpdate) {
-		QString qstrFileName = ParamReadWrite::readParam("file", AppVersion(), _Root_, config).toString();
-		QString qstrFilePath = QApplication::applicationDirPath() + _NewVersionPath_ + "/" + qstrFileName;
-		if (false == QFile::exists(qstrFilePath)) return false;
-		QProcess process;
-		qInfo() << "启动新版本安装程序" << qstrNewVersionNumber << qstrFilePath;
-		process.startDetached(qstrFilePath);
-		process.waitForStarted(1000);
-		return true;
-	}
-	return false;
-}
-
 #ifdef Q_OS_WIN
 #include <imagehlp.h>
 #pragma comment(lib, "DbgHelp.lib")
@@ -106,13 +71,28 @@ LONG ExceptionCrashHandler(EXCEPTION_POINTERS* pException)
 
 int main(int argc, char *argv[])
 {
-	QtSingleApplication a("myapp_id", argc, argv);
+	QtSingleApplication a("UAVManage", argc, argv);
 #ifdef Q_OS_WIN
 	//抛出异常
 	::SetUnhandledExceptionFilter((LPTOP_LEVEL_EXCEPTION_FILTER)ExceptionCrashHandler);
 #endif
 	//注册MessageHandler
 	qInstallMessageHandler(outputMessage);
+	//判断启动参数
+	QStringList listParam;
+	for (int i = 0; i < argc; i++) {
+		listParam.append(argv[i]);
+	}
+	qInfo() << listParam;
+	if (2 != listParam.count()) {
+		qWarning() << "程序无启动参数";
+		return -1;
+	}
+	if (QString("p210") != listParam.at(1)) {
+		qWarning() << "程序启动参数错误";
+		return -1;
+	}
+
 	//判断实例是否已经运行
 	if (a.isRunning()) {
 		QTime time;
