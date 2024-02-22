@@ -57,3 +57,4 @@ build*
 /.vs
 *.aps
 install/*.exe
+*/app/
