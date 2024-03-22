@@ -2,7 +2,7 @@
 #include <QDir>
 //程序版本号
 #define _MajorNumber_ 3
-#define _MinorNumber_ 1
+#define _MinorNumber_ 2
 #define _BuildNumber_ 0
 //新程序下载存放文件夹
 #define _NewVersionPath_	"/update"
