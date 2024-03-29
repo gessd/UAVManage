@@ -44,6 +44,10 @@ public:
 	 */
 	static PyObject* FlyTakeoff(PyObject* self, PyObject* args);
 	/**
+	 * @brief 延时起飞
+	 */
+	static PyObject* FlyTakeoffDelay(PyObject* self, PyObject* args);
+	/**
 	 * @brief 降落
 	 */
 	static PyObject* FlyLand(PyObject* self, PyObject* args);

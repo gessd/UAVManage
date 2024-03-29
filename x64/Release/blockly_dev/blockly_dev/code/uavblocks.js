@@ -73,6 +73,34 @@ Blockly.Python['Fly_Takeoff'] = function(block) {
     return code;
 };
 
+Blockly.Blocks['Fly_TakeoffDelay'] = {
+    init: function() {
+        this.appendDummyInput("flystart")
+            .appendField("地面停留")
+            .appendField(new Blockly.FieldNumber(0, 0, 300, 1), "delay")
+            .appendField("秒后")
+            .appendField("起飞至")
+            .appendField(new Blockly.FieldNumber(100, 100, 100, 1), "height")
+            .appendField("厘米")
+            .appendField("用时")
+            .appendField(new Blockly.FieldNumber(5, 2, 10, 1), "time")
+            .appendField("秒");
+        this.setNextStatement(true, ["time"]);
+        //this.setNextStatement(true, ["action", "notReachAction", "ReachAction", "time"]);
+        this.setColour('#FF6680');
+        this.setTooltip('起飞至高度固定为100厘米，用时范围2~10秒');
+    }
+};
+
+Blockly.Python['Fly_TakeoffDelay'] = function(block) {
+    addHead();
+    var delay = block.getFieldValue("delay");
+    var alt = block.getFieldValue("height");
+    var t = block.getFieldValue('time');
+    var code = 'Fly_TakeoffDelay('+ delay + ',' +alt + ',' + t + ',\'' +block.id + '\''+ ')' + '\n';
+    return code;
+};
+
 Blockly.Blocks['Fly_TimeGroup'] = {
     init: function() {
         var validator = function(newValue) {

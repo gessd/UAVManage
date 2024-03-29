@@ -1398,12 +1398,21 @@ void DeviceManage::sendWaypointTo3D(QMap<QString, QVector<NavWayPointData>> map)
 				waypoint.commandID = _WaypointFly;
 			}
 			else if (_WaypointStart == waypoint.commandID) {
-				//三维中需要第0秒为初始位置
 				waypoint.commandID = _WaypointFly;
-				waypoint.param1 = waypoint.param2 = waypoint.param3 = waypoint.param4 = 0;
 				red = green = 0;
 				blue = 255;
 				status = 8;	//开始时点亮LED
+				if (waypoint.param3 > 0) {
+					//三维中需要第0秒为初始位置
+					//当延时起飞时把提前插入0秒时位置
+					int x = waypoint.x;
+					int y = waypoint.y;
+					int z = waypoint.z;
+					QList<QVariant> value;
+					value << timesum << red << green << blue << status << angle << x << y << z << 16;
+					arrWaypoint.append(QJsonArray::fromVariantList(value));
+				}
+				waypoint.param1 = waypoint.param2 = waypoint.param4 = 0;
 			}
 			else if (_WaypointLedColor == waypoint.commandID) {
 				//color = QString::number(waypoint.param1).toInt() * 1000 * 1000 + QString::number(waypoint.param2).toInt() * 1000 + QString::number(waypoint.param3).toInt();

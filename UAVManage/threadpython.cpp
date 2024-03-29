@@ -181,6 +181,7 @@ PyMethodDef xWrapMethods[] = {
 	{"FlySetLedColor",	QZAPI::FlySetLedColor,		METH_VARARGS, "FlySetLedColor"},
 	{"FlyHover",		QZAPI::FlyHover,			METH_VARARGS, "FlyHover"},
 	{"FlyTakeoff",		QZAPI::FlyTakeoff,			METH_VARARGS, "FlyTakeoff"},
+	{"FlyTakeoffDelay",	QZAPI::FlyTakeoffDelay,		METH_VARARGS, "FlyTakeoffDelay"},
 	{"FlyLand",			QZAPI::FlyLand,				METH_VARARGS, "FlyLand"},
 	{"FlyTimeGroup",	QZAPI::FlyTimeGroup,		METH_VARARGS, "FlyTimeGroup"},
 	{"FlyRevolve",		QZAPI::FlyRevolve,			METH_VARARGS, "FlyRevolve"},
@@ -194,6 +195,7 @@ PyMethodDef xWrapMethods[] = {
 	{"Fly_SetLedColor",	QZAPI::FlySetLedColor,		METH_VARARGS, "FlySetLedColor"},
 	{"Fly_Hover",		QZAPI::FlyHover,			METH_VARARGS, "FlyHover"},
 	{"Fly_Takeoff",		QZAPI::FlyTakeoff,			METH_VARARGS, "FlyTakeoff"},
+	{"Fly_TakeoffDelay",QZAPI::FlyTakeoffDelay,		METH_VARARGS, "FlyTakeoffDelay"},
 	{"Fly_Land",		QZAPI::FlyLand,				METH_VARARGS, "FlyLand"},
 	{"Fly_TimeGroup",	QZAPI::FlyTimeGroup,		METH_VARARGS, "FlyTimeGroup"},
 	{"Fly_Revolve",		QZAPI::FlyRevolve,			METH_VARARGS, "FlyRevolve"},
@@ -363,6 +365,35 @@ PyObject* QZAPI::FlyTakeoff(PyObject* self, PyObject* args)
 		QZAPI::Instance()->showWaypointError(tr("起飞必须是第一步"), data.blockid);
 		return nullptr;
 	}
+	data.x = lastWaypoint.x;
+	data.y = lastWaypoint.y;
+	data.z = n;
+	data.bTakeoff = true;
+	g_waypointData.append(data);
+	return QZAPI::Instance()->examineWaypoint();
+}
+
+PyObject* QZAPI::FlyTakeoffDelay(PyObject* self, PyObject* args)
+{
+	int n = 0;
+	char* id = NULL;
+	NavWayPointData data;
+	int millisecond = 0;
+	int delay = 0;
+	if (!PyArg_ParseTuple(args, "i|i|i|s", &delay, &n, &millisecond, &id)) {
+		QZAPI::Instance()->showWaypointError(tr("起飞参数值错误"));
+		return nullptr;
+	}
+	data.blockid = QString(id);
+	data.param3 = millisecond;
+	qDebug() << "延时起飞" << delay << n << millisecond;
+	NavWayPointData lastWaypoint = g_waypointData.back();
+	if (_WaypointStart != lastWaypoint.commandID) {
+		QZAPI::Instance()->showWaypointError(tr("起飞必须是第一步"), data.blockid);
+		return nullptr;
+	}
+	g_waypointData[0].param1 = delay;
+	g_waypointData[0].param3 = delay;
 	data.x = lastWaypoint.x;
 	data.y = lastWaypoint.y;
 	data.z = n;
