@@ -1262,6 +1262,7 @@ void UAVManage::onTimerLogFile()
 bool UAVManage::newProjectFile(QString qstrFile, unsigned int X, unsigned int Y)
 {	
 	const char* declaration = _XMLVersion_;
+	QString qstrName = QString(_DeviceNamePrefix_) + QString::number(1);
 	tinyxml2::XMLDocument doc;
 	tinyxml2::XMLError error = doc.Parse(declaration);
 	if (error != tinyxml2::XMLError::XML_SUCCESS) return false;
@@ -1272,6 +1273,7 @@ bool UAVManage::newProjectFile(QString qstrFile, unsigned int X, unsigned int Y)
 	user->SetAttribute(_AttributeY_, Y);
 	QString version = QString("%1.%2.%3").arg(_MajorNumber_).arg(_MinorNumber_).arg(_BuildNumber_);
 	user->SetAttribute(_QZVersion_, version.toUtf8().data());
+	user->SetAttribute(_AttributeName_, qstrName.toUtf8().data());
 	root->InsertEndChild(user);
 	QTextCodec* code = QTextCodec::codecForName(_XMLNameCoding_);
 	std::string name = code->fromUnicode(qstrFile).data();
@@ -1282,7 +1284,7 @@ bool UAVManage::newProjectFile(QString qstrFile, unsigned int X, unsigned int Y)
 	//新建项目后默认新建一个无人机设备
 	m_qstrCurrentProjectFile = qstrFile;
 	m_pDeviceManage->setCrrentProject(m_qstrCurrentProjectFile);
-	onDeviceAdd(QString(_DeviceNamePrefix_) + QString::number(1), "", 100, 100);
+	onDeviceAdd(qstrName, "", 100, 100);
 	return true;
 }
 
