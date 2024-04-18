@@ -33,7 +33,7 @@ ShowUnInstDetails hide
 
 ; 安装程序初始定义常量
 !define PRODUCT_NAME "无人机炫舞编程"											
-!define PRODUCT_VERSION "3.2.2"
+!define PRODUCT_VERSION "3.2.4"
 !define PRODUCT_PUBLISHER "奇正数元"
 !define PRODUCT_WEB_SITE ""
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
