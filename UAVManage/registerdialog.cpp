@@ -78,6 +78,22 @@ RegisterDialog::~RegisterDialog()
 
 bool RegisterDialog::isRegister()
 {
+	QString qstrKeyFile = QApplication::applicationDirPath() + "/.key";
+	QFile file(qstrKeyFile);
+	if (file.exists()) {
+		if (file.open(QIODevice::ReadOnly)) {
+			QByteArray dataKey = file.readAll();
+			file.close();
+			int nDeadline = QByteArray::fromBase64(dataKey).toInt();
+			int nCurrent = QDateTime::currentDateTime().toTime_t();
+			if (nDeadline > nCurrent) {
+				m_bRegister = true;
+				qInfo() << "软件内部授权" << QDateTime::fromTime_t(nDeadline).toString("yyyy-MM-dd hh:mm:ss");
+				return true;
+			}
+		}
+	}
+
 	ui.labelError->clear();
 	QSettings set(_KeyPath_, QSettings::NativeFormat);
 	QString key = set.value("key").toString();
