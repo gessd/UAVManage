@@ -75,3 +75,30 @@ def FlyTo(x, y, z, second):
   :param z:           Z轴坐标位置(厘米)，正整数
   :param second:      飞行用时(秒)，正整数
 """
+
+"""P185地面站编程使用"""
+def FlyIdentifyStart(id):
+"""
+    设定需要识别的二维码编号，需要与FlyIdentifyEnd配合使用
+    :param id:    二维码编号，整数
+"""
+
+def FlyIdentifyEnd():
+"""
+    识别结束，需要与FlyIdentifyEnd配合使用
+"""
+
+def FlyPutDown(second):
+"""
+    悬停设定时间后投放物体
+    :param second:    悬停second秒，正整数
+"""
+
+def FlyLandTo(x, y, speed):
+"""
+    降落到设定位置
+    :param x:        X轴坐标位置(厘米)，正整数
+    :param y:        Y轴坐标位置(厘米)，正整数
+    :param speed:    下降速度，厘米每秒，正整数
+"""
+
