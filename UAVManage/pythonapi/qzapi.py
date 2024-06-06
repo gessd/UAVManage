@@ -85,18 +85,18 @@ def FlyIdentifyStart(id):
 
 def FlyIdentifyEnd():
 """
-    识别结束，需要与FlyIdentifyEnd配合使用
+    识别结束，需要与FlyIdentifyStart配合使用
 """
 
 def FlyPutDown(second):
 """
-    悬停设定时间后投放物体
+    识别到指定二维码后，悬停设定时间后投放物体
     :param second:    悬停second秒，正整数
 """
 
 def FlyLandTo(x, y, speed):
 """
-    降落到设定位置
+    识别到指定二维码后，降落到设定位置
     :param x:        X轴坐标位置(厘米)，正整数
     :param y:        Y轴坐标位置(厘米)，正整数
     :param speed:    下降速度，厘米每秒，正整数
