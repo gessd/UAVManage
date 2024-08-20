@@ -78,6 +78,7 @@ int main(int argc, char *argv[])
 #endif
 	//注册MessageHandler
 	qInstallMessageHandler(outputMessage);
+#ifndef _TestNumber_
 	//判断启动参数
 	QStringList listParam;
 	for (int i = 0; i < argc; i++) {
@@ -92,7 +93,7 @@ int main(int argc, char *argv[])
 		qWarning() << "程序启动参数错误";
 		return -1;
 	}
-
+#endif
 	//判断实例是否已经运行
 	if (a.isRunning()) {
 		QTime time;

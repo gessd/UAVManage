@@ -830,10 +830,12 @@ void DeviceControl::sendHeartBeatData()
 	mavlink_message_t message;
 	mavlink_heartbeat_t heard;
 	heard.custom_mode = time;
-	heard.type = 17;
-	heard.autopilot = 84;
-	heard.base_mode = 151;
-	heard.system_status = 218;
+#ifdef _TestNumber_
+	unsigned int nx = getX();
+	unsigned int ny = getY();
+	heard.custom_mode = (static_cast<unsigned int>(nx) << 16);
+	heard.custom_mode |= (static_cast<long>(ny) << 8);
+#endif
 	if (mavlink_msg_heartbeat_encode(_DeviceSYS_ID_, _DeviceCOMP_ID_, &message, &heard) > 0) {
 		QByteArray arrData = mavMessageToBuffer(message);
 #ifdef _UseUWBData_

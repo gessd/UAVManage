@@ -4,6 +4,7 @@
 #define _MajorNumber_ 3
 #define _MinorNumber_ 3
 #define _BuildNumber_ 1
+#define _TestNumber_ "测试"
 //新程序下载存放文件夹
 #define _NewVersionPath_	"/update"
 #define _VersionFile_		"version.ini"
@@ -75,7 +76,7 @@
 //无人机碰撞检测距离 厘米
 #define _UAVMinDistance_  50
 //无人机初始位置偏差 厘米
-#define _UAVStartLocation_ 10
+#define _UAVStartLocation_ 50
 
 enum _WaypointType {
 	_WaypointFly		= 16,		//飞行动作航点
@@ -141,7 +142,11 @@ enum _AllDeviceCommand {
 };
 
 static QString AppVersion() {
+#ifdef _TestNumber_
+	return QString("%1.%2.%3.%4").arg(_MajorNumber_).arg(_MinorNumber_).arg(_BuildNumber_).arg(_TestNumber_);
+#else
 	return QString("%1.%2.%3").arg(_MajorNumber_).arg(_MinorNumber_).arg(_BuildNumber_);
+#endif
 }
 
 static bool deleteDir(const QString& path)
