@@ -56,7 +56,7 @@ Blockly.Blocks['Fly_Takeoff'] = {
             .appendField(new Blockly.FieldNumber(100, 100, 100, 1), "height")
             .appendField("厘米")
             .appendField("用时")
-            .appendField(new Blockly.FieldNumber(5, 2, 10, 1), "time")
+            .appendField(new Blockly.FieldNumber(5, 5, 10, 1), "time")
             .appendField("秒");
         this.setNextStatement(true, ["time"]);
         //this.setNextStatement(true, ["action", "notReachAction", "ReachAction", "time"]);

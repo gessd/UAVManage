@@ -365,6 +365,10 @@ PyObject* QZAPI::FlyTakeoff(PyObject* self, PyObject* args)
 		QZAPI::Instance()->showWaypointError(tr("起飞必须是第一步"), data.blockid);
 		return nullptr;
 	}
+	if (millisecond < 5) {
+		QZAPI::Instance()->showWaypointError(tr("起飞用时最少5秒钟"));
+		return nullptr;
+	}
 	data.x = lastWaypoint.x;
 	data.y = lastWaypoint.y;
 	data.z = n;
