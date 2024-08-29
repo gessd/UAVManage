@@ -988,7 +988,7 @@ QString DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upl
 		for (int i = 1; i < data.count(); i++) {
 			NavWayPointData end = data.at(i);
 			//非航点数据不处理
-			if (_WaypointFly != end.commandID && _WaypointFlyLand != end.commandID) continue;
+			if (_WaypointFly != end.commandID && _WaypointFlyLand != end.commandID && _WaypointFlyTakeOff != end.commandID) continue;
 			if (_WaypointFlyLand == end.commandID) {
 				//降落时使用固定速度
 				end.param3 = (start.z - end.z) / _WaypointLanding_;
@@ -1441,6 +1441,9 @@ void DeviceManage::sendWaypointTo3D(QMap<QString, QVector<NavWayPointData>> map)
 				int z = waypoint.z;
 				int d = getDistance(lastX, lastY, lastZ, x, y, z);
 				waypoint.param3 = d / _WaypointLanding_;
+				waypoint.commandID = _WaypointFly;
+			}
+			else if (_WaypointFlyTakeOff == waypoint.commandID) {
 				waypoint.commandID = _WaypointFly;
 			}
 

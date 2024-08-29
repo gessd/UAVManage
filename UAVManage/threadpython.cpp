@@ -78,7 +78,7 @@ PyObject* QZAPI::examineWaypoint()
 		if (g_waypointData.count() > 1) {
 			for (int i = g_waypointData.count() - 2; i >= 0; i--) {
 				NavWayPointData last = g_waypointData.at(i);
-				if (_WaypointFly != last.commandID) continue;
+				if (_WaypointFly != last.commandID && _WaypointFlyTakeOff != last.commandID) continue;
 				int d = getDistance(last.x, last.y, last.z, data.x, data.y, data.z);
 				if (qAbs(d) > 0 && qAbs(data.param3) > 0) {
 					float speed = qAbs(d) / data.param3;
@@ -137,6 +137,8 @@ PyObject* QZAPI::examineWaypoint()
 		break;
 	case _WaypointFlyLand:
 		g_bLand = true;
+		break;
+	case _WaypointFlyTakeOff:
 		break;
 	case _WaypointLedColor:
 		break;
@@ -373,6 +375,7 @@ PyObject* QZAPI::FlyTakeoff(PyObject* self, PyObject* args)
 	data.y = lastWaypoint.y;
 	data.z = n;
 	data.bTakeoff = true;
+	data.commandID = _WaypointFlyTakeOff;
 	g_waypointData.append(data);
 	return QZAPI::Instance()->examineWaypoint();
 }
@@ -402,6 +405,7 @@ PyObject* QZAPI::FlyTakeoffDelay(PyObject* self, PyObject* args)
 	data.y = lastWaypoint.y;
 	data.z = n;
 	data.bTakeoff = true;
+	data.commandID = _WaypointFlyTakeOff;
 	g_waypointData.append(data);
 	return QZAPI::Instance()->examineWaypoint();
 }
