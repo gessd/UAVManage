@@ -33,7 +33,7 @@ ShowUnInstDetails hide
 
 ; 安装程序初始定义常量
 !define PRODUCT_NAME "无人机炫舞编程"											
-!define PRODUCT_VERSION "3.3.1"
+!define PRODUCT_VERSION "AI4.0.0"
 !define PRODUCT_PUBLISHER "奇正数元"
 !define PRODUCT_WEB_SITE ""
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
@@ -81,7 +81,7 @@ SetCompressor lzma
 ; ------ MUI 现代界面定义结束 ------
 
 Name "${PRODUCT_NAME}"
-OutFile "${PRODUCT_NAME}_v${PRODUCT_VERSION}_已授权.exe"
+OutFile "${PRODUCT_NAME}_${PRODUCT_VERSION}_已授权.exe"
 InstallDir "D:\UAVManage"
 InstallDirRegKey HKLM "${PRODUCT_UNINST_KEY}" "UninstallString"
 ShowInstDetails show
@@ -159,6 +159,7 @@ Section "MainSection" SEC01
 	;视觉无人机程序依赖文件
 	File    "${qrcodeDir}\.key"
 	File    "${qrcodeDir}\UAVManage-qrcode.exe"
+	File    "${qrcodeDir}\FCSW-VIS-Release-V1-AI.bin"
 	File /r "${qrcodeDir}\3DQRCode"
 	File /r "${qrcodeDir}\blockly_dev_qrcode"
 	File /r "${qrcodeDir}\qrcode"
