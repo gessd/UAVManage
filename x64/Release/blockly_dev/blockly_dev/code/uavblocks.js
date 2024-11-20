@@ -39,14 +39,14 @@ function getMaxZ(){
 function initHead(name){
     var head = Blockly.Python.definitions_.import_PythonWrap;
     if(isEmpty(head)){
-        Blockly.Python.definitions_.import_PythonWrap = "#coding=utf-8\nfrom QZAPI import "  +name + "\n";
+        Blockly.Python.definitions_.import_PythonWrap = "#coding=utf-8\nimport math\nimport random\nfrom QZAPI import "  +name + "\n";
     } else {
         if(head.indexOf(name)>=0) return;
         Blockly.Python.definitions_.import_PythonWrap += "from QZAPI import " +name+ "\n";
     }
 }
 function addHead(){
-    Blockly.Python.definitions_.import_PythonWrap = "#coding=utf-8\nfrom QZAPI import *";
+    Blockly.Python.definitions_.import_PythonWrap = "#coding=utf-8\nimport math\nimport random\nfrom QZAPI import *";
 }
 
 Blockly.Blocks['Fly_Takeoff'] = {
