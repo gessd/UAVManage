@@ -238,7 +238,7 @@ PyObject* QZAPI::FlyAddMarkPoint(PyObject* self, PyObject* args)
 		return nullptr;
 	}
 	//判断是否飞出场地范围
-	if (x <= 0 || y <= 0 || x >= g_nSpaceX || y >= g_nSpaceY) {
+	if (x < 100 || y < 100 || x >(g_nSpaceX - 100) || y >(g_nSpaceY - 100)) {
 		QZAPI::Instance()->showWaypointError(tr("标定点超出场地范围"), qstrId);
 		return nullptr;
 	}
