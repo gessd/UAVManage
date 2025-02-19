@@ -1,9 +1,9 @@
 #pragma once
 #include <QDir>
 //程序版本号
-#define _MajorNumber_ 3
-#define _MinorNumber_ 3
-#define _BuildNumber_ 1
+#define _MajorNumber_ 4
+#define _MinorNumber_ 1
+#define _BuildNumber_ 0
 #define _TestNumber_ "测试2"
 //新程序下载存放文件夹
 #define _NewVersionPath_	"/update"
