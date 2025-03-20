@@ -76,7 +76,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
-    <TargetName>$(ProjectName)-P210-测试</TargetName>
+    <TargetName>$(ProjectName)-WIFI</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='UWB|x64'">
     <TargetName>$(ProjectName)-UWB</TargetName>
