@@ -24,7 +24,7 @@ PlaceInfoDialog::PlaceInfoDialog(QPoint place, QWidget *parent)
 	connect(ui.btnOnekey, SIGNAL(clicked()), this, SLOT(onBtnOnekeyClicked()));
 
 	connect(&m_serialPort, &QSerialPort::readyRead, this, &PlaceInfoDialog::onSerialReadData);
-	ui.labelSpace->setText(QString("场地大小:%1米 X %2米").arg(place.x() / 100).arg(place.y() / 100));
+	ui.labelSpace->setText(QString("场地大小:%1米 X %2米").arg(place.x() / 100.0).arg(place.y() / 100.0));
 	ui.btnWrite->setVisible(false);
 	connect(&m_timerOnekeyStatus, &QTimer::timeout, this, &PlaceInfoDialog::onTimerOnekeyStatus);
 }
@@ -445,30 +445,33 @@ void PlaceInfoDialog::verifyBaseStationPosition()
 	ui.labelStationSpace->setText(text);
 	//判断场地是否太小或太大
 #ifndef _DebugApp_
-	if (xmax > 52 || ymax > 52) {
-		QString error = tr("基站范围[%1米X%2米]大于[52米X52米]无法使用请检查后重新标定").arg(xmax).arg(ymax);
-		qWarning() << error;
-		QMessageBox::warning(this, tr("提示"), error);
-		return;
-	}
-	if (xmax < 5 || ymax < 5) {
-		QString error = tr("基站范围[%1米X%2米]小于[5米X5米]无法使用请检查后重新标定").arg(xmax).arg(ymax);
-		qWarning() << error;
-		QMessageBox::warning(this, tr("提示"), error);
-		return;
-	}
-	if (xmax < (m_pointPlace.x() / 100)) {
-		QString error = QString("X轴方向长度%1米比项目设定场地长度%2米小，基站无法满足飞行范围").arg(xmax).arg(m_pointPlace.x() / 100);
-		qWarning() << error;
-		QMessageBox::warning(this, tr("提示"), error);
-		return;
-	}
-	if (ymax < (m_pointPlace.y() / 100)) {
-		QString error = QString("Y轴方向长度%1米比项目设定场地长度%2米小，基站无法满足飞行范围").arg(xmax).arg(m_pointPlace.x() / 100);
-		qWarning() << error;
-		QMessageBox::warning(this, tr("提示"), error);
-		return;
-	}
+	//不判断场地大小
+	//if (xmax > 52 || ymax > 52) {
+	//	QString error = tr("基站范围[%1米X%2米]大于[52米X52米]无法使用请检查后重新标定").arg(xmax).arg(ymax);
+	//	qWarning() << error;
+	//	QMessageBox::warning(this, tr("提示"), error);
+	//	return;
+	//}
+	//if (xmax < 5 || ymax < 5) {
+	//	QString error = tr("基站范围[%1米X%2米]小于[5米X5米]无法使用请检查后重新标定").arg(xmax).arg(ymax);
+	//	qWarning() << error;
+	//	QMessageBox::warning(this, tr("提示"), error);
+	//	return;
+	//}
+	//double currentX = m_pointPlace.x() / 100.0;
+	//if (xmax < currentX) {
+	//	QString error = QString("X轴方向长度%1米比项目设定场地长度%2米小，基站无法满足飞行范围").arg(xmax).arg(currentX);
+	//	qWarning() << error;
+	//	QMessageBox::warning(this, tr("提示"), error);
+	//	return;
+	//}
+	//double currentY = m_pointPlace.y() / 100.0;
+	//if (ymax < currentY) {
+	//	QString error = QString("Y轴方向长度%1米比项目设定场地长度%2米小，基站无法满足飞行范围").arg(xmax).arg(currentY);
+	//	qWarning() << error;
+	//	QMessageBox::warning(this, tr("提示"), error);
+	//	return;
+	//}
 #endif
 	m_stationStatus = 1;
 	ui.progressBar->setValue(ui.progressBar->maximum());
