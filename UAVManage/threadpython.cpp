@@ -773,6 +773,58 @@ bool ThreadPython::compilePythonFile(QString qstrFile)
 	return true;
 }
 
+void ThreadPython::print_python_error()
+{
+	// 获取异常信息
+	PyObject* type, * value, * traceback;
+	PyErr_Fetch(&type, &value, &traceback); // 获取当前异常信息
+	PyErr_NormalizeException(&type, &value, &traceback); // 规范化异常
+	if (type) {
+		PyObject* type_str = PyObject_Str(type);
+		QString error = PyUnicode_AsUTF8(type_str);
+		Py_XDECREF(type_str);
+	}
+
+	if (value) {
+		PyObject* value_str = PyObject_Str(value);
+		_ShowErrorMessage(PyUnicode_AsUTF8(value_str));
+		Py_XDECREF(value_str);
+	}
+
+	if (traceback) {
+		PyObject* traceback_module = PyImport_ImportModule("traceback");
+		if (traceback_module) {
+			PyObject* format_tb_func = PyObject_GetAttrString(traceback_module, "format_tb");
+			if (format_tb_func && PyCallable_Check(format_tb_func)) {
+				PyObject* tb_list = PyObject_CallFunctionObjArgs(format_tb_func, traceback, NULL);
+				if (tb_list) {
+					PyObject* tb_str = PyUnicode_FromString("");
+					for (Py_ssize_t i = 0; i < PyList_Size(tb_list); ++i) {
+						PyObject* item = PyList_GetItem(tb_list, i);
+						tb_str = PyUnicode_Concat(tb_str, item);
+					}
+					QString error = PyUnicode_AsUTF8(tb_str);
+					//_ShowErrorMessage(error);
+					int index = error.indexOf(", line ");
+					if (index > 0) {
+						QString text = error.mid(index + QString(", line ").length());
+						_ShowErrorMessage(QString("错误代码所在行：") + text.replace("\n", ""));
+					}
+					Py_DECREF(tb_str);
+				}
+				Py_XDECREF(tb_list);
+			}
+			Py_XDECREF(format_tb_func);
+		}
+		Py_XDECREF(traceback_module);
+	}
+	//_ShowErrorMessage(errorText);
+	// 清理异常
+	Py_XDECREF(type);
+	Py_XDECREF(value);
+	Py_XDECREF(traceback);
+}
+
 void ThreadPython::run()
 {
 	if (!QFile::exists(m_qstrFilePath)) return;
@@ -785,6 +837,7 @@ void ThreadPython::run()
 	//执行python文件,生成航点列表
 	PyObject* pPyFile = PyImport_ImportModule(_PyFileName_);
 	if (!pPyFile) {
+		print_python_error();
 		PyErr_CheckSignals();
 		qDebug() << "python执行出错";
 		Py_Finalize();

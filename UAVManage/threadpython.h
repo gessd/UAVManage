@@ -144,6 +144,7 @@ public:
 	QVector<NavWayPointData> getWaypointData();
 private:
 	bool compilePythonFile(QString qstrFile);
+	void print_python_error();
 private:
 	void run();
 private:
