@@ -341,11 +341,25 @@ Code.attemptCodeGeneration = function(generator) {
     editor_content_python.getSession().setMode("ace/mode/python");
     editor_content_python.setFontSize(17);
     editor_content_python.setShowPrintMargin(false);
-    editor_content_python.setScrollSpeed(0.05);
+    editor_content_python.setScrollSpeed(1);
     editor_content_python.setHighlightActiveLine(true);//行高亮
     //更新python编程区域内容
     //var code = generator.workspaceToCode(Code.workspace);
     //editor_content_python.setValue(code,-1);
+	
+	// 获取编辑器会话的语法高亮器
+    var customHighlightRules = editor_content_python.getSession().getMode().$highlightRules;
+    // 添加自定义规则（例如高亮特定函数名或关键字）
+    customHighlightRules.$rules.start.unshift({
+      token: "keyword.custom", // 使用已有的样式或自定义样式
+      regex: "(FlyAddMarkPoint|FlySetSpeed|FlySetLedMode|FlySetLedColor|FlyHover|\
+      |FlyTakeoff|FlyTakeoffDelay|FlyLand|FlyTimeGroup|FlyRevolve|FlyToMarkPoint|FlyMove|\
+      |FlyTo|)"
+    });
+    // 重置高亮规则
+    editor_content_python.getSession().getMode().$tokenizer = null;
+    editor_content_python.getSession().bgTokenizer.setTokenizer(editor_content_python.getSession().getMode().getTokenizer());
+    editor_content_python.getSession().bgTokenizer.start(0);
   }
 };
 
