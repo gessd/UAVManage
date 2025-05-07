@@ -7,6 +7,7 @@
 #include <QPainter>
 #include <QMessageBox>
 #include <QMouseEvent>
+#include "messagelistdialog.h"
 
 MusicPlayer::MusicPlayer(QWidget *parent)
 	: QWidget(parent)
@@ -100,7 +101,10 @@ void MusicPlayer::onMediaStatusChanged(QMediaPlayer::MediaStatus status)
 {
 	if (QMediaPlayer::LoadedMedia == status) {
 		if (false == m_mediaPlayer.isAudioAvailable()) {
-			QMessageBox::warning(this, tr("错误"), tr("音乐文件无法使用"));
+			//音乐文件无法使用时默认最长时间10分钟
+			emit sigUpdateMusicTime(10 * 60);
+			_ShowErrorMessage(tr("音频文件或设备不可用"));
+			//QMessageBox::warning(this, tr("错误"), tr("音乐文件无法使用"));
 			return;
 		}
 	}
@@ -130,7 +134,9 @@ void MusicPlayer::onMediaStateChanged(QMediaPlayer::State state)
 void MusicPlayer::onMediaError(QMediaPlayer::Error error)
 {
 	qDebug() << "音乐播放器错误" << error;
-	QMessageBox::warning(this, tr("错误"), tr("音乐文件无法使用"));
+	emit sigUpdateMusicTime(10 * 60);
+	_ShowErrorMessage(tr("音频文件或设备不可用") + error);
+	//QMessageBox::warning(this, tr("错误"), tr("音乐文件无法使用"));
 }
 
 void MusicPlayer::onMediaPositionChanged(qint64 position)

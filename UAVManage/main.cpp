@@ -85,8 +85,8 @@ int main(int argc, char *argv[])
 		listParam.append(argv[i]);
 	}
 	qInfo() << listParam;
-	if (2 != listParam.count()) {
-		qWarning() << "程序无启动参数";
+	if (listParam.count() < 2) {
+		qWarning() << "程序启动参数数量错误";
 		return -1;
 	}
 	if (QString("p210") != listParam.at(1)) {
