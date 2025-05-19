@@ -949,9 +949,9 @@ QString DeviceManage::waypointComposeAndUpload(QString qstrProjectFile, bool upl
 			//更新积木块文件里动作组中时间值
 			QString qstrError = updateBlocklyData(name, mapTimeGroup);
 			if (false == qstrError.isEmpty()) {
-				_ShowErrorMessage(name + qstrError);
-				qstrErrorNames.append("," + pDevice->getName());
-				continue;
+				_ShowWarningMessage(name + qstrError);
+				//qstrErrorNames.append("," + pDevice->getName());
+				//continue;
 			}
 		}
 		//判断飞行动作是否超出音乐时长，在更新动作时间组以后判断，便于展示总耗时
