@@ -761,11 +761,18 @@ void DeviceControl::UnpackData(QByteArray arrData)
 			//电压范围9.6-12.6
 			uint16_t v = battery.voltages[0];
 			int16_t b = battery.current_battery;
-			//计算剩余电量
-			uint16_t n = (float(v - 9600) / (12600 - 9600)) * 100;
-			if (n > 100) n = 100;
-			emit sigBatteryStatus((float)v / 1000, (float)b / 1000, n);
-			m_deviceStatus.battery = n;
+			if (v < 9600) {
+				m_deviceStatus.battery = 0;
+			} else if (v > 12600){
+				m_deviceStatus.battery = 100;
+			}
+			else {
+				//计算剩余电量
+				uint16_t n = (float(v - 9600) / (12600 - 9600)) * 100;
+				if (n > 100) n = 100;
+				m_deviceStatus.battery = n;
+			}
+			emit sigBatteryStatus((float)v / 1000, (float)b / 1000, m_deviceStatus.battery);
 			//qDebug() << getName() << "电池信息" << msg.msgid;
 			break;
 		}
