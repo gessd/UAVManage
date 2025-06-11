@@ -131,15 +131,15 @@ PyObject* QZAPI::examineWaypoint()
 	case _WaypointFlyLand:
 		g_bLand = true;
 		break;
-	case _WaypointFlyTakeOff:
-		//只有第一步才能是起飞位置
-		if (g_waypointData.count() != 2) {
-			//第一条为初始位置，第二条为起飞
-			showWaypointError(tr("起飞位置放置错误"), data.blockid);
-			return nullptr;
-		}
-		g_nTimeTotal += data.param3;
-		break;
+	//case _WaypointFlyTakeOff:
+	//	//只有第一步才能是起飞位置
+	//	if (g_waypointData.count() != 2) {
+	//		//第一条为初始位置，第二条为起飞
+	//		showWaypointError(tr("起飞位置放置错误"), data.blockid);
+	//		return nullptr;
+	//	}
+	//	g_nTimeTotal += data.param3;
+	//	break;
 	case _WaypointLedColor:
 		break;
 	default:

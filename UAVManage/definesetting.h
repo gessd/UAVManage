@@ -3,7 +3,7 @@
 //程序版本号
 #define _MajorNumber_ 4
 #define _MinorNumber_ 3
-#define _BuildNumber_ 1
+#define _BuildNumber_ 2
 //#define _TestNumber_ "测试2"
 //新程序下载存放文件夹
 #define _NewVersionPath_	"/update"
@@ -76,12 +76,13 @@
 //无人机碰撞检测距离 厘米
 #define _UAVMinDistance_  50
 //无人机初始位置偏差 厘米
-#define _UAVStartLocation_ 50
+#define _UAVStartLocation_ 10
 
 enum _WaypointType {
 	_WaypointFly		= 16,		//飞行动作航点
 	_WaypointFlyLand	= 23,		//降落 //降落时使用固定速度_WaypointLanding_
-	_WaypointFlyTakeOff = 24,		//起飞航点
+	//case判断暂时屏蔽
+	_WaypointFlyTakeOff = 16,		//起飞航点 //后续改为24
 	_WaypointSpeed		= 31000,	//设置飞行速度
 	_WaypointRevolve	= 31001,	//旋转信息
 	_WaypointHover		= 31002,	//悬停信息
@@ -89,7 +90,6 @@ enum _WaypointType {
 	_WaypointStart		= 31004,	//初始位置信息
 	_WaypointTime		= 31005,	//时间信息
 	_WaypointLedColor	= 31006		//LED灯颜色
-
 };
 
 enum _CalibrationEnum {
@@ -233,7 +233,7 @@ public:
 		case _WaypointStart: qstrText = QObject::tr("初始位置"); break;
 		case _WaypointTime: qstrText = QObject::tr("时间信息"); break;
 		case _WaypointFlyLand: qstrText = QObject::tr("降落"); break;
-		case _WaypointFlyTakeOff: qstrText = QObject::tr("起飞"); break;
+		//case _WaypointFlyTakeOff: qstrText = QObject::tr("起飞"); break;
 		case _WaypointLedColor: qstrText = QObject::tr("LED灯颜色"); break;
 		}
 		return qstrText;
