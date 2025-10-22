@@ -3,7 +3,7 @@
 //程序版本号
 #define _MajorNumber_ 4
 #define _MinorNumber_ 3
-#define _BuildNumber_ 2
+#define _BuildNumber_ 3
 //#define _TestNumber_ "测试2"
 //新程序下载存放文件夹
 #define _NewVersionPath_	"/update"
