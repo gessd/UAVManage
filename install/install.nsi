@@ -158,6 +158,10 @@ Section "MainSection" SEC01
 	
 	;视觉无人机程序依赖文件
 	File    "${qrcodeDir}\.key"
+	File    "${qrcodeDir}\vcruntime140.dll"
+	File    "${qrcodeDir}\vcruntime140_1.dll"
+	File    "${qrcodeDir}\msvcp140.dll"
+	File    "${qrcodeDir}\msvcp140_1.dll"
 	File    "${qrcodeDir}\UAVManage-qrcode.exe"
 	File    "${qrcodeDir}\FCSW-VIS-Release-V1-AI.bin"
 	File /r "${qrcodeDir}\3DQRCode"
